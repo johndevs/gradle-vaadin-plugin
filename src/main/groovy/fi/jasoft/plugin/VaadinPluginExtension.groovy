@@ -8,4 +8,7 @@ class VaadinPluginExtension{
 
 	String gwtStyle = "OBF"
 	String gwtOptimize = 0
+	String gwtLogLevel = "INFO"
+
+	String startupUrl = 'http://localhost:8080'
 }

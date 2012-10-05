@@ -7,6 +7,10 @@ import fi.jasoft.plugin.VaadinPlugin;
 import fi.jasoft.plugin.ui.TemplateUtil;
 import org.gradle.api.plugins.WarPluginConvention;
 import org.gradle.api.file.FileCollection;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.jar.JarInputStream
+import java.util.jar.Manifest
 
 class CompileWidgetsetTask extends JavaExec {
    
@@ -57,11 +61,18 @@ class CompileWidgetsetTask extends JavaExec {
     	File widgetsetFile = new File('src/main/java/'+project.vaadin.widgetset.replaceAll(/\./,'/')+".gwt.xml")
     	inputs.file widgetsetFile
 
-    	File widgetsetDir = new File(widgetsetFile.parent)
-    	if(!widgetsetFile.exists()){
-    		TemplateUtil.writeTemplate(project, 'Widgetset.xml', widgetsetDir, project.vaadin.widgetset.tokenize('.').last()+".gwt.xml")
-    		println "Create widgetset file in "+widgetsetFile
-    	}
-    }
+        String inherits = ""
+        project.configurations.compile.each{
+            JarInputStream jarStream = new JarInputStream(it.newDataInputStream());
+            Manifest mf = jarStream.getManifest();
 
+            String widgetset = mf.getMainAttributes().getValue('Vaadin-Widgetsets')
+            if(widgetset != null && widgetset != 'com.vaadin.terminal.gwt.DefaultWidgetSet'){
+                inherits += "\t<inherits name=\"${widgetset}\" />\n"
+            }
+        }
+
+    	File widgetsetDir = new File(widgetsetFile.parent)
+		TemplateUtil.writeTemplate(project, 'Widgetset.xml', widgetsetDir, project.vaadin.widgetset.tokenize('.').last()+".gwt.xml", ['%INHERITS%' : inherits])
+    }
 }

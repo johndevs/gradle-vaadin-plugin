@@ -9,6 +9,19 @@ class TemplateUtil {
     }
 
     public static  void writeTemplate(Project project,  String template, File targetDir, String targetFileName){
+    	def substitutions = [:]
+    	substitutions['%PACKAGE%'] = getRootPackagePath(project)
+    	substitutions['%APPLICATION_NAME%'] = project.vaadin.applicationName
+    	substitutions['%INHERITS%'] = ""
+
+    	if(project.vaadin.widgetset != null){
+    		substitutions['%WIDGETSET%'] = project.vaadin.widgetset
+    	}
+
+    	writeTemplate(project, template, targetDir, targetFileName, substitutions)
+    }
+
+    public static  void writeTemplate(Project project,  String template, File targetDir, String targetFileName, Map substitutions){
     	InputStream templateStream = TemplateUtil.class.getClassLoader().getResourceAsStream("templates/${template}.template")
 		if(templateStream == null){
 			println "Failed to open template file templates/${template}.template"
@@ -16,11 +29,8 @@ class TemplateUtil {
 		}
 
 		String content = templateStream.getText().toString()
-		content = content.replaceAll("%PACKAGE%", getRootPackagePath(project))
-		content = content.replaceAll("%APPLICATION_NAME%", project.vaadin.applicationName)
-		
-		if(project.vaadin.widgetset != null){
-			content = content.replaceAll("%WIDGETSET%", project.vaadin.widgetset)	
+		substitutions.each { key, value ->
+			content = content.replaceAll(key, value)	
 		}
 		
 		File targetFile = new File(targetDir.canonicalPath + '/'+targetFileName)

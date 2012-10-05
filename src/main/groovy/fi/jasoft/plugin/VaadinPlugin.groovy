@@ -10,8 +10,9 @@ class VaadinPlugin implements Plugin<Project>{
 	void apply(Project project){
 		project.plugins.apply(WarPlugin)
 		project.extensions.create('vaadin', VaadinPluginExtension)
-		project.tasks.add(name: 'createVaadinProject', type: CreateProjectTask)
-		project.tasks.add(name: 'widgetset', type: CompileWidgetsetTask)
+		project.tasks.add(name: 'createVaadinProject', type: CreateProjectTask, group: 'Vaadin')
+		project.tasks.add(name: 'widgetset', type: CompileWidgetsetTask, group: 'Vaadin')
+		project.tasks.add(name: 'devmode', type: DevModeTask, group: 'Vaadin')
 		project.getGradle().addProjectEvaluationListener(new DependencyListener());
 	}
 }
