@@ -1,0 +1,11 @@
+apply plugin: 'groovy'
+
+dependencies {
+    compile gradleApi()
+    groovy localGroovy()
+}
+
+group = "fi.jasoft.plugin"
+version = "1.0"
+
+

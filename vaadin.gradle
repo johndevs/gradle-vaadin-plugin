@@ -1,0 +1,21 @@
+buildscript {
+    repositories {
+        flatDir dirs: file('/home/johnnie/Workspaces/Gradle/VaadinPlugin/build/libs')
+    }
+    dependencies {
+        classpath group: 'fi.jasoft.plugin', name: 'VaadinPlugin', version: '1.0'
+    }
+}
+
+if(!project.plugins.findPlugin('java')) {
+	project.apply(plugin: 'java')
+}
+
+if (!project.plugins.findPlugin(fi.jasoft.plugin.VaadinPlugin)) {
+	project.apply(plugin: fi.jasoft.plugin.VaadinPlugin)
+}
+
+repositories{
+	mavenCentral()
+	mavenRepo name:'Vaadin addons', url:'http://maven.vaadin.com/vaadin-addons'
+}
