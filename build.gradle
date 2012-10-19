@@ -4,14 +4,44 @@ repositories{
 	mavenCentral()
 }
 
+configurations {
+    deployerJars
+}
+
 dependencies {
     compile gradleApi()
     groovy localGroovy()
-
     compile group:'com.google.gwt',	name:'gwt-dev', version:'2.3.0'
+    deployerJars "org.apache.maven.wagon:wagon-ftp:1.0-beta-2"
 }
 
+apply plugin: 'maven'
+
 group = "fi.jasoft.plugin"
-version = "1.0"
+version = "0.0.2"
 
+uploadArchives {
+    repositories.mavenDeployer {
+        name = 'sshDeployer' // optional
+        configuration = configurations.deployerJars
+        repository(url: "ftp://ftp.jasoft.fi/maven/maven2") {
+            authentication(userName: "jahlroos", password: "JH20alos")
+        }
+	    pom.project {
+	            licenses {
+	                license {
+	                    name 'The Apache Software License, Version 2.0'
+	                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+	                    distribution 'repo'
+	                }
+	            }
+	    }
 
+	    pom.scopeMappings.mappings.remove(configurations.compile)
+    }
+
+    repositories
+}
+
+// Use wrapper
+task wrapper(type: Wrapper) { gradleVersion = '1.1' }

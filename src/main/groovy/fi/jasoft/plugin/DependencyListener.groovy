@@ -13,8 +13,9 @@ class DependencyListener implements ProjectEvaluationListener{
 	void afterEvaluate(Project project, ProjectState state){
 		project.repositories.mavenCentral()
 		project.repositories.mavenRepo(name: 'Vaadin addons', url: 'http://maven.vaadin.com/vaadin-addons')
+		project.repositories.mavenRepo(name: 'Jasoft.fi Maven repository', url: 'http://mvn.jasoft.fi/maven2')
 
-		project.dependencies.add('providedCompile', 'fi.jasoft.plugin:VaadinPlugin:1.0')
+		project.dependencies.add('providedCompile', 'fi.jasoft.plugin:VaadinPlugin:0.0.2')
 
 		def version = project.vaadin.version;
 		if(version.startsWith("6")){

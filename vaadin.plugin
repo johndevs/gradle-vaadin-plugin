@@ -1,0 +1,11 @@
+buildscript {
+    repositories {
+    	mavenRepo name: 'Jasoft.fi Repo', url: 'http://mvn.jasoft.fi/maven2'
+    }
+    dependencies {
+        classpath group: 'fi.jasoft.plugin', name: 'VaadinPlugin', version: '+'
+    }
+}
+if (!project.plugins.findPlugin(fi.jasoft.plugin.VaadinPlugin)) {
+    project.apply(plugin: fi.jasoft.plugin.VaadinPlugin)
+}
