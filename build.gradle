@@ -1,8 +1,14 @@
 apply plugin: 'groovy'
 
+repositories{
+	mavenCentral()
+}
+
 dependencies {
     compile gradleApi()
     groovy localGroovy()
+
+    compile group:'com.google.gwt',	name:'gwt-dev', version:'2.3.0'
 }
 
 group = "fi.jasoft.plugin"

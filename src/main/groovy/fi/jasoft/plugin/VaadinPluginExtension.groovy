@@ -3,12 +3,15 @@ package fi.jasoft.plugin;
 class VaadinPluginExtension{
 	String widgetset										// Widgetset, leave empty for serverside application
 	String version = "7+" 									// Using the latest vaadin 7 build
-	String applicationPackage = "com.example" 			// Default package to create the application in
-	String applicationName = "MyApplication"	
-
+	
+	// GWT Compiler and DevMode
 	String gwtStyle = "OBF"
 	String gwtOptimize = 0
 	String gwtLogLevel = "INFO"
 
-	String startupUrl = 'http://localhost:8080'
+	// DevMode
+	String devModeStartupUrl = 'http://localhost:8888'
+	String devModeDebugPort = 8000
+	boolean superDevModeEnabled = false
+	String servletVersion = "2.5"
 }

@@ -10,31 +10,57 @@ class CreateProjectTask extends DefaultTask {
 
     @TaskAction
     public void run() {
+
+    	Console console = System.console()
+    	if(console == null){
+    		println "Create project task needs a console but could not get one. Quitting..."
+    		return;
+    	}
+
+    	String applicationPackage = console.readLine('\nApplication Package (com.example): ')
+    	if(applicationPackage == ''){
+    		applicationPackage = 'com.example'
+    	}
+
+    	String applicationName = console.readLine('Application Name (MyApplication): ')
+    	if(applicationName == ''){
+    		applicationName = 'MyApplication'
+    	}
+
 		File javaDir = new File('src/main/java/')
 		File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-		File uidir = new File(javaDir.canonicalPath + '/' + TemplateUtil.getRootPackagePath(project).replaceAll(/\./,'/'))
+		File uidir = new File(javaDir.canonicalPath + '/' + (applicationPackage+'.'+applicationName.toLowerCase()).replaceAll(/\./,'/'))
 		File webinf = new File(webAppDir.canonicalPath + '/WEB-INF')
 		
 		webAppDir.mkdirs()
 		uidir.mkdirs()
 		webinf.mkdirs()
+
+		def substitutions = [:]
+    	substitutions['%PACKAGE%'] = applicationPackage+'.'+applicationName.toLowerCase()
+    	substitutions['%APPLICATION_NAME%'] = applicationName
+    	substitutions['%INHERITS%'] = ""
 		
 		if(project.vaadin.version.startsWith("6")){
-			TemplateUtil.writeTemplate(project, "MyApplication.java", uidir, project.vaadin.applicationName+".java")
+			TemplateUtil.writeTemplate("MyApplication.java", uidir, applicationName+".java", substitutions)
 			if(project.vaadin.widgetset == null){
-				TemplateUtil.writeTemplate(project, "web.xml.vaadin6", webinf, "web.xml")	
+				TemplateUtil.writeTemplate("web.xml.vaadin6", webinf, "web.xml", substitutions)	
 			} else {
-				TemplateUtil.writeTemplate(project, "web.xml.vaadin6.widgetset", webinf, "web.xml")	
+				substitutions['%WIDGETSET%'] = project.vaadin.widgetset
+				TemplateUtil.writeTemplate("web.xml.vaadin6.widgetset", webinf, "web.xml", substitutions)	
+				TemplateUtil.ensureWidgetPresent(project)
 			}
 			
 		} else {
-			TemplateUtil.writeTemplate(project, 'MyUI.java', uidir, project.vaadin.applicationName+"UI.java")
+			TemplateUtil.writeTemplate('MyUI.java', uidir, applicationName+"UI.java", substitutions)
 			if(project.vaadin.widgetset == null){
-				TemplateUtil.writeTemplate(project, 'web.xml', webinf) 
+				TemplateUtil.writeTemplate('web.xml', webinf, substitutions) 
 			} else {
-				TemplateUtil.writeTemplate(project, 'web.xml.widgetset', webinf, "web.xml") 
+				substitutions['%WIDGETSET%'] = project.vaadin.widgetset
+				TemplateUtil.writeTemplate('web.xml.widgetset', webinf, "web.xml", substitutions) 
+				TemplateUtil.ensureWidgetPresent(project)
 			}
 		}
     }
-
 }
+

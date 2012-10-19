@@ -7,13 +7,29 @@ import fi.jasoft.plugin.VaadinPlugin;
 import fi.jasoft.plugin.ui.TemplateUtil;
 import org.gradle.api.plugins.WarPluginConvention;
 import org.gradle.api.file.FileCollection;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-import java.util.jar.JarInputStream
-import java.util.jar.Manifest
+
 
 class CompileWidgetsetTask extends JavaExec {
    
+    public CompileWidgetsetTask(){
+        dependsOn(project.tasks.classes)
+
+        File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
+        File targetDir = new File(webAppDir.canonicalPath+'/VAADIN/widgetsets')
+        getOutputs().dir(targetDir)
+
+        /* Monitor changes in dependencies since upgrading a
+        * dependency should also trigger a recompile of the widgetset
+        */
+        getInputs().files(project.configurations.compile)       
+
+        // Monitor changes in client side classes
+        project.sourceSets.main.java.srcDirs.each{
+            getInputs().files(project.fileTree(it.absolutePath).include('**/*/client/**/*.java'))
+            getInputs().files(project.fileTree(it.absolutePath).include('**/*/shared/**/*.java'))
+        }  
+    }
+
     @Override
     public void exec(){
     	if(project.vaadin.widgetset == null){
@@ -21,33 +37,21 @@ class CompileWidgetsetTask extends JavaExec {
     		return;	
     	}
 
-    	File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-    	File targetDir = new File(webAppDir.canonicalPath+'/VAADIN/widgetsets')
-    	getOutputs().dir(targetDir)
+        File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
+        File targetDir = new File(webAppDir.canonicalPath+'/VAADIN/widgetsets')
 
     	// Create a widgetset if needed
-    	ensureWidgetPresent()
-
-		/* Monitor changes in dependencies since upgrading a
-		* dependency should also trigger a recompile of the widgetset
-		*/
-    	getInputs().files(project.configurations.compile)
-
-    	// Monitor changes in client side classes
-		project.sourceSets.main.java.srcDirs.each{
-			getInputs().files(project.fileTree(it.absolutePath).include('**/*/client/**/*.java'))
-			getInputs().files(project.fileTree(it.absolutePath).include('**/*/shared/**/*.java'))
-		} 
+    	TemplateUtil.ensureWidgetPresent(project)
     	
-        FileCollection classpath = project.files(project.sourceSets.main.runtimeClasspath)
-        classpath = project.files(classpath, project.configurations.compile.asPath)
-        classpath = project.files(classpath, project.configurations.providedCompile.asPath)
+        FileCollection classpath = project.files(classpath, project.configurations.compile.asPath) 
+        classpath += project.files(project.sourceSets.main.runtimeClasspath.asPath)
         project.sourceSets.main.java.srcDirs.each{
-            classpath = project.files(classpath, it)
+            classpath += project.files(it.absolutePath)
         }
+
         setClasspath(classpath)
         setMain('com.google.gwt.dev.Compiler')
-        setArgs(['-style', project.vaadin.gwtStyle, '-optimize', project.vaadin.gwtOptimize, '-war', targetDir.canonicalPath, project.vaadin.widgetset])
+        setArgs(['-style', project.vaadin.gwtStyle, '-optimize', project.vaadin.gwtOptimize, '-war', targetDir.canonicalPath, project.vaadin.widgetset, '-logLevel', project.vaadin.gwtLogLevel])
         
         super.exec();
 
@@ -56,23 +60,5 @@ class CompileWidgetsetTask extends JavaExec {
          */
          new File(targetDir.canonicalPath+"/WEB-INF").deleteDir()
     }
-
-    private void ensureWidgetPresent(){
-    	File widgetsetFile = new File('src/main/java/'+project.vaadin.widgetset.replaceAll(/\./,'/')+".gwt.xml")
-    	inputs.file widgetsetFile
-
-        String inherits = ""
-        project.configurations.compile.each{
-            JarInputStream jarStream = new JarInputStream(it.newDataInputStream());
-            Manifest mf = jarStream.getManifest();
-
-            String widgetset = mf.getMainAttributes().getValue('Vaadin-Widgetsets')
-            if(widgetset != null && widgetset != 'com.vaadin.terminal.gwt.DefaultWidgetSet'){
-                inherits += "\t<inherits name=\"${widgetset}\" />\n"
-            }
-        }
-
-    	File widgetsetDir = new File(widgetsetFile.parent)
-		TemplateUtil.writeTemplate(project, 'Widgetset.xml', widgetsetDir, project.vaadin.widgetset.tokenize('.').last()+".gwt.xml", ['%INHERITS%' : inherits])
-    }
+    
 }

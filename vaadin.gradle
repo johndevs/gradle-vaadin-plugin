@@ -7,15 +7,12 @@ buildscript {
     }
 }
 
-if(!project.plugins.findPlugin('java')) {
-	project.apply(plugin: 'java')
-}
-
-if (!project.plugins.findPlugin(fi.jasoft.plugin.VaadinPlugin)) {
-	project.apply(plugin: fi.jasoft.plugin.VaadinPlugin)
-}
-
 repositories{
-	mavenCentral()
-	mavenRepo name:'Vaadin addons', url:'http://maven.vaadin.com/vaadin-addons'
+	// TODO: Move into plugin
+	flatDir dirs: file('/home/johnnie/Workspaces/Gradle/VaadinPlugin/build/libs')
+}
+
+// Ensure plugin is not loaded multiple times
+if (!project.plugins.findPlugin(fi.jasoft.plugin.VaadinPlugin)) {
+    project.apply(plugin: fi.jasoft.plugin.VaadinPlugin)
 }
