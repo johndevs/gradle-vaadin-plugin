@@ -19,13 +19,14 @@ apply plugin: 'maven'
 
 group = "fi.jasoft.plugin"
 version = "0.0.2"
+archivesBaseName = 'VaadinPlugin'
 
 uploadArchives {
     repositories.mavenDeployer {
-        name = 'sshDeployer' // optional
+        name = 'sshDeployer' 
         configuration = configurations.deployerJars
-        repository(url: "ftp://ftp.jasoft.fi/maven/maven2") {
-            authentication(userName: "jahlroos", password: "JH20alos")
+        repository(url: PLUGIN_MAVEN_REPOSITORY) {
+            authentication(userName: PLUGIN_MAVEN_REPOSITORY_USER, password: PLUGIN_MAVEN_REPOSITORY_PASSWORD)
         }
 	    pom.project {
 	            licenses {
