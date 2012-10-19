@@ -1,0 +1,17 @@
+package %PACKAGE_CLIENT%;
+
+import com.google.gwt.user.client.ui.Label;
+
+/**
+ * Client side widget. Can extend any GWT widget.
+ */
+public class %COMPONENT_NAME%Widget extends Label {
+
+	// Style name used for theming
+    public static final String CLASSNAME = "%COMPONENT_STYLENAME%";
+
+    public %COMPONENT_NAME%Widget() {
+        setStyleName(CLASSNAME);
+    	setText("It works!");
+    }
+}

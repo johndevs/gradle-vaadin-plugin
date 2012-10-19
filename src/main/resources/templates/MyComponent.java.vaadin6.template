@@ -1,0 +1,30 @@
+package %PACKAGE%;
+
+import java.util.Map;
+
+import com.vaadin.terminal.PaintException;
+import com.vaadin.terminal.PaintTarget;
+import com.vaadin.ui.AbstractComponent;
+
+/**
+ * Server side component for the V%COMPONENT_NAME% widget.
+ */
+ @com.vaadin.ui.ClientWidget(%PACKAGE_CLIENT%.V%COMPONENT_NAME%.class)
+public class %COMPONENT_NAME% extends AbstractComponent {
+ 
+    @Override
+    public void paintContent(PaintTarget target) throws PaintException {
+        super.paintContent(target);
+
+    }
+
+    /**
+     * Receive and handle events and other variable changes from the client.
+     */
+    @Override
+    public void changeVariables(Object source, Map<String, Object> variables) {
+        super.changeVariables(source, variables);
+    
+    }
+}
+
