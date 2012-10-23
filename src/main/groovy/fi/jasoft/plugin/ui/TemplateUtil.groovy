@@ -44,13 +44,17 @@ class TemplateUtil {
 		targetFile.write(content)
     }
 
-    public static void ensureWidgetPresent(Project project){
+    public static boolean ensureWidgetPresent(Project project){
+        boolean result = false;
+
         File widgetsetFile = new File('src/main/java/'+project.vaadin.widgetset.replaceAll(/\./,'/')+".gwt.xml")
         
         new File(widgetsetFile.parent).mkdirs()
         
         if(!widgetsetFile.exists()){
             widgetsetFile.createNewFile()
+            println "!! A new widgetset was created. Ensure it has been added to web.xml !!"
+            result = true;
         }
 
         String inherits = ""
@@ -69,7 +73,18 @@ class TemplateUtil {
         }
 
         File widgetsetDir = new File(widgetsetFile.parent)
-        TemplateUtil.writeTemplate('Widgetset.xml', widgetsetDir, project.vaadin.widgetset.tokenize('.').last()+".gwt.xml", 
+        if(project.vaadin.version.startsWith('6')){
+            TemplateUtil.writeTemplate('Widgetset.xml.vaadin6', 
+                widgetsetDir, 
+                project.vaadin.widgetset.tokenize('.').last()+".gwt.xml", 
                 ['%INHERITS%' : inherits, '%WIDGETSET%' : project.vaadin.widgetset, '%SUPERDEVMODE%' : String.valueOf(project.vaadin.superDevModeEnabled)])
+        } else {
+            TemplateUtil.writeTemplate('Widgetset.xml',
+                 widgetsetDir, 
+                 project.vaadin.widgetset.tokenize('.').last()+".gwt.xml", 
+                ['%INHERITS%' : inherits, '%WIDGETSET%' : project.vaadin.widgetset, '%SUPERDEVMODE%' : String.valueOf(project.vaadin.superDevModeEnabled)])
+        }     
+
+        return result   
     }
 }

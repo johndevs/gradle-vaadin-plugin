@@ -1,15 +1,17 @@
 buildscript {
-
-	// Local directory where the git repository has been cloned
-	def localPluginDirectory = '/home/johnnie/Workspaces/Gradle/VaadinPlugin'
-
     repositories {
-    	flatDir dir: localPluginDirectory+'/build/libs'
+    	flatDir dirs: '/home/johnnie/Workspaces/Gradle/VaadinPlugin/build/libs'
     }
+
     dependencies {
-        classpath group: 'fi.jasoft.plugin', name: 'VaadinPlugin', version: '+'
+        classpath group: 'fi.jasoft.plugin', name: 'VaadinPlugin', version: '0.0.2'
     }
 }
+
+repositories {
+	flatDir dirs: '/home/johnnie/Workspaces/Gradle/VaadinPlugin/build/libs'
+}
+
 if (!project.plugins.findPlugin(fi.jasoft.plugin.VaadinPlugin)) {
     project.apply(plugin: fi.jasoft.plugin.VaadinPlugin)
 }

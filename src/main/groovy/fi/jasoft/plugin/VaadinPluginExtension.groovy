@@ -25,7 +25,6 @@ class VaadinPluginExtension{
 	String gwtLogLevel = "INFO"
 
 	// DevMode
-	String devModeStartupUrl = 'http://localhost:8888'
 	String devModeDebugPort = 8000
 	boolean superDevModeEnabled = false
 	String servletVersion = "2.5"

@@ -18,6 +18,7 @@ package fi.jasoft.plugin;
 import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.plugins.WarPluginConvention;
+import fi.jasoft.plugin.ui.TemplateUtil
 
 class DevModeTask extends JavaExec  {
 	
@@ -28,10 +29,20 @@ class DevModeTask extends JavaExec  {
 
 	 @Override
     public void exec(){        
+
+        if(project.vaadin.widgetset == null){
+            println "No widgetset defined. Please define a widgetset by using the vaadin.widgetset property."
+            return
+        }
+
+        // ensure the widgetset is up-2-date
+        if(TemplateUtil.ensureWidgetPresent(project)){
+            println "A new widgetset was just created for the project. You need to add it to web.xml before running devmode again."
+            return
+        }
         
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-
-        String widgetset = project.vaadin.widgetset == null ? 'com.vaadin.terminal.gwt.DefaultWidgetSet' : project.vaadin.widgetset
+        String widgetset = project.vaadin.widgetset
 
     	setMain('com.google.gwt.dev.DevMode')
         
@@ -40,27 +51,28 @@ class DevModeTask extends JavaExec  {
         setArgs([widgetset, 
             '-war',         webAppDir.canonicalPath+'/VAADIN/widgetsets', 
             '-gen',         'build/gen', 
-            '-startupUrl',  project.vaadin.devModeStartupUrl, 
+            '-startupUrl',  'http://localhost:8080', 
             '-logLevel',    project.vaadin.gwtLogLevel,
-            '-server',      'com.github.shyiko.gists.vaadin.DevModeJettyLauncher'])
+            '-server',      'com.github.shyiko.gists.vaadin.DevModeJettyLauncher',
+            '-port',        8080,
+            '-bindAddress', '0.0.0.0'])
 
         jvmArgs([ 
             '-Ddev.mode.app.root='+webAppDir.canonicalPath, 
             "-Xrunjdwp:transport=dt_socket,address=${project.vaadin.devModeDebugPort},server=y,suspend=n", 
             '-Xdebug'])
 
-        println "Vaadin Application is running on " + project.vaadin.devModeStartupUrl
+        println "Vaadin Application is running on http://localhost:8080"
 
     	super.exec()
 	}
 
     private FileCollection getClassPath(){
 
-        FileCollection classpath = project.files(
-            project.sourceSets.main.runtimeClasspath,
-            project.configurations.compile.asPath, 
-            project.configurations.providedCompile.asPath,
-            project.configurations.runtime.asPath)
+        FileCollection classpath = project.configurations.vaadinPlugin +
+            project.configurations.providedCompile + 
+            project.configurations.compile +
+            project.sourceSets.main.runtimeClasspath
 
         project.sourceSets.main.java.srcDirs.each{
             classpath += project.files(it)
