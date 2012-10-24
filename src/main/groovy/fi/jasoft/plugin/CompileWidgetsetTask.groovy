@@ -49,7 +49,6 @@ class CompileWidgetsetTask extends JavaExec {
     @Override
     public void exec(){
     	if(project.vaadin.widgetset == null){
-    		println "No widgetset defined. Please add a widgetset to your Vaadin configuration."
     		return;	
     	}
 

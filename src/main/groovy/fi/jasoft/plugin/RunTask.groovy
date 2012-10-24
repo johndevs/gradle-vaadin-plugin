@@ -22,7 +22,7 @@ import org.gradle.api.plugins.WarPluginConvention;
 public class RunTask extends JavaExec {
 
     public RunTask(){
-        dependsOn(project.tasks.classes)
+        dependsOn(project.tasks.widgetset)
         description = 'Runs the Vaadin application on an embedded Jetty Server'
     }
 

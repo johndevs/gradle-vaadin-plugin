@@ -53,7 +53,6 @@ class TemplateUtil {
         
         if(!widgetsetFile.exists()){
             widgetsetFile.createNewFile()
-            println "!! A new widgetset was created. Ensure it has been added to web.xml !!"
             result = true;
         }
 

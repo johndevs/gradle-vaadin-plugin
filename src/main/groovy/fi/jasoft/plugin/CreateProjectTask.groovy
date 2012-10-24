@@ -36,19 +36,25 @@ class CreateProjectTask extends DefaultTask {
     		return;
     	}
 
-    	String applicationPackage = console.readLine('\nApplication Package (com.example): ')
-    	if(applicationPackage == ''){
-    		applicationPackage = 'com.example'
-    	}
-
-    	String applicationName = console.readLine('Application Name (MyApplication): ')
+    	String applicationName = console.readLine('\nApplication Name (MyApplication): ')
     	if(applicationName == ''){
     		applicationName = 'MyApplication'
     	}
 
+    	String applicationPackage;
+    	if(project.vaadin.widgetset != null){
+			String widgetsetName = project.vaadin.widgetset.tokenize('.').last()
+			applicationPackage = project.vaadin.widgetset[0..(-widgetsetName.size()-2)]
+		} else {
+			applicationPackage = console.readLine("\nApplication Package (com.example.${applicationName.toLowerCase()}): ")
+			if(applicationPackage == ''){
+				applicationPackage = 'com.example.'+applicationName.toLowerCase()
+			}
+		}
+
 		File javaDir = new File('src/main/java/')
 		File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-		File uidir = new File(javaDir.canonicalPath + '/' + (applicationPackage+'.'+applicationName.toLowerCase()).replaceAll(/\./,'/'))
+		File uidir = new File(javaDir.canonicalPath + '/' + applicationPackage.replaceAll(/\./,'/'))
 		File webinf = new File(webAppDir.canonicalPath + '/WEB-INF')
 		
 		webAppDir.mkdirs()
@@ -56,7 +62,7 @@ class CreateProjectTask extends DefaultTask {
 		webinf.mkdirs()
 
 		def substitutions = [:]
-    	substitutions['%PACKAGE%'] = applicationPackage+'.'+applicationName.toLowerCase()
+    	substitutions['%PACKAGE%'] = applicationPackage
     	substitutions['%APPLICATION_NAME%'] = applicationName
     	substitutions['%INHERITS%'] = ""
 		
