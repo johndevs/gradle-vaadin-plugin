@@ -55,6 +55,9 @@ class CompileWidgetsetTask extends JavaExec {
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
         File targetDir = new File(webAppDir.canonicalPath+'/VAADIN/widgetsets')
 
+        // Ensure unit cache dir is present so the compiler does not complain
+        new File(targetDir.canonicalPath+'/VAADIN/gwt-unitCache').mkdirs()
+
     	// Create a widgetset if needed
     	TemplateUtil.ensureWidgetPresent(project)
     	

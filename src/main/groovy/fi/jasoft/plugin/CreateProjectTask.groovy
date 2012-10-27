@@ -52,7 +52,7 @@ class CreateProjectTask extends DefaultTask {
 			}
 		}
 
-		File javaDir = new File('src/main/java/')
+		File javaDir = project.sourceSets.main.java.srcDirs.iterator().next()
 		File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
 		File uidir = new File(javaDir.canonicalPath + '/' + applicationPackage.replaceAll(/\./,'/'))
 		File webinf = new File(webAppDir.canonicalPath + '/WEB-INF')

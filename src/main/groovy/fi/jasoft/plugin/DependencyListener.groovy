@@ -30,12 +30,12 @@ class DependencyListener implements ProjectEvaluationListener{
 		project.repositories.mavenRepo(name: 'Vaadin addons', url: 'http://maven.vaadin.com/vaadin-addons')
 		project.repositories.mavenRepo(name: 'Jasoft.fi Maven repository', url: 'http://mvn.jasoft.fi/maven2')
 
-		def jettyVersion = "8.1.0.RC0"
-		project.configurations.add("jetty8")
-		project.dependencies.add('jetty8', "org.mortbay.jetty:jetty-runner:$jettyVersion")
-
 		project.configurations.add('vaadinPlugin')
 		project.dependencies.add('vaadinPlugin', 'fi.jasoft.plugin:VaadinPlugin:0.0.2')
+
+		def jettyVersion = "8.1.5.v20120716"
+		project.configurations.add("jetty8")
+		project.dependencies.add('jetty8', "org.mortbay.jetty:jetty-runner:$jettyVersion")
 
 		def version = project.vaadin.version;
 		if(version.startsWith("6")){
@@ -66,5 +66,6 @@ class DependencyListener implements ProjectEvaluationListener{
 				project.dependencies.add("providedCompile", "jspapi:jsp-api:2.0")
 			}
 		}
+
 	}
 }

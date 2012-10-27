@@ -32,10 +32,11 @@ class SuperDevModeTask extends JavaExec  {
     public void exec(){
     	
         if(!project.vaadin.superDevModeEnabled){
-            println "SuperDevMode is not enabled for project, please enable it by setting vaadin.superDevModeEnabled to true"
+            println "SuperDevMode is a experimental feature and is not enabled for project by default. To enable it set vaadin.superDevModeEnabled to true"
         }
 
     	File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
+        File javaDir = project.sourceSets.main.java.srcDirs.iterator().next()
 
     	File widgetsetsDir = new File(webAppDir.canonicalPath+'/VAADIN/widgetsets')
     	widgetsetsDir.mkdirs()
@@ -49,7 +50,7 @@ class SuperDevModeTask extends JavaExec  {
     	setArgs([
     			'-port', 9876,
     			'-workDir', widgetsetsDir.canonicalPath,
-    			'-src', 'src/main/java',
+    			'-src', javaDir.canonicalPath,
     			widgetset ])
 
     	jvmArgs('-Dgwt.compiler.skip=true')
@@ -59,6 +60,7 @@ class SuperDevModeTask extends JavaExec  {
     	jetty.stopKey = 'STOP'
     	jetty.stopPort = 8181
     	jetty.daemon = true
+        jetty.contextPath = '/'
     	jetty.execute()
 
     	super.exec()
@@ -67,16 +69,14 @@ class SuperDevModeTask extends JavaExec  {
     	jettyStop.stopKey = 'STOP'
     	jettyStop.stopPort = 8181
     	jettyStop.stop()
-
     }
 
-     private FileCollection getClassPath(){
+    private FileCollection getClassPath(){
 
-        FileCollection classpath = project.files(
-            project.sourceSets.main.runtimeClasspath,
-            project.configurations.compile.asPath, 
-            project.configurations.providedCompile.asPath,
-            project.configurations.runtime.asPath)
+        FileCollection classpath = 
+            project.configurations.providedCompile + 
+            project.configurations.compile +
+            project.sourceSets.main.runtimeClasspath
 
         project.sourceSets.main.java.srcDirs.each{
             classpath += project.files(it)
