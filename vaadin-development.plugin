@@ -1,3 +1,14 @@
+/*
+ * Bootstrap script for the Gradle Vaadin Plugin.
+ *
+ * The script will add the latest version of the plugin to the build script
+ * dependencies and apply the plugin to the project. If you do not want
+ * this behaviour you can copy&paste the below configuration into your
+ * own build script and define your own repository and version for the plugin.
+ *
+ * Note: This script is only intended for use when developing the plugin itself,
+ * use the vaadin.plugin script in your projects.
+ */ 
 buildscript {
     repositories {
 	mavenCentral()
@@ -15,4 +26,12 @@ repositories {
 
 if (!project.plugins.findPlugin(fi.jasoft.plugin.VaadinPlugin)) {
     project.apply(plugin: fi.jasoft.plugin.VaadinPlugin)
+}
+
+/*
+ * Convienience task for enabling the gradle wrapper 
+task enableWrapper(type: Wrapper) {
+    gradleVersion = '1.2'
+    description = "Configures the Gradle wrapper for this project"
+    group = "Gradle"
 }
