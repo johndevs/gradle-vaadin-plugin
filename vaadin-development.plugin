@@ -30,6 +30,7 @@ if (!project.plugins.findPlugin(fi.jasoft.plugin.VaadinPlugin)) {
 
 /*
  * Convienience task for enabling the gradle wrapper 
+ */
 task enableWrapper(type: Wrapper) {
     gradleVersion = '1.2'
     description = "Configures the Gradle wrapper for this project"

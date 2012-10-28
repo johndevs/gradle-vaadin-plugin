@@ -24,6 +24,10 @@ import java.util.jar.Attributes
 
 class TemplateUtil {
 
+    public static void writeTemplate(String template, File targetDir, String targetFileName){
+        writeTemplate(template, targetDir, targetFileName, [:])
+    }
+
     public static  void writeTemplate(String template, File targetDir, Map substitutions){
         writeTemplate(template, targetDir, template, substitutions)
     }

@@ -36,6 +36,7 @@ class VaadinPlugin implements Plugin<Project>{
 		// Tasks
 		project.tasks.add(name: 'createVaadinProject', 	type: CreateProjectTask, 	group: 'Vaadin')	
 		project.tasks.add(name: 'createVaadinComponent',type: CreateComponentTask,	group: 'Vaadin')
+		project.tasks.add(name: 'createVaadinTheme',	type: CreateThemeTask,		group: 'Vaadin')
 
 		project.tasks.add(name: 'widgetset', 			type: CompileWidgetsetTask, group: 'Vaadin')
 		project.tasks.add(name: 'vaadinRun',			type: RunTask,				group: 'Vaadin')
