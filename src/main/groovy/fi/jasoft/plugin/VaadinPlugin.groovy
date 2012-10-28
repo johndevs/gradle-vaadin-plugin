@@ -42,6 +42,7 @@ class VaadinPlugin implements Plugin<Project>{
 		project.tasks.add(name: 'vaadinRun',			type: RunTask,				group: 'Vaadin')
 		project.tasks.add(name: 'devmode', 				type: DevModeTask, 			group: 'Vaadin')
 		project.tasks.add(name: 'superdevmode', 		type: SuperDevModeTask, 	group: 'Vaadin')
+		project.tasks.add(name: 'themes',				type: CompileThemeTask,		group: 'Vaadin')
 
 		// Dependency resolution
 		project.getGradle().addProjectEvaluationListener(new DependencyListener());

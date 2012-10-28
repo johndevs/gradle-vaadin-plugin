@@ -52,6 +52,7 @@ class DependencyListener implements ProjectEvaluationListener{
 
 			project.dependencies.add("compile", "com.vaadin:vaadin-server:"+version)
 			project.dependencies.add("runtime",	"com.vaadin:vaadin-themes:"+version)
+			project.dependencies.add("runtime",	"com.vaadin:vaadin-theme-compiler:"+version)
 
 			if(project.vaadin.widgetset == null){
 				project.dependencies.add("runtime",	"com.vaadin:vaadin-client-compiled:"+version)
@@ -65,6 +66,8 @@ class DependencyListener implements ProjectEvaluationListener{
 				project.dependencies.add("providedCompile", "javax.servlet:servlet-api:"+project.vaadin.servletVersion)
 				project.dependencies.add("providedCompile", "jspapi:jsp-api:2.0")
 			}
+
+
 		}
 
 	}

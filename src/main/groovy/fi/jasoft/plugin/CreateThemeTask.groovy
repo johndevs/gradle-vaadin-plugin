@@ -53,7 +53,4 @@ class CreateThemeTask extends DefaultTask {
     		println "Remember to annotate your UI with the @Theme(\"${themeName}\") to use your new theme."
     	}
     }
-
-
-
 }
