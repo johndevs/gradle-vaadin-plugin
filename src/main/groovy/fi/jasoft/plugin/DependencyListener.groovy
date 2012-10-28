@@ -18,6 +18,8 @@ package fi.jasoft.plugin;
 import org.gradle.api.ProjectEvaluationListener;
 import org.gradle.api.Project;
 import org.gradle.api.ProjectState;
+import org.gradle.api.plugins.WarPluginConvention;
+import org.gradle.api.file.FileTree;
 
 class DependencyListener implements ProjectEvaluationListener{
 	
@@ -52,7 +54,12 @@ class DependencyListener implements ProjectEvaluationListener{
 
 			project.dependencies.add("compile", "com.vaadin:vaadin-server:"+version)
 			project.dependencies.add("runtime",	"com.vaadin:vaadin-themes:"+version)
-			project.dependencies.add("runtime",	"com.vaadin:vaadin-theme-compiler:"+version)
+
+			File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
+    		FileTree themes = project.fileTree(dir: webAppDir.canonicalPath + '/VAADIN/themes', include: '**/styles.scss')
+			if(!themes.isEmpty()){
+				project.dependencies.add("runtime",	"com.vaadin:vaadin-theme-compiler:"+version)	
+			}
 
 			if(project.vaadin.widgetset == null){
 				project.dependencies.add("runtime",	"com.vaadin:vaadin-client-compiled:"+version)
