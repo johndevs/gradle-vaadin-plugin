@@ -27,5 +27,4 @@ class VaadinPluginExtension{
 	// DevMode
 	String devModeDebugPort = 8000
 	boolean superDevModeEnabled = false
-	String servletVersion = "2.5"
 }

@@ -75,5 +75,12 @@ class CreateComponentTask extends DefaultTask {
     		TemplateUtil.writeTemplate("MyComponentWidget.java", clientui, componentName+"Widget.java", substitutions)
     		TemplateUtil.writeTemplate("MyComponentConnector.java", clientui, componentName+"Connector.java", substitutions)
     	}
+
+        if(project.vaadin.widgetset != null){
+            String compile = console.readLine("Compile widgetset (Y/N)[Y]: ")
+            if(compile == '' || compile == 'Y'){
+                project.widgetset.exec()
+            }
+        }
     }
 }
