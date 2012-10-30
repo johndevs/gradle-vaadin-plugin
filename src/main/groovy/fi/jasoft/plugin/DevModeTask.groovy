@@ -44,6 +44,23 @@ class DevModeTask extends JavaExec  {
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
         String widgetset = project.vaadin.widgetset
 
+        project.javaexec{
+            setMain('org.mortbay.jetty.runner.Runner')
+            setClasspath(project.configurations.jetty8 + 
+                    project.configurations.providedCompile + 
+                    project.configurations.compile +
+                    project.sourceSets.main.runtimeClasspath)
+
+            setArgs([webAppDir.canonicalPath])
+
+            jvmArgs([
+                "-Xrunjdwp:transport=dt_socket,address=${project.vaadin.devModeDebugPort},server=y,suspend=n", 
+                '-Xdebug'])
+
+        }
+
+        /*
+
     	setMain('com.google.gwt.dev.DevMode')
         
         setClasspath(getClassPath())
@@ -65,6 +82,8 @@ class DevModeTask extends JavaExec  {
         println "Vaadin Application is running on http://localhost:8080"
 
     	super.exec()
+
+        */
 	}
 
     private FileCollection getClassPath(){
