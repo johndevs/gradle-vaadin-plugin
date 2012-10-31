@@ -15,35 +15,37 @@
 */
 package fi.jasoft.plugin;
 
-import org.gradle.api.file.FileCollection
-import org.gradle.api.tasks.JavaExec;
+import org.gradle.api.DefaultTask;
+import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.plugins.WarPluginConvention;
 
-public class RunTask extends JavaExec {
+public class RunTask extends DefaultTask {
 
     public RunTask(){
         dependsOn(project.tasks.widgetset)
         description = 'Runs the Vaadin application on an embedded Jetty Server'
     }
 
-     @Override
-    public void exec(){        
+    @TaskAction
+    public void run() {       
 
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
 
-    	setMain('org.mortbay.jetty.runner.Runner')
+        project.javaexec{
 
-        setClasspath(project.configurations.jetty8 + 
-            project.configurations.providedCompile + 
-            project.configurations.compile +
-            project.sourceSets.main.runtimeClasspath)
+            setMain('org.mortbay.jetty.runner.Runner')
 
-        setArgs([webAppDir.canonicalPath])
+            setClasspath(project.configurations.jetty8 + 
+                project.configurations.providedCompile + 
+                project.configurations.compile +
+                project.sourceSets.main.runtimeClasspath +
+                project.sourceSets.main.compileClasspath)
 
-        jvmArgs([
-            "-Xrunjdwp:transport=dt_socket,address=${project.vaadin.devModeDebugPort},server=y,suspend=n", 
-            '-Xdebug'])
+            setArgs([webAppDir.canonicalPath])
 
-    	super.exec()
+            jvmArgs([
+                "-Xrunjdwp:transport=dt_socket,address=${project.vaadin.debugPort},server=y,suspend=n", 
+                '-Xdebug'])
+        }
     }
 }

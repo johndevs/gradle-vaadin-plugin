@@ -24,7 +24,7 @@ import org.gradle.api.plugins.WarPluginConvention;
 import org.gradle.api.file.FileCollection;
 
 
-class CompileWidgetsetTask extends JavaExec {
+class CompileWidgetsetTask extends DefaultTask {
    
     public CompileWidgetsetTask(){
         dependsOn(project.tasks.classes)
@@ -46,8 +46,8 @@ class CompileWidgetsetTask extends JavaExec {
         }  
     }
 
-    @Override
-    public void exec(){
+    @TaskAction
+    public void run() {
     	if(project.vaadin.widgetset == null){
     		return;	
     	}
@@ -61,22 +61,31 @@ class CompileWidgetsetTask extends JavaExec {
     	// Create a widgetset if needed
     	TemplateUtil.ensureWidgetPresent(project)
     	
-        FileCollection classpath = project.files(classpath, project.configurations.compile.asPath) 
-        classpath += project.files(project.sourceSets.main.runtimeClasspath.asPath)
-        project.sourceSets.main.java.srcDirs.each{
-            classpath += project.files(it.absolutePath)
-        }
-
-        setClasspath(classpath)
-        setMain('com.google.gwt.dev.Compiler')
-        setArgs(['-style', project.vaadin.gwtStyle, '-optimize', project.vaadin.gwtOptimize, '-war', targetDir.canonicalPath, project.vaadin.widgetset, '-logLevel', project.vaadin.gwtLogLevel])
+        FileCollection classpath =getClassPath()
         
-        super.exec();
+        project.javaexec{
+            setClasspath(classpath)
+            setMain('com.google.gwt.dev.Compiler')
+            setArgs(['-style', project.vaadin.gwt.style, '-optimize', project.vaadin.gwt.optimize, '-war', targetDir.canonicalPath, project.vaadin.widgetset, '-logLevel', project.vaadin.gwt.logLevel])
+        }
 
         /*
          * Compiler generates an extra WEB-INF folder into the widgetsets folder. Remove it.
          */
          new File(targetDir.canonicalPath+"/WEB-INF").deleteDir()
+    }
+
+     private FileCollection getClassPath(){
+        FileCollection classpath = 
+            project.configurations.providedCompile + 
+            project.configurations.compile +
+            project.sourceSets.main.runtimeClasspath +
+            project.sourceSets.main.compileClasspath
+
+        project.sourceSets.main.java.srcDirs.each{
+            classpath += project.files(it)
+        }
+        return classpath   
     }
     
 }

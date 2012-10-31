@@ -26,12 +26,14 @@ class VaadinPlugin implements Plugin<Project>{
 
 	void apply(Project project){
 
-		// Plugins
-		project.plugins.apply(WarPlugin)
-		project.plugins.apply(JettyPlugin)
-		
 		// Extensions
 		project.extensions.create('vaadin', VaadinPluginExtension)
+
+		// Dependency resolution
+		project.getGradle().addProjectEvaluationListener(new DependencyListener());
+
+		// Plugins
+		project.plugins.apply(WarPlugin)
 		
 		// Tasks
 		project.tasks.add(name: 'createVaadinProject', 	type: CreateProjectTask, 	group: 'Vaadin')	
@@ -44,11 +46,9 @@ class VaadinPlugin implements Plugin<Project>{
 		project.tasks.add(name: 'superdevmode', 		type: SuperDevModeTask, 	group: 'Vaadin')
 		project.tasks.add(name: 'themes',				type: CompileThemeTask,		group: 'Vaadin')
 
-		// Dependency resolution
-		project.getGradle().addProjectEvaluationListener(new DependencyListener());
-
 		// Add debug information to all compilation results
 		project.tasks.compileJava.options.debugOptions.debugLevel = 'source,lines,vars'
+
 
 		//Ensure eclipse plugin has the right classes dir
 		if (project.plugins.hasPlugin('eclipse')) {

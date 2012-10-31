@@ -23,59 +23,67 @@ import org.gradle.api.file.FileTree;
 
 class DependencyListener implements ProjectEvaluationListener{
 	
-	void beforeEvaluate(Project project){
-		
+	void beforeEvaluate(Project project){		
+	
 	}
 
 	void afterEvaluate(Project project, ProjectState state){
+
+		// Repositories 
 		project.repositories.mavenCentral()
 		project.repositories.mavenRepo(name: 'Vaadin addons', url: 'http://maven.vaadin.com/vaadin-addons')
 		project.repositories.mavenRepo(name: 'Jasoft.fi Maven repository', url: 'http://mvn.jasoft.fi/maven2')
 
-		project.configurations.add('vaadinPlugin')
-		project.dependencies.add('vaadinPlugin', 'fi.jasoft.plugin:VaadinPlugin:0.0.2')
+		// Configurations
+		project.configurations.add('vaadin')
+		project.sourceSets.main.compileClasspath += project.configurations.vaadin
+		project.war.classpath(project.configurations.vaadin)
 
-		def jettyVersion = "8.1.5.v20120716"
+		project.configurations.add('gwt')
+		project.sourceSets.main.compileClasspath += project.configurations.gwt
+
 		project.configurations.add("jetty8")
+
+
+		// Tasks
+		def jettyVersion = "8.1.5.v20120716"	
 		project.dependencies.add('jetty8', "org.mortbay.jetty:jetty-runner:$jettyVersion")
 
 		def version = project.vaadin.version;
 		if(version.startsWith("6")){
 			println "Building a Vaadin 6.x project"
-			project.dependencies.add("compile", "com.vaadin:vaadin:"+version)
+			project.dependencies.add("vaadin", "com.vaadin:vaadin:"+version)
 			if(project.vaadin.widgetset != null){
-				project.dependencies.add("providedCompile", "com.google.gwt:gwt-user:2.3.0")
-				project.dependencies.add("providedCompile", "com.google.gwt:gwt-dev:2.3.0")
-				project.dependencies.add("providedCompile",	"javax.validation:validation-api:1.0.0.GA")
-				project.dependencies.add("providedCompile",	"javax.validation:validation-api:1.0.0.GA:sources")
+				project.dependencies.add("gwt", "com.google.gwt:gwt-user:2.3.0")
+				project.dependencies.add("gwt", "com.google.gwt:gwt-dev:2.3.0")
+				project.dependencies.add("gwt",	"javax.validation:validation-api:1.0.0.GA")
+				project.dependencies.add("gwt",	"javax.validation:validation-api:1.0.0.GA:sources")
 			}
 		} else{ 
 			println "Building a Vaadin 7.x project"
 
-			project.dependencies.add("compile", "com.vaadin:vaadin-server:"+version)
-			project.dependencies.add("runtime",	"com.vaadin:vaadin-themes:"+version)
 
 			File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
     		FileTree themes = project.fileTree(dir: webAppDir.canonicalPath + '/VAADIN/themes', include: '**/styles.scss')
 			if(!themes.isEmpty()){
-				project.dependencies.add("runtime",	"com.vaadin:vaadin-theme-compiler:"+version)	
+				project.dependencies.add("vaadin",	"com.vaadin:vaadin-theme-compiler:"+version)	
 			}
 
 			if(project.vaadin.widgetset == null){
-				project.dependencies.add("runtime",	"com.vaadin:vaadin-client-compiled:"+version)
+				project.dependencies.add("vaadin",	"com.vaadin:vaadin-client-compiled:"+version)
 			} else {
-				project.dependencies.add("providedCompile",	"com.vaadin:vaadin-client-compiler:"+version)
-				project.dependencies.add("providedCompile",	"com.vaadin:vaadin-client:"+version)
-				project.dependencies.add("providedCompile",	"javax.validation:validation-api:1.0.0.GA")
-				project.dependencies.add("providedCompile",	"javax.validation:validation-api:1.0.0.GA:sources")
+				project.dependencies.add("gwt",	"com.vaadin:vaadin-client-compiler:"+version)
+				project.dependencies.add("gwt",	"com.vaadin:vaadin-client:"+version)
+				project.dependencies.add("gwt",	"javax.validation:validation-api:1.0.0.GA")
+				project.dependencies.add("gwt",	"javax.validation:validation-api:1.0.0.GA:sources")
 
 				// For devmode
-				project.dependencies.add("providedCompile", "javax.servlet:servlet-api:"+project.vaadin.servletVersion)
-				project.dependencies.add("providedCompile", "jspapi:jsp-api:2.0")
+				project.dependencies.add("jetty8", "javax.servlet:servlet-api:"+project.vaadin.servletVersion)
+				project.dependencies.add("jetty8", "jspapi:jsp-api:2.0")
 			}
 
-
+			project.dependencies.add("vaadin", "com.vaadin:vaadin-server:"+version)
+			project.dependencies.add("vaadin", "com.vaadin:vaadin-themes:"+version)
 		}
-
 	}
 }

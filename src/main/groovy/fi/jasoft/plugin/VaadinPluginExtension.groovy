@@ -17,14 +17,24 @@ package fi.jasoft.plugin;
 
 class VaadinPluginExtension{
 	String widgetset										// Widgetset, leave empty for serverside application
-	String version = "7+" 									// Using the latest vaadin 7 build
+	String version = "7+" 									// Using the latest vaadin 7 
+	String servletVersion = "2.5"
+	String debugPort = 8000
 	
 	// GWT Compiler and DevMode
-	String gwtStyle = "OBF"
-	String gwtOptimize = 0
-	String gwtLogLevel = "INFO"
+	GWT gwt = new GWT()
+	class GWT{
+		String style = "OBF"
+		String optimize = 0
+		String logLevel = "INFO"
+	}
 
 	// DevMode
-	String devModeDebugPort = 8000
-	boolean superDevModeEnabled = false
+	DevMode devmode = new DevMode()
+	class DevMode {
+		boolean noserver = false
+		boolean superDevMode = false
+	}
+
+
 }

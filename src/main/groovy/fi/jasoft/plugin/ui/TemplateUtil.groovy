@@ -80,12 +80,12 @@ class TemplateUtil {
             TemplateUtil.writeTemplate('Widgetset.xml.vaadin6', 
                 widgetsetDir, 
                 project.vaadin.widgetset.tokenize('.').last()+".gwt.xml", 
-                ['%INHERITS%' : inherits, '%WIDGETSET%' : project.vaadin.widgetset, '%SUPERDEVMODE%' : String.valueOf(project.vaadin.superDevModeEnabled)])
+                ['%INHERITS%' : inherits, '%WIDGETSET%' : project.vaadin.widgetset, '%SUPERDEVMODE%' : String.valueOf(project.vaadin.devmode.superDevMode)])
         } else {
             TemplateUtil.writeTemplate('Widgetset.xml',
                  widgetsetDir, 
                  project.vaadin.widgetset.tokenize('.').last()+".gwt.xml", 
-                ['%INHERITS%' : inherits, '%WIDGETSET%' : project.vaadin.widgetset, '%SUPERDEVMODE%' : String.valueOf(project.vaadin.superDevModeEnabled)])
+                ['%INHERITS%' : inherits, '%WIDGETSET%' : project.vaadin.widgetset, '%SUPERDEVMODE%' : String.valueOf(project.vaadin.devmode.superDevMode)])
         }     
 
         return result   

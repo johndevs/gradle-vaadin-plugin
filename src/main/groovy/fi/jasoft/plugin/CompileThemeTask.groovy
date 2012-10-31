@@ -54,7 +54,7 @@ class CompileThemeTask extends DefaultTask {
     		println "Compiling "+theme.canonicalPath+"..."
     		project.javaexec {
     			setMain('com.vaadin.sass.SassCompiler')
-    			setClasspath(project.sourceSets.main.runtimeClasspath) 
+    			setClasspath(project.sourceSets.main.runtimeClasspath + project.sourceSets.main.compileClasspath) 
 				  setArgs([theme.canonicalPath, dir.canonicalPath+'/styles.css'])
     		}
     	}
