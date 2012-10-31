@@ -23,6 +23,7 @@ public class RunTask extends DefaultTask {
 
     public RunTask(){
         dependsOn(project.tasks.widgetset)
+        dependsOn(project.tasks.themes)
         description = 'Runs the Vaadin application on an embedded Jetty Server'
     }
 

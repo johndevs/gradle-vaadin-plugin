@@ -41,10 +41,10 @@ class VaadinPlugin implements Plugin<Project>{
 		project.tasks.add(name: 'createVaadinTheme',	type: CreateThemeTask,		group: 'Vaadin')
 
 		project.tasks.add(name: 'widgetset', 			type: CompileWidgetsetTask, group: 'Vaadin')
-		project.tasks.add(name: 'vaadinRun',			type: RunTask,				group: 'Vaadin')
 		project.tasks.add(name: 'devmode', 				type: DevModeTask, 			group: 'Vaadin')
 		project.tasks.add(name: 'superdevmode', 		type: SuperDevModeTask, 	group: 'Vaadin')
 		project.tasks.add(name: 'themes',				type: CompileThemeTask,		group: 'Vaadin')
+		project.tasks.add(name: 'vaadinRun',			type: RunTask,				group: 'Vaadin')
 
 		// Add debug information to all compilation results
 		project.tasks.compileJava.options.debugOptions.debugLevel = 'source,lines,vars'
