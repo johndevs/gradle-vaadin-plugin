@@ -16,10 +16,11 @@
 package fi.jasoft.plugin;
 
 class VaadinPluginExtension{
-	String widgetset										// Widgetset, leave empty for serverside application
-	String version = "7+" 									// Using the latest vaadin 7 
+	String widgetset										
+	String version = "7+" 									
 	String servletVersion = "2.5"
 	String debugPort = 8000
+	boolean manageWidgetset = true
 	
 	// GWT Compiler and DevMode
 	GWT gwt = new GWT()

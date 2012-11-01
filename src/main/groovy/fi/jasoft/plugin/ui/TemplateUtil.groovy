@@ -51,7 +51,12 @@ class TemplateUtil {
     public static boolean ensureWidgetPresent(Project project){
         boolean result = false;
 
-        File widgetsetFile = new File('src/main/java/'+project.vaadin.widgetset.replaceAll(/\./,'/')+".gwt.xml")
+        if(!project.vaadin.manageWidgetset){
+            return false;
+        }
+
+        File javaDir = project.sourceSets.main.java.srcDirs.iterator().next()
+        File widgetsetFile = new File(javaDir.canonicalPath + project.vaadin.widgetset.replaceAll(/\./,'/')+".gwt.xml")
         
         new File(widgetsetFile.parent).mkdirs()
         
