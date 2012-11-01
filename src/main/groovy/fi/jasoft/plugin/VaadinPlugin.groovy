@@ -31,6 +31,7 @@ class VaadinPlugin implements Plugin<Project>{
 
 		// Dependency resolution
 		project.getGradle().addProjectEvaluationListener(new DependencyListener());
+		project.getGradle().getTaskGraph().addTaskExecutionListener(new TaskListener())
 
 		// Plugins
 		project.plugins.apply(WarPlugin)
@@ -48,11 +49,5 @@ class VaadinPlugin implements Plugin<Project>{
 
 		// Add debug information to all compilation results
 		project.tasks.compileJava.options.debugOptions.debugLevel = 'source,lines,vars'
-
-
-		//Ensure eclipse plugin has the right classes dir
-		if (project.plugins.hasPlugin('eclipse')) {
-			project.plugins.eclipse.classpath.defaultOutputDir = project.file('build/classes/main')
-		} 
 	}
 }
