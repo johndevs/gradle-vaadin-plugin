@@ -23,9 +23,9 @@ archivesBaseName = 'VaadinPlugin'
 
 uploadArchives {
     repositories.mavenDeployer {
-        def repo = hasProperty('PLUGIN_MAVEN_REPOSITORY') ? PLUGIN_MAVEN_REPOSITORY : ''
-        def user = hasProperty('PLUGIN_MAVEN_REPOSITORY_USER') ? PLUGIN_MAVEN_REPOSITORY_USER : ''
-        def password = hasProperty('PLUGIN_MAVEN_REPOSITORY_PASSWORD') ? PLUGIN_MAVEN_REPOSITORY_PASSWORD : ''
+        def repo = hasProperty('PLUGIN_MAVEN_REPOSITORY') ? PLUGIN_MAVEN_REPOSITORY : '<plugin repository not defined>'
+        def user = hasProperty('PLUGIN_MAVEN_REPOSITORY_USER') ? PLUGIN_MAVEN_REPOSITORY_USER : '<user not defined>'
+        def password = hasProperty('PLUGIN_MAVEN_REPOSITORY_PASSWORD') ? PLUGIN_MAVEN_REPOSITORY_PASSWORD : '<password not defined>'
 
         name = 'sshDeployer' 
         configuration = configurations.deployerJars
