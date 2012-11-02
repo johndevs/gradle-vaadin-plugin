@@ -22,6 +22,15 @@ import org.gradle.api.plugins.jetty.JettyPlugin
 import org.gradle.api.plugins.WarPlugin
 import org.gradle.api.tasks.compile.Compile
 
+import fi.jasoft.plugin.tasks.CreateProjectTask
+import fi.jasoft.plugin.tasks.CreateComponentTask
+import fi.jasoft.plugin.tasks.CreateThemeTask
+import fi.jasoft.plugin.tasks.CompileWidgetsetTask
+import fi.jasoft.plugin.tasks.DevModeTask
+import fi.jasoft.plugin.tasks.SuperDevModeTask
+import fi.jasoft.plugin.tasks.CompileThemeTask
+import fi.jasoft.plugin.tasks.RunTask
+
 class VaadinPlugin implements Plugin<Project>{
 
 	void apply(Project project){
