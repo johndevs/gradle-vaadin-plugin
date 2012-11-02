@@ -1,6 +1,9 @@
-# Using the plugin
+# Introduction
+The Vaadin Gradle plugin allows you to easily build Vaadin projects with Gradle. It helps with the most tedious tasks when building a Vaadin project like building the widgetset and running development mode. It also helps you to quickly get started by providing tasks for project, component and theme creation.
 
-You will not need to compile the plugin from scratch if you want to use it. You can just include it in your gradle project by adding the following line into your build.gradle.
+
+# Using the plugin
+You do not need to compile the plugin from scratch if you want to use it. You only need to add the following line to your projects build.gradle to start using the plugin.
 
     apply from: 'http://plugins.jasoft.fi/vaadin.plugin'
 
