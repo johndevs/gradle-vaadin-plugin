@@ -56,7 +56,7 @@ class TemplateUtil {
         }
 
         File javaDir = project.sourceSets.main.java.srcDirs.iterator().next()
-        File widgetsetFile = new File(javaDir.canonicalPath + project.vaadin.widgetset.replaceAll(/\./,'/')+".gwt.xml")
+        File widgetsetFile = new File(javaDir.canonicalPath + '/'+ project.vaadin.widgetset.replaceAll(/\./,'/')+".gwt.xml")
         
         new File(widgetsetFile.parent).mkdirs()
         
