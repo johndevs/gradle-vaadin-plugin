@@ -29,6 +29,10 @@ class DependencyListener implements ProjectEvaluationListener{
 
 	void afterEvaluate(Project project, ProjectState state){
 
+		if(!project.vaadin.manageDependencies){
+			return
+		}
+
 		// Repositories 
 		project.repositories.mavenCentral()
 		project.repositories.mavenRepo(name: 'Vaadin addons', url: 'http://maven.vaadin.com/vaadin-addons')

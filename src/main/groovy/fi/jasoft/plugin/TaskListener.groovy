@@ -23,10 +23,13 @@ public class TaskListener implements TaskExecutionListener{
 
 	public void  beforeExecute(Task task){
 		if(task.getName() == 'eclipseClasspath'){
-			println "Adding Vaadin dependencies to eclipse classpath"
 			def project = task.getProject()
+			if(!project.vaadin.manageDependencies){
+				return
+			}
+			
+			println "Adding Vaadin dependencies to eclipse classpath"
 			def cp = project.eclipse.classpath
-
 			cp.defaultOutputDir = project.file('build/classes/main')
 			cp.plusConfigurations += project.configurations.vaadin
 			cp.plusConfigurations += project.configurations.gwt

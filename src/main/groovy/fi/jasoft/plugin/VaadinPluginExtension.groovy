@@ -21,6 +21,7 @@ class VaadinPluginExtension{
 	String servletVersion = "2.5"
 	String debugPort = 8000
 	boolean manageWidgetset = true
+	boolean manageDependencies = true
 	
 	// GWT Compiler and DevMode
 	GWT gwt = new GWT()
@@ -28,6 +29,9 @@ class VaadinPluginExtension{
 		String style = "OBF"
 		String optimize = 0
 		String logLevel = "INFO"
+		int localWorkers = 4
+		boolean draftCompile = false
+		boolean strict = false
 	}
 
 	// DevMode

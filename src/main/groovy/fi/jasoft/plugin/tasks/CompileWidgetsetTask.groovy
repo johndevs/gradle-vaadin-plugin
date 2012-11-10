@@ -66,7 +66,24 @@ class CompileWidgetsetTask extends DefaultTask {
         project.javaexec{
             setClasspath(classpath)
             setMain('com.google.gwt.dev.Compiler')
-            setArgs(['-style', project.vaadin.gwt.style, '-optimize', project.vaadin.gwt.optimize, '-war', targetDir.canonicalPath, project.vaadin.widgetset, '-logLevel', project.vaadin.gwt.logLevel])
+
+            def args = ['-style', project.vaadin.gwt.style] +
+                       ['-optimize', project.vaadin.gwt.optimize] +
+                       ['-war', targetDir.canonicalPath] +
+                       ['-logLevel', project.vaadin.gwt.logLevel] +
+                       ['-localWorkers', project.vaadin.gwt.localWorkers]
+
+            if(project.vaadin.gwt.draftCompile){
+                args.add('-draftCompile')
+            }
+
+            if(project.vaadin.gwt.strict){
+                args.add('-strict')
+            }
+
+            args.add(project.vaadin.widgetset)
+
+            setArgs(args)
         }
 
         /*
