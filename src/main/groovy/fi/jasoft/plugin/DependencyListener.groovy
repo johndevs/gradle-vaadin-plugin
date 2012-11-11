@@ -35,20 +35,33 @@ class DependencyListener implements ProjectEvaluationListener{
 
 		// Repositories 
 		project.repositories.mavenCentral()
-		project.repositories.mavenRepo(name: 'Vaadin addons', url: 'http://maven.vaadin.com/vaadin-addons')
-		project.repositories.mavenRepo(name: 'Jasoft.fi Maven repository', url: 'http://mvn.jasoft.fi/maven2')
 
+		if(project.repositories.findByName('Vaadin addons') == null) {
+			println "Adding vaadin addons repository"
+			project.repositories.mavenRepo(name: 'Vaadin addons', url: 'http://maven.vaadin.com/vaadin-addons')
+		}
+
+		if(project.repositories.findByName('Jasoft.fi Maven repository') == null) {
+			println "Adding maven repository"
+			project.repositories.mavenRepo(name: 'Jasoft.fi Maven repository', url: 'http://mvn.jasoft.fi/maven2')
+		}
+		
 		// Configurations
-		project.configurations.add('vaadin')
-		project.sourceSets.main.compileClasspath += project.configurations.vaadin
-		project.war.classpath(project.configurations.vaadin)
+		if(!project.configurations.hasProperty('vaadin')){
+			project.configurations.add('vaadin')
+			project.sourceSets.main.compileClasspath += project.configurations.vaadin
+			project.war.classpath(project.configurations.vaadin)	
+		}
 
-		project.configurations.add('gwt')
-		project.sourceSets.main.compileClasspath += project.configurations.gwt
+		if(!project.configurations.hasProperty('gwt')){
+			project.configurations.add('gwt')
+			project.sourceSets.main.compileClasspath += project.configurations.gwt
+		}
 
-		project.configurations.add("jetty8")
-
-
+		if(!project.configurations.hasProperty('jetty8')){
+			project.configurations.add("jetty8")	
+		}
+		
 		// Tasks
 		def jettyVersion = "8.1.5.v20120716"	
 		project.dependencies.add('jetty8', "org.mortbay.jetty:jetty-runner:$jettyVersion")
