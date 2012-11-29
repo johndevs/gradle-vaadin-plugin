@@ -44,12 +44,15 @@ class CreateThemeTask extends DefaultTask {
     	File themeDir = new File(webAppDir.canonicalPath + '/VAADIN/themes/'+themeName)
     	themeDir.mkdirs()
 
+        def substitutions = [:]
+        substitutions['%THEME%'] = themeName.toLowerCase()
+
     	if(project.vaadin.version.startsWith("6")){
-    		TemplateUtil.writeTemplate('MyTheme.css', themeDir, 'styles.css')
+    		TemplateUtil.writeTemplate('MyTheme.css', themeDir, 'styles.css', substitutions)
     		println "Remember to call setTheme(\"${themeName}\") in your Application to use your new theme."
 
     	} else {
-    		TemplateUtil.writeTemplate('MyTheme.scss', themeDir, 'styles.scss')
+    		TemplateUtil.writeTemplate('MyTheme.scss', themeDir, 'styles.scss', substitutions)
     		println "Remember to annotate your UI with the @Theme(\"${themeName}\") to use your new theme."
     	}
     }

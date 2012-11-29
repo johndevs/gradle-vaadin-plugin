@@ -9,6 +9,6 @@ public class %APPLICATION_NAME%UI extends UI{
 	@Override
 	protected void init(VaadinRequest request){
 		Label lbl = new Label("Hello vaadin");
-		addComponent(lbl);
+		setContent(lbl);
 	}
 }

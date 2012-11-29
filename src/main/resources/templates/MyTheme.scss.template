@@ -1,4 +1,7 @@
 @import "../reindeer/reindeer.scss";
-@include reindeer;
 
-/* Add your theme selectors here */
+.%THEME% {
+	@include reindeer;
+
+	/* Add your theme selectors here */
+}
