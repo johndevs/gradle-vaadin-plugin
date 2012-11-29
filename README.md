@@ -28,5 +28,7 @@ The following configuration options are available
 * ``vaadin.gwt.style`` - Compilation style of the GWT compiler. Default is OBF.
 * ``vaadin.gwt.optimize`` - Optimization level of the GWT compiler. Default is 0.
 * ``vaadin.gwt.logLevel`` - The log level of the GWT compiler. Default is INFO.
+* ``vaadin.gwt.userAgent`` - The browsers you want to support. All browser are supported by default.
 * ``vaadin.devmode.noserver`` - Do not run the embedded Jetty server when running devmode. Default is false.
 * ``vaadin.devmode.superDevMode`` - Add support for super devmode
+
