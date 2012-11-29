@@ -81,16 +81,19 @@ class TemplateUtil {
         }
 
         File widgetsetDir = new File(widgetsetFile.parent)
+        
+        String moduleXML = project.vaadin.widgetset.tokenize('.').last()+".gwt.xml"
+
+        def substitutions = [:]
+        substitutions['%INHERITS%'] = inherits
+        substitutions['%WIDGETSET%'] = project.vaadin.widgetset
+        substitutions['%SUPERDEVMODE%'] = String.valueOf(project.vaadin.devmode.superDevMode)
+        substitutions['%USERAGENT%'] = project.vaadin.gwt.userAgent
+        
         if(project.vaadin.version.startsWith('6')){
-            TemplateUtil.writeTemplate('Widgetset.xml.vaadin6', 
-                widgetsetDir, 
-                project.vaadin.widgetset.tokenize('.').last()+".gwt.xml", 
-                ['%INHERITS%' : inherits, '%WIDGETSET%' : project.vaadin.widgetset, '%SUPERDEVMODE%' : String.valueOf(project.vaadin.devmode.superDevMode)])
+            TemplateUtil.writeTemplate('Widgetset.xml.vaadin6', widgetsetDir, moduleXML, substitutions)
         } else {
-            TemplateUtil.writeTemplate('Widgetset.xml',
-                 widgetsetDir, 
-                 project.vaadin.widgetset.tokenize('.').last()+".gwt.xml", 
-                ['%INHERITS%' : inherits, '%WIDGETSET%' : project.vaadin.widgetset, '%SUPERDEVMODE%' : String.valueOf(project.vaadin.devmode.superDevMode)])
+            TemplateUtil.writeTemplate('Widgetset.xml', widgetsetDir, moduleXML, substitutions)
         }     
 
         return result   

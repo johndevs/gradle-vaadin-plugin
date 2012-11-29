@@ -29,9 +29,10 @@ class VaadinPluginExtension{
 		String style = "OBF"
 		String optimize = 0
 		String logLevel = "INFO"
-		int localWorkers = 4
+		int localWorkers = Runtime.getRuntime().availableProcessors()
 		boolean draftCompile = false
 		boolean strict = false
+		String userAgent = "ie8,ie9,gecko1_8,safari,opera"
 	}
 
 	// DevMode
