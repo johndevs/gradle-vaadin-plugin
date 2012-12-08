@@ -49,6 +49,7 @@ class DependencyListener implements ProjectEvaluationListener{
 			project.configurations.add('vaadin')
 			project.sourceSets.main.compileClasspath += project.configurations.vaadin
 			project.sourceSets.test.compileClasspath += project.configurations.vaadin
+			project.sourceSets.test.runtimeClasspath += project.configurations.vaadin
 			project.war.classpath(project.configurations.vaadin)	
 		}
 
@@ -56,6 +57,7 @@ class DependencyListener implements ProjectEvaluationListener{
 			project.configurations.add('gwt')
 			project.sourceSets.main.compileClasspath += project.configurations.gwt
 			project.sourceSets.test.compileClasspath += project.configurations.gwt
+			project.sourceSets.test.runtimeClasspath += project.configurations.gwt
 		}
 
 		if(!project.configurations.hasProperty('jetty8')){
