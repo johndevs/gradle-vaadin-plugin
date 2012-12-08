@@ -16,7 +16,7 @@ buildscript {
     }
 
     dependencies {
-        classpath group: 'fi.jasoft.plugin', name: 'VaadinPlugin', version: '0.3.1'
+        classpath group: 'fi.jasoft.plugin', name: 'VaadinPlugin', version: '0.3.2'
 	}
 }
 
