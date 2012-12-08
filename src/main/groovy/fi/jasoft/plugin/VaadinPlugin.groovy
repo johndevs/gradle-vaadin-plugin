@@ -58,5 +58,9 @@ class VaadinPlugin implements Plugin<Project>{
 
 		// Add debug information to all compilation results
 		project.tasks.compileJava.options.debugOptions.debugLevel = 'source,lines,vars'
+
+		// Add sources to test classpath
+		project.sourceSets.test.runtimeClasspath += project.files(project.sourceSets.main.java.srcDirs)
+
 	}
 }

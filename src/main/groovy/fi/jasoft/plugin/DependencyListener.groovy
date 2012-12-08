@@ -50,12 +50,14 @@ class DependencyListener implements ProjectEvaluationListener{
 		if(!project.configurations.hasProperty('vaadin')){
 			project.configurations.add('vaadin')
 			project.sourceSets.main.compileClasspath += project.configurations.vaadin
+			project.sourceSets.test.compileClasspath += project.configurations.vaadin
 			project.war.classpath(project.configurations.vaadin)	
 		}
 
 		if(!project.configurations.hasProperty('gwt')){
 			project.configurations.add('gwt')
 			project.sourceSets.main.compileClasspath += project.configurations.gwt
+			project.sourceSets.test.compileClasspath += project.configurations.gwt
 		}
 
 		if(!project.configurations.hasProperty('jetty8')){
