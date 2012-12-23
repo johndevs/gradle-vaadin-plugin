@@ -23,7 +23,7 @@ public class TaskListener implements TaskExecutionListener{
 
 	public void  beforeExecute(Task task){
 		def project = task.getProject()
-		if(!project.vaadin.manageDependencies){
+		if(!project.hasProperty('vaadin') || !project.vaadin.manageDependencies){
 			return
 		}
 
