@@ -29,7 +29,7 @@ class DependencyListener implements ProjectEvaluationListener{
 
 	void afterEvaluate(Project project, ProjectState state){
 
-		if(!project.vaadin.manageDependencies){
+		if(!project.hasProperty('vaadin') || !project.vaadin.manageDependencies){
 			return
 		}
 
