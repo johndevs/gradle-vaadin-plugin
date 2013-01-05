@@ -18,7 +18,7 @@ dependencies {
 apply plugin: 'maven'
 
 group = "fi.jasoft.plugin"
-version = "0.3.2"
+version = "0.3.3"
 archivesBaseName = 'VaadinPlugin'
 
 uploadArchives {
