@@ -49,22 +49,39 @@ class TemplateUtil {
     }
 
     public static boolean ensureWidgetPresent(Project project){
-        boolean result = false;
-
         if(!project.vaadin.manageWidgetset){
             return false;
         }
 
+        // Check source dir if widgetset is present there
         File javaDir = project.sourceSets.main.java.srcDirs.iterator().next()
         File widgetsetFile = new File(javaDir.canonicalPath + '/'+ project.vaadin.widgetset.replaceAll(/\./,'/')+".gwt.xml")
         
-        new File(widgetsetFile.parent).mkdirs()
-        
-        if(!widgetsetFile.exists()){
-            widgetsetFile.createNewFile()
-            result = true;
+        if(widgetsetFile.exists()){
+            updateWidgetset(widgetsetFile, project);
+            return false;
+        } 
+
+        // Check resource dir if widgetset is present there
+        File resourceDir = project.sourceSets.main.resources.srcDirs.iterator().next()
+        widgetsetFile = new File(resourceDir.canonicalPath + '/'+ project.vaadin.widgetset.replaceAll(/\./,'/')+".gwt.xml")
+
+        if(widgetsetFile.exists()){
+            updateWidgetset(widgetsetFile, project);
+            return false;
         }
 
+        // No widgetset detected, create one
+        new File(widgetsetFile.parent).mkdirs()
+        
+        widgetsetFile.createNewFile()
+           
+        updateWidgetset(widgetsetFile, project);
+
+        return true;
+    }
+
+    public static void updateWidgetset(File widgetsetFile, Project project) {
         String inherits = ""
         project.configurations.compile.each{
             JarInputStream jarStream = new JarInputStream(it.newDataInputStream());
@@ -95,7 +112,5 @@ class TemplateUtil {
         } else {
             TemplateUtil.writeTemplate('Widgetset.xml', widgetsetDir, moduleXML, substitutions)
         }     
-
-        return result   
     }
 }
