@@ -36,6 +36,7 @@ class SuperDevModeTask extends DefaultTask  {
     	
         if(!project.vaadin.devmode.superDevMode){
             println "SuperDevMode is a experimental feature and is not enabled for project by default. To enable it set vaadin.superDevModeEnabled to true"
+            return;
         }
 
         TemplateUtil.ensureWidgetPresent(project)
