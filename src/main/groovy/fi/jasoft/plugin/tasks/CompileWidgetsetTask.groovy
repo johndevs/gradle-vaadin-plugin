@@ -39,11 +39,19 @@ class CompileWidgetsetTask extends DefaultTask {
         */
         getInputs().files(project.configurations.compile)       
 
-        // Monitor changes in client side classes
+        // Monitor changes in client side classes and resources
         project.sourceSets.main.java.srcDirs.each{
             getInputs().files(project.fileTree(it.absolutePath).include('**/*/client/**/*.java'))
             getInputs().files(project.fileTree(it.absolutePath).include('**/*/shared/**/*.java'))
+            getInputs().files(project.fileTree(it.absolutePath).include('**/*/public/**/*.*'))
+            getInputs().files(project.fileTree(it.absolutePath).include('**/*/*.gwt.xml'))
         }  
+
+        //Monitor changes in resources
+        project.sourceSets.main.resources.srcDirs.each{
+           getInputs().files(project.fileTree(it.absolutePath).include('**/*/public/**/*.*')) 
+           getInputs().files(project.fileTree(it.absolutePath).include('**/*/*.gwt.xml'))
+        }
     }
 
     @TaskAction
@@ -60,8 +68,8 @@ class CompileWidgetsetTask extends DefaultTask {
 
     	// Create a widgetset if needed
     	TemplateUtil.ensureWidgetPresent(project)
-    	
-        FileCollection classpath =getClassPath()
+
+        FileCollection classpath = getClassPath()
         
         project.javaexec{
             setClasspath(classpath)
