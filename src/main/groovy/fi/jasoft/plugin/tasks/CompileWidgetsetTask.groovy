@@ -61,10 +61,12 @@ class CompileWidgetsetTask extends DefaultTask {
     	}
 
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
+
         File targetDir = new File(webAppDir.canonicalPath+'/VAADIN/widgetsets')
+        targetDir.mkdirs()
 
         // Ensure unit cache dir is present so the compiler does not complain
-        new File(targetDir.canonicalPath+'/VAADIN/gwt-unitCache').mkdirs()
+        new File(webAppDir.canonicalPath+'/VAADIN/gwt-unitCache').mkdirs()
 
     	// Create a widgetset if needed
     	TemplateUtil.ensureWidgetPresent(project)
