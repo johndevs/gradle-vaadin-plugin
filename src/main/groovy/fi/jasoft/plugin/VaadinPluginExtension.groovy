@@ -22,6 +22,7 @@ class VaadinPluginExtension{
 	String debugPort = 8000
 	boolean manageWidgetset = true
 	boolean manageDependencies = true
+	int serverPort = 8080
 	
 	// GWT Compiler and DevMode
 	GWT gwt = new GWT()
@@ -40,6 +41,8 @@ class VaadinPluginExtension{
 	class DevMode {
 		boolean noserver = false
 		boolean superDevMode = false
+		String bindAddress = '127.0.0.1'
+		int codeServerPort = 9997
 	}
 
 

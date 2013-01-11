@@ -65,14 +65,22 @@ class DevModeTask extends DefaultTask  {
                     project.sourceSets.main.runtimeClasspath +
                     project.sourceSets.main.compileClasspath
 
+
+        File logDir = new File('build/jetty/')
+        logDir.mkdirs()            
+
         appServerProcess = ['java', 
             "-Xrunjdwp:transport=dt_socket,address=${project.vaadin.debugPort},server=y,suspend=n",
             '-Xdebug',
             '-cp', cp.getAsPath(), 
             'org.mortbay.jetty.runner.Runner', 
-            webAppDir.canonicalPath].execute()
+            '--port', project.vaadin.serverPort,
+            '--out', logDir.canonicalPath + '/jetty8-devmode.log',
+            '--log', logDir.canonicalPath + '/jetty8-devmode.log',
+            webAppDir.canonicalPath
+        ].execute()
        
-        println "Application running on http://localhost:8080 (debugger on ${project.vaadin.debugPort})"
+        println "Application running on http://0.0.0.0:${project.vaadin.serverPort} (debugger on ${project.vaadin.debugPort})"
     }
 
     protected void terminateApplicationServer(){
@@ -91,10 +99,16 @@ class DevModeTask extends DefaultTask  {
             setClasspath(classpath)
             setArgs([project.vaadin.widgetset, 
                     '-noserver',
-                    '-war',         webAppDir.canonicalPath+'/VAADIN/widgetsets', 
-                    '-gen',         'build/gen', 
-                    '-startupUrl',  'http://localhost:8080', 
-                    '-logLevel',    project.vaadin.gwt.logLevel])
+                    '-war',             webAppDir.canonicalPath+'/VAADIN/widgetsets', 
+                    '-gen',             'build/devmode/gen', 
+                    '-startupUrl',      'http://localhost:8080', 
+                    '-logLevel',        project.vaadin.gwt.logLevel,
+                    '-deploy',          'build/devmode/deploy',
+                    '-workDir',         'build/devmode/',
+                    '-logdir',          'build/devmode/logs',
+                    '-codeServerPort',  project.vaadin.devmode.codeServerPort,
+                    '-bindAddress',     project.vaadin.devmode.bindAddress
+            ])
         }
     }
 
