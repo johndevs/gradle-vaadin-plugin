@@ -70,7 +70,6 @@ class DependencyListener implements ProjectEvaluationListener{
 
 		def version = project.vaadin.version;
 		if(version.startsWith("6")){
-			println "Building a Vaadin 6.x project"
 			project.dependencies.add("vaadin", "com.vaadin:vaadin:"+version)
 			if(project.vaadin.widgetset != null){
 				project.dependencies.add("gwt", "com.google.gwt:gwt-user:2.3.0")
@@ -79,9 +78,6 @@ class DependencyListener implements ProjectEvaluationListener{
 				project.dependencies.add("gwt",	"javax.validation:validation-api:1.0.0.GA:sources")
 			}
 		} else{ 
-			println "Building a Vaadin 7.x project"
-
-
 			File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
     		FileTree themes = project.fileTree(dir: webAppDir.canonicalPath + '/VAADIN/themes', include: '**/styles.scss')
 			if(!themes.isEmpty()){
