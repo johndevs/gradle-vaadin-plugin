@@ -62,5 +62,8 @@ class VaadinPlugin implements Plugin<Project>{
 		// Add sources to test classpath
 		project.sourceSets.test.runtimeClasspath += project.files(project.sourceSets.main.java.srcDirs)
 
+		// War project should build the widgetset and themes
+		project.war.dependsOn(project.tasks.widgetset)
+		project.war.dependsOn(project.tasks.themes)
 	}
 }
