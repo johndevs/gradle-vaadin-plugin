@@ -25,10 +25,18 @@ The following configuration options are available
 * ``vaadin.widgetset`` - The fully qualified name of the widgetset (eg. com.example.helloworld.MyWidgetset)
 * ``vaadin.servletVersion`` - What server version is your application using. Default is 2.5
 * ``vaadin.debugPort`` - On what port should the debugger listen. Default is 8000
+* ``vaadin.manageWidgetset`` - Should the plugin manage the widgetset for you. Default is true.
+* ``vaadin.manageDependencies`` - Should the plugin manage the Vaadin depencies for you. Default is true.
+* ``vaadin.serverPort`` - The port the embedded server listens to. Default is 8080.
 * ``vaadin.gwt.style`` - Compilation style of the GWT compiler. Default is OBF.
 * ``vaadin.gwt.optimize`` - Optimization level of the GWT compiler. Default is 0.
 * ``vaadin.gwt.logLevel`` - The log level of the GWT compiler. Default is INFO.
+* ``vaadin.gwt.localWorkers`` - The amount of threads the GWT compiler should use. Default is the amount of CPU's available.
+* ``vaadin.gwt.draftCompile`` - Should GWT draft compile be used. Default is false.
+* ``vaadin.gwt.strict`` - Should the GWT Compiler be run in strict mode. Default is false.
 * ``vaadin.gwt.userAgent`` - The browsers you want to support. All browser are supported by default.
 * ``vaadin.devmode.noserver`` - Do not run the embedded Jetty server when running devmode. Default is false.
-* ``vaadin.devmode.superDevMode`` - Add support for super devmode
+* ``vaadin.devmode.superDevMode`` - Add support for super devmode. Default is false.
+* ``vaadin.devmode.bindAddress`` - The address the DevMode server should be bound to. Default is 127.0.0.1. 
+* ``vaadin.devmode.codeServerPort`` - The port the DevMode server should be bound to. Default is 9997.
 
