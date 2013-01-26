@@ -81,3 +81,15 @@ task createPOMforVaadinDirectory {
 processResources {
     dependsOn project.createPOMforVaadinDirectory
 }
+
+jar {
+    manifest{
+        attributes(
+            'Vaadin-Package-Version': 1,
+            'Vaadin-License-Title': 'Apache 2.0',
+            'Implementation-Title': 'Vaadin Plugin for Gradle',
+            'Implementation-Version': version,
+            'Implementation-Vendor': 'John Ahlroos',
+        )
+    }
+}
