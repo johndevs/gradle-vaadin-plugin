@@ -49,7 +49,7 @@ uploadArchives {
 task wrapper(type: Wrapper) { gradleVersion = '1.3' }
 
 // Create pom.xml for Vaadin Directory
-task createPOMforVaadinDirectory << {
+task createPOMforVaadinDirectory {
 
     File pomDir = new File("src/main/resources/META-INF/maven/${project.group}/${project.archivesBaseName}")
     pomDir.mkdirs()
@@ -58,6 +58,7 @@ task createPOMforVaadinDirectory << {
     outputs.file pomFile
 
     pom {
+        artifactId = project.archivesBaseName
         project {
             licenses {
                 license {
