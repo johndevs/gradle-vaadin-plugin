@@ -17,7 +17,7 @@ dependencies {
 apply plugin: 'maven'
 
 group = "fi.jasoft.plugin"
-version = "0.3.3"
+version = "0.3.4"
 archivesBaseName = 'VaadinPlugin'
 
 uploadArchives {
@@ -43,9 +43,40 @@ uploadArchives {
 
 	    pom.scopeMappings.mappings.remove(configurations.compile)
     }
-
-    repositories
 }
 
 // Use wrapper
 task wrapper(type: Wrapper) { gradleVersion = '1.3' }
+
+// Create pom.xml for Vaadin Directory
+task createPOMforVaadinDirectory << {
+
+    File pomDir = new File("src/main/resources/META-INF/maven/${project.group}/${project.archivesBaseName}")
+    pomDir.mkdirs()
+
+    File pomFile = new File(pomDir.canonicalPath+'/pom.xml')
+    outputs.file pomFile
+
+    pom {
+        project {
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    distribution 'repo'
+                }
+            }
+            repositories {
+                repository {
+                    name 'Jasoft.fi Repository'
+                    url 'http://mvn.jasoft.fi/maven2'
+                }
+            }
+            
+        }
+    }.writeTo(pomFile.canonicalPath)
+}
+
+processResources {
+    dependsOn project.createPOMforVaadinDirectory
+}
