@@ -23,6 +23,7 @@ class VaadinPluginExtension{
 	boolean manageWidgetset = true
 	boolean manageDependencies = true
 	int serverPort = 8080
+	String[] jvmArgs = null
 	
 	// GWT Compiler and DevMode
 	GWT gwt = new GWT()
@@ -34,6 +35,7 @@ class VaadinPluginExtension{
 		boolean draftCompile = false
 		boolean strict = false
 		String userAgent = "ie8,ie9,gecko1_8,safari,opera"
+		String[] jvmArgs = null
 	}
 
 	// DevMode

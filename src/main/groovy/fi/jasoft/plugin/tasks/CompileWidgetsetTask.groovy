@@ -94,6 +94,10 @@ class CompileWidgetsetTask extends DefaultTask {
             args.add(project.vaadin.widgetset)
 
             setArgs(args)
+
+            if(project.vaadin.gwt.jvmArgs != null){
+                jvmArgs(project.vaadin.gwt.jvmArgs)    
+            }
         }
 
         /*

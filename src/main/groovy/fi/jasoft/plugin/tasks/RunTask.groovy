@@ -40,17 +40,37 @@ public class RunTask extends DefaultTask {
         File logDir = new File('build/jetty/')
         logDir.mkdirs()
 
-        def appServerProcess = ['java', 
-            "-Xrunjdwp:transport=dt_socket,address=${project.vaadin.debugPort},server=y,suspend=n",
-            '-Xdebug',
-            '-cp', cp.getAsPath(), 
-            'org.mortbay.jetty.runner.Runner', 
-            '--port', project.vaadin.serverPort,
-            '--out', logDir.canonicalPath + '/jetty8-vaadinRun.log',
-            '--log', logDir.canonicalPath + '/jetty8-vaadinRun.log',
-            webAppDir.canonicalPath
-        ].execute()
-       
+
+        def appServerProcess = ['java']
+        
+        // Debug
+        appServerProcess.add("-Xrunjdwp:transport=dt_socket,address=${project.vaadin.debugPort},server=y,suspend=n")
+        appServerProcess.add('-Xdebug')
+
+        // JVM options
+        appServerProcess.add('-cp')
+        appServerProcess.add(cp.getAsPath())  
+        
+        if(project.vaadin.jvmArgs != null){
+            appServerProcess.addAll(project.vaadin.jvmArgs)
+        }      
+
+        // Program args
+        appServerProcess.add('org.mortbay.jetty.runner.Runner')
+
+        appServerProcess.add('--port')
+        appServerProcess.add(project.vaadin.serverPort)
+
+        appServerProcess.add('--out')
+        appServerProcess.add(logDir.canonicalPath + '/jetty8-vaadinRun.log')
+
+        appServerProcess.add('--log')
+        appServerProcess.add(logDir.canonicalPath + '/jetty8-vaadinRun.log')
+
+        appServerProcess.add(webAppDir.canonicalPath)
+
+        appServerProcess = appServerProcess.execute()
+
         println "Application running on http://0.0.0.0:${project.vaadin.serverPort} (debugger on ${project.vaadin.debugPort})"
    
         // Wait for termination signal
