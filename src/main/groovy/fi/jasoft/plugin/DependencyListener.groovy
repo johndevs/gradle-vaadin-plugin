@@ -68,12 +68,13 @@ class DependencyListener implements ProjectEvaluationListener{
 		def jettyVersion = "8.1.5.v20120716"	
 		project.dependencies.add('jetty8', "org.mortbay.jetty:jetty-runner:$jettyVersion")
 
-		def version = project.vaadin.version;
+		def version = project.vaadin.version
+		def gwtVersion = project.vaadin.gwt.version
 		if(version.startsWith("6")){
 			project.dependencies.add("vaadin", "com.vaadin:vaadin:"+version)
 			if(project.vaadin.widgetset != null){
-				project.dependencies.add("gwt", "com.google.gwt:gwt-user:2.3.0")
-				project.dependencies.add("gwt", "com.google.gwt:gwt-dev:2.3.0")
+				project.dependencies.add("gwt", "com.google.gwt:gwt-user:"+gwtVersion)
+				project.dependencies.add("gwt", "com.google.gwt:gwt-dev:"+gwtVersion)
 				project.dependencies.add("gwt",	"javax.validation:validation-api:1.0.0.GA")
 				project.dependencies.add("gwt",	"javax.validation:validation-api:1.0.0.GA:sources")
 			}
