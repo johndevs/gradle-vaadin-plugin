@@ -36,7 +36,7 @@ class VaadinPluginExtension{
 		boolean strict = false
 		String userAgent = "ie8,ie9,gecko1_8,safari,opera"
 		String[] jvmArgs = null
-		String version = "2.3"
+		String version = "2.3.0"
 	}
 
 	// DevMode
