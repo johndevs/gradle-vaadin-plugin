@@ -74,7 +74,12 @@ public class RunTask extends DefaultTask {
         println "Application running on http://0.0.0.0:${project.vaadin.serverPort} (debugger on ${project.vaadin.debugPort})"
    
         // Wait for termination signal
-        System.console().readLine("\nPress [Enter] to stop server...")
+        def console = System.console()
+        if(console){
+             console.readLine("\nPress [Enter] to stop server...")
+        } else {
+            logger.error("Cannot get console, is a console available? Server is stopping...")
+        }
 
         // Terminate server
         appServerProcess.in.close()
