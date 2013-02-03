@@ -39,8 +39,6 @@ class SuperDevModeTask extends DefaultTask  {
             return;
         }
 
-        TemplateUtil.ensureWidgetPresent(project)
-
     	File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
         File javaDir = project.sourceSets.main.java.srcDirs.iterator().next()
 

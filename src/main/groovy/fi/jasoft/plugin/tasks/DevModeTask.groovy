@@ -39,12 +39,6 @@ class DevModeTask extends DefaultTask  {
             println "No widgetset defined. Please define a widgetset by using the vaadin.widgetset property."
             return
         }
-
-        // ensure the widgetset is up-2-date
-        if(TemplateUtil.ensureWidgetPresent(project)){
-            println "A new widgetset was just created for the project. You need to add it to web.xml before running devmode again."
-            return
-        }
         
         if(!project.vaadin.devmode.noserver){
              launchApplicationServer()     

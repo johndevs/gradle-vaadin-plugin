@@ -29,6 +29,7 @@ import fi.jasoft.plugin.tasks.CompileWidgetsetTask
 import fi.jasoft.plugin.tasks.DevModeTask
 import fi.jasoft.plugin.tasks.SuperDevModeTask
 import fi.jasoft.plugin.tasks.CompileThemeTask
+import fi.jasoft.plugin.tasks.UpdateWidgetsetTask
 import fi.jasoft.plugin.tasks.RunTask
 
 class VaadinPlugin implements Plugin<Project>{
@@ -55,6 +56,7 @@ class VaadinPlugin implements Plugin<Project>{
 		project.tasks.add(name: 'superdevmode', 		type: SuperDevModeTask, 	group: 'Vaadin')
 		project.tasks.add(name: 'themes',				type: CompileThemeTask,		group: 'Vaadin')
 		project.tasks.add(name: 'vaadinRun',			type: RunTask,				group: 'Vaadin')
+		project.tasks.add(name: 'updateWidgetset',		type: UpdateWidgetsetTask,	group: 'Vaadin')
 
 		// Add debug information to all compilation results
 		project.tasks.compileJava.options.debugOptions.debugLevel = 'source,lines,vars'
@@ -65,5 +67,8 @@ class VaadinPlugin implements Plugin<Project>{
 		// War project should build the widgetset and themes
 		project.war.dependsOn(project.tasks.widgetset)
 		project.war.dependsOn(project.tasks.themes)
+
+		// Ensure widgetset is up-2-date
+		project.processResources.dependsOn(project.tasks.updateWidgetset)
 	}
 }

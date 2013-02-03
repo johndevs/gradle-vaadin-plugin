@@ -68,9 +68,6 @@ class CompileWidgetsetTask extends DefaultTask {
         // Ensure unit cache dir is present so the compiler does not complain
         new File(webAppDir.canonicalPath+'/VAADIN/gwt-unitCache').mkdirs()
 
-    	// Create a widgetset if needed
-    	TemplateUtil.ensureWidgetPresent(project)
-
         FileCollection classpath = getClassPath()
         
         project.javaexec{
