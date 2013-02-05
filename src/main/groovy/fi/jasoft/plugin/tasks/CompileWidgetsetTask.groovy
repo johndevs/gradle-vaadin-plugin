@@ -28,6 +28,7 @@ class CompileWidgetsetTask extends DefaultTask {
    
     public CompileWidgetsetTask(){
         dependsOn(project.tasks.classes)
+
         description = "Compiles Vaadin Addons and components into Javascript."
 
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir

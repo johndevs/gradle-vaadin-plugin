@@ -106,6 +106,32 @@ class TemplateUtil {
         substitutions['%WIDGETSET%'] = project.vaadin.widgetset
         substitutions['%SUPERDEVMODE%'] = String.valueOf(project.vaadin.devmode.superDevMode)
         substitutions['%USERAGENT%'] = project.vaadin.gwt.userAgent
+
+        String name, pkg, filename
+        if(project.vaadin.widgetsetGenerator == null){
+            name = project.vaadin.widgetset.tokenize('.').last()
+            pkg = project.vaadin.widgetset.replaceAll('.'+ name,'') + '.client.ui'
+            filename = name + "Generator.java"
+
+        } else {
+            name = project.vaadin.widgetsetGenerator.tokenize('.').last()
+            pkg = project.vaadin.widgetsetGenerator.replaceAll('.'+ name,'')
+            filename = name + ".java"
+        }
+
+        File javaDir = project.sourceSets.main.java.srcDirs.iterator().next()
+        File f = new File(javaDir.canonicalPath + '/' + pkg.replaceAll(/\./,'/') + '/' + filename)
+
+        if(f.exists() || project.vaadin.widgetsetGenerator != null){
+
+            String generatorString = "<generate-with class=\"${pkg}.${filename.replaceAll('.java','')}\">\n" + 
+            "\t<when-type-assignable class=\"com.vaadin.client.metadata.ConnectorBundleLoader\" />\n" +
+            "\t</generate-with>"
+
+            substitutions['%WIDGETSET_GENERATOR%'] = generatorString
+        } else {
+            substitutions['%WIDGETSET_GENERATOR%'] = ''
+        }
         
         if(project.vaadin.version.startsWith('6')){
             TemplateUtil.writeTemplate('Widgetset.xml.vaadin6', widgetsetDir, moduleXML, substitutions)

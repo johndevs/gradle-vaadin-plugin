@@ -30,6 +30,10 @@ public class TaskListener implements TaskExecutionListener{
 		if(task.getName() == 'eclipseClasspath'){
 			configureEclipsePlugin(task)
 		} 
+
+		if(task.getName() == 'compileJava'){
+			ensureWidgetsetGeneratorExists(task)
+		}
 	}
 
 	public void  afterExecute(Task task, TaskState state){
@@ -42,5 +46,19 @@ public class TaskListener implements TaskExecutionListener{
 		cp.defaultOutputDir = project.file('build/classes/main')
 		cp.plusConfigurations += project.configurations.vaadin
 		cp.plusConfigurations += project.configurations.gwt
+	}
+
+	private void ensureWidgetsetGeneratorExists(Task task){
+		def project = task.getProject()
+		if(project.vaadin.widgetsetGenerator != null ){
+			String name = project.vaadin.widgetsetGenerator.tokenize('.').last()
+            String pkg = project.vaadin.widgetsetGenerator.replaceAll('.'+ name,'')
+            String filename = name + ".java"
+			File javaDir = project.sourceSets.main.java.srcDirs.iterator().next()
+    		File f = new File(javaDir.canonicalPath + '/' + pkg.replaceAll(/\./,'/') + '/' + filename)
+    		if(!f.exists()){
+    			project.tasks.createVaadinWidgetsetGenerator.run()	
+    		}
+        }
 	}
 }

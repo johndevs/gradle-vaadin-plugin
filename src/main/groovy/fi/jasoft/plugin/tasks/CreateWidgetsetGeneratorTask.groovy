@@ -36,7 +36,6 @@ class CreateWidgetsetGenerator extends DefaultTask {
         File javaDir = project.sourceSets.main.java.srcDirs.iterator().next()
         
         String name, pkg, filename
-
         if(project.vaadin.widgetsetGenerator == null){
             name = project.vaadin.widgetset.tokenize('.').last()
             pkg = project.vaadin.widgetset.replaceAll('.'+ name,'') + '.client.ui'
