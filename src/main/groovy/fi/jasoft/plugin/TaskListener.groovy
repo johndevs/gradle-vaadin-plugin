@@ -28,14 +28,19 @@ public class TaskListener implements TaskExecutionListener{
 		}
 
 		if(task.getName() == 'eclipseClasspath'){
-			def cp = project.eclipse.classpath
-			cp.defaultOutputDir = project.file('build/classes/main')
-			cp.plusConfigurations += project.configurations.vaadin
-			cp.plusConfigurations += project.configurations.gwt
-		}
+			configureEclipsePlugin(task)
+		} 
 	}
 
 	public void  afterExecute(Task task, TaskState state){
 		
+	}
+
+	private void configureEclipsePlugin(Task task){
+		def project = task.getProject()
+		def cp = project.eclipse.classpath
+		cp.defaultOutputDir = project.file('build/classes/main')
+		cp.plusConfigurations += project.configurations.vaadin
+		cp.plusConfigurations += project.configurations.gwt
 	}
 }

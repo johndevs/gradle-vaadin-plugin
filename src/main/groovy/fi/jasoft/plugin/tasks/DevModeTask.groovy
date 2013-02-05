@@ -30,6 +30,13 @@ class DevModeTask extends DefaultTask  {
     public DevModeTask(){
         dependsOn(project.tasks.classes)
         description = "Run Development Mode for easier debugging and development of client widgets."
+
+        getOutputs().dir(new File("build/devmode"))
+        getOutputs().dir(new File('build/jetty/'))     
+
+        File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
+        File unitCacheDir = new File(webAppDir.canonicalPath+'/VAADIN/gwt-unitCache')
+        getOutputs().dir(unitCacheDir)
     }
 
 	@TaskAction

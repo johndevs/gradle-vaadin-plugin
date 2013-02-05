@@ -70,5 +70,12 @@ class VaadinPlugin implements Plugin<Project>{
 
 		// Ensure widgetset is up-2-date
 		project.processResources.dependsOn(project.tasks.updateWidgetset)
+
+		// Cleanup plugin outputs
+		project.clean.dependsOn(project.tasks.cleanWidgetset)
+		project.clean.dependsOn(project.tasks.cleanVaadinRun)
+		project.clean.dependsOn(project.tasks.cleanThemes)
+		project.clean.dependsOn(project.tasks.cleanSuperdevmode)
+		project.clean.dependsOn(project.tasks.cleanDevmode)
 	}
 }

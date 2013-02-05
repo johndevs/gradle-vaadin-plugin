@@ -31,8 +31,12 @@ class CompileWidgetsetTask extends DefaultTask {
         description = "Compiles Vaadin Addons and components into Javascript."
 
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
+        
         File targetDir = new File(webAppDir.canonicalPath+'/VAADIN/widgetsets')
         getOutputs().dir(targetDir)
+        
+        File unitCacheDir = new File(webAppDir.canonicalPath+'/VAADIN/gwt-unitCache')
+        getOutputs().dir(unitCacheDir)
 
         /* Monitor changes in dependencies since upgrading a
         * dependency should also trigger a recompile of the widgetset
