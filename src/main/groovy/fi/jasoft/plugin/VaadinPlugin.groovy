@@ -31,6 +31,7 @@ import fi.jasoft.plugin.tasks.SuperDevModeTask
 import fi.jasoft.plugin.tasks.CompileThemeTask
 import fi.jasoft.plugin.tasks.UpdateWidgetsetTask
 import fi.jasoft.plugin.tasks.RunTask
+import fi.jasoft.plugin.tasks.CreateWidgetsetGenerator
 
 class VaadinPlugin implements Plugin<Project>{
 
@@ -47,9 +48,10 @@ class VaadinPlugin implements Plugin<Project>{
 		project.plugins.apply(WarPlugin)
 		
 		// Tasks
-		project.tasks.add(name: 'createVaadinProject', 	type: CreateProjectTask, 	group: 'Vaadin')	
-		project.tasks.add(name: 'createVaadinComponent',type: CreateComponentTask,	group: 'Vaadin')
-		project.tasks.add(name: 'createVaadinTheme',	type: CreateThemeTask,		group: 'Vaadin')
+		project.tasks.add(name: 'createVaadinProject', 				type: CreateProjectTask, 		group: 'Vaadin')	
+		project.tasks.add(name: 'createVaadinComponent',			type: CreateComponentTask,		group: 'Vaadin')
+		project.tasks.add(name: 'createVaadinTheme',				type: CreateThemeTask,			group: 'Vaadin')
+		project.tasks.add(name: 'createVaadinWidgetsetGenerator',	type: CreateWidgetsetGenerator,	group: 'Vaadin')
 
 		project.tasks.add(name: 'widgetset', 			type: CompileWidgetsetTask, group: 'Vaadin')
 		project.tasks.add(name: 'devmode', 				type: DevModeTask, 			group: 'Vaadin')

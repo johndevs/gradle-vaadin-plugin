@@ -16,7 +16,8 @@
 package fi.jasoft.plugin;
 
 class VaadinPluginExtension{
-	String widgetset										
+	String widgetset
+	String widgetsetGenerator = null										
 	String version = "7+" 									
 	String servletVersion = "2.5"
 	String debugPort = 8000
