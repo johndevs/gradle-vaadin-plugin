@@ -31,6 +31,10 @@ public class TaskListener implements TaskExecutionListener{
 			configureEclipsePlugin(task)
 		} 
 
+		if(task.getName() == 'eclipseWtpComponent'){
+			configureEclipseWtpPlugin(task)
+		}
+
 		if(task.getName() == 'compileJava'){
 			ensureWidgetsetGeneratorExists(task)
 		}
@@ -46,6 +50,12 @@ public class TaskListener implements TaskExecutionListener{
 		cp.defaultOutputDir = project.file('build/classes/main')
 		cp.plusConfigurations += project.configurations.vaadin
 		cp.plusConfigurations += project.configurations.gwt
+	}
+
+	private void configureEclipseWtpPlugin(Task task){
+		def project = task.getProject()
+		def wtp = project.eclipse.wtp.component
+		wtp.plusConfigurations += project.configurations.vaadin		
 	}
 
 	private void ensureWidgetsetGeneratorExists(Task task){
