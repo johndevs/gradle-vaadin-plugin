@@ -23,16 +23,22 @@ public class TaskListener implements TaskExecutionListener{
 
 	public void  beforeExecute(Task task){
 		def project = task.getProject()
-		if(!project.hasProperty('vaadin') || !project.vaadin.manageDependencies){
+		if(!project.hasProperty('vaadin')){
 			return
 		}
 
-		if(task.getName() == 'eclipseClasspath'){
-			configureEclipsePlugin(task)
-		} 
+		/*
+		 * Dependency related configurations
+		 */
+		if(project.vaadin.manageDependencies){
 
-		if(task.getName() == 'eclipseWtpComponent'){
-			configureEclipseWtpPlugin(task)
+			if(task.getName() == 'eclipseClasspath'){
+				configureEclipsePlugin(task)
+			} 
+
+			if(task.getName() == 'eclipseWtpComponent'){
+				configureEclipseWtpPlugin(task)
+			}
 		}
 
 		if(task.getName() == 'compileJava'){
