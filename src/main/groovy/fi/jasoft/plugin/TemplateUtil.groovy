@@ -124,13 +124,47 @@ class TemplateUtil {
 
         if(f.exists() || project.vaadin.widgetsetGenerator != null){
 
-            String generatorString = "<generate-with class=\"${pkg}.${filename.replaceAll('.java','')}\">\n" + 
-            "\t<when-type-assignable class=\"com.vaadin.client.metadata.ConnectorBundleLoader\" />\n" +
+            String generatorString = "\t<generate-with class=\"${pkg}.${filename.replaceAll('.java','')}\">\n" + 
+            "\t\t<when-type-assignable class=\"com.vaadin.client.metadata.ConnectorBundleLoader\" />\n" +
             "\t</generate-with>"
 
             substitutions['%WIDGETSET_GENERATOR%'] = generatorString
         } else {
             substitutions['%WIDGETSET_GENERATOR%'] = ''
+        }
+
+        File[] clientSCSS = getClientSCSSFiles(project)
+        if(clientSCSS.length > 0){
+            String linkerString = "\t<define-linker name=\"scssintegration\" class=\"com.vaadin.sass.linker.SassLinker\" />\n" +
+            "\t<add-linker name=\"scssintegration\" />";
+            substitutions['%SASS_LINKER%'] = linkerString
+
+            StringBuilder stylesheets = new StringBuilder()
+            clientSCSS.each {
+
+                // Get the relative path to the public folder
+                String path = it.parent.substring(it.parent.lastIndexOf('public')+'public'.length())
+                if(path.startsWith('/')){
+                    path = path.substring(1);
+                }
+
+                // Convert file name from scss -> css
+                filename = it.name.substring(0, it.name.length()-4) + 'css'
+
+                // Recreate relative path to scss file
+                path = path+'/'+filename
+                if(path.startsWith('/')){
+                    path = path.substring(1);
+                }
+
+                stylesheets.append("\t<stylesheet src=\"${path}\"/>\n")
+            }
+
+            substitutions['%STYLESHEETS%'] = stylesheets.toString()
+
+        } else {
+            substitutions['%SASS_LINKER%'] = ''
+            substitutions['%STYLESHEETS%'] = ''
         }
         
         if(project.vaadin.version.startsWith('6')){
@@ -138,5 +172,23 @@ class TemplateUtil {
         } else {
             TemplateUtil.writeTemplate('Widgetset.xml', widgetsetDir, moduleXML, substitutions)
         }     
+    }
+
+    public static File[] getClientSCSSFiles(Project project){
+
+        def files = []
+        project.sourceSets.main.resources.srcDirs.each {
+            project.fileTree(it.absolutePath).include('**/*/public/**/*.scss').each {
+                files.add(it)
+            }
+        }
+
+        project.sourceSets.main.java.srcDirs.each {
+            project.fileTree(it.absolutePath).include('**/*/public/**/*.scss').each {
+                files.add(it)
+            }
+        }
+
+        return files;
     }
 }
