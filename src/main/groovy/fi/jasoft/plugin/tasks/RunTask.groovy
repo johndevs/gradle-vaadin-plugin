@@ -15,10 +15,11 @@
 */
 package fi.jasoft.plugin.tasks;
 
-import org.gradle.api.DefaultTask;
-import org.gradle.api.tasks.TaskAction;
-import org.gradle.api.plugins.WarPluginConvention;
-import org.gradle.api.file.FileCollection;
+import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.TaskAction
+import org.gradle.api.plugins.WarPluginConvention
+import org.gradle.api.file.FileCollection
+import fi.jasoft.plugin.Util
 
 public class RunTask extends DefaultTask {
 
@@ -74,13 +75,8 @@ public class RunTask extends DefaultTask {
         println "Application running on http://0.0.0.0:${project.vaadin.serverPort} (debugger on ${project.vaadin.debugPort})"
    
         // Wait for termination signal
-        def console = System.console()
-        if(console){
-             console.readLine("\nPress [Enter] to stop server...")
-        } else {
-            logger.error("Cannot get console, is a console available? Server is stopping...")
-        }
-
+        Util.readLine("\nPress [Enter] to stop server...")
+     
         // Terminate server
         appServerProcess.in.close()
         appServerProcess.out.close()
