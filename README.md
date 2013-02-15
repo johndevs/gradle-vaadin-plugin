@@ -13,6 +13,7 @@ The following tasks are available in the plugin
 * ``createVaadinComponent`` - Creates a new Vaadin Component.
 * ``createVaadinProject`` - Creates a new Vaadin Project.
 * ``createVaadinTheme`` - Creates a new Vaadin Theme
+* ``createVaadinWidgetsetGenerator`` - Creates a new widgetset generator for optimizing the widgetset
 * ``devmode`` - Run Development Mode for easier debugging and development of client widgets.
 * ``superdevmode`` - Run Super Development Mode for easier client widget development.
 * ``themes`` - Compiles a Vaadin SASS theme into CSS
@@ -23,11 +24,14 @@ The following tasks are available in the plugin
 The following configuration options are available
 * ``vaadin.version`` - Vaadin version (Vaadin 6 and 7 supported). Defaults to latest Vaadin 7
 * ``vaadin.widgetset`` - The fully qualified name of the widgetset (eg. com.example.helloworld.MyWidgetset)
+* ``vaadin.widgetsetGenerator`` - The fully qualified name of the widgetset generator.
 * ``vaadin.servletVersion`` - What server version is your application using. Default is 2.5
 * ``vaadin.debugPort`` - On what port should the debugger listen. Default is 8000
 * ``vaadin.manageWidgetset`` - Should the plugin manage the widgetset for you. Default is true.
 * ``vaadin.manageDependencies`` - Should the plugin manage the Vaadin depencies for you. Default is true.
 * ``vaadin.serverPort`` - The port the embedded server listens to. Default is 8080.
+* ``vaadin.jvmArgs`` - Additional JVM arguments passed to the vaadinRun task. Default is ''.
+* ``vaadin.gwt.version`` - GWT version used with Vaadin 6. Defaults to 2.3.0. 
 * ``vaadin.gwt.style`` - Compilation style of the GWT compiler. Default is OBF.
 * ``vaadin.gwt.optimize`` - Optimization level of the GWT compiler. Default is 0.
 * ``vaadin.gwt.logLevel`` - The log level of the GWT compiler. Default is INFO.
@@ -35,6 +39,7 @@ The following configuration options are available
 * ``vaadin.gwt.draftCompile`` - Should GWT draft compile be used. Default is false.
 * ``vaadin.gwt.strict`` - Should the GWT Compiler be run in strict mode. Default is false.
 * ``vaadin.gwt.userAgent`` - The browsers you want to support. All browser are supported by default.
+* ``vaadin.gwt.jvmArgs`` - Additional JVM arguments passed to the widgetset compiler. Default is ''.
 * ``vaadin.devmode.noserver`` - Do not run the embedded Jetty server when running devmode. Default is false.
 * ``vaadin.devmode.superDevMode`` - Add support for super devmode. Default is false.
 * ``vaadin.devmode.bindAddress`` - The address the DevMode server should be bound to. Default is 127.0.0.1. 
