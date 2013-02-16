@@ -1,2 +1,2 @@
 language: groovy
-script: ./gradlew jar
+script: ./gradlew test
