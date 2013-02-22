@@ -93,6 +93,10 @@ class CompileWidgetsetTask extends DefaultTask {
                 args.add('-strict')
             }
 
+            if(project.vaadin.gwt.extraArgs){
+                args.add(project.vaadin.gwt.extraArgs)
+            }
+
             args.add(project.vaadin.widgetset)
 
             setArgs(args)
