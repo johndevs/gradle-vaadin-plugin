@@ -1,4 +1,5 @@
 apply plugin: 'groovy'
+apply plugin: 'maven'
 
 repositories{
 	mavenCentral()
@@ -14,8 +15,7 @@ dependencies {
     deployerJars "org.apache.maven.wagon:wagon-ftp:1.0-beta-2"
 }
 
-apply plugin: 'maven'
-
+defaultTasks 'jar'
 group = "fi.jasoft.plugin"
 version = "0.4"
 archivesBaseName = 'VaadinPlugin'
