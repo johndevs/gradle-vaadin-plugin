@@ -50,5 +50,11 @@ class VaadinPluginExtension{
 		int codeServerPort = 9997
 	}
 
+    // Plugin configurations
+    VaadinPluginConfiguration plugin = new VaadinPluginConfiguration()
+    class VaadinPluginConfiguration {
+        boolean terminateOnEnter = true
+    }
+
 
 }

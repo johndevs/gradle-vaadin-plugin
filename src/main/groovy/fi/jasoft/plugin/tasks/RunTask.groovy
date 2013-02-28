@@ -41,7 +41,6 @@ public class RunTask extends DefaultTask {
         File logDir = new File('build/jetty/')
         logDir.mkdirs()
 
-
         def appServerProcess = ['java']
         
         // Debug
@@ -73,15 +72,19 @@ public class RunTask extends DefaultTask {
         appServerProcess = appServerProcess.execute()
 
         println "Application running on http://0.0.0.0:${project.vaadin.serverPort} (debugger on ${project.vaadin.debugPort})"
-   
-        // Wait for termination signal
-        Util.readLine("\nPress [Enter] to stop server...")
-     
-        // Terminate server
-        appServerProcess.in.close()
-        appServerProcess.out.close()
-        appServerProcess.err.close()
-        appServerProcess.destroy()
-        appServerProcess = null;
+
+        if(project.vaadin.plugin.terminateOnEnter){
+            Util.readLine("\nPress [Enter] to stop server...")
+
+            // Terminate server
+            appServerProcess.in.close()
+            appServerProcess.out.close()
+            appServerProcess.err.close()
+            appServerProcess.destroy()
+            appServerProcess = null;
+
+        } else {
+            appServerProcess.waitFor()
+        }
     }
 }
