@@ -19,6 +19,8 @@ defaultTasks 'jar'
 group = "fi.jasoft.plugin"
 version = "0.4"
 archivesBaseName = 'VaadinPlugin'
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
 
 uploadArchives {
     repositories.mavenDeployer {
