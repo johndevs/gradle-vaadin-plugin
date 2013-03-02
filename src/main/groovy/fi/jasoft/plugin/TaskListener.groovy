@@ -44,6 +44,10 @@ public class TaskListener implements TaskExecutionListener{
 		if(task.getName() == 'compileJava'){
 			ensureWidgetsetGeneratorExists(task)
 		}
+
+        if(task.getName() == 'jar'){
+            configureAddonMetadata(task)
+        }
 	}
 
 	public void  afterExecute(Task task, TaskState state){
@@ -77,4 +81,28 @@ public class TaskListener implements TaskExecutionListener{
     		}
         }
 	}
+
+    private void configureAddonMetadata(Task task){
+        def project = task.getProject()
+
+        // Resolve widgetset
+        def widgetset = project.vaadin.widgetset
+        if(widgetset == null){
+            if(project.vaadin.version.startsWith('6')){
+                widgetset = 'com.vaadin.terminal.gwt.DefaultWidgetSet'
+            } else {
+                widgetset = 'com.vaadin.DefaultWidgetSet'
+            }
+        }
+
+        // Add metadata to jar manifest
+        project.tasks.jar.manifest.attributes (
+                'Vaadin-Package-Version': 1,
+                'Vaadin-Widgetsets': widgetset,
+                'Vaadin-License-Title': project.vaadin.addon.license,
+                'Implementation-Title': project.vaadin.addon.title,
+                'Implementation-Version': project.version != null ? project.version : '',
+                'Implementation-Vendor': project.vaadin.addon.author,
+        )
+    }
 }

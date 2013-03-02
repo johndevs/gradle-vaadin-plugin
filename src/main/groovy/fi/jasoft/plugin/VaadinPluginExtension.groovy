@@ -57,5 +57,11 @@ class VaadinPluginExtension{
         boolean terminateOnEnter = true
     }
 
-
+    // Metadata
+    Addon addon = new Addon()
+    class Addon {
+        String author = ''
+        String license = ''
+        String title = ''
+    }
 }
