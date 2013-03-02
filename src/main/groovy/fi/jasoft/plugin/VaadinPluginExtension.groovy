@@ -39,6 +39,7 @@ class VaadinPluginExtension{
 		String[] jvmArgs = null
 		String version = "2.3.0"
 		String extraArgs
+        String[] sourcePaths = ['client', 'shared']
 	}
 
 	// DevMode

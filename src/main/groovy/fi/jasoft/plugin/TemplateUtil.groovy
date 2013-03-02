@@ -101,11 +101,17 @@ class TemplateUtil {
         
         String moduleXML = project.vaadin.widgetset.tokenize('.').last()+".gwt.xml"
 
+        String sourcePaths = ""
+        for(String path : project.vaadin.gwt.sourcePaths){
+            sourcePaths+="\t<source path=\"${path}\" />\n"
+        }
+
         def substitutions = [:]
         substitutions['%INHERITS%'] = inherits
         substitutions['%WIDGETSET%'] = project.vaadin.widgetset
         substitutions['%SUPERDEVMODE%'] = String.valueOf(project.vaadin.devmode.superDevMode)
         substitutions['%USERAGENT%'] = project.vaadin.gwt.userAgent
+        substitutions['%SOURCE%'] = sourcePaths
 
         String name, pkg, filename
         if(project.vaadin.widgetsetGenerator == null){
