@@ -30,13 +30,6 @@ class DevModeTask extends DefaultTask  {
     public DevModeTask(){
         dependsOn(project.tasks.classes)
         description = "Run Development Mode for easier debugging and development of client widgets."
-
-        getOutputs().dir(new File("build/devmode"))
-        getOutputs().dir(new File('build/jetty/'))     
-
-        File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-        File unitCacheDir = new File(webAppDir.canonicalPath+'/VAADIN/gwt-unitCache')
-        getOutputs().dir(unitCacheDir)
     }
 
 	@TaskAction
@@ -95,6 +88,7 @@ class DevModeTask extends DefaultTask  {
     protected void runDevelopmentMode(){
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
         def classpath = getClassPath()
+
         project.javaexec{
             setMain('com.google.gwt.dev.DevMode')
             setClasspath(classpath)
@@ -117,6 +111,8 @@ class DevModeTask extends DefaultTask  {
         FileCollection classpath = 
             project.configurations.providedCompile + 
             project.configurations.compile +
+            project.configurations.vaadinSources +
+            project.configurations.gwtSources +
             project.sourceSets.main.runtimeClasspath +
             project.sourceSets.main.compileClasspath
 

@@ -53,12 +53,20 @@ class DependencyListener implements ProjectEvaluationListener{
 			project.war.classpath(project.configurations.vaadin)	
 		}
 
+        if(!project.configurations.hasProperty('vaadinSources')){
+            project.configurations.add('vaadinSources')
+        }
+
 		if(!project.configurations.hasProperty('gwt')){
 			project.configurations.add('gwt')
 			project.sourceSets.main.compileClasspath += project.configurations.gwt
 			project.sourceSets.test.compileClasspath += project.configurations.gwt
 			project.sourceSets.test.runtimeClasspath += project.configurations.gwt
 		}
+
+        if(!project.configurations.hasProperty("gwtSources")){
+            project.configurations.add('gwtSources')
+        }
 
 		if(!project.configurations.hasProperty('jetty8')){
 			project.configurations.add("jetty8")	
@@ -71,7 +79,7 @@ class DependencyListener implements ProjectEvaluationListener{
 		def version = project.vaadin.version
 		def gwtVersion = project.vaadin.gwt.version
 		if(version.startsWith("6")){
-			project.dependencies.add("vaadin", "com.vaadin:vaadin:"+version)
+			project.dependencies.add("vaadin", "com.vaadin:vaadin:${version}")
 			if(project.vaadin.widgetset != null){
 				project.dependencies.add("gwt", "com.google.gwt:gwt-user:"+gwtVersion)
 				project.dependencies.add("gwt", "com.google.gwt:gwt-dev:"+gwtVersion)
@@ -82,14 +90,20 @@ class DependencyListener implements ProjectEvaluationListener{
 			File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
     		FileTree themes = project.fileTree(dir: webAppDir.canonicalPath + '/VAADIN/themes', include: '**/styles.scss')
 			if(!themes.isEmpty()){
-				project.dependencies.add("vaadin",	"com.vaadin:vaadin-theme-compiler:"+version)	
-			}
+				project.dependencies.add("vaadin",	"com.vaadin:vaadin-theme-compiler:${version}")
+                project.dependencies.add("vaadinSources",	"com.vaadin:vaadin-theme-compiler:${version}:sources" )
+            }
 
 			if(project.vaadin.widgetset == null){
-				project.dependencies.add("vaadin",	"com.vaadin:vaadin-client-compiled:"+version)
+				project.dependencies.add("vaadin",	"com.vaadin:vaadin-client-compiled:${version}")
+                project.dependencies.add("vaadinSources",	"com.vaadin:vaadin-client-compiled:${version}:sources")
 			} else {
-				project.dependencies.add("gwt",	"com.vaadin:vaadin-client-compiler:"+version)
-				project.dependencies.add("gwt",	"com.vaadin:vaadin-client:"+version)
+				project.dependencies.add("gwt",	"com.vaadin:vaadin-client-compiler:${version}")
+                project.dependencies.add("gwtSources",	"com.vaadin:vaadin-client-compiler:${version}:sources")
+
+				project.dependencies.add("gwt",	"com.vaadin:vaadin-client:${version}")
+                project.dependencies.add("gwtSources",	"com.vaadin:vaadin-client:${version}:sources")
+
 				project.dependencies.add("gwt",	"javax.validation:validation-api:1.0.0.GA")
 				project.dependencies.add("gwt",	"javax.validation:validation-api:1.0.0.GA:sources")
 
@@ -98,8 +112,10 @@ class DependencyListener implements ProjectEvaluationListener{
 				project.dependencies.add("jetty8", "jspapi:jsp-api:2.0")
 			}
 
-			project.dependencies.add("vaadin", "com.vaadin:vaadin-server:"+version)
-			project.dependencies.add("vaadin", "com.vaadin:vaadin-themes:"+version)
+			project.dependencies.add("vaadin", "com.vaadin:vaadin-server:${version}")
+            project.dependencies.add("vaadinSources", "com.vaadin:vaadin-server:${version}:sources")
+
+			project.dependencies.add("vaadin", "com.vaadin:vaadin-themes:${version}")
 		}
 	}
 }

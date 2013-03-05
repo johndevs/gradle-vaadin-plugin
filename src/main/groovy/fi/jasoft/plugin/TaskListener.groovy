@@ -57,9 +57,13 @@ public class TaskListener implements TaskExecutionListener{
 	private void configureEclipsePlugin(Task task){
 		def project = task.getProject()
 		def cp = project.eclipse.classpath
+        cp.downloadSources = true
 		cp.defaultOutputDir = project.file('build/classes/main')
 		cp.plusConfigurations += project.configurations.vaadin
+        cp.plusConfigurations += project.configurations.vaadinSources
 		cp.plusConfigurations += project.configurations.gwt
+        cp.plusConfigurations += project.configurations.gwtSources
+
 	}
 
 	private void configureEclipseWtpPlugin(Task task){
