@@ -13,8 +13,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fi.jasoft.plugin;
+package fi.jasoft.plugin
 
+import fi.jasoft.plugin.tasks.CreateCompositeTask;
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import fi.jasoft.plugin.DependencyListener
@@ -50,6 +51,7 @@ class VaadinPlugin implements Plugin<Project>{
 		// Tasks
 		project.tasks.add(name: 'createVaadinProject', 				type: CreateProjectTask, 		group: 'Vaadin')	
 		project.tasks.add(name: 'createVaadinComponent',			type: CreateComponentTask,		group: 'Vaadin')
+        project.tasks.add(name: 'createVaadinComposite',            type: CreateCompositeTask,      group: 'Vaadin')
 		project.tasks.add(name: 'createVaadinTheme',				type: CreateThemeTask,			group: 'Vaadin')
 		project.tasks.add(name: 'createVaadinWidgetsetGenerator',	type: CreateWidgetsetGenerator,	group: 'Vaadin')
 
