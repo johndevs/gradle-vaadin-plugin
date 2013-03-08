@@ -11,6 +11,7 @@ You do not need to compile the plugin from scratch if you want to use it. You on
 The following tasks are available in the plugin
 
 * ``createVaadinComponent`` - Creates a new Vaadin Component.
+* ``createVaadinComposite`` - Creates a new Vaadin Composite for use with VisualDesigner.
 * ``createVaadinProject`` - Creates a new Vaadin Project.
 * ``createVaadinTheme`` - Creates a new Vaadin Theme
 * ``createVaadinWidgetsetGenerator`` - Creates a new widgetset generator for optimizing the widgetset
@@ -22,6 +23,8 @@ The following tasks are available in the plugin
 
 # Plugin configurations
 The following configuration options are available
+
+## Vaadin Project configurations
 * ``vaadin.version`` - Vaadin version (Vaadin 6 and 7 supported). Defaults to latest Vaadin 7
 * ``vaadin.widgetset`` - The fully qualified name of the widgetset (eg. com.example.helloworld.MyWidgetset)
 * ``vaadin.widgetsetGenerator`` - The fully qualified name of the widgetset generator.
@@ -31,6 +34,8 @@ The following configuration options are available
 * ``vaadin.manageDependencies`` - Should the plugin manage the Vaadin depencies for you. Default is true.
 * ``vaadin.serverPort`` - The port the embedded server listens to. Default is 8080.
 * ``vaadin.jvmArgs`` - Additional JVM arguments passed to the vaadinRun task. Default is ''.
+
+## Vaadin GWT configurations
 * ``vaadin.gwt.version`` - GWT version used with Vaadin 6. Defaults to 2.3.0. 
 * ``vaadin.gwt.style`` - Compilation style of the GWT compiler. Default is OBF.
 * ``vaadin.gwt.optimize`` - Optimization level of the GWT compiler. Default is 0.
@@ -40,6 +45,8 @@ The following configuration options are available
 * ``vaadin.gwt.strict`` - Should the GWT Compiler be run in strict mode. Default is false.
 * ``vaadin.gwt.userAgent`` - The browsers you want to support. All browser are supported by default.
 * ``vaadin.gwt.jvmArgs`` - Additional JVM arguments passed to the widgetset compiler. Default is ''.
+
+## Vaadin Devmode configurations
 * ``vaadin.devmode.noserver`` - Do not run the embedded Jetty server when running devmode. Default is false.
 * ``vaadin.devmode.superDevMode`` - Add support for super devmode. Default is false.
 * ``vaadin.devmode.bindAddress`` - The address the DevMode server should be bound to. Default is 127.0.0.1. 
