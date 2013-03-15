@@ -37,9 +37,13 @@ public class TaskListener implements TaskExecutionListener{
 			} 
 
 			if(task.getName() == 'eclipseWtpComponent'){
-				configureEclipseWtpPlugin(task)
+                configureEclipseWtpPluginComponent(task)
 			}
 		}
+
+        if (task.getName() == 'eclipseWtpFacet'){
+            configureEclipseWtpPluginFacet(task)
+        }
 
 		if(task.getName() == 'compileJava'){
 			ensureWidgetsetGeneratorExists(task)
@@ -63,14 +67,26 @@ public class TaskListener implements TaskExecutionListener{
         cp.plusConfigurations += project.configurations.vaadinSources
 		cp.plusConfigurations += project.configurations.gwt
         cp.plusConfigurations += project.configurations.gwtSources
-
 	}
 
-	private void configureEclipseWtpPlugin(Task task){
+	private void configureEclipseWtpPluginComponent(Task task){
 		def project = task.getProject()
-		def wtp = project.eclipse.wtp.component
-		wtp.plusConfigurations += project.configurations.vaadin		
-	}
+		def wtp = project.eclipse.wtp
+		wtp.component.plusConfigurations += project.configurations.vaadin
+    }
+
+    private void configureEclipseWtpPluginFacet(Task task){
+        def project = task.getProject()
+        def wtp = project.eclipse.wtp
+
+        if(project.vaadin.version.startsWith('6')){
+            wtp.facet.facet(name: 'com.vaadin.integration.eclipse.core', version: '1.0')
+        } else {
+            wtp.facet.facet(name: 'com.vaadin.integration.eclipse.core', version: '7.0')
+        }
+        wtp.facet.facet(name: 'jst.web', version: project.vaadin.servletVersion)
+        wtp.facet.facet(name: 'java', version: project.sourceCompatibility)
+    }
 
 	private void ensureWidgetsetGeneratorExists(Task task){
 		def project = task.getProject()
