@@ -7,6 +7,10 @@ You do not need to compile the plugin from scratch if you want to use it. You on
 
     apply from: 'http://plugins.jasoft.fi/vaadin.plugin'
 
+or to use a specific version of the plugin
+
+    apply from: 'http://plugins.jasoft.fi/vaadin.plugin?version=x.x.x'
+
 # Plugin tasks
 The following tasks are available in the plugin
 
