@@ -13,8 +13,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fi.jasoft.plugin;
+package fi.jasoft.plugin
 
+import groovy.xml.MarkupBuilder;
 import org.gradle.api.execution.TaskExecutionListener
 import org.gradle.api.Task
 import org.gradle.api.tasks.TaskState
@@ -52,10 +53,14 @@ public class TaskListener implements TaskExecutionListener{
         if(task.getName() == 'jar'){
             configureAddonMetadata(task)
         }
+
+        if (task.getName() == 'war'){
+            configureJRebel(task)
+        }
 	}
 
 	public void  afterExecute(Task task, TaskState state){
-		
+
 	}
 
 	private void configureEclipsePlugin(Task task){
@@ -124,5 +129,23 @@ public class TaskListener implements TaskExecutionListener{
                 'Implementation-Version': project.version != null ? project.version : '',
                 'Implementation-Vendor': project.vaadin.addon.author,
         )
+    }
+
+    private void configureJRebel(Task task){
+        def project = task.getProject()
+        def rebelFile = project.sourceSets.main.output.classesDir.absolutePath + '/rebel.xml'
+        def srcWebApp = project.webAppDir.absolutePath
+        def writer = new FileWriter(rebelFile)
+
+        new MarkupBuilder(writer).application() {
+            classpath{
+                dir( name:project.sourceSets.main.output.classesDir.absolutePath )
+            }
+            web{
+                link(target:'/'){
+                    dir(name:srcWebApp)
+                }
+            }
+        }
     }
 }

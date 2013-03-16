@@ -59,22 +59,59 @@ class DevModeTask extends DefaultTask  {
                     project.sourceSets.main.runtimeClasspath +
                     project.sourceSets.main.compileClasspath
 
-
         File logDir = new File('build/jetty/')
-        logDir.mkdirs()            
+        logDir.mkdirs()
 
-        appServerProcess = ['java', 
-            "-Xrunjdwp:transport=dt_socket,address=${project.vaadin.debugPort},server=y,suspend=n",
-            '-Xdebug',
-            '-cp', cp.getAsPath(), 
-            'org.mortbay.jetty.runner.Runner', 
-            '--port', project.vaadin.serverPort,
-            '--out', logDir.canonicalPath + '/jetty8-devmode.log',
-            '--log', logDir.canonicalPath + '/jetty8-devmode.log',
-            webAppDir.canonicalPath
-        ].execute()
-       
-        println "Application running on http://0.0.0.0:${project.vaadin.serverPort} (debugger on ${project.vaadin.debugPort})"
+        def appServerProcess = ['java']
+
+        // Debug
+        appServerProcess.add('-Xdebug')
+        appServerProcess.add("-Xrunjdwp:transport=dt_socket,address=${project.vaadin.debugPort},server=y,suspend=n")
+
+        // Jrebel
+        if(project.vaadin.jrebel.enabled){
+            if(project.vaadin.jrebel.location != null && new File(project.vaadin.jrebel.location).exists()){
+                appServerProcess.add('-noverify')
+                appServerProcess.add("-javaagent:${project.vaadin.jrebel.location}")
+            } else {
+                println "Could not find jrebel.jar, aborting run."
+                return;
+            }
+        }
+
+        // JVM options
+        appServerProcess.add('-cp')
+        appServerProcess.add(cp.getAsPath())
+
+        if(project.vaadin.jvmArgs != null){
+            appServerProcess.addAll(project.vaadin.jvmArgs)
+        }
+
+        // Program args
+        appServerProcess.add('org.mortbay.jetty.runner.Runner')
+
+        appServerProcess.add('--port')
+        appServerProcess.add(project.vaadin.serverPort)
+
+        appServerProcess.add(webAppDir.canonicalPath)
+
+        print "Application running on http://0.0.0.0:${project.vaadin.serverPort} "
+
+        if(project.vaadin.jrebel.enabled){
+            println "(debugger on ${project.vaadin.debugPort}, JRebel active)"
+        } else {
+            println "(debugger on ${project.vaadin.debugPort})"
+        }
+
+        // Execute server
+        appServerProcess = appServerProcess.execute()
+
+        if(project.vaadin.plugin.logToConsole){
+            appServerProcess.consumeProcessOutput(System.out, System.out)
+        } else {
+            File log = new File(logDir.canonicalPath + '/jetty8-devMode.log')
+            appServerProcess.consumeProcessOutputStream(new FileOutputStream(log))
+        }
     }
 
     protected void terminateApplicationServer(){

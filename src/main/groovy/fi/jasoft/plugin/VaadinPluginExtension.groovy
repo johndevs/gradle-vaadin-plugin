@@ -25,7 +25,7 @@ class VaadinPluginExtension{
 	boolean manageDependencies = true
 	int serverPort = 8080
 	String[] jvmArgs = null
-	
+
 	// GWT Compiler and DevMode
 	GWT gwt = new GWT()
 	class GWT{
@@ -55,6 +55,7 @@ class VaadinPluginExtension{
     VaadinPluginConfiguration plugin = new VaadinPluginConfiguration()
     class VaadinPluginConfiguration {
         boolean terminateOnEnter = true
+        boolean logToConsole = false
     }
 
     // Metadata
@@ -63,5 +64,12 @@ class VaadinPluginExtension{
         String author = ''
         String license = ''
         String title = ''
+    }
+
+    // Jrebel
+    JRebel jrebel = new JRebel()
+    class JRebel {
+        boolean enabled = false
+        String location
     }
 }
