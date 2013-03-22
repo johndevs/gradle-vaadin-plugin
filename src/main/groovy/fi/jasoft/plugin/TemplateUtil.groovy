@@ -87,11 +87,16 @@ class TemplateUtil {
             JarInputStream jarStream = new JarInputStream(it.newDataInputStream());
             Manifest mf = jarStream.getManifest();
             if(mf != null){
-                 Attributes attributes = mf.getMainAttributes()
+                Attributes attributes = mf.getMainAttributes()
                 if(attributes != null){
-                    String widgetset = attributes.getValue('Vaadin-Widgetsets')
-                    if(widgetset != null && widgetset != 'com.vaadin.terminal.gwt.DefaultWidgetSet' && widgetset != 'com.vaadin.DefaultWidgetSet'){
-                        inherits += "\t<inherits name=\"${widgetset}\" />\n"
+                    String widgetsets = attributes.getValue('Vaadin-Widgetsets')
+                    if(widgetsets != null){
+                        for(String widgetset : widgetsets.split(",")){
+                            if(widgetset != 'com.vaadin.terminal.gwt.DefaultWidgetSet'
+                                    && widgetset != 'com.vaadin.DefaultWidgetSet'){
+                                inherits += "\t<inherits name=\"${widgetset}\" />\n"
+                            }
+                        }
                     }
                 }
             }
