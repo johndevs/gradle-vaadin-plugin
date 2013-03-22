@@ -66,6 +66,6 @@ The following configuration options are available
 * ``vaadin.jrebel.location`` - Absolute path of jrebel.jar (required if ```jrebel.enabled``` is set to true)
  
 ## Plugin configurations
-* ``vaadin.terminateOnEnter`` - Should the vaadinRun and devmode tasks be terminated on enter-key. Default true.
-* ``vaadin.logToConsole``- Should server logs be logged to the console or to a log file. Default is logging to file.
+* ``vaadin.plugin.terminateOnEnter`` - Should the vaadinRun and devmode tasks be terminated on enter-key. Default true.
+* ``vaadin.plugin.logToConsole``- Should server logs be logged to the console or to a log file. Default is logging to file.
 
