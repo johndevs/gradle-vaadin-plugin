@@ -19,6 +19,7 @@ import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.WarPluginConvention
+import fi.jasoft.plugin.ApplicationServer
 import java.lang.Process
 import fi.jasoft.plugin.TemplateUtil
 
@@ -39,15 +40,22 @@ class SuperDevModeTask extends DefaultTask  {
             return;
         }
 
-    	File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
+        ApplicationServer server = new ApplicationServer(project)
+
+        server.start()
+
+        runCodeServer()
+
+        server.terminate()
+    }
+
+    private runCodeServer(){
+
+        File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
         File javaDir = project.sourceSets.main.java.srcDirs.iterator().next()
-
-    	File widgetsetsDir = new File(webAppDir.canonicalPath+'/VAADIN/widgetsets')
-    	widgetsetsDir.mkdirs()
-
-    	String widgetset = project.vaadin.widgetset == null ? 'com.vaadin.terminal.gwt.DefaultWidgetSet' : project.vaadin.widgetset
-
-        launchApplicationServer()
+        File widgetsetsDir = new File(webAppDir.canonicalPath+'/VAADIN/widgetsets')
+        widgetsetsDir.mkdirs()
+        String widgetset = project.vaadin.widgetset == null ? 'com.vaadin.terminal.gwt.DefaultWidgetSet' : project.vaadin.widgetset
 
         def classpath = getClassPath()
 
@@ -55,47 +63,15 @@ class SuperDevModeTask extends DefaultTask  {
             setMain('com.google.gwt.dev.codeserver.CodeServer')
             setClasspath(classpath)
             setArgs([
-                '-port', 9876,
-                '-workDir', widgetsetsDir.canonicalPath,
-                '-src', javaDir.canonicalPath,
-                widgetset ])
+                    '-port', 9876,
+                    '-workDir', widgetsetsDir.canonicalPath,
+                    '-src', javaDir.canonicalPath,
+                    widgetset ])
             jvmArgs('-Dgwt.compiler.skip=true')
         }
-
-        terminateApplicationServer()
     }
 
-    protected void launchApplicationServer(){
-        File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-        FileCollection cp = project.configurations.jetty8 + 
-                    project.configurations.providedCompile + 
-                    project.configurations.compile +
-                    project.configurations.vaadinSources +
-                    project.configurations.gwtSources +
-                    project.sourceSets.main.runtimeClasspath +
-                    project.sourceSets.main.compileClasspath
-
-        appServerProcess = ['java', 
-            "-Xrunjdwp:transport=dt_socket,address=${project.vaadin.debugPort},server=y,suspend=n",
-            '-Xdebug',
-            '-cp', cp.getAsPath(), 
-            'org.mortbay.jetty.runner.Runner', 
-            webAppDir.canonicalPath].execute()
-       
-        println "Application running on http://localhost:8080 (debugger on ${project.vaadin.debugPort})"
-    }
-
-    protected void terminateApplicationServer(){
-        appServerProcess.in.close()
-        appServerProcess.out.close()
-        appServerProcess.err.close()
-        appServerProcess.destroy()
-        appServerProcess = null;
-    }
-
-
-    private FileCollection getClassPath(){
-
+    private getClassPath(){
         FileCollection classpath = 
             project.configurations.providedCompile + 
             project.configurations.compile +
