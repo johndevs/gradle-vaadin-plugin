@@ -79,7 +79,7 @@ class CreateComponentTask extends DefaultTask {
         if(project.vaadin.widgetset != null){
             String compile = console.readLine("Compile widgetset (Y/N)[Y]: ")
             if(compile == '' || compile == 'Y'){
-                project.widgetset.exec()
+                project.widgetset.run()
             }
         }
     }
