@@ -28,7 +28,7 @@ class SuperDevModeTask extends DefaultTask  {
     private Process appServerProcess;
 
     public SuperDevModeTask(){
-        dependsOn(project.tasks.widgetset)
+        dependsOn(project.tasks.classes)
         description = "Run Super Development Mode for easier client widget development."
     }
 
