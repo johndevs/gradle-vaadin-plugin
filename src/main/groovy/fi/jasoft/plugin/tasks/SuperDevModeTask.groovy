@@ -13,8 +13,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fi.jasoft.plugin.tasks;
+package fi.jasoft.plugin.tasks
 
+import fi.jasoft.plugin.Util;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.file.FileCollection
@@ -57,7 +58,7 @@ class SuperDevModeTask extends DefaultTask  {
         widgetsetsDir.mkdirs()
         String widgetset = project.vaadin.widgetset == null ? 'com.vaadin.terminal.gwt.DefaultWidgetSet' : project.vaadin.widgetset
 
-        def classpath = getClassPath()
+        def classpath = Util.getClassPath(project)
 
         project.javaexec{
             setMain('com.google.gwt.dev.codeserver.CodeServer')
@@ -69,18 +70,5 @@ class SuperDevModeTask extends DefaultTask  {
                     widgetset ])
             jvmArgs('-Dgwt.compiler.skip=true')
         }
-    }
-
-    private getClassPath(){
-        FileCollection classpath = 
-            project.configurations.providedCompile + 
-            project.configurations.compile +
-            project.sourceSets.main.runtimeClasspath +
-            project.sourceSets.main.compileClasspath
-
-        project.sourceSets.main.java.srcDirs.each{
-            classpath += project.files(it)
-        }
-        return classpath   
     }
 }

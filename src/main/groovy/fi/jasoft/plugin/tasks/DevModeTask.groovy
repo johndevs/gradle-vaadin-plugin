@@ -15,7 +15,8 @@
 */
 package fi.jasoft.plugin.tasks
 
-import fi.jasoft.plugin.ApplicationServer;
+import fi.jasoft.plugin.ApplicationServer
+import fi.jasoft.plugin.Util;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.JavaExec;
@@ -54,7 +55,7 @@ class DevModeTask extends DefaultTask  {
 
     protected void runDevelopmentMode(){
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-        def classpath = getClassPath()
+        def classpath = Util.getClassPath(project)
 
         project.javaexec{
             setMain('com.google.gwt.dev.DevMode')
@@ -72,20 +73,5 @@ class DevModeTask extends DefaultTask  {
                     '-bindAddress',     project.vaadin.devmode.bindAddress
             ])
         }
-    }
-
-    private FileCollection getClassPath(){
-        FileCollection classpath = 
-            project.configurations.providedCompile + 
-            project.configurations.compile +
-            project.configurations.vaadinSources +
-            project.configurations.gwtSources +
-            project.sourceSets.main.runtimeClasspath +
-            project.sourceSets.main.compileClasspath
-
-        project.sourceSets.main.java.srcDirs.each{
-            classpath += project.files(it)
-        }
-        return classpath   
     }
 }

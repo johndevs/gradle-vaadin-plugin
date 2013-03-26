@@ -13,7 +13,10 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fi.jasoft.plugin;
+package fi.jasoft.plugin
+
+import org.gradle.api.Project
+import org.gradle.api.file.FileCollection;
 
 class Util {
 
@@ -37,4 +40,22 @@ class Util {
 		}
     	return null;
 	}
+
+    public static FileCollection getClassPath(Project project){
+        FileCollection classpath =
+            project.configurations.providedCompile +
+                    project.configurations.compile +
+                    project.configurations.vaadinSources +
+                    project.configurations.gwtSources +
+                    project.sourceSets.main.runtimeClasspath +
+                    project.sourceSets.main.compileClasspath
+
+        project.sourceSets.main.java.srcDirs.each{
+            classpath += project.files(it)
+        }
+        project.sourceSets.main.resources.srcDirs.each{
+            classpath += project.files(it)
+        }
+        return classpath
+    }
 }

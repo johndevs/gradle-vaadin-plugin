@@ -25,14 +25,7 @@ public class ApplicationServer {
         }
 
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-        FileCollection cp = project.configurations.jetty8 +
-                project.configurations.providedCompile +
-                project.configurations.compile +
-                project.configurations.vaadinSources +
-                project.configurations.gwtSources +
-                project.sourceSets.main.runtimeClasspath +
-                project.sourceSets.main.compileClasspath
-
+        FileCollection cp = project.configurations.jetty8 + Util.getClassPath(project)
         File logDir = new File('build/jetty/')
         logDir.mkdirs()
 

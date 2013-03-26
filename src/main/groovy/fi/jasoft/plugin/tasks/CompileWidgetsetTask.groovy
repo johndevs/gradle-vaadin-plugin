@@ -13,13 +13,11 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fi.jasoft.plugin.tasks;
+package fi.jasoft.plugin.tasks
 
+import fi.jasoft.plugin.Util;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
-import org.gradle.api.tasks.JavaExec;
-import fi.jasoft.plugin.VaadinPlugin;
-import fi.jasoft.plugin.TemplateUtil;
 import org.gradle.api.plugins.WarPluginConvention;
 import org.gradle.api.file.FileCollection;
 
@@ -73,7 +71,7 @@ class CompileWidgetsetTask extends DefaultTask {
         // Ensure unit cache dir is present so the compiler does not complain
         new File(webAppDir.canonicalPath+'/VAADIN/gwt-unitCache').mkdirs()
 
-        FileCollection classpath = getClassPath()
+        FileCollection classpath = Util.getClassPath(project)
         
         project.javaexec{
             setClasspath(classpath)
@@ -112,17 +110,4 @@ class CompileWidgetsetTask extends DefaultTask {
          new File(targetDir.canonicalPath+"/WEB-INF").deleteDir()
     }
 
-     private FileCollection getClassPath(){
-        FileCollection classpath = 
-            project.configurations.providedCompile + 
-            project.configurations.compile +
-            project.sourceSets.main.runtimeClasspath +
-            project.sourceSets.main.compileClasspath
-
-        project.sourceSets.main.java.srcDirs.each{
-            classpath += project.files(it)
-        }
-        return classpath   
-    }
-    
 }
