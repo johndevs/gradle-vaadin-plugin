@@ -106,10 +106,6 @@ class DependencyListener implements ProjectEvaluationListener{
 
 				project.dependencies.add("gwt",	"javax.validation:validation-api:1.0.0.GA")
 				project.dependencies.add("gwt",	"javax.validation:validation-api:1.0.0.GA:sources")
-
-				// For devmode
-				project.dependencies.add("jetty8", "javax.servlet:servlet-api:"+project.vaadin.servletVersion)
-				project.dependencies.add("jetty8", "jspapi:jsp-api:2.0")
 			}
 
 			project.dependencies.add("vaadin", "com.vaadin:vaadin-server:${version}")
