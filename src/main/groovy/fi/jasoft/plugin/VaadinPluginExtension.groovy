@@ -18,7 +18,7 @@ package fi.jasoft.plugin;
 class VaadinPluginExtension{
 	String widgetset
 	String widgetsetGenerator = null										
-	String version = "7+" 									
+	String version = "7+"
 	String servletVersion = "2.5"
 	String debugPort = 8000
 	boolean manageWidgetset = true
@@ -26,8 +26,42 @@ class VaadinPluginExtension{
 	int serverPort = 8080
 	String[] jvmArgs = null
 
-	// GWT Compiler and DevMode
-	GWT gwt = new GWT()
+
+    JRebel jrebel = new JRebel()
+
+    JRebel jrebel(closure) {
+        closure.delegate = jrebel
+        closure()
+    }
+
+    DevMode devmode = new DevMode()
+
+    DevMode devmode(closure) {
+        closure.delegate = devmode
+        closure()
+    }
+
+    VaadinPluginConfiguration plugin = new VaadinPluginConfiguration()
+
+    VaadinPluginConfiguration plugin(closure) {
+        closure.delegate = plugin
+        closure()
+    }
+
+    Addon addon = new Addon()
+
+    Addon addon(closure) {
+        closure.delegate = addon
+        closure()
+    }
+
+    GWT gwt = new GWT()
+
+    GWT gwt(closure) {
+        closure.delegate = gwt
+        closure()
+    }
+
 	class GWT{
 		String style = "OBF"
 		String optimize = 0
@@ -40,36 +74,118 @@ class VaadinPluginExtension{
 		String version = "2.3.0"
 		String extraArgs
         String[] sourcePaths = ['client', 'shared']
-	}
 
-	// DevMode
-	DevMode devmode = new DevMode()
+        void style(String style) {
+            this.style = style
+        }
+
+        void optimize(String optimize) {
+            this.optimize = optimize
+        }
+
+        void logLevel(String logLevel) {
+            this.logLevel = logLevel
+        }
+
+        void localWorkers(int localWorkers) {
+            this.localWorkers = localWorkers
+        }
+
+        void draftCompile(boolean draftCompile) {
+            this.draftCompile = draftCompile
+        }
+
+        void strict(boolean strict) {
+            this.strict = strict
+        }
+
+        void userAgent(String userAgent) {
+            this.userAgent = userAgent
+        }
+
+        void jvmArgs(String[] jvmArgs) {
+            this.jvmArgs = jvmArgs
+        }
+
+        void version(String version) {
+            this.version = version
+        }
+
+        void extraArgs(String extraArgs) {
+            this.extraArgs = extraArgs
+        }
+
+        void sourcePaths(String[] sourcePaths) {
+            this.sourcePaths = sourcePaths
+        }
+    }
+
 	class DevMode {
 		boolean noserver = false
 		boolean superDevMode = false
 		String bindAddress = '127.0.0.1'
 		int codeServerPort = 9997
-	}
 
-    // Plugin configurations
-    VaadinPluginConfiguration plugin = new VaadinPluginConfiguration()
-    class VaadinPluginConfiguration {
-        boolean terminateOnEnter = true
-        boolean logToConsole = false
+        void noserver(boolean noserver) {
+            this.noserver = noserver
+        }
+
+        void superDevMode(boolean superDevMode) {
+            this.superDevMode = superDevMode
+        }
+
+        void bindAddress(String bindAddress) {
+            this.bindAddress = bindAddress
+        }
+
+        void codeServerPort(int codeServerPort) {
+            this.codeServerPort = codeServerPort
+        }
     }
 
-    // Metadata
-    Addon addon = new Addon()
+    class VaadinPluginConfiguration {
+
+        boolean terminateOnEnter = true
+        boolean logToConsole = false
+
+        void logToConsole (boolean logToConsole) {
+            this.logToConsole = logToConsole
+        }
+
+        void terminateOnEnter(boolean terminateOnEnter) {
+            this.terminateOnEnter = terminateOnEnter
+        }
+    }
+
     class Addon {
         String author = ''
         String license = ''
         String title = ''
+
+        void author(String author) {
+            this.author = author
+        }
+
+        void license(String license) {
+            this.license = license
+        }
+
+        void title(String title) {
+            this.title = title
+        }
     }
 
-    // Jrebel
-    JRebel jrebel = new JRebel()
     class JRebel {
         boolean enabled = false
         String location
+
+        void enabled(boolean enabled) {
+            this.enabled = enabled
+        }
+
+        void location(String location) {
+            this.location = location
+        }
     }
+
 }
