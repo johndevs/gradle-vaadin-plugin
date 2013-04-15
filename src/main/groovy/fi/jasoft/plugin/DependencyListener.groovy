@@ -96,7 +96,6 @@ class DependencyListener implements ProjectEvaluationListener{
 
 			if(project.vaadin.widgetset == null){
 				project.dependencies.add("vaadin",	"com.vaadin:vaadin-client-compiled:${version}")
-                project.dependencies.add("vaadinSources",	"com.vaadin:vaadin-client-compiled:${version}:sources")
 			} else {
 				project.dependencies.add("gwt",	"com.vaadin:vaadin-client-compiler:${version}")
                 project.dependencies.add("gwtSources",	"com.vaadin:vaadin-client-compiler:${version}:sources")
