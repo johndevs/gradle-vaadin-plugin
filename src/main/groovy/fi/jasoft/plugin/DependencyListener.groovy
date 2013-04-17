@@ -43,7 +43,9 @@ class DependencyListener implements ProjectEvaluationListener{
 		if(project.repositories.findByName('Jasoft.fi Maven repository') == null) {
 			project.repositories.mavenRepo(name: 'Jasoft.fi Maven repository', url: 'http://mvn.jasoft.fi/maven2')
 		}
-		
+
+        project.repositories.flatDir(dirs: '/home/johnnie/Repositories/gradle-vaadin-plugin/build/libs')
+
 		// Configurations
 		if(!project.configurations.hasProperty('vaadin')){
 			project.configurations.add('vaadin')
@@ -73,8 +75,9 @@ class DependencyListener implements ProjectEvaluationListener{
 		}
 		
 		// Tasks
-		def jettyVersion = "8.1.5.v20120716"	
-		project.dependencies.add('jetty8', "org.mortbay.jetty:jetty-runner:$jettyVersion")
+        project.dependencies.add('jetty8', 'org.eclipse.jetty.aggregate:jetty-all-server:8.1.10.v20130312')
+        project.dependencies.add('jetty8', 'fi.jasoft.plugin:VaadinPlugin:'+VaadinPlugin.getVersion())
+        project.dependencies.add('jetty8', 'asm:asm:3.3.1')
 
 		def version = project.vaadin.version
 		def gwtVersion = project.vaadin.gwt.version

@@ -13,6 +13,8 @@ dependencies {
     compile gradleApi()
     groovy localGroovy()
     deployerJars "org.apache.maven.wagon:wagon-ftp:1.0-beta-2"
+
+    compile 'org.eclipse.jetty.aggregate:jetty-all-server:8.1.10.v20130312'
 }
 
 defaultTasks 'jar'

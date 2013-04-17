@@ -11,17 +11,13 @@
  */ 
 buildscript {
     repositories {
-	mavenCentral()
-    	flatDir dirs: '/home/johnnie/Workspaces/Gradle/VaadinPlugin/build/libs'
+	    mavenCentral()
+    	flatDir dirs: '/home/johnnie/Repositories/gradle-vaadin-plugin/build/libs'
     }
 
     dependencies {
-        classpath group: 'fi.jasoft.plugin', name: 'VaadinPlugin', version: '0.5'
+        classpath group: 'fi.jasoft.plugin', name: 'VaadinPlugin', version: '0.5.2'
 	}
-}
-
-repositories {
-	flatDir dirs: '/home/johnnie/Workspaces/Gradle/VaadinPlugin/build/libs'
 }
 
 if (!project.plugins.findPlugin(fi.jasoft.plugin.VaadinPlugin)) {

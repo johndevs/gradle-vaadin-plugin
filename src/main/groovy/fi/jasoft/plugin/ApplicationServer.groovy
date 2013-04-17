@@ -26,6 +26,7 @@ public class ApplicationServer {
 
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
         FileCollection cp = project.configurations.jetty8 + Util.getClassPath(project)
+
         File logDir = new File('build/jetty/')
         logDir.mkdirs()
 
@@ -55,12 +56,11 @@ public class ApplicationServer {
         }
 
         // Program args
-        appServerProcess.add('org.mortbay.jetty.runner.Runner')
+        appServerProcess.add('fi.jasoft.plugin.server.ApplicationServerRunner')
 
-        appServerProcess.add('--port')
         appServerProcess.add(project.vaadin.serverPort)
 
-        appServerProcess.add(webAppDir.canonicalPath)
+        appServerProcess.add(webAppDir.canonicalPath+'/')
 
         print "Application running on http://0.0.0.0:${project.vaadin.serverPort} "
 
