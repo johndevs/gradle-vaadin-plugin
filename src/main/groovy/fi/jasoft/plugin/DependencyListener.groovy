@@ -77,7 +77,7 @@ class DependencyListener implements ProjectEvaluationListener{
 		// Tasks
         project.dependencies.add('jetty8', 'org.eclipse.jetty.aggregate:jetty-all-server:8.1.10.v20130312')
         project.dependencies.add('jetty8', 'fi.jasoft.plugin:VaadinPlugin:'+VaadinPlugin.getVersion())
-        project.dependencies.add('jetty8', 'asm:asm:3.3.1')
+        project.dependencies.add('jetty8', 'asm:asm-all:3.3.1')
 
 		def version = project.vaadin.version
 		def gwtVersion = project.vaadin.gwt.version

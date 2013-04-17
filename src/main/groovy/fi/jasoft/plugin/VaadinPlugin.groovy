@@ -15,7 +15,8 @@
 */
 package fi.jasoft.plugin
 
-import fi.jasoft.plugin.tasks.CreateCompositeTask;
+import fi.jasoft.plugin.tasks.CreateCompositeTask
+import fi.jasoft.plugin.tasks.CreateServlet3ProjectTask;
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import fi.jasoft.plugin.DependencyListener
@@ -53,8 +54,9 @@ class VaadinPlugin implements Plugin<Project>{
 		project.plugins.apply(WarPlugin)
 		
 		// Tasks
-		project.tasks.add(name: 'createVaadinProject', 				type: CreateProjectTask, 		group: 'Vaadin')	
-		project.tasks.add(name: 'createVaadinComponent',			type: CreateComponentTask,		group: 'Vaadin')
+		project.tasks.add(name: 'createVaadinProject', 				type: CreateProjectTask, 		group: 'Vaadin')
+        project.tasks.add(name: 'createVaadinServlet3Project', 		type: CreateServlet3ProjectTask,group: 'Vaadin')
+        project.tasks.add(name: 'createVaadinComponent',			type: CreateComponentTask,		group: 'Vaadin')
         project.tasks.add(name: 'createVaadinComposite',            type: CreateCompositeTask,      group: 'Vaadin')
 		project.tasks.add(name: 'createVaadinTheme',				type: CreateThemeTask,			group: 'Vaadin')
 		project.tasks.add(name: 'createVaadinWidgetsetGenerator',	type: CreateWidgetsetGenerator,	group: 'Vaadin')

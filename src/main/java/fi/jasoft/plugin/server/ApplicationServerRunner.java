@@ -32,6 +32,14 @@ public class ApplicationServerRunner {
         String webapp = args[1];
         String classes = args[2];
 
+        List<String> resources = new ArrayList<String>();
+        if(new File(webapp).exists()){
+            resources.add(webapp);
+        }
+        if(new File(classes).exists()){
+            resources.add(classes);
+        }
+
         // For debugging
         // System.setProperty("org.eclipse.jetty.LEVEL", "DEBUG");
 
@@ -40,15 +48,14 @@ public class ApplicationServerRunner {
         // Static file handler
         WebAppContext handler = new WebAppContext();
         handler.setConfigurations(new Configuration[] {
-                new RJRAnnotationConfiguration(), new WebXmlConfiguration(),
+                new RJRAnnotationConfiguration(resources), new WebXmlConfiguration(),
                 new WebInfConfiguration(), new TagLibConfiguration(),
                 new PlusConfiguration(), new MetaInfConfiguration(),
                 new FragmentConfiguration(), new EnvConfiguration() });
         handler.setContextPath("/");
-        handler.setBaseResource(new ResourceCollection(new String[] {
-            webapp,
-            classes
-         }));
+
+        handler.setBaseResource(new ResourceCollection(resources.toArray(new String[resources.size()])));
+
         handler.setParentLoaderPriority(true);
         handler.setClassLoader(Thread.currentThread().getContextClassLoader());
 

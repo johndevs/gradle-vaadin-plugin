@@ -28,6 +28,12 @@ import org.eclipse.jetty.webapp.WebAppContext;
 public class RJRAnnotationConfiguration extends AnnotationConfiguration {
 	private static Logger logger =  Log.getLogger(RJRAnnotationConfiguration.class);
 
+    private final List<String> scannableClasspaths;
+
+    public RJRAnnotationConfiguration(List<String> classpath){
+        scannableClasspaths = classpath;
+    }
+
 	public void parseWebInfClasses(final WebAppContext context,
 			final AnnotationParser parser) throws Exception {
 		
@@ -50,8 +56,7 @@ public class RJRAnnotationConfiguration extends AnnotationConfiguration {
         	jars = new ArrayList<Resource>();
         }
         //Hacked , add RJR classpaths
-		List<String> rjrClasspaths = Arrays.asList("/tmp/test/build/classes");
-        for (String path : rjrClasspaths) {
+        for (String path : scannableClasspaths) {
 			File file = new File(path);
 			if (file.isDirectory()) {
 				if (logger.isDebugEnabled()) logger.debug("scanning RJR classes for annotation:" + file.getAbsolutePath());

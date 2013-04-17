@@ -62,6 +62,9 @@ public class ApplicationServer {
 
         appServerProcess.add(webAppDir.canonicalPath+'/')
 
+        File classesDir = new File("build/classes");
+        appServerProcess.add(classesDir.canonicalPath+'/')
+
         print "Application running on http://0.0.0.0:${project.vaadin.serverPort} "
 
         if(project.vaadin.jrebel.enabled){

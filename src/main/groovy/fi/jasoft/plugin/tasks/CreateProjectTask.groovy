@@ -64,8 +64,7 @@ class CreateProjectTask extends DefaultTask {
 		def substitutions = [:]
     	substitutions['%PACKAGE%'] = applicationPackage
     	substitutions['%APPLICATION_NAME%'] = applicationName
-    	substitutions['%INHERITS%'] = ""
-		
+
 		if(project.vaadin.version.startsWith("6")){
 			TemplateUtil.writeTemplate("MyApplication.java", uidir, applicationName+".java", substitutions)
 			if(project.vaadin.widgetset == null){
