@@ -19,8 +19,6 @@ import fi.jasoft.plugin.tasks.CreateCompositeTask
 import fi.jasoft.plugin.tasks.CreateServlet3ProjectTask;
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import fi.jasoft.plugin.DependencyListener
-import org.gradle.api.plugins.jetty.JettyPlugin
 import org.gradle.api.plugins.WarPlugin
 import org.gradle.api.tasks.compile.Compile
 
@@ -33,7 +31,7 @@ import fi.jasoft.plugin.tasks.SuperDevModeTask
 import fi.jasoft.plugin.tasks.CompileThemeTask
 import fi.jasoft.plugin.tasks.UpdateWidgetsetTask
 import fi.jasoft.plugin.tasks.RunTask
-import fi.jasoft.plugin.tasks.CreateWidgetsetGenerator
+import fi.jasoft.plugin.tasks.CreateWidgetsetGeneratorTask
 
 class VaadinPlugin implements Plugin<Project>{
 
@@ -54,12 +52,12 @@ class VaadinPlugin implements Plugin<Project>{
 		project.plugins.apply(WarPlugin)
 		
 		// Tasks
-		project.tasks.add(name: 'createVaadinProject', 				type: CreateProjectTask, 		group: 'Vaadin')
-        project.tasks.add(name: 'createVaadinServlet3Project', 		type: CreateServlet3ProjectTask,group: 'Vaadin')
-        project.tasks.add(name: 'createVaadinComponent',			type: CreateComponentTask,		group: 'Vaadin')
-        project.tasks.add(name: 'createVaadinComposite',            type: CreateCompositeTask,      group: 'Vaadin')
-		project.tasks.add(name: 'createVaadinTheme',				type: CreateThemeTask,			group: 'Vaadin')
-		project.tasks.add(name: 'createVaadinWidgetsetGenerator',	type: CreateWidgetsetGenerator,	group: 'Vaadin')
+		project.tasks.add(name: 'createVaadinProject', 				type: CreateProjectTask, 		    group: 'Vaadin')
+        project.tasks.add(name: 'createVaadinServlet3Project', 		type: CreateServlet3ProjectTask,    group: 'Vaadin')
+        project.tasks.add(name: 'createVaadinComponent',			type: CreateComponentTask,		    group: 'Vaadin')
+        project.tasks.add(name: 'createVaadinComposite',            type: CreateCompositeTask,          group: 'Vaadin')
+		project.tasks.add(name: 'createVaadinTheme',				type: CreateThemeTask,			    group: 'Vaadin')
+		project.tasks.add(name: 'createVaadinWidgetsetGenerator',	type: CreateWidgetsetGeneratorTask,	group: 'Vaadin')
 
 		project.tasks.add(name: 'widgetset', 			type: CompileWidgetsetTask, group: 'Vaadin')
 		project.tasks.add(name: 'devmode', 				type: DevModeTask, 			group: 'Vaadin')

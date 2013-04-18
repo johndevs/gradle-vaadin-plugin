@@ -19,9 +19,9 @@ import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 import fi.jasoft.plugin.TemplateUtil;
 
-class CreateWidgetsetGenerator extends DefaultTask {
+class CreateWidgetsetGeneratorTask extends DefaultTask {
 
-	public CreateWidgetsetGenerator(){
+	public CreateWidgetsetGeneratorTask(){
         description = "Creates a new widgetset generator for optimizing the widgetset"
     }
 
