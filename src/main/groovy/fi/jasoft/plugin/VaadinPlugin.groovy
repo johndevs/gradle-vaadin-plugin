@@ -38,7 +38,7 @@ import fi.jasoft.plugin.tasks.CreateWidgetsetGenerator
 class VaadinPlugin implements Plugin<Project>{
 
     static String getVersion(){
-        return '0.5.2';
+        return '0.6';
     }
 
 	void apply(Project project){
