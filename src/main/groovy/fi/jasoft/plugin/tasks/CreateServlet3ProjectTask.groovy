@@ -63,6 +63,15 @@ class CreateServlet3ProjectTask extends DefaultTask {
         substitutions['%PACKAGE%'] = applicationPackage
         substitutions['%APPLICATION_NAME%'] = applicationName
 
+        if (project.vaadin.widgetset != null) {
+            substitutions['%WEBINITPARAMIMPORT%'] = "import javax.servlet.annotation.WebInitParam;"
+            substitutions['%WIDGETSETPARAM%'] = "@WebInitParam(name=\"widgetset\", value=\"${project.vaadin.widgetset}\")"
+        } else {
+            substitutions['%WEBINITPARAMIMPORT%'] = ''
+            substitutions['%WIDGETSETPARAM%'] = ''
+        }
+
+
         TemplateUtil.writeTemplate('MyUI.java', uidir, applicationName+"UI.java", substitutions)
 
         TemplateUtil.writeTemplate("MyServlet.java", uidir, applicationName+"Servlet.java", substitutions)

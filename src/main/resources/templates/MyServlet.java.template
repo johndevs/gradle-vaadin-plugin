@@ -11,8 +11,9 @@ import com.vaadin.server.UIProvider;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.UI;
+%WEBINITPARAMIMPORT%
 
-@WebServlet(urlPatterns="/*")
+@WebServlet(urlPatterns="/*", initParams={%WIDGETSETPARAM%})
 public class %APPLICATION_NAME%Servlet extends VaadinServlet {
 
 	protected void servletInitialized() throws ServletException {
