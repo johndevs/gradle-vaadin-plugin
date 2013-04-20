@@ -25,7 +25,7 @@ import fi.jasoft.plugin.TemplateUtil;
 
 class CreateServlet3ProjectTask extends DefaultTask {
 
-    public CreateProjectTask(){
+    public CreateServlet3ProjectTask(){
         description = "Creates a new Vaadin Project bases on Java Servlet 3.0"
     }
 
