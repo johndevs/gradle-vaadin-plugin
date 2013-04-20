@@ -35,6 +35,7 @@ class DependencyListener implements ProjectEvaluationListener{
 
 		// Repositories 
 		project.repositories.mavenCentral()
+        project.repositories.mavenLocal()
 
 		if(project.repositories.findByName('Vaadin addons') == null) {
 			project.repositories.mavenRepo(name: 'Vaadin addons', url: 'http://maven.vaadin.com/vaadin-addons')
