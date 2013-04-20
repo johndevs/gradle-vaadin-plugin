@@ -64,10 +64,8 @@ class CreateServlet3ProjectTask extends DefaultTask {
         substitutions['%APPLICATION_NAME%'] = applicationName
 
         if (project.vaadin.widgetset != null) {
-            substitutions['%WEBINITPARAMIMPORT%'] = "import javax.servlet.annotation.WebInitParam;"
-            substitutions['%WIDGETSETPARAM%'] = "@WebInitParam(name=\"widgetset\", value=\"${project.vaadin.widgetset}\")"
+            substitutions['%WIDGETSETPARAM%'] = ",\n\t\t@WebInitParam(name=\"widgetset\", value=\"${project.vaadin.widgetset}\")"
         } else {
-            substitutions['%WEBINITPARAMIMPORT%'] = ''
             substitutions['%WIDGETSETPARAM%'] = ''
         }
 
