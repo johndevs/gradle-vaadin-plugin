@@ -15,7 +15,9 @@
 */
 package fi.jasoft.plugin.tasks;
 
-import org.gradle.api.DefaultTask;
+import org.gradle.api.DefaultTask
+import org.gradle.api.artifacts.ExternalModuleDependency
+import org.gradle.api.artifacts.ProjectDependency;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.plugins.WarPluginConvention;
 import org.gradle.api.plugins.JavaPluginConvention;
