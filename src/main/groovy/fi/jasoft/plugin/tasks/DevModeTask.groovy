@@ -40,6 +40,8 @@ class DevModeTask extends DefaultTask  {
             return
         }
 
+        TemplateUtil.ensureWidgetPresent(project)
+
         if(project.vaadin.devmode.noserver){
             runDevelopmentMode()
         } else {
