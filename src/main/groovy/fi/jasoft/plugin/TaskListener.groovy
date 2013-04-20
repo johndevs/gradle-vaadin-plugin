@@ -72,6 +72,7 @@ public class TaskListener implements TaskExecutionListener{
         cp.plusConfigurations += project.configurations.vaadinSources
 		cp.plusConfigurations += project.configurations.gwt
         cp.plusConfigurations += project.configurations.gwtSources
+        cp.plusConfigurations += project.configurations.jetty8
 	}
 
 	private void configureEclipseWtpPluginComponent(Task task){
