@@ -23,16 +23,6 @@ class UpdateWidgetsetTask extends DefaultTask {
 
 	public UpdateWidgetsetTask(){
 		description = "Updates the widgetset xml file"
-
-		project.sourceSets.main.java.srcDirs.each{
-			getInputs().files(project.fileTree(it.absolutePath).include('**/*/*.gwt.xml'))
-			getOutputs().files(project.fileTree(it.absolutePath).include('**/*/*.gwt.xml'))
-		}
-
-		project.sourceSets.main.resources.srcDirs.each{
-			getInputs().files(project.fileTree(it.absolutePath).include('**/*/*.gwt.xml'))
-			getOutputs().files(project.fileTree(it.absolutePath).include('**/*/*.gwt.xml'))
-		}
 	}
 
 	@TaskAction
