@@ -17,50 +17,67 @@ package fi.jasoft.plugin;
 
 class VaadinPluginExtension{
 	String widgetset
-	String widgetsetGenerator = null										
-	String version = "7+"
-	String servletVersion = "2.5"
-	String debugPort = 8000
-	boolean manageWidgetset = true
-	boolean manageDependencies = true
-	int serverPort = 8080
-	String[] jvmArgs = null
 
+	String widgetsetGenerator = null
+
+	String version = "7+"
+
+	String servletVersion = "2.5"
+
+	String debugPort = 8000
+
+	boolean manageWidgetset = true
+
+	boolean manageDependencies = true
+
+	int serverPort = 8080
+
+	String[] jvmArgs = null
 
     JRebel jrebel = new JRebel()
 
-    JRebel jrebel(closure) {
-        closure.delegate = jrebel
-        closure()
-    }
-
     DevMode devmode = new DevMode()
-
-    DevMode devmode(closure) {
-        closure.delegate = devmode
-        closure()
-    }
 
     VaadinPluginConfiguration plugin = new VaadinPluginConfiguration()
 
-    VaadinPluginConfiguration plugin(closure) {
-        closure.delegate = plugin
-        closure()
-    }
-
     Addon addon = new Addon()
+
+    GWT gwt = new GWT()
+
+
+    /*
+     * Closures
+     */
 
     Addon addon(closure) {
         closure.delegate = addon
         closure()
     }
 
-    GWT gwt = new GWT()
-
     GWT gwt(closure) {
         closure.delegate = gwt
         closure()
     }
+
+    VaadinPluginConfiguration plugin(closure) {
+        closure.delegate = plugin
+        closure()
+    }
+
+    DevMode devmode(closure) {
+        closure.delegate = devmode
+        closure()
+    }
+
+    JRebel jrebel(closure) {
+        closure.delegate = jrebel
+        closure()
+    }
+
+
+    /*
+     * Inner classes
+     */
 
 	class GWT{
 		String style = "OBF"
