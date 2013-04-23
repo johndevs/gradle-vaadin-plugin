@@ -136,6 +136,7 @@ class VaadinPluginExtension{
 		String version = "2.3.0"
 		String extraArgs
         String[] sourcePaths = ['client', 'shared']
+        boolean collapsePermutations = false
 
         void style(String style) {
             this.style = style
@@ -179,6 +180,10 @@ class VaadinPluginExtension{
 
         void sourcePaths(String[] sourcePaths) {
             this.sourcePaths = sourcePaths
+        }
+
+        void collapsePermutations(boolean collapse) {
+            this.collapsePermutations = collapse
         }
     }
 

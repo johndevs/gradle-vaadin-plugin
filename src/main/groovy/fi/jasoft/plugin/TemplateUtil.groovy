@@ -177,6 +177,10 @@ class TemplateUtil {
             substitutions['%SASS_LINKER%'] = ''
             substitutions['%STYLESHEETS%'] = ''
         }
+
+        if (project.vaadin.gwt.collapsePermutations){
+            substitutions['%COLLAPSE_PERMUTATIONS%'] = "\t<collapse-all-properties />"
+        }
         
         if(project.vaadin.version.startsWith('6')){
             TemplateUtil.writeTemplate('Widgetset.xml.vaadin6', widgetsetDir, moduleXML, substitutions)
