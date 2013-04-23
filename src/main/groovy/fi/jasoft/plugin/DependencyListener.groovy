@@ -69,7 +69,7 @@ class DependencyListener implements ProjectEvaluationListener{
         if(!project.configurations.hasProperty('jetty8')){
             project.configurations.add("jetty8")
             project.dependencies.add('jetty8', 'org.eclipse.jetty.aggregate:jetty-all-server:8.1.10.v20130312')
-            project.dependencies.add('jetty8', 'fi.jasoft.plugin:VaadinPlugin:'+VaadinPlugin.getVersion())
+            project.dependencies.add('jetty8', 'fi.jasoft.plugin:gradle-vaadin-plugin:'+GradleVaadinPlugin.getVersion())
             project.dependencies.add('jetty8', 'asm:asm-all:3.3.1')
             project.dependencies.add('jetty8', 'javax.servlet.jsp:jsp-api:2.2')
         }

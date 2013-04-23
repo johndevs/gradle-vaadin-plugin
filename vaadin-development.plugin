@@ -16,19 +16,19 @@ buildscript {
     }
 
     dependencies {
-        classpath group: 'fi.jasoft.plugin', name: 'VaadinPlugin', version: '0.6'
+        classpath group: 'fi.jasoft.plugin', name: 'gradle-vaadin-plugin', version: '0.6'
 	}
 }
 
-if (!project.plugins.findPlugin(fi.jasoft.plugin.VaadinPlugin)) {
-    project.apply(plugin: fi.jasoft.plugin.VaadinPlugin)
+if (!project.plugins.findPlugin(fi.jasoft.plugin.GradleVaadinPlugin)) {
+    project.apply(plugin: fi.jasoft.plugin.GradleVaadinPlugin)
 }
 
 /*
  * Convienience task for enabling the gradle wrapper 
  */
 task enableWrapper(type: Wrapper) {
-    gradleVersion = '1.3'
+    gradleVersion = '1.5'
     description = "Configures the Gradle wrapper for this project"
     group = "Gradle"
 }

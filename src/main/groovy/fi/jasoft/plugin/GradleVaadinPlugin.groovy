@@ -33,7 +33,7 @@ import fi.jasoft.plugin.tasks.UpdateWidgetsetTask
 import fi.jasoft.plugin.tasks.RunTask
 import fi.jasoft.plugin.tasks.CreateWidgetsetGeneratorTask
 
-class VaadinPlugin implements Plugin<Project>{
+class GradleVaadinPlugin implements Plugin<Project>{
 
     static String getVersion(){
         return '0.6';
