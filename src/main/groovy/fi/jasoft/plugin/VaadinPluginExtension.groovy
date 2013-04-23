@@ -19,6 +19,7 @@ import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.tasks.SourceSet;
 
 class VaadinPluginExtension{
+
 	String widgetset
 
 	String widgetsetGenerator = null
@@ -27,7 +28,7 @@ class VaadinPluginExtension{
 
 	String servletVersion = "2.5"
 
-	String debugPort = 8000
+	int debugPort = 8000
 
 	boolean manageWidgetset = true
 
@@ -49,6 +50,45 @@ class VaadinPluginExtension{
 
     SourceDirectorySet mainSourceSet = null
 
+    /*
+     * Assignment methods
+     */
+    void widgetset(String widgetset){
+        this.widgetset = widgetset
+    }
+
+    void widgetsetGenerator(String widgetsetGenerator){
+        this.widgetsetGenerator = widgetsetGenerator
+    }
+
+    void version(String version){
+        this.version = version
+    }
+
+    @Deprecated
+    void servletVersion(String servletVersion) {
+        this.servletVersion = servletVersion
+    }
+
+    void debugPort(int port){
+        this.debugPort = port
+    }
+
+    void manageWidgetset(boolean manage){
+        this.manageWidgetset = manage
+    }
+
+    void manageDependencies(boolean manage){
+        this.manageDependencies = manage
+    }
+
+    void serverPort(int port){
+        this.serverPort = port;
+    }
+
+    void jvmArgs(String[] args){
+        this.jvmArgs = args
+    }
 
     /*
      * Closures
