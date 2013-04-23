@@ -100,7 +100,7 @@ public class TaskListener implements TaskExecutionListener{
 			String name = project.vaadin.widgetsetGenerator.tokenize('.').last()
             String pkg = project.vaadin.widgetsetGenerator.replaceAll('.'+ name,'')
             String filename = name + ".java"
-			File javaDir = project.sourceSets.main.java.srcDirs.iterator().next()
+			File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
     		File f = new File(javaDir.canonicalPath + '/' + pkg.replaceAll(/\./,'/') + '/' + filename)
     		if(!f.exists()){
     			project.tasks.createVaadinWidgetsetGenerator.run()	

@@ -16,7 +16,9 @@
 package fi.jasoft.plugin
 
 import org.gradle.api.Project
-import org.gradle.api.file.FileCollection;
+import org.gradle.api.file.FileCollection
+import org.gradle.api.file.SourceDirectorySet
+import org.gradle.api.tasks.SourceSet;
 
 class Util {
 
@@ -50,7 +52,7 @@ class Util {
                     project.sourceSets.main.runtimeClasspath +
                     project.sourceSets.main.compileClasspath
 
-        project.sourceSets.main.java.srcDirs.each{
+        Util.getMainSourceSet(project).srcDirs.each{
             classpath += project.files(it)
         }
         project.sourceSets.main.resources.srcDirs.each{
@@ -58,4 +60,13 @@ class Util {
         }
         return classpath
     }
+
+    public static SourceDirectorySet getMainSourceSet(Project project){
+        def sourceSet = project.vaadin.mainSourceSet
+        if (sourceSet == null){
+            sourceSet = project.sourceSets.main.java
+        }
+        return sourceSet
+    }
+
 }

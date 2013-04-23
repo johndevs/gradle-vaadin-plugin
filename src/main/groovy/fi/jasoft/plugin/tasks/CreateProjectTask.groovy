@@ -13,8 +13,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fi.jasoft.plugin.tasks;
+package fi.jasoft.plugin.tasks
 
+import fi.jasoft.plugin.Util;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.plugins.WarPluginConvention;
@@ -52,7 +53,7 @@ class CreateProjectTask extends DefaultTask {
 			}
 		}
 
-		File javaDir = project.sourceSets.main.java.srcDirs.iterator().next()
+		File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
 		File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
 		File uidir = new File(javaDir.canonicalPath + '/' + applicationPackage.replaceAll(/\./,'/'))
 		File webinf = new File(webAppDir.canonicalPath + '/WEB-INF')

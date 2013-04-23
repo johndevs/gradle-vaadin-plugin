@@ -53,7 +53,7 @@ class SuperDevModeTask extends DefaultTask  {
     private runCodeServer(){
 
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-        File javaDir = project.sourceSets.main.java.srcDirs.iterator().next()
+        File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
         File widgetsetsDir = new File(webAppDir.canonicalPath+'/VAADIN/widgetsets')
         widgetsetsDir.mkdirs()
         String widgetset = project.vaadin.widgetset == null ? 'com.vaadin.terminal.gwt.DefaultWidgetSet' : project.vaadin.widgetset

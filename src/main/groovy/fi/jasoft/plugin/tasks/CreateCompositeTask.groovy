@@ -16,6 +16,7 @@
 package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.TemplateUtil
+import fi.jasoft.plugin.Util
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 
@@ -40,7 +41,7 @@ public class CreateCompositeTask extends DefaultTask {
             componentName = 'MyComposite'
         }
 
-        File javaDir = project.sourceSets.main.java.srcDirs.iterator().next()
+        File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
         String componentPackage
         if(project.vaadin.widgetset){
             String widgetsetClass = project.vaadin.widgetset

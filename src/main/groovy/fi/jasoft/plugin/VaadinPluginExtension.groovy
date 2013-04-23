@@ -13,7 +13,10 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fi.jasoft.plugin;
+package fi.jasoft.plugin
+
+import org.gradle.api.file.SourceDirectorySet
+import org.gradle.api.tasks.SourceSet;
 
 class VaadinPluginExtension{
 	String widgetset
@@ -43,6 +46,8 @@ class VaadinPluginExtension{
     Addon addon = new Addon()
 
     GWT gwt = new GWT()
+
+    SourceDirectorySet mainSourceSet = null
 
 
     /*

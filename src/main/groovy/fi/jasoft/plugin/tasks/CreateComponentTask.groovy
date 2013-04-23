@@ -13,8 +13,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fi.jasoft.plugin.tasks;
+package fi.jasoft.plugin.tasks
 
+import fi.jasoft.plugin.Util;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 import fi.jasoft.plugin.TemplateUtil;
@@ -44,7 +45,7 @@ class CreateComponentTask extends DefaultTask {
     		componentName = 'MyComponent'
     	}
 
-        File javaDir = project.sourceSets.main.java.srcDirs.iterator().next()
+        File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
     	File widgetsetFile = new File(javaDir.canonicalPath+'/'+project.vaadin.widgetset.replaceAll(/\./,'/')+".gwt.xml")
     	File widgetsetDir = new File(widgetsetFile.parent)
         File componentDir = new File(widgetsetDir.canonicalPath+'/server/'+componentName.toLowerCase())

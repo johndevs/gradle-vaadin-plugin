@@ -13,8 +13,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fi.jasoft.plugin.tasks;
+package fi.jasoft.plugin.tasks
 
+import fi.jasoft.plugin.Util;
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.artifacts.ProjectDependency;
@@ -54,7 +55,7 @@ class CreateServlet3ProjectTask extends DefaultTask {
             }
         }
 
-        File javaDir = project.sourceSets.main.java.srcDirs.iterator().next()
+        File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
         File uidir = new File(javaDir.canonicalPath + '/' + applicationPackage.replaceAll(/\./,'/'))
 
         uidir.mkdirs()

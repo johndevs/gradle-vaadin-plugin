@@ -54,7 +54,7 @@ class TemplateUtil {
         }
 
         // Check source dir if widgetset is present there
-        File javaDir = project.sourceSets.main.java.srcDirs.iterator().next()
+        File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
         File widgetsetFile = new File(javaDir.canonicalPath + '/'+ project.vaadin.widgetset.replaceAll(/\./,'/')+".gwt.xml")
         
         if(widgetsetFile.exists()){
@@ -130,7 +130,7 @@ class TemplateUtil {
             filename = name + ".java"
         }
 
-        File javaDir = project.sourceSets.main.java.srcDirs.iterator().next()
+        File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
         File f = new File(javaDir.canonicalPath + '/' + pkg.replaceAll(/\./,'/') + '/' + filename)
 
         if(f.exists() || project.vaadin.widgetsetGenerator != null){
@@ -194,7 +194,7 @@ class TemplateUtil {
             }
         }
 
-        project.sourceSets.main.java.srcDirs.each {
+        Util.getMainSourceSet(project).srcDirs.each {
             project.fileTree(it.absolutePath).include('**/*/public/**/*.scss').each {
                 files.add(it)
             }
