@@ -1,3 +1,18 @@
+/*
+* Copyright 2013 John Ahlroos
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package fi.jasoft.plugin.server;
 
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
@@ -19,14 +34,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created with IntelliJ IDEA.
- * User: johnnie
- * Date: 4/16/13
- * Time: 8:16 PM
- * To change this template use File | Settings | File Templates.
+ * Runs the embedded jetty server with provided paramaters
+ *
  */
 public class ApplicationServerRunner {
 
+    /**
+     *
+     * @param args
+     *      param 1: The webapp folder path
+     *      param 2: Path to precompiled classes
+     *      *
+     * @throws Exception
+     */
     public static void main(String[] args) throws Exception{
         int port = Integer.parseInt(args[0]);
         String webapp = args[1];
