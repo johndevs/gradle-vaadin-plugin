@@ -36,7 +36,7 @@ import fi.jasoft.plugin.tasks.CreateWidgetsetGeneratorTask
 class GradleVaadinPlugin implements Plugin<Project>{
 
     static String getVersion(){
-        return '0.6';
+        return '0.6.1';
     }
 
 	void apply(Project project){
