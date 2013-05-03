@@ -180,7 +180,9 @@ class TemplateUtil {
 
         if (project.vaadin.gwt.collapsePermutations){
             substitutions['%COLLAPSE_PERMUTATIONS%'] = "\t<collapse-all-properties />"
-        }
+        } else {
+	    substitutions['%COLLAPSE_PERMUTATIONS%'] = ''
+	}
         
         if(project.vaadin.version.startsWith('6')){
             TemplateUtil.writeTemplate('Widgetset.xml.vaadin6', widgetsetDir, moduleXML, substitutions)
