@@ -17,6 +17,7 @@ The following tasks are available in the plugin
 * ``createVaadinComponent`` - Creates a new Vaadin Component.
 * ``createVaadinComposite`` - Creates a new Vaadin Composite for use with VisualDesigner.
 * ``createVaadinProject`` - Creates a new Vaadin Project.
+* ``createVaadinServlet3Project`` - Creates a new Vaadin project based on Servlet 3.0
 * ``createVaadinTheme`` - Creates a new Vaadin Theme
 * ``createVaadinWidgetsetGenerator`` - Creates a new widgetset generator for optimizing the widgetset
 * ``devmode`` - Run Development Mode for easier debugging and development of client widgets.
@@ -41,6 +42,7 @@ The following configuration options are available
 * ``vaadin.addon.author`` - The author of the Vaadin addon. 
 * ``vaadin.addon.license`` - The licence of the Vaadin addon.
 * ``vaadin.addon.title`` - The title for the addon as seen in the Vaadin Directory.
+* ``vaadin.mainSourceSet`` - Defines the main source set where all source files will be generated.
 
 ## Vaadin GWT configurations
 * ``vaadin.gwt.version`` - GWT version used with Vaadin 6. Defaults to 2.3.0. 
@@ -54,6 +56,7 @@ The following configuration options are available
 * ``vaadin.gwt.jvmArgs`` - Additional JVM arguments passed to the widgetset compiler. Default is ''.
 * ``vaadin.gwt.extraArgs`` - Extra compiler arguments that should be passed to the widgetset compiler.
 * ``vaadin.gwt.sourcePaths`` - Source folders where GWT code that should be compiled to JS is found. Default is 'client' and 'shared'.
+* ``vaadin.gwt.collapsePermutations`` - Should all permutations be compiled into a single js file for faster compilation time (but larger file size).
 
 ## Vaadin Devmode configurations
 * ``vaadin.devmode.noserver`` - Do not run the embedded Jetty server when running devmode. Default is false.
