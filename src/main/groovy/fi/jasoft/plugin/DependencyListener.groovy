@@ -73,10 +73,6 @@ class DependencyListener implements ProjectEvaluationListener{
             project.dependencies.add('jetty8', 'asm:asm-all:3.3.1')
             project.dependencies.add('jetty8', 'javax.servlet.jsp:jsp-api:2.2')
         }
-
-        if(!project.configurations.hasProperty('vaadinSources')){
-            project.configurations.add('vaadinSources')
-        }
     }
 
     private static void createCommonVaadinConfiguration(Project project){
@@ -101,10 +97,9 @@ class DependencyListener implements ProjectEvaluationListener{
 
         project.dependencies.add("vaadin", "com.vaadin:vaadin:${version}")
         if(project.vaadin.widgetset != null){
-            project.dependencies.add("gwt", "com.google.gwt:gwt-user:"+gwtVersion)
-            project.dependencies.add("gwt", "com.google.gwt:gwt-dev:"+gwtVersion)
-            project.dependencies.add("gwt",	"javax.validation:validation-api:1.0.0.GA")
-            project.dependencies.add("gwt",	"javax.validation:validation-api:1.0.0.GA:sources")
+            project.dependencies.add("vaadin-client", "com.google.gwt:gwt-user:"+gwtVersion)
+            project.dependencies.add("vaadin-client", "com.google.gwt:gwt-dev:"+gwtVersion)
+            project.dependencies.add("vaadin-client", "javax.validation:validation-api:1.0.0.GA")
         }
     }
 
@@ -115,38 +110,28 @@ class DependencyListener implements ProjectEvaluationListener{
         FileTree themes = project.fileTree(dir: webAppDir.canonicalPath + '/VAADIN/themes', include: '**/styles.scss')
         if(!themes.isEmpty()){
             project.dependencies.add("vaadin",	"com.vaadin:vaadin-theme-compiler:${version}")
-            project.dependencies.add("vaadinSources",	"com.vaadin:vaadin-theme-compiler:${version}:sources" )
         }
 
         if(project.vaadin.widgetset == null){
             project.dependencies.add("vaadin",	"com.vaadin:vaadin-client-compiled:${version}")
         } else {
-            project.dependencies.add("gwt",	"com.vaadin:vaadin-client-compiler:${version}")
-            project.dependencies.add("gwtSources",	"com.vaadin:vaadin-client-compiler:${version}:sources")
-
-            project.dependencies.add("gwt",	"com.vaadin:vaadin-client:${version}")
-            project.dependencies.add("gwtSources",	"com.vaadin:vaadin-client:${version}:sources")
-
-            project.dependencies.add("gwt",	"javax.validation:validation-api:1.0.0.GA")
-            project.dependencies.add("gwt",	"javax.validation:validation-api:1.0.0.GA:sources")
+            project.dependencies.add("vaadin-client",	"com.vaadin:vaadin-client-compiler:${version}", {
+                exclude([group:'org.mortbay.jetty'])
+            })
+            project.dependencies.add("vaadin-client",	"com.vaadin:vaadin-client:${version}")
+            project.dependencies.add("vaadin-client",	"javax.validation:validation-api:1.0.0.GA")
         }
 
         project.dependencies.add("vaadin", "com.vaadin:vaadin-server:${version}")
-        project.dependencies.add("vaadinSources", "com.vaadin:vaadin-server:${version}:sources")
-
         project.dependencies.add("vaadin", "com.vaadin:vaadin-themes:${version}")
     }
 
     private static void createGWTConfiguration(Project project){
-        if(!project.configurations.hasProperty('gwt')){
-            project.configurations.add('gwt')
-            project.sourceSets.main.compileClasspath += project.configurations.gwt
-            project.sourceSets.test.compileClasspath += project.configurations.gwt
-            project.sourceSets.test.runtimeClasspath += project.configurations.gwt
-        }
-
-        if(!project.configurations.hasProperty("gwtSources")){
-            project.configurations.add('gwtSources')
+        if(!project.configurations.hasProperty('vaadin-client')){
+            project.configurations.add('vaadin-client')
+            project.sourceSets.main.compileClasspath += project.configurations['vaadin-client']
+            project.sourceSets.test.compileClasspath += project.configurations['vaadin-client']
+            project.sourceSets.test.runtimeClasspath += project.configurations['vaadin-client']
         }
     }
 }

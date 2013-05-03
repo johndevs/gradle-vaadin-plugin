@@ -69,9 +69,7 @@ public class TaskListener implements TaskExecutionListener{
         cp.downloadSources = true
 		cp.defaultOutputDir = project.file('build/classes/main')
 		cp.plusConfigurations += project.configurations.vaadin
-        cp.plusConfigurations += project.configurations.vaadinSources
-		cp.plusConfigurations += project.configurations.gwt
-        cp.plusConfigurations += project.configurations.gwtSources
+		cp.plusConfigurations += project.configurations['vaadin-client']
         cp.plusConfigurations += project.configurations.jetty8
 	}
 

@@ -47,8 +47,6 @@ class Util {
         FileCollection classpath =
             project.configurations.providedCompile +
                     project.configurations.compile +
-                    project.configurations.vaadinSources +
-                    project.configurations.gwtSources +
                     project.sourceSets.main.runtimeClasspath +
                     project.sourceSets.main.compileClasspath
 
