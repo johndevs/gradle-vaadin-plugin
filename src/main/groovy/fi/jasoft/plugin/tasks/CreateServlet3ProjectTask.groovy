@@ -63,6 +63,9 @@ class CreateServlet3ProjectTask extends DefaultTask {
         def substitutions = [:]
         substitutions['%PACKAGE%'] = applicationPackage
         substitutions['%APPLICATION_NAME%'] = applicationName
+        substitutions['%PUSH%'] = Util.isPushSupportedAndEnabled(project) ? '@Push': ''
+        substitutions['%PUSH_IMPORT%'] = Util.isPushSupportedAndEnabled(project) ? "\nimport com.vaadin.annotations.Push;" : ''
+        substitutions['%ASYNC_SUPPORTED%'] = Util.isPushSupportedAndEnabled(project) ? "\n    asyncSupported=true," : ''
 
         if (project.vaadin.widgetset != null) {
             substitutions['%WIDGETSETPARAM%'] = ",\n\t\t@WebInitParam(name=\"widgetset\", value=\"${project.vaadin.widgetset}\")"

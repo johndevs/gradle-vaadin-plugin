@@ -4,7 +4,7 @@ import javax.servlet.annotation.WebInitParam;
 import javax.servlet.annotation.WebServlet;
 import com.vaadin.server.VaadinServlet;
 
-@WebServlet(
+@WebServlet(%ASYNC_SUPPORTED%
     urlPatterns={"/*","/VAADIN/*"},
     initParams={
         @WebInitParam(name="ui", value="%PACKAGE%.%APPLICATION_NAME%UI")%WIDGETSETPARAM%
