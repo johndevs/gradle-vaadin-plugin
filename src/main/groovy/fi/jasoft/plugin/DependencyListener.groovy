@@ -125,7 +125,7 @@ class DependencyListener implements ProjectEvaluationListener{
         project.dependencies.add("vaadin", "com.vaadin:vaadin-server:${version}")
         project.dependencies.add("vaadin", "com.vaadin:vaadin-themes:${version}")
 
-        if (Util.isPushSupported(project) && project.vaadin.push){
+        if (Util.isPushSupportedAndEnabled(project)){
             project.dependencies.add('vaadin', "com.vaadin:vaadin-push:${version}")
         }
     }

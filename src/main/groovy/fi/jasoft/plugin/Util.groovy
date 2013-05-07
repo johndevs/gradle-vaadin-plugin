@@ -67,7 +67,11 @@ class Util {
         return sourceSet
     }
 
-    public static boolean isPushSupported(Project project){
+    public static boolean isPushSupportedAndEnabled(Project project){
+        if (!project.vaadin.push){
+            return false
+        }
+
         String version = project.vaadin.version
         if (version == '+'){
            return true

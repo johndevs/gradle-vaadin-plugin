@@ -65,6 +65,8 @@ class CreateProjectTask extends DefaultTask {
 		def substitutions = [:]
     	substitutions['%PACKAGE%'] = applicationPackage
     	substitutions['%APPLICATION_NAME%'] = applicationName
+        substitutions['%PUSH%'] = Util.isPushSupportedAndEnabled(project) ? '@Push': ''
+        substitutions['%PUSH_IMPORT%'] = Util.isPushSupportedAndEnabled(project) ? "\nimport com.vaadin.annotations.Push;" : ''
 
 		if(project.vaadin.version.startsWith("6")){
 			TemplateUtil.writeTemplate("MyApplication.java", uidir, applicationName+".java", substitutions)
