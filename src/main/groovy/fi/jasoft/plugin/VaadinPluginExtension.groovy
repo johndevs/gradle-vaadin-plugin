@@ -52,6 +52,8 @@ class VaadinPluginExtension{
 
     SourceDirectorySet mainSourceSet = null
 
+    boolean push = false
+
     /*
      * Assignment methods
      */
@@ -94,6 +96,10 @@ class VaadinPluginExtension{
 
     void jvmArgs(String[] args){
         this.jvmArgs = args
+    }
+
+    void push(boolean push){
+        this.push = push
     }
 
     /*

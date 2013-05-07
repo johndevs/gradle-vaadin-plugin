@@ -124,6 +124,10 @@ class DependencyListener implements ProjectEvaluationListener{
 
         project.dependencies.add("vaadin", "com.vaadin:vaadin-server:${version}")
         project.dependencies.add("vaadin", "com.vaadin:vaadin-themes:${version}")
+
+        if (Util.isPushSupported(project) && project.vaadin.push){
+            project.dependencies.add('vaadin', "com.vaadin:vaadin-push:${version}")
+        }
     }
 
     private static void createGWTConfiguration(Project project){
