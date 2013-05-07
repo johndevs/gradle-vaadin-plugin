@@ -33,11 +33,13 @@ public class ApplicationServer {
         appServerProcess = ['java']
 
         // Debug
-        appServerProcess.add('-Xdebug')
-        appServerProcess.add("-Xrunjdwp:transport=dt_socket,address=${project.vaadin.debugPort},server=y,suspend=n")
+        if(project.vaadin.debug){
+            appServerProcess.add('-Xdebug')
+            appServerProcess.add("-Xrunjdwp:transport=dt_socket,address=${project.vaadin.debugPort},server=y,suspend=n")
+        }
 
         // Jrebel
-        if(project.vaadin.jrebel.enabled){
+        if(project.vaadin.jrebel.enabled && project.vaadin.debug){
             if(project.vaadin.jrebel.location != null && new File(project.vaadin.jrebel.location).exists()){
                 appServerProcess.add('-noverify')
                 appServerProcess.add("-javaagent:${project.vaadin.jrebel.location}")
@@ -48,6 +50,10 @@ public class ApplicationServer {
         }
 
         // JVM options
+        if(project.vaadin.debug){
+            appServerProcess.add('-ea')
+        }
+
         appServerProcess.add('-cp')
         appServerProcess.add(cp.getAsPath())
 

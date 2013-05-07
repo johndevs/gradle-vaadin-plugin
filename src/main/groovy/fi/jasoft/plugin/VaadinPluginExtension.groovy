@@ -28,6 +28,8 @@ class VaadinPluginExtension{
 
 	String servletVersion = "2.5"
 
+    boolean debug = true
+
 	int debugPort = 8000
 
 	boolean manageWidgetset = true
@@ -68,6 +70,10 @@ class VaadinPluginExtension{
     @Deprecated
     void servletVersion(String servletVersion) {
         this.servletVersion = servletVersion
+    }
+
+    void debug(boolean debug) {
+        this.debug = debug
     }
 
     void debugPort(int port){
