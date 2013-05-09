@@ -21,7 +21,7 @@ dependencies {
 
 defaultTasks 'jar'
 group = "fi.jasoft.plugin"
-version = "0.6.2"
+version = project.hasProperty('BUILD_VERSION') ? getProperty('BUILD_VERSION') : 'SNAPSHOT-'+ new Date().format('yyyyMMdd')
 archivesBaseName ='gradle-vaadin-plugin'
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
