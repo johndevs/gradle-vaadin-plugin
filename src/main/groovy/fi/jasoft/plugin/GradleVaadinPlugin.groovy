@@ -35,11 +35,23 @@ import fi.jasoft.plugin.tasks.CreateWidgetsetGeneratorTask
 
 class GradleVaadinPlugin implements Plugin<Project>{
 
+    public static final PLUGIN_VERSION
+
+    public static final PLUGIN_PROPERTIES
+
+    static{
+        PLUGIN_PROPERTIES = new Properties()
+        PLUGIN_PROPERTIES.load(GradleVaadinPlugin.class.getResourceAsStream('/plugin.properties'))
+        PLUGIN_VERSION = PLUGIN_PROPERTIES.getProperty('version')
+    }
+
     static String getVersion(){
-        return '0.6.2';
+        return PLUGIN_VERSION
     }
 
 	void apply(Project project){
+
+        println("Using Gradle Vaadin Plugin "+PLUGIN_VERSION)
 
 		// Extensions
 		project.extensions.create('vaadin', VaadinPluginExtension)

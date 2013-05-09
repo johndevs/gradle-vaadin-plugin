@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 apply plugin: 'groovy'
 apply plugin: 'maven'
 
@@ -83,8 +85,16 @@ task createPOMforVaadinDirectory {
 }
 
 processResources {
+
+    // Create pom.xml for Vaadin directory
     dependsOn project.createPOMforVaadinDirectory
+
+    // Apply version
+    from(sourceSets.main.resources.srcDirs){
+        filter(ReplaceTokens, tokens: [version: project.version])
+    }
 }
+
 
 jar {
     manifest{
