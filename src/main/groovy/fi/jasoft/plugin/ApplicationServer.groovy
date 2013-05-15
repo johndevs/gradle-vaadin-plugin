@@ -75,7 +75,7 @@ public class ApplicationServer {
 
         if(project.vaadin.jrebel.enabled){
             println "(debugger on ${project.vaadin.debugPort}, JRebel active)"
-        } else {
+        } else if (project.vaadin.debug) {
             println "(debugger on ${project.vaadin.debugPort})"
         }
 
