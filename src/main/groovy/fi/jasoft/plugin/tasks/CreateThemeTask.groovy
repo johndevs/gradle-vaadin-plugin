@@ -13,8 +13,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fi.jasoft.plugin.tasks;
+package fi.jasoft.plugin.tasks
 
+import fi.jasoft.plugin.Util;
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 import fi.jasoft.plugin.TemplateUtil
@@ -29,13 +30,7 @@ class CreateThemeTask extends DefaultTask {
 	 @TaskAction
     public void run() {
 
-    	Console console = System.console()
-    	if(console == null){
-    		println "Create project task needs a console but could not get one. Quitting..."
-    		return;
-    	}
-
-    	String themeName = console.readLine('\nTheme Name (MyTheme): ')
+    	String themeName = Util.readLine('\nTheme Name (MyTheme): ')
     	if(themeName == ''){
     		themeName = 'MyTheme'
     	}

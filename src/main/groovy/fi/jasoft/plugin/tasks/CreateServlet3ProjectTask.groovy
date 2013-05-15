@@ -33,13 +33,7 @@ class CreateServlet3ProjectTask extends DefaultTask {
     @TaskAction
     public void run() {
 
-        Console console = System.console()
-        if(console == null){
-            println "Create project task needs a console but could not get one. Quitting..."
-            return;
-        }
-
-        String applicationName = console.readLine('\nApplication Name (MyApplication): ')
+        String applicationName = Util.readLine('\nApplication Name (MyApplication): ')
         if(applicationName == ''){
             applicationName = 'MyApplication'
         }
@@ -49,7 +43,7 @@ class CreateServlet3ProjectTask extends DefaultTask {
             String widgetsetName = project.vaadin.widgetset.tokenize('.').last()
             applicationPackage = project.vaadin.widgetset[0..(-widgetsetName.size()-2)]
         } else {
-            applicationPackage = console.readLine("\nApplication Package (com.example.${applicationName.toLowerCase()}): ")
+            applicationPackage = Util.readLine("\nApplication Package (com.example.${applicationName.toLowerCase()}): ")
             if(applicationPackage == ''){
                 applicationPackage = 'com.example.'+applicationName.toLowerCase()
             }

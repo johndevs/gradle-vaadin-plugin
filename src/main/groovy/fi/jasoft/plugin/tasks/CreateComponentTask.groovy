@@ -34,13 +34,7 @@ class CreateComponentTask extends DefaultTask {
     		return
     	}
 
-    	Console console = System.console()
-    	if(console == null){
-    		println "Create project task needs a console but could not get one. Quitting..."
-    		return;
-    	}
-
-    	String componentName = console.readLine('\nComponent Name (MyComponent): ')
+    	String componentName = Util.readLine('\nComponent Name (MyComponent): ')
     	if(componentName == ''){
     		componentName = 'MyComponent'
     	}
@@ -78,7 +72,7 @@ class CreateComponentTask extends DefaultTask {
     	}
 
         if(project.vaadin.widgetset != null){
-            String compile = console.readLine("Compile widgetset (Y/N)[Y]: ")
+            String compile = Util.readLine("\nCompile widgetset (Y/N)[Y]: ")
             if(compile == '' || compile == 'Y'){
                 project.widgetset.run()
             }

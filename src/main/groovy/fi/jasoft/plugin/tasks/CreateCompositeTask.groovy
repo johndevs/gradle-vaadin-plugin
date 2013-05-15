@@ -30,13 +30,7 @@ public class CreateCompositeTask extends DefaultTask {
     @TaskAction
     public void run(){
 
-        Console console = System.console()
-        if(console == null){
-            println "Create project task needs a console but could not get one. Quitting..."
-            return;
-        }
-
-        String componentName = console.readLine('\nComposite Name (MyComposite): ')
+        String componentName = Util.readLine('\nComposite Name (MyComposite): ')
         if(componentName == ''){
             componentName = 'MyComposite'
         }
@@ -49,7 +43,7 @@ public class CreateCompositeTask extends DefaultTask {
             componentPackage = widgetsetPackage+'.'+componentName.toLowerCase();
 
         } else {
-            componentPackage = console.readLine("\nComposite Package (com.example.${componentName.toLowerCase()}): ")
+            componentPackage = Util.readLine("\nComposite Package (com.example.${componentName.toLowerCase()}): ")
             if(componentPackage == ''){
                 componentPackage = "com.example.${componentName.toLowerCase()}"
             }
