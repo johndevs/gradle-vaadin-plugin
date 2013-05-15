@@ -71,6 +71,9 @@ public class ApplicationServer {
         File classesDir = new File("build/classes");
         appServerProcess.add(classesDir.canonicalPath+'/')
 
+        // Execute server
+        appServerProcess = appServerProcess.execute()
+
         print "Application running on http://0.0.0.0:${project.vaadin.serverPort} "
 
         if(project.vaadin.jrebel.enabled){
@@ -78,9 +81,6 @@ public class ApplicationServer {
         } else if (project.vaadin.debug) {
             println "(debugger on ${project.vaadin.debugPort})"
         }
-
-        // Execute server
-        appServerProcess = appServerProcess.execute()
 
         if(project.vaadin.plugin.logToConsole){
             appServerProcess.consumeProcessOutput(System.out, System.out)
