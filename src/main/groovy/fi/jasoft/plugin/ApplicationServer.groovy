@@ -21,7 +21,8 @@ public class ApplicationServer {
     public start() {
 
         if(appServerProcess != null){
-            throw new IllegalStateException("Server already running.")
+            project.logger.error('Server is already running.')
+            return
         }
 
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
@@ -44,8 +45,7 @@ public class ApplicationServer {
                 appServerProcess.add('-noverify')
                 appServerProcess.add("-javaagent:${project.vaadin.jrebel.location}")
             } else {
-                println "Could not find jrebel.jar, aborting run."
-                return;
+                project.logger.warn('jrebel.jar not found, running without jrebel')
             }
         }
 
@@ -74,24 +74,28 @@ public class ApplicationServer {
         // Execute server
         appServerProcess = appServerProcess.execute()
 
-        print "Application running on http://0.0.0.0:${project.vaadin.serverPort} "
-
-        if(project.vaadin.jrebel.enabled){
-            println "(debugger on ${project.vaadin.debugPort}, JRebel active)"
-        } else if (project.vaadin.debug) {
-            println "(debugger on ${project.vaadin.debugPort})"
-        }
-
         if(project.vaadin.plugin.logToConsole){
             appServerProcess.consumeProcessOutput(System.out, System.out)
         } else {
             File log = new File(logDir.canonicalPath + '/jetty8-devMode.log')
             appServerProcess.consumeProcessOutputStream(new FileOutputStream(log))
         }
+
+        def resultStr = "Application running on http://0.0.0.0:${project.vaadin.serverPort} "
+        if(project.vaadin.jrebel.enabled){
+            resultStr += "(debugger on ${project.vaadin.debugPort}, JRebel active)"
+        } else if (project.vaadin.debug) {
+            resultStr += "(debugger on ${project.vaadin.debugPort})"
+        } else {
+            resultStr += '(debugger off)'
+        }
+        project.logger.lifecycle(resultStr)
     }
+
 
     public startAndBlock(){
         start()
+        project.logger.lifecycle('Press [Ctrl+C] to terminate server...')
         appServerProcess.waitFor()
         terminate()
     }

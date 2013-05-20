@@ -15,7 +15,8 @@
 */
 package fi.jasoft.plugin.tasks
 
-import fi.jasoft.plugin.ApplicationServer;
+import fi.jasoft.plugin.ApplicationServer
+import org.apache.tools.ant.types.selectors.PresentSelector;
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.plugins.WarPluginConvention
@@ -35,7 +36,8 @@ public class RunTask extends DefaultTask {
         ApplicationServer server = new ApplicationServer(project)
         if(project.vaadin.plugin.terminateOnEnter){
             server.start()
-            Util.readLine("")        // Wait for enter
+            project.logger.lifecycle('Press [Enter] to terminate server...')
+            Util.readLine("")
             server.terminate()
         } else {
             server.startAndBlock()

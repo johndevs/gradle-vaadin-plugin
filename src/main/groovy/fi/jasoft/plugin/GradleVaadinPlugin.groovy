@@ -51,7 +51,7 @@ class GradleVaadinPlugin implements Plugin<Project>{
 
 	void apply(Project project){
 
-        println("Using Gradle Vaadin Plugin "+PLUGIN_VERSION)
+        project.logger.quiet("Using Gradle Vaadin Plugin "+PLUGIN_VERSION)
 
 		// Extensions
 		project.extensions.create('vaadin', VaadinPluginExtension)

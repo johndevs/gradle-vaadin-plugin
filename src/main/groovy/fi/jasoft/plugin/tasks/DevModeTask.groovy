@@ -36,7 +36,7 @@ class DevModeTask extends DefaultTask  {
     public void run() {  
 
         if(project.vaadin.widgetset == null){
-            println "No widgetset defined. Please define a widgetset by using the vaadin.widgetset property."
+            project.logger.error("No widgetset defined. Please define a widgetset by using the vaadin.widgetset property.")
             return
         }
 

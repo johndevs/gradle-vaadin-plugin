@@ -39,7 +39,7 @@ class CompileThemeTask extends DefaultTask {
 	@TaskAction
   public void exec(){
     	if(project.vaadin.version.startsWith('6')){
-    		println("SASS themes are not compatible with Vaadin 6.")
+    		project.logger.error("SASS themes are not compatible with Vaadin 6.")
     		return;
     	}
 
@@ -47,7 +47,7 @@ class CompileThemeTask extends DefaultTask {
     	FileTree themes = project.fileTree(dir: webAppDir.canonicalPath + '/VAADIN/themes', include: '**/styles.scss')
     	themes.each { File theme ->
     		File dir = new File(theme.parent)
-    		println "Compiling "+theme.canonicalPath+"..."
+    		project.logger.lifecycle("Compiling "+theme.canonicalPath+"...")
     		project.javaexec {
     			setMain('com.vaadin.sass.SassCompiler')
     			setClasspath(project.sourceSets.main.runtimeClasspath + project.sourceSets.main.compileClasspath) 

@@ -30,7 +30,7 @@ class CreateComponentTask extends DefaultTask {
     public void run() {
 
     	if(project.vaadin.widgetset == null){
-    		println "No widgetset found. Please define a widgetset using the vaadin.widgetset property."
+    		project.logger.error("No widgetset found. Please define a widgetset using the vaadin.widgetset property.")
     		return
     	}
 
