@@ -82,4 +82,8 @@ class Util {
         return false
     }
 
+    public static boolean isAddonStylesSupported(Project project) {
+       return !project.vaadin.version.startsWith('6') && !project.vaadin.version.startsWith('7.0')
+    }
+
 }

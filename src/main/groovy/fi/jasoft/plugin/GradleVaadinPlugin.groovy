@@ -16,7 +16,8 @@
 package fi.jasoft.plugin
 
 import fi.jasoft.plugin.tasks.CreateCompositeTask
-import fi.jasoft.plugin.tasks.CreateServlet3ProjectTask;
+import fi.jasoft.plugin.tasks.CreateServlet3ProjectTask
+import fi.jasoft.plugin.tasks.UpdateAddonStylesTask;
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.WarPlugin
@@ -71,12 +72,13 @@ class GradleVaadinPlugin implements Plugin<Project>{
 		project.tasks.add(name: 'createVaadinTheme',				type: CreateThemeTask,			    group: 'Vaadin')
 		project.tasks.add(name: 'createVaadinWidgetsetGenerator',	type: CreateWidgetsetGeneratorTask,	group: 'Vaadin')
 
-		project.tasks.add(name: 'widgetset', 			type: CompileWidgetsetTask, group: 'Vaadin')
-		project.tasks.add(name: 'devmode', 				type: DevModeTask, 			group: 'Vaadin')
-		project.tasks.add(name: 'superdevmode', 		type: SuperDevModeTask, 	group: 'Vaadin')
-		project.tasks.add(name: 'themes',				type: CompileThemeTask,		group: 'Vaadin')
-		project.tasks.add(name: 'vaadinRun',			type: RunTask,				group: 'Vaadin')
-		project.tasks.add(name: 'updateWidgetset',		type: UpdateWidgetsetTask,	group: 'Vaadin')
+		project.tasks.add(name: 'widgetset', 			type: CompileWidgetsetTask,     group: 'Vaadin')
+		project.tasks.add(name: 'devmode', 				type: DevModeTask, 			    group: 'Vaadin')
+		project.tasks.add(name: 'superdevmode', 		type: SuperDevModeTask, 	    group: 'Vaadin')
+		project.tasks.add(name: 'themes',				type: CompileThemeTask,		    group: 'Vaadin')
+		project.tasks.add(name: 'vaadinRun',			type: RunTask,				    group: 'Vaadin')
+		project.tasks.add(name: 'updateWidgetset',		type: UpdateWidgetsetTask,	    group: 'Vaadin')
+        project.tasks.add(name: 'updateAddonStyles',    type: UpdateAddonStylesTask,    group: 'Vaadin')
 
 		// Add debug information to all compilation results
 		project.tasks.compileJava.options.debugOptions.debugLevel = 'source,lines,vars'
@@ -90,6 +92,9 @@ class GradleVaadinPlugin implements Plugin<Project>{
 
 		// Ensure widgetset is up-2-date
 		project.processResources.dependsOn(project.tasks.updateWidgetset)
+
+        // Ensure addon themes are up2date
+        project.processResources.dependsOn(project.tasks.updateAddonStyles)
 
 		// Cleanup plugin outputs
 		project.clean.dependsOn(project.tasks.cleanWidgetset)

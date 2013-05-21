@@ -30,25 +30,34 @@ class CreateThemeTask extends DefaultTask {
 	 @TaskAction
     public void run() {
 
-    	String themeName = Util.readLine('\nTheme Name (MyTheme): ')
-    	if(themeName == ''){
-    		themeName = 'MyTheme'
-    	}
+         String themeName = Util.readLine('\nTheme Name (MyTheme): ')
+         if(themeName == ''){
+             themeName = 'MyTheme'
+         }
 
-    	File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-    	File themeDir = new File(webAppDir.canonicalPath + '/VAADIN/themes/'+themeName)
-    	themeDir.mkdirs()
+         createTheme(themeName)
+    }
+
+    public void createTheme(String themeName) {
+
+        File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
+        File themeDir = new File(webAppDir.canonicalPath + '/VAADIN/themes/'+themeName)
+        themeDir.mkdirs()
 
         def substitutions = [:]
         substitutions['%THEME%'] = themeName.toLowerCase()
+        substitutions['%THEME_IMPORT_FILE%'] = themeName.toLowerCase() + '.scss'
 
-    	if(project.vaadin.version.startsWith("6")){
-    		TemplateUtil.writeTemplate('MyTheme.css', themeDir, 'styles.css', substitutions)
-    		project.logger.info("Remember to call setTheme(\"${themeName}\") in your Application to use your new theme.")
+        if(project.vaadin.version.startsWith("6")){
+            TemplateUtil.writeTemplate('MyTheme.css', themeDir, 'styles.css', substitutions)
 
-    	} else {
-    		TemplateUtil.writeTemplate('MyTheme.scss', themeDir, 'styles.scss', substitutions)
-    		project.logger.info("Remember to annotate your UI with the @Theme(\"${themeName}\") to use your new theme.")
-    	}
+        } else if (project.vaadin.version.startsWith('7.0')){
+            TemplateUtil.writeTemplate('MyTheme.scss.vaadin70', themeDir, 'styles.scss', substitutions)
+
+        } else {
+            TemplateUtil.writeTemplate('styles.scss', themeDir, 'styles.scss', substitutions)
+            TemplateUtil.writeTemplate('MyTheme.scss', themeDir, substitutions['%THEME_IMPORT_FILE%'], substitutions)
+            project.tasks.updateAddonStyles.run()
+        }
     }
 }

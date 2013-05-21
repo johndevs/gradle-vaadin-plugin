@@ -59,6 +59,8 @@ class CreateServlet3ProjectTask extends DefaultTask {
         substitutions['%APPLICATION_NAME%'] = applicationName
         substitutions['%PUSH%'] = Util.isPushSupportedAndEnabled(project) ? '@Push': ''
         substitutions['%PUSH_IMPORT%'] = Util.isPushSupportedAndEnabled(project) ? "\nimport com.vaadin.annotations.Push;" : ''
+        substitutions['%THEME%'] = Util.isAddonStylesSupported(project) ? "@Theme(\"${applicationName}\")" : ''
+        substitutions['%THEME_IMPORT%'] = Util.isAddonStylesSupported(project) ? "\nimport com.vaadin.annotations.Theme;" : ''
         substitutions['%ASYNC_SUPPORTED%'] = Util.isPushSupportedAndEnabled(project) ? "\n    asyncSupported=true," : ''
 
         if (project.vaadin.widgetset != null) {
@@ -67,10 +69,13 @@ class CreateServlet3ProjectTask extends DefaultTask {
             substitutions['%WIDGETSETPARAM%'] = ''
         }
 
-
         TemplateUtil.writeTemplate('MyUI.java', uidir, applicationName+"UI.java", substitutions)
 
         TemplateUtil.writeTemplate("MyServlet.java", uidir, applicationName+"Servlet.java", substitutions)
+
+        if (Util.isAddonStylesSupported(project)){
+            project.tasks.createVaadinTheme.createTheme(applicationName)
+        }
     }
 }
 

@@ -59,8 +59,10 @@ class CreateProjectTask extends DefaultTask {
 		def substitutions = [:]
     	substitutions['%PACKAGE%'] = applicationPackage
     	substitutions['%APPLICATION_NAME%'] = applicationName
-        substitutions['%PUSH%'] = Util.isPushSupportedAndEnabled(project) ? '@Push': ''
+        substitutions['%PUSH%'] = Util.isPushSupportedAndEnabled(project) ? '\n@Push': ''
         substitutions['%PUSH_IMPORT%'] = Util.isPushSupportedAndEnabled(project) ? "\nimport com.vaadin.annotations.Push;" : ''
+        substitutions['%THEME%'] = Util.isAddonStylesSupported(project) ? "@Theme(\"${applicationName}\")" : ''
+        substitutions['%THEME_IMPORT%'] = Util.isAddonStylesSupported(project) ? "\nimport com.vaadin.annotations.Theme;" : ''
 
 		if(project.vaadin.version.startsWith("6")){
 			TemplateUtil.writeTemplate("MyApplication.java", uidir, applicationName+".java", substitutions)
@@ -81,6 +83,10 @@ class CreateProjectTask extends DefaultTask {
 				TemplateUtil.writeTemplate('web.xml.widgetset', webinf, "web.xml", substitutions) 
 				TemplateUtil.ensureWidgetPresent(project)
 			}
+
+            if(!project.vaadin.version.startsWith('7.0'))        {
+                project.tasks.createVaadinTheme.createTheme(applicationName)
+            }
 		}
     }
 }
