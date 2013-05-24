@@ -87,8 +87,8 @@ class Util {
     }
 
     public static void openBrowser(Project project, String url, int delay=3000){
-        if (project.vaadin.plugin.openInBrowser){
-            Thread.start {
+        if (project.vaadin.plugin.openInBrowser && java.awt.Desktop.isDesktopSupported()){
+            Thread.startDaemon {
                 sleep delay
                 java.awt.Desktop.desktop.browse url.toURI()
             }
