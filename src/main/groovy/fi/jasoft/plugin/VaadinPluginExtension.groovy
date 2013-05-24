@@ -226,6 +226,7 @@ class VaadinPluginExtension{
 
         boolean terminateOnEnter = true
         boolean logToConsole = false
+        boolean openInBrowser = true
 
         void logToConsole (boolean logToConsole) {
             this.logToConsole = logToConsole
@@ -233,6 +234,10 @@ class VaadinPluginExtension{
 
         void terminateOnEnter(boolean terminateOnEnter) {
             this.terminateOnEnter = terminateOnEnter
+        }
+
+        void openInBrowser(boolean openInBrowser) {
+            this.openInBrowser = openInBrowser
         }
     }
 

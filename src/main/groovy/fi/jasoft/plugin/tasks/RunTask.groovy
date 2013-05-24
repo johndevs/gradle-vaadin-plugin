@@ -34,6 +34,13 @@ public class RunTask extends DefaultTask {
     @TaskAction
     public void run() {
         ApplicationServer server = new ApplicationServer(project)
+
+        if (project.vaadin.debug){
+            Util.openBrowser(project, "http://localhost:${project.vaadin.serverPort}?debug")
+        } else {
+            Util.openBrowser(project, "http://localhost:${project.vaadin.serverPort}")
+        }
+
         if(project.vaadin.plugin.terminateOnEnter){
             server.start()
             project.logger.lifecycle('Press [Enter] to terminate server...')

@@ -86,4 +86,13 @@ class Util {
        return !project.vaadin.version.startsWith('6') && !project.vaadin.version.startsWith('7.0')
     }
 
+    public static void openBrowser(Project project, String url, int delay=3000){
+        if (project.vaadin.plugin.openInBrowser){
+            Thread.start {
+                sleep delay
+                java.awt.Desktop.desktop.browse url.toURI()
+            }
+        }
+    }
+
 }

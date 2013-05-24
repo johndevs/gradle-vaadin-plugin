@@ -49,6 +49,18 @@ class DevModeTask extends DefaultTask  {
 
             server.start()
 
+            if(project.vaadin.debug){
+                Util.openBrowser(
+                        project,
+                        "http://localhost:${project.vaadin.serverPort}/?gwt.codesvr=${project.vaadin.devmode.bindAddress}:${project.vaadin.devmode.codeServerPort}&debug"
+                )
+            } else {
+                Util.openBrowser(
+                        project,
+                        "http://localhost:${project.vaadin.serverPort}/?gwt.codesvr=${project.vaadin.devmode.bindAddress}:${project.vaadin.devmode.codeServerPort}"
+                )
+            }
+
             runDevelopmentMode()
 
             server.terminate()
@@ -66,7 +78,7 @@ class DevModeTask extends DefaultTask  {
                     '-noserver',
                     '-war',             webAppDir.canonicalPath+'/VAADIN/widgetsets', 
                     '-gen',             'build/devmode/gen', 
-                    '-startupUrl',      'http://localhost:8080', 
+                    '-startupUrl',      "http://localhost:${project.vaadin.serverPort}",
                     '-logLevel',        project.vaadin.gwt.logLevel,
                     '-deploy',          'build/devmode/deploy',
                     '-workDir',         'build/devmode/',

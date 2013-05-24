@@ -37,13 +37,19 @@ class SuperDevModeTask extends DefaultTask  {
     public void run() {  
     	
         if(!project.vaadin.devmode.superDevMode){
-            println "SuperDevMode is a experimental feature and is not enabled for project by default. To enable it set vaadin.superDevModeEnabled to true"
+            println "SuperDevMode is a experimental feature and is not enabled for project by default. To enable it set vaadin.devmode.superDevMode to true"
             return;
         }
 
         ApplicationServer server = new ApplicationServer(project)
 
         server.start()
+
+        if(project.vaadin.debug){
+            Util.openBrowser(project, "http://localhost:${project.vaadin.serverPort}/?superdevmode&debug")
+        } else {
+            Util.openBrowser(project, "http://localhost:${project.vaadin.serverPort}/?superdevmode")
+        }
 
         runCodeServer()
 
@@ -58,7 +64,7 @@ class SuperDevModeTask extends DefaultTask  {
         widgetsetsDir.mkdirs()
         String widgetset = project.vaadin.widgetset == null ? 'com.vaadin.terminal.gwt.DefaultWidgetSet' : project.vaadin.widgetset
 
-        def classpath = Util.getClassPath(project)
+        def classpath = project.configurations.jetty8 + Util.getClassPath(project)
 
         project.javaexec{
             setMain('com.google.gwt.dev.codeserver.CodeServer')
