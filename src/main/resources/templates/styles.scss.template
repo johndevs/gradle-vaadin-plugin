@@ -3,7 +3,7 @@
 
 /* This file prefixes all rules with the theme name to avoid causing conflicts with other themes. */
 /* The actual styles should be defined in %THEME_IMPORT_FILE% */
-.%THEME% {
+.%THEME_NAME% {
   @include addons;
   @include %THEME%;
 }

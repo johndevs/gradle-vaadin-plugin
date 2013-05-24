@@ -46,6 +46,7 @@ class CreateThemeTask extends DefaultTask {
 
         def substitutions = [:]
         substitutions['%THEME%'] = themeName.toLowerCase()
+        substitutions['%THEME_NAME%'] = themeName
         substitutions['%THEME_IMPORT_FILE%'] = themeName.toLowerCase() + '.scss'
 
         if(project.vaadin.version.startsWith("6")){
