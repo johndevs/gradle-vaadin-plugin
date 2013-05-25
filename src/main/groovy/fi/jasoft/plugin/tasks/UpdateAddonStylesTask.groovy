@@ -35,7 +35,11 @@ class UpdateAddonStylesTask extends DefaultTask{
         }
 
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
+
         File themesDir = new File(webAppDir.canonicalPath+'/VAADIN/themes')
+        if(!themesDir.exists()){
+            return;
+        }
 
         def cp = Util.getClassPath(project)
 
