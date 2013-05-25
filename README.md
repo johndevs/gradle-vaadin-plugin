@@ -43,6 +43,7 @@ The following configuration options are available
 * ``vaadin.addon.license`` - The licence of the Vaadin addon.
 * ``vaadin.addon.title`` - The title for the addon as seen in the Vaadin Directory.
 * ``vaadin.mainSourceSet`` - Defines the main source set where all source files will be generated.
+* ``vaadin.push`` - Should vaadin push be enabled for the application. Default is false.
 
 ## Vaadin GWT configurations
 * ``vaadin.gwt.version`` - GWT version used with Vaadin 6. Defaults to 2.3.0. 
@@ -71,4 +72,4 @@ The following configuration options are available
 ## Plugin configurations
 * ``vaadin.plugin.terminateOnEnter`` - Should the vaadinRun and devmode tasks be terminated on enter-key. Default true.
 * ``vaadin.plugin.logToConsole``- Should server logs be logged to the console or to a log file. Default is logging to file.
-
+* ``vaadin.plugin.openInBrowser`` - Should the application be opened in a browser tab after the application is launched. Default true. 
