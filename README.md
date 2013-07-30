@@ -10,6 +10,24 @@ You do not need to compile the plugin from scratch if you want to use it. You on
 or to use a specific version of the plugin
 
     apply from: 'http://plugins.jasoft.fi/vaadin.plugin?version=x.x.x'
+    
+If you are behind a proxy and cannot use the plugin url directly you then you can download the plugin jar from https://vaadin.com/directory/addon/vaadin-plugin-for-gradle and include it in your build.gradle like so:
+```
+buildscript {
+    repositories {        
+        flatDir dirs: '<Directory where the plugin jar can be found>'
+    }
+
+    dependencies {
+        classpath group: 'fi.jasoft.plugin', name: 'gradle-vaadin-plugin', version: '0.6'
+    }
+}
+
+repositories {
+        flatDir dirs: '<Directory where the plugin jar can be found>'
+}
+```
+    
 
 # Plugin tasks
 The following tasks are available in the plugin
