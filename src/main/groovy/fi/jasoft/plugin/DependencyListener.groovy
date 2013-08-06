@@ -67,18 +67,18 @@ class DependencyListener implements ProjectEvaluationListener{
 
     private static void createJetty8Configuration(Project project){
         if(!project.configurations.hasProperty('jetty8')){
-            project.configurations.add("jetty8")
-            project.dependencies.add('jetty8', 'org.eclipse.jetty.aggregate:jetty-all-server:8.1.10.v20130312')
-            project.dependencies.add('jetty8', 'fi.jasoft.plugin:gradle-vaadin-plugin:'+GradleVaadinPlugin.getVersion())
-            project.dependencies.add('jetty8', 'asm:asm-all:3.3.1')
-            project.dependencies.add('jetty8', 'javax.servlet.jsp:jsp-api:2.2')
+            project.configurations.create("jetty8")
+            project.dependencies.create('jetty8', 'org.eclipse.jetty.aggregate:jetty-all-server:8.1.10.v20130312')
+            project.dependencies.create('jetty8', 'fi.jasoft.plugin:gradle-vaadin-plugin:'+GradleVaadinPlugin.getVersion())
+            project.dependencies.create('jetty8', 'asm:asm-all:3.3.1')
+            project.dependencies.create('jetty8', 'javax.servlet.jsp:jsp-api:2.2')
         }
     }
 
     private static void createCommonVaadinConfiguration(Project project){
         createGWTConfiguration(project)
         if(!project.configurations.hasProperty('vaadin')){
-            project.configurations.add('vaadin')
+            project.configurations.create('vaadin')
             project.sourceSets.main.compileClasspath += project.configurations.vaadin
             project.sourceSets.test.compileClasspath += project.configurations.vaadin
             project.sourceSets.test.runtimeClasspath += project.configurations.vaadin
@@ -95,44 +95,43 @@ class DependencyListener implements ProjectEvaluationListener{
     private static void createVaadin6Configuration(Project project, String version, String gwtVersion){
         createCommonVaadinConfiguration(project)
 
-        project.dependencies.add("vaadin", "com.vaadin:vaadin:${version}")
+        project.dependencies.create("vaadin", "com.vaadin:vaadin:${version}")
         if(project.vaadin.widgetset != null){
-            project.dependencies.add("vaadin-client", "com.google.gwt:gwt-user:"+gwtVersion)
-            project.dependencies.add("vaadin-client", "com.google.gwt:gwt-dev:"+gwtVersion)
-            project.dependencies.add("vaadin-client", "javax.validation:validation-api:1.0.0.GA")
+            project.dependencies.create("vaadin-client", "com.google.gwt:gwt-user:"+gwtVersion)
+            project.dependencies.create("vaadin-client", "com.google.gwt:gwt-dev:"+gwtVersion)
+            project.dependencies.create("vaadin-client", "javax.validation:validation-api:1.0.0.GA")
         }
     }
 
     private static void createVaadin7Configuration(Project project, String version){
         createCommonVaadinConfiguration(project)
-
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
         FileTree themes = project.fileTree(dir: webAppDir.canonicalPath + '/VAADIN/themes', include: '**/styles.scss')
         if(!themes.isEmpty()){
-            project.dependencies.add("vaadin",	"com.vaadin:vaadin-theme-compiler:${version}")
+            project.dependencies.create("vaadin",	"com.vaadin:vaadin-theme-compiler:${version}")
         }
 
         if(project.vaadin.widgetset == null){
-            project.dependencies.add("vaadin",	"com.vaadin:vaadin-client-compiled:${version}")
+            project.dependencies.create("vaadin",	"com.vaadin:vaadin-client-compiled:${version}")
         } else {
-            project.dependencies.add("vaadin-client",	"com.vaadin:vaadin-client-compiler:${version}", {
+            project.dependencies.create("vaadin-client",	"com.vaadin:vaadin-client-compiler:${version}", {
                 exclude([group:'org.mortbay.jetty'])
             })
-            project.dependencies.add("vaadin-client",	"com.vaadin:vaadin-client:${version}")
-            project.dependencies.add("vaadin-client",	"javax.validation:validation-api:1.0.0.GA")
+            project.dependencies.create("vaadin-client",	"com.vaadin:vaadin-client:${version}")
+            project.dependencies.create("vaadin-client",	"javax.validation:validation-api:1.0.0.GA")
         }
 
-        project.dependencies.add("vaadin", "com.vaadin:vaadin-server:${version}")
-        project.dependencies.add("vaadin", "com.vaadin:vaadin-themes:${version}")
+        project.dependencies.create("vaadin", "com.vaadin:vaadin-server:${version}")
+        project.dependencies.create("vaadin", "com.vaadin:vaadin-themes:${version}")
 
         if (Util.isPushSupportedAndEnabled(project)){
-            project.dependencies.add('vaadin', "com.vaadin:vaadin-push:${version}")
+            project.dependencies.create('vaadin', "com.vaadin:vaadin-push:${version}")
         }
     }
 
     private static void createGWTConfiguration(Project project){
         if(!project.configurations.hasProperty('vaadin-client')){
-            project.configurations.add('vaadin-client')
+            project.configurations.create('vaadin-client')
             project.sourceSets.main.compileClasspath += project.configurations['vaadin-client']
             project.sourceSets.test.compileClasspath += project.configurations['vaadin-client']
             project.sourceSets.test.runtimeClasspath += project.configurations['vaadin-client']
