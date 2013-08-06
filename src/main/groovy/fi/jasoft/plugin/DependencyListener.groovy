@@ -65,9 +65,9 @@ class DependencyListener implements ProjectEvaluationListener {
         }
     }
 
-    private static void createJetty8Configuration(Project project) {
-        if (!project.configurations.hasProperty('jetty8')) {
-            project.configurations.add("jetty8")
+    private static void createJetty8Configuration(Project project){
+        if(!project.configurations.hasProperty('jetty8')){
+            project.configurations.create("jetty8")
             project.dependencies.add('jetty8', 'org.eclipse.jetty.aggregate:jetty-all-server:8.1.10.v20130312')
             project.dependencies.add('jetty8', 'fi.jasoft.plugin:gradle-vaadin-plugin:' + GradleVaadinPlugin.getVersion())
             project.dependencies.add('jetty8', 'asm:asm-all:3.3.1')
@@ -77,8 +77,8 @@ class DependencyListener implements ProjectEvaluationListener {
 
     private static void createCommonVaadinConfiguration(Project project) {
         createGWTConfiguration(project)
-        if (!project.configurations.hasProperty('vaadin')) {
-            project.configurations.add('vaadin')
+        if(!project.configurations.hasProperty('vaadin')){
+            project.configurations.create('vaadin')
             project.sourceSets.main.compileClasspath += project.configurations.vaadin
             project.sourceSets.test.compileClasspath += project.configurations.vaadin
             project.sourceSets.test.runtimeClasspath += project.configurations.vaadin
@@ -105,7 +105,6 @@ class DependencyListener implements ProjectEvaluationListener {
 
     private static void createVaadin7Configuration(Project project, String version) {
         createCommonVaadinConfiguration(project)
-
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
         FileTree themes = project.fileTree(dir: webAppDir.canonicalPath + '/VAADIN/themes', include: '**/styles.scss')
         if (!themes.isEmpty()) {
@@ -130,9 +129,9 @@ class DependencyListener implements ProjectEvaluationListener {
         }
     }
 
-    private static void createGWTConfiguration(Project project) {
-        if (!project.configurations.hasProperty('vaadin-client')) {
-            project.configurations.add('vaadin-client')
+    private static void createGWTConfiguration(Project project){
+        if(!project.configurations.hasProperty('vaadin-client')){
+            project.configurations.create('vaadin-client')
             project.sourceSets.main.compileClasspath += project.configurations['vaadin-client']
             project.sourceSets.test.compileClasspath += project.configurations['vaadin-client']
             project.sourceSets.test.runtimeClasspath += project.configurations['vaadin-client']

@@ -21,7 +21,6 @@ import fi.jasoft.plugin.tasks.UpdateAddonStylesTask;
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.WarPlugin
-import org.gradle.api.tasks.compile.Compile
 
 import fi.jasoft.plugin.tasks.CreateProjectTask
 import fi.jasoft.plugin.tasks.CreateComponentTask
