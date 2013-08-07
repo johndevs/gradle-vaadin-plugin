@@ -21,7 +21,6 @@ import fi.jasoft.plugin.tasks.UpdateAddonStylesTask;
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.WarPlugin
-import org.gradle.api.tasks.compile.Compile
 
 import fi.jasoft.plugin.tasks.CreateProjectTask
 import fi.jasoft.plugin.tasks.CreateComponentTask
@@ -65,20 +64,20 @@ class GradleVaadinPlugin implements Plugin<Project>{
 		project.plugins.apply(WarPlugin)
 		
 		// Tasks
-		project.tasks.add(name: 'createVaadinProject', 				type: CreateProjectTask, 		    group: 'Vaadin')
-        project.tasks.add(name: 'createVaadinServlet3Project', 		type: CreateServlet3ProjectTask,    group: 'Vaadin')
-        project.tasks.add(name: 'createVaadinComponent',			type: CreateComponentTask,		    group: 'Vaadin')
-        project.tasks.add(name: 'createVaadinComposite',            type: CreateCompositeTask,          group: 'Vaadin')
-		project.tasks.add(name: 'createVaadinTheme',				type: CreateThemeTask,			    group: 'Vaadin')
-		project.tasks.add(name: 'createVaadinWidgetsetGenerator',	type: CreateWidgetsetGeneratorTask,	group: 'Vaadin')
+		project.tasks.create(name: 'createVaadinProject', 				type: CreateProjectTask, 		    group: 'Vaadin')
+        project.tasks.create(name: 'createVaadinServlet3Project', 		type: CreateServlet3ProjectTask,    group: 'Vaadin')
+        project.tasks.create(name: 'createVaadinComponent',			type: CreateComponentTask,		    group: 'Vaadin')
+        project.tasks.create(name: 'createVaadinComposite',            type: CreateCompositeTask,          group: 'Vaadin')
+		project.tasks.create(name: 'createVaadinTheme',				type: CreateThemeTask,			    group: 'Vaadin')
+		project.tasks.create(name: 'createVaadinWidgetsetGenerator',	type: CreateWidgetsetGeneratorTask,	group: 'Vaadin')
 
-		project.tasks.add(name: 'widgetset', 			type: CompileWidgetsetTask,     group: 'Vaadin')
-		project.tasks.add(name: 'devmode', 				type: DevModeTask, 			    group: 'Vaadin')
-		project.tasks.add(name: 'superdevmode', 		type: SuperDevModeTask, 	    group: 'Vaadin')
-		project.tasks.add(name: 'themes',				type: CompileThemeTask,		    group: 'Vaadin')
-		project.tasks.add(name: 'vaadinRun',			type: RunTask,				    group: 'Vaadin')
-		project.tasks.add(name: 'updateWidgetset',		type: UpdateWidgetsetTask,	    group: 'Vaadin')
-        project.tasks.add(name: 'updateAddonStyles',    type: UpdateAddonStylesTask,    group: 'Vaadin')
+		project.tasks.create(name: 'widgetset', 			type: CompileWidgetsetTask,     group: 'Vaadin')
+		project.tasks.create(name: 'devmode', 				type: DevModeTask, 			    group: 'Vaadin')
+		project.tasks.create(name: 'superdevmode', 		type: SuperDevModeTask, 	    group: 'Vaadin')
+		project.tasks.create(name: 'themes',				type: CompileThemeTask,		    group: 'Vaadin')
+		project.tasks.create(name: 'vaadinRun',			type: RunTask,				    group: 'Vaadin')
+		project.tasks.create(name: 'updateWidgetset',		type: UpdateWidgetsetTask,	    group: 'Vaadin')
+        project.tasks.create(name: 'updateAddonStyles',    type: UpdateAddonStylesTask,    group: 'Vaadin')
 
 		// Add debug information to all compilation results
 		project.tasks.compileJava.options.debugOptions.debugLevel = 'source,lines,vars'
