@@ -102,6 +102,10 @@ class VaadinPluginExtension{
         this.push = push
     }
 
+    void mainSourceSet(SourceDirectorySet set){
+        this.mainSourceSet = set
+    }
+
     /*
      * Closures
      */
@@ -138,7 +142,7 @@ class VaadinPluginExtension{
 
 	class GWT{
 		String style = "OBF"
-		String optimize = 0
+		int optimize = 0
 		String logLevel = "INFO"
 		int localWorkers = Runtime.getRuntime().availableProcessors()
 		boolean draftCompile = false
@@ -154,7 +158,7 @@ class VaadinPluginExtension{
             this.style = style
         }
 
-        void optimize(String optimize) {
+        void optimize(int optimize) {
             this.optimize = optimize
         }
 
