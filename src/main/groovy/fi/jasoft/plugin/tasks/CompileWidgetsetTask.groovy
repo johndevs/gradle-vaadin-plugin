@@ -23,75 +23,75 @@ import org.gradle.api.file.FileCollection;
 
 
 class CompileWidgetsetTask extends DefaultTask {
-   
-    public CompileWidgetsetTask(){
+
+    public CompileWidgetsetTask() {
         dependsOn(project.tasks.classes)
 
         description = "Compiles Vaadin Addons and components into Javascript."
 
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-        
-        File targetDir = new File(webAppDir.canonicalPath+'/VAADIN/widgetsets')
+
+        File targetDir = new File(webAppDir.canonicalPath + '/VAADIN/widgetsets')
         getOutputs().dir(targetDir)
-        
-        File unitCacheDir = new File(webAppDir.canonicalPath+'/VAADIN/gwt-unitCache')
+
+        File unitCacheDir = new File(webAppDir.canonicalPath + '/VAADIN/gwt-unitCache')
         getOutputs().dir(unitCacheDir)
 
         /* Monitor changes in dependencies since upgrading a
         * dependency should also trigger a recompile of the widgetset
         */
-        getInputs().files(project.configurations.compile)       
+        getInputs().files(project.configurations.compile)
 
         // Monitor changes in client side classes and resources
-        project.sourceSets.main.java.srcDirs.each{
+        project.sourceSets.main.java.srcDirs.each {
             getInputs().files(project.fileTree(it.absolutePath).include('**/*/client/**/*.java'))
             getInputs().files(project.fileTree(it.absolutePath).include('**/*/shared/**/*.java'))
             getInputs().files(project.fileTree(it.absolutePath).include('**/*/public/**/*.*'))
             getInputs().files(project.fileTree(it.absolutePath).include('**/*/*.gwt.xml'))
-        }  
+        }
 
         //Monitor changes in resources
-        project.sourceSets.main.resources.srcDirs.each{
-           getInputs().files(project.fileTree(it.absolutePath).include('**/*/public/**/*.*')) 
-           getInputs().files(project.fileTree(it.absolutePath).include('**/*/*.gwt.xml'))
+        project.sourceSets.main.resources.srcDirs.each {
+            getInputs().files(project.fileTree(it.absolutePath).include('**/*/public/**/*.*'))
+            getInputs().files(project.fileTree(it.absolutePath).include('**/*/*.gwt.xml'))
         }
     }
 
     @TaskAction
     public void run() {
-    	if(project.vaadin.widgetset == null){
-    		return;	
-    	}
+        if (project.vaadin.widgetset == null) {
+            return;
+        }
 
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
 
-        File targetDir = new File(webAppDir.canonicalPath+'/VAADIN/widgetsets')
+        File targetDir = new File(webAppDir.canonicalPath + '/VAADIN/widgetsets')
         targetDir.mkdirs()
 
         // Ensure unit cache dir is present so the compiler does not complain
-        new File(webAppDir.canonicalPath+'/VAADIN/gwt-unitCache').mkdirs()
+        new File(webAppDir.canonicalPath + '/VAADIN/gwt-unitCache').mkdirs()
 
         FileCollection classpath = Util.getClassPath(project)
-        
-        project.javaexec{
+
+        project.javaexec {
             setClasspath(classpath)
             setMain('com.google.gwt.dev.Compiler')
 
             def args = ['-style', project.vaadin.gwt.style] +
-                       ['-optimize', project.vaadin.gwt.optimize] +
-                       ['-war', targetDir.canonicalPath] +
-                       ['-logLevel', project.vaadin.gwt.logLevel] +
-                       ['-localWorkers', project.vaadin.gwt.localWorkers]
+                    ['-optimize', project.vaadin.gwt.optimize] +
+                    ['-war', targetDir.canonicalPath] +
+                    ['-logLevel', project.vaadin.gwt.logLevel] +
+                    ['-localWorkers', project.vaadin.gwt.localWorkers]
 
-            if(project.vaadin.gwt.draftCompile){
+            if (project.vaadin.gwt.draftCompile) {
                 args.add('-draftCompile')
             }
 
-            if(project.vaadin.gwt.strict){
+            if (project.vaadin.gwt.strict) {
                 args.add('-strict')
             }
 
-            if(project.vaadin.gwt.extraArgs){
+            if (project.vaadin.gwt.extraArgs) {
                 args.add(project.vaadin.gwt.extraArgs)
             }
 
@@ -99,15 +99,15 @@ class CompileWidgetsetTask extends DefaultTask {
 
             setArgs(args)
 
-            if(project.vaadin.gwt.jvmArgs != null){
-                jvmArgs(project.vaadin.gwt.jvmArgs)    
+            if (project.vaadin.gwt.jvmArgs != null) {
+                jvmArgs(project.vaadin.gwt.jvmArgs)
             }
         }
 
         /*
          * Compiler generates an extra WEB-INF folder into the widgetsets folder. Remove it.
          */
-         new File(targetDir.canonicalPath+"/WEB-INF").deleteDir()
+        new File(targetDir.canonicalPath + "/WEB-INF").deleteDir()
     }
 
 }

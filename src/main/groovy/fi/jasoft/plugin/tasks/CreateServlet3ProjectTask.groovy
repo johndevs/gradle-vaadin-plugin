@@ -26,7 +26,7 @@ import fi.jasoft.plugin.TemplateUtil;
 
 class CreateServlet3ProjectTask extends DefaultTask {
 
-    public CreateServlet3ProjectTask(){
+    public CreateServlet3ProjectTask() {
         description = "Creates a new Vaadin Project bases on Java Servlet 3.0"
     }
 
@@ -34,30 +34,30 @@ class CreateServlet3ProjectTask extends DefaultTask {
     public void run() {
 
         String applicationName = Util.readLine('\nApplication Name (MyApplication): ')
-        if(applicationName == ''){
+        if (applicationName == '') {
             applicationName = 'MyApplication'
         }
 
         String applicationPackage;
-        if(project.vaadin.widgetset != null){
+        if (project.vaadin.widgetset != null) {
             String widgetsetName = project.vaadin.widgetset.tokenize('.').last()
-            applicationPackage = project.vaadin.widgetset[0..(-widgetsetName.size()-2)]
+            applicationPackage = project.vaadin.widgetset[0..(-widgetsetName.size() - 2)]
         } else {
             applicationPackage = Util.readLine("\nApplication Package (com.example.${applicationName.toLowerCase()}): ")
-            if(applicationPackage == ''){
-                applicationPackage = 'com.example.'+applicationName.toLowerCase()
+            if (applicationPackage == '') {
+                applicationPackage = 'com.example.' + applicationName.toLowerCase()
             }
         }
 
         File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
-        File uidir = new File(javaDir.canonicalPath + '/' + applicationPackage.replaceAll(/\./,'/'))
+        File uidir = new File(javaDir.canonicalPath + '/' + applicationPackage.replaceAll(/\./, '/'))
 
         uidir.mkdirs()
 
         def substitutions = [:]
         substitutions['%PACKAGE%'] = applicationPackage
         substitutions['%APPLICATION_NAME%'] = applicationName
-        substitutions['%PUSH%'] = Util.isPushSupportedAndEnabled(project) ? '@Push': ''
+        substitutions['%PUSH%'] = Util.isPushSupportedAndEnabled(project) ? '@Push' : ''
         substitutions['%PUSH_IMPORT%'] = Util.isPushSupportedAndEnabled(project) ? "\nimport com.vaadin.annotations.Push;" : ''
         substitutions['%THEME%'] = Util.isAddonStylesSupported(project) ? "@Theme(\"${applicationName}\")" : ''
         substitutions['%THEME_IMPORT%'] = Util.isAddonStylesSupported(project) ? "\nimport com.vaadin.annotations.Theme;" : ''
@@ -69,11 +69,11 @@ class CreateServlet3ProjectTask extends DefaultTask {
             substitutions['%WIDGETSETPARAM%'] = ''
         }
 
-        TemplateUtil.writeTemplate('MyUI.java', uidir, applicationName+"UI.java", substitutions)
+        TemplateUtil.writeTemplate('MyUI.java', uidir, applicationName + "UI.java", substitutions)
 
-        TemplateUtil.writeTemplate("MyServlet.java", uidir, applicationName+"Servlet.java", substitutions)
+        TemplateUtil.writeTemplate("MyServlet.java", uidir, applicationName + "Servlet.java", substitutions)
 
-        if (Util.isAddonStylesSupported(project)){
+        if (Util.isAddonStylesSupported(project)) {
             project.tasks.createVaadinTheme.createTheme(applicationName)
         }
     }

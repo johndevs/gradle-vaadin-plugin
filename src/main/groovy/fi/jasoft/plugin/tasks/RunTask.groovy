@@ -25,7 +25,7 @@ import fi.jasoft.plugin.Util
 
 public class RunTask extends DefaultTask {
 
-    public RunTask(){
+    public RunTask() {
         dependsOn(project.tasks.widgetset)
         dependsOn(project.tasks.themes)
         description = 'Runs the Vaadin application on an embedded Jetty ApplicationServer'
@@ -35,13 +35,13 @@ public class RunTask extends DefaultTask {
     public void run() {
         ApplicationServer server = new ApplicationServer(project)
 
-        if (project.vaadin.debug){
+        if (project.vaadin.debug) {
             Util.openBrowser(project, "http://localhost:${project.vaadin.serverPort}?debug")
         } else {
             Util.openBrowser(project, "http://localhost:${project.vaadin.serverPort}")
         }
 
-        if(project.vaadin.plugin.terminateOnEnter){
+        if (project.vaadin.plugin.terminateOnEnter) {
             server.start()
             project.logger.lifecycle('Press [Enter] to terminate server...')
             Util.readLine("")

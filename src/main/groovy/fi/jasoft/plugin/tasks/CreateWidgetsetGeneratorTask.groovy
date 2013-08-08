@@ -22,39 +22,39 @@ import fi.jasoft.plugin.TemplateUtil;
 
 class CreateWidgetsetGeneratorTask extends DefaultTask {
 
-	public CreateWidgetsetGeneratorTask(){
+    public CreateWidgetsetGeneratorTask() {
         description = "Creates a new widgetset generator for optimizing the widgetset"
     }
 
     @TaskAction
     public void run() {
 
-    	if(project.vaadin.widgetset == null){
-    		project.logger.error("No widgetset found. Please define a widgetset using the vaadin.widgetset property.")
-    		return
-    	}
+        if (project.vaadin.widgetset == null) {
+            project.logger.error("No widgetset found. Please define a widgetset using the vaadin.widgetset property.")
+            return
+        }
 
         File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
-        
+
         String name, pkg, filename
-        if(project.vaadin.widgetsetGenerator == null){
+        if (project.vaadin.widgetsetGenerator == null) {
             name = project.vaadin.widgetset.tokenize('.').last()
-            pkg = project.vaadin.widgetset.replaceAll('.'+ name,'') + '.client.ui'
+            pkg = project.vaadin.widgetset.replaceAll('.' + name, '') + '.client.ui'
             filename = name + "Generator.java"
 
         } else {
             name = project.vaadin.widgetsetGenerator.tokenize('.').last()
-            pkg = project.vaadin.widgetsetGenerator.replaceAll('.'+ name,'')
+            pkg = project.vaadin.widgetsetGenerator.replaceAll('.' + name, '')
             filename = name + ".java"
         }
 
-        File dir = new File(javaDir.canonicalPath + '/' + pkg.replaceAll(/\./,'/'))
+        File dir = new File(javaDir.canonicalPath + '/' + pkg.replaceAll(/\./, '/'))
 
-        dir.mkdirs()    
-       
+        dir.mkdirs()
+
         def substitutions = [:]
         substitutions['%PACKAGE_CLIENT%'] = pkg
-        substitutions['%CLASS_NAME%'] = filename.replaceAll('.java','')
+        substitutions['%CLASS_NAME%'] = filename.replaceAll('.java', '')
 
         TemplateUtil.writeTemplate('MyConnectorBundleLoaderFactory.java', dir, filename, substitutions)
     }

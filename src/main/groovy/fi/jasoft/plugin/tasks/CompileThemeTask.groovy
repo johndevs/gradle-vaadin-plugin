@@ -22,38 +22,38 @@ import org.gradle.api.file.FileTree
 
 class CompileThemeTask extends DefaultTask {
 
-	public CompileThemeTask(){
-		description = "Compiles a Vaadin SASS theme into CSS"
+    public CompileThemeTask() {
+        description = "Compiles a Vaadin SASS theme into CSS"
 
-		File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
+        File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
 
         getInputs().files(project.fileTree(dir: webAppDir.canonicalPath + '/VAADIN/themes', include: '**/*.scss'))
 
         FileTree themes = project.fileTree(dir: webAppDir.canonicalPath + '/VAADIN/themes', include: '**/styles.scss')
-   		themes.each { File theme ->
-   			File dir = new File(theme.parent)
-   			File css = new File(dir.canonicalPath+'/styles.css')
-   			getOutputs().files(css)	
-   		} 	
-	}
+        themes.each { File theme ->
+            File dir = new File(theme.parent)
+            File css = new File(dir.canonicalPath + '/styles.css')
+            getOutputs().files(css)
+        }
+    }
 
-	@TaskAction
-    public void exec(){
-    	if(project.vaadin.version.startsWith('6')){
-    		project.logger.error("SASS themes are not compatible with Vaadin 6.")
-    		return;
-    	}
+    @TaskAction
+    public void exec() {
+        if (project.vaadin.version.startsWith('6')) {
+            project.logger.error("SASS themes are not compatible with Vaadin 6.")
+            return;
+        }
 
-    	File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-    	FileTree themes = project.fileTree(dir: webAppDir.canonicalPath + '/VAADIN/themes', include: '**/styles.scss')
-    	themes.each { File theme ->
-    		File dir = new File(theme.parent)
-    		project.logger.lifecycle("Compiling "+theme.canonicalPath+"...")
-    		project.javaexec {
-    			setMain('com.vaadin.sass.SassCompiler')
-    			setClasspath(project.sourceSets.main.runtimeClasspath + project.sourceSets.main.compileClasspath) 
-				setArgs([theme.canonicalPath, dir.canonicalPath+'/styles.css'])
-    		}
-    	}
+        File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
+        FileTree themes = project.fileTree(dir: webAppDir.canonicalPath + '/VAADIN/themes', include: '**/styles.scss')
+        themes.each { File theme ->
+            File dir = new File(theme.parent)
+            project.logger.lifecycle("Compiling " + theme.canonicalPath + "...")
+            project.javaexec {
+                setMain('com.vaadin.sass.SassCompiler')
+                setClasspath(project.sourceSets.main.runtimeClasspath + project.sourceSets.main.compileClasspath)
+                setArgs([theme.canonicalPath, dir.canonicalPath + '/styles.css'])
+            }
+        }
     }
 }

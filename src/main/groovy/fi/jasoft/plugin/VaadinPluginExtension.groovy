@@ -18,27 +18,27 @@ package fi.jasoft.plugin
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.tasks.SourceSet;
 
-class VaadinPluginExtension{
+class VaadinPluginExtension {
 
-	String widgetset
+    String widgetset
 
-	String widgetsetGenerator = null
+    String widgetsetGenerator = null
 
-	String version = "7+"
+    String version = "7+"
 
-	String servletVersion = "2.5"
+    String servletVersion = "2.5"
 
     boolean debug = true
 
-	int debugPort = 8000
+    int debugPort = 8000
 
-	boolean manageWidgetset = true
+    boolean manageWidgetset = true
 
-	boolean manageDependencies = true
+    boolean manageDependencies = true
 
-	int serverPort = 8080
+    int serverPort = 8080
 
-	String[] jvmArgs = null
+    String[] jvmArgs = null
 
     JRebel jrebel = new JRebel()
 
@@ -57,15 +57,16 @@ class VaadinPluginExtension{
     /*
      * Assignment methods
      */
-    void widgetset(String widgetset){
+
+    void widgetset(String widgetset) {
         this.widgetset = widgetset
     }
 
-    void widgetsetGenerator(String widgetsetGenerator){
+    void widgetsetGenerator(String widgetsetGenerator) {
         this.widgetsetGenerator = widgetsetGenerator
     }
 
-    void version(String version){
+    void version(String version) {
         this.version = version
     }
 
@@ -78,31 +79,31 @@ class VaadinPluginExtension{
         this.debug = debug
     }
 
-    void debugPort(int port){
+    void debugPort(int port) {
         this.debugPort = port
     }
 
-    void manageWidgetset(boolean manage){
+    void manageWidgetset(boolean manage) {
         this.manageWidgetset = manage
     }
 
-    void manageDependencies(boolean manage){
+    void manageDependencies(boolean manage) {
         this.manageDependencies = manage
     }
 
-    void serverPort(int port){
+    void serverPort(int port) {
         this.serverPort = port;
     }
 
-    void jvmArgs(String[] args){
+    void jvmArgs(String[] args) {
         this.jvmArgs = args
     }
 
-    void push(boolean push){
+    void push(boolean push) {
         this.push = push
     }
 
-    void mainSourceSet(SourceDirectorySet set){
+    void mainSourceSet(SourceDirectorySet set) {
         this.mainSourceSet = set
     }
 
@@ -135,22 +136,21 @@ class VaadinPluginExtension{
         closure()
     }
 
-
     /*
      * Inner classes
      */
 
-	class GWT{
-		String style = "OBF"
-		int optimize = 0
-		String logLevel = "INFO"
-		int localWorkers = Runtime.getRuntime().availableProcessors()
-		boolean draftCompile = false
-		boolean strict = false
-		String userAgent = "ie8,ie9,gecko1_8,safari,opera"
-		String[] jvmArgs = null
-		String version = "2.3.0"
-		String extraArgs
+    class GWT {
+        String style = "OBF"
+        int optimize = 0
+        String logLevel = "INFO"
+        int localWorkers = Runtime.getRuntime().availableProcessors()
+        boolean draftCompile = false
+        boolean strict = false
+        String userAgent = "ie8,ie9,gecko1_8,safari,opera"
+        String[] jvmArgs = null
+        String version = "2.3.0"
+        String extraArgs
         String[] sourcePaths = ['client', 'shared']
         boolean collapsePermutations = false
 
@@ -203,11 +203,11 @@ class VaadinPluginExtension{
         }
     }
 
-	class DevMode {
-		boolean noserver = false
-		boolean superDevMode = false
-		String bindAddress = '127.0.0.1'
-		int codeServerPort = 9997
+    class DevMode {
+        boolean noserver = false
+        boolean superDevMode = false
+        String bindAddress = '127.0.0.1'
+        int codeServerPort = 9997
 
         void noserver(boolean noserver) {
             this.noserver = noserver
@@ -232,7 +232,7 @@ class VaadinPluginExtension{
         boolean logToConsole = false
         boolean openInBrowser = true
 
-        void logToConsole (boolean logToConsole) {
+        void logToConsole(boolean logToConsole) {
             this.logToConsole = logToConsole
         }
 

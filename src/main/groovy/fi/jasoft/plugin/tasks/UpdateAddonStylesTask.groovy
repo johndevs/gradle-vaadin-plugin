@@ -21,23 +21,23 @@ import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskAction
 
 
-class UpdateAddonStylesTask extends DefaultTask{
+class UpdateAddonStylesTask extends DefaultTask {
 
-    UpdateAddonStylesTask(){
+    UpdateAddonStylesTask() {
         description = 'Updates the addons.scss file with addon styles.'
     }
 
     @TaskAction
     public void run() {
 
-        if (!Util.isAddonStylesSupported(project)){
+        if (!Util.isAddonStylesSupported(project)) {
             return
         }
 
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
 
-        File themesDir = new File(webAppDir.canonicalPath+'/VAADIN/themes')
-        if(!themesDir.exists()){
+        File themesDir = new File(webAppDir.canonicalPath + '/VAADIN/themes')
+        if (!themesDir.exists()) {
             return;
         }
 

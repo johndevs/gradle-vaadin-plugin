@@ -25,31 +25,31 @@ import org.gradle.api.plugins.WarPluginConvention;
 import fi.jasoft.plugin.TemplateUtil
 import java.lang.Process;
 
-class DevModeTask extends DefaultTask  {
+class DevModeTask extends DefaultTask {
 
-    public DevModeTask(){
+    public DevModeTask() {
         dependsOn(project.tasks.classes)
         description = "Run Development Mode for easier debugging and development of client widgets."
     }
 
-	@TaskAction
-    public void run() {  
+    @TaskAction
+    public void run() {
 
-        if(project.vaadin.widgetset == null){
+        if (project.vaadin.widgetset == null) {
             project.logger.error("No widgetset defined. Please define a widgetset by using the vaadin.widgetset property.")
             return
         }
 
         TemplateUtil.ensureWidgetPresent(project)
 
-        if(project.vaadin.devmode.noserver){
+        if (project.vaadin.devmode.noserver) {
             runDevelopmentMode()
         } else {
             ApplicationServer server = new ApplicationServer(project)
 
             server.start()
 
-            if(project.vaadin.debug){
+            if (project.vaadin.debug) {
                 Util.openBrowser(
                         project,
                         "http://localhost:${project.vaadin.serverPort}/?gwt.codesvr=${project.vaadin.devmode.bindAddress}:${project.vaadin.devmode.codeServerPort}&debug"
@@ -65,26 +65,26 @@ class DevModeTask extends DefaultTask  {
 
             server.terminate()
         }
-	}
+    }
 
-    protected void runDevelopmentMode(){
+    protected void runDevelopmentMode() {
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
         def classpath = Util.getClassPath(project)
 
-        project.javaexec{
+        project.javaexec {
             setMain('com.google.gwt.dev.DevMode')
             setClasspath(classpath)
-            setArgs([project.vaadin.widgetset, 
+            setArgs([project.vaadin.widgetset,
                     '-noserver',
-                    '-war',             webAppDir.canonicalPath+'/VAADIN/widgetsets', 
-                    '-gen',             'build/devmode/gen', 
-                    '-startupUrl',      "http://localhost:${project.vaadin.serverPort}",
-                    '-logLevel',        project.vaadin.gwt.logLevel,
-                    '-deploy',          'build/devmode/deploy',
-                    '-workDir',         'build/devmode/',
-                    '-logdir',          'build/devmode/logs',
-                    '-codeServerPort',  project.vaadin.devmode.codeServerPort,
-                    '-bindAddress',     project.vaadin.devmode.bindAddress
+                    '-war', webAppDir.canonicalPath + '/VAADIN/widgetsets',
+                    '-gen', 'build/devmode/gen',
+                    '-startupUrl', "http://localhost:${project.vaadin.serverPort}",
+                    '-logLevel', project.vaadin.gwt.logLevel,
+                    '-deploy', 'build/devmode/deploy',
+                    '-workDir', 'build/devmode/',
+                    '-logdir', 'build/devmode/logs',
+                    '-codeServerPort', project.vaadin.devmode.codeServerPort,
+                    '-bindAddress', project.vaadin.devmode.bindAddress
             ])
         }
     }

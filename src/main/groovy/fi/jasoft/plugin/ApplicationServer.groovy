@@ -14,13 +14,13 @@ public class ApplicationServer {
 
     private final project;
 
-    ApplicationServer(Project project){
-           this.project = project;
+    ApplicationServer(Project project) {
+        this.project = project;
     }
 
     public start() {
 
-        if(appServerProcess != null){
+        if (appServerProcess != null) {
             project.logger.error('Server is already running.')
             return
         }
@@ -34,14 +34,14 @@ public class ApplicationServer {
         appServerProcess = ['java']
 
         // Debug
-        if(project.vaadin.debug){
+        if (project.vaadin.debug) {
             appServerProcess.add('-Xdebug')
             appServerProcess.add("-Xrunjdwp:transport=dt_socket,address=${project.vaadin.debugPort},server=y,suspend=n")
         }
 
         // Jrebel
-        if(project.vaadin.jrebel.enabled && project.vaadin.debug){
-            if(project.vaadin.jrebel.location != null && new File(project.vaadin.jrebel.location).exists()){
+        if (project.vaadin.jrebel.enabled && project.vaadin.debug) {
+            if (project.vaadin.jrebel.location != null && new File(project.vaadin.jrebel.location).exists()) {
                 appServerProcess.add('-noverify')
                 appServerProcess.add("-javaagent:${project.vaadin.jrebel.location}")
             } else {
@@ -50,14 +50,14 @@ public class ApplicationServer {
         }
 
         // JVM options
-        if(project.vaadin.debug){
+        if (project.vaadin.debug) {
             appServerProcess.add('-ea')
         }
 
         appServerProcess.add('-cp')
         appServerProcess.add(cp.getAsPath())
 
-        if(project.vaadin.jvmArgs != null){
+        if (project.vaadin.jvmArgs != null) {
             appServerProcess.addAll(project.vaadin.jvmArgs)
         }
 
@@ -66,15 +66,15 @@ public class ApplicationServer {
 
         appServerProcess.add(project.vaadin.serverPort)
 
-        appServerProcess.add(webAppDir.canonicalPath+'/')
+        appServerProcess.add(webAppDir.canonicalPath + '/')
 
         File classesDir = new File("build/classes");
-        appServerProcess.add(classesDir.canonicalPath+'/')
+        appServerProcess.add(classesDir.canonicalPath + '/')
 
         // Execute server
         appServerProcess = appServerProcess.execute()
 
-        if(project.vaadin.plugin.logToConsole){
+        if (project.vaadin.plugin.logToConsole) {
             appServerProcess.consumeProcessOutput(System.out, System.out)
         } else {
             File log = new File(logDir.canonicalPath + '/jetty8-devMode.log')
@@ -82,7 +82,7 @@ public class ApplicationServer {
         }
 
         def resultStr = "Application running on http://0.0.0.0:${project.vaadin.serverPort} "
-        if(project.vaadin.jrebel.enabled){
+        if (project.vaadin.jrebel.enabled) {
             resultStr += "(debugger on ${project.vaadin.debugPort}, JRebel active)"
         } else if (project.vaadin.debug) {
             resultStr += "(debugger on ${project.vaadin.debugPort})"
@@ -93,14 +93,14 @@ public class ApplicationServer {
     }
 
 
-    public startAndBlock(){
+    public startAndBlock() {
         start()
         project.logger.lifecycle('Press [Ctrl+C] to terminate server...')
         appServerProcess.waitFor()
         terminate()
     }
 
-    public terminate(){
+    public terminate() {
         appServerProcess.in.close()
         appServerProcess.out.close()
         appServerProcess.err.close()

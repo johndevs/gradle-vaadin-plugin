@@ -20,70 +20,70 @@ import org.gradle.api.execution.TaskExecutionListener
 import org.gradle.api.Task
 import org.gradle.api.tasks.TaskState
 
-public class TaskListener implements TaskExecutionListener{
+public class TaskListener implements TaskExecutionListener {
 
-	public void  beforeExecute(Task task){
-		def project = task.getProject()
-		if(!project.hasProperty('vaadin')){
-			return
-		}
+    public void beforeExecute(Task task) {
+        def project = task.getProject()
+        if (!project.hasProperty('vaadin')) {
+            return
+        }
 
-		/*
-		 * Dependency related configurations
-		 */
-		if(project.vaadin.manageDependencies){
+        /*
+         * Dependency related configurations
+         */
+        if (project.vaadin.manageDependencies) {
 
-			if(task.getName() == 'eclipseClasspath'){
-				configureEclipsePlugin(task)
-			} 
+            if (task.getName() == 'eclipseClasspath') {
+                configureEclipsePlugin(task)
+            }
 
-			if(task.getName() == 'eclipseWtpComponent'){
+            if (task.getName() == 'eclipseWtpComponent') {
                 configureEclipseWtpPluginComponent(task)
-			}
-		}
+            }
+        }
 
-        if (task.getName() == 'eclipseWtpFacet'){
+        if (task.getName() == 'eclipseWtpFacet') {
             configureEclipseWtpPluginFacet(task)
         }
 
-		if(task.getName() == 'compileJava'){
-			ensureWidgetsetGeneratorExists(task)
-		}
+        if (task.getName() == 'compileJava') {
+            ensureWidgetsetGeneratorExists(task)
+        }
 
-        if(task.getName() == 'jar'){
+        if (task.getName() == 'jar') {
             configureAddonMetadata(task)
         }
 
-        if (task.getName() == 'war'){
+        if (task.getName() == 'war') {
             configureJRebel(task)
         }
-	}
-
-	public void  afterExecute(Task task, TaskState state){
-
-	}
-
-	private void configureEclipsePlugin(Task task){
-		def project = task.getProject()
-		def cp = project.eclipse.classpath
-        cp.downloadSources = true
-		cp.defaultOutputDir = project.file('build/classes/main')
-		cp.plusConfigurations += project.configurations.vaadin
-		cp.plusConfigurations += project.configurations['vaadin-client']
-        cp.plusConfigurations += project.configurations.jetty8
-	}
-
-	private void configureEclipseWtpPluginComponent(Task task){
-		def project = task.getProject()
-		def wtp = project.eclipse.wtp
-		wtp.component.plusConfigurations += project.configurations.vaadin
     }
 
-    private void configureEclipseWtpPluginFacet(Task task){
+    public void afterExecute(Task task, TaskState state) {
+
+    }
+
+    private void configureEclipsePlugin(Task task) {
+        def project = task.getProject()
+        def cp = project.eclipse.classpath
+        cp.downloadSources = true
+        cp.defaultOutputDir = project.file('build/classes/main')
+        cp.plusConfigurations += project.configurations.vaadin
+        cp.plusConfigurations += project.configurations['vaadin-client']
+        cp.plusConfigurations += project.configurations.jetty8
+    }
+
+    private void configureEclipseWtpPluginComponent(Task task) {
+        def project = task.getProject()
+        def wtp = project.eclipse.wtp
+        wtp.component.plusConfigurations += project.configurations.vaadin
+    }
+
+    private void configureEclipseWtpPluginFacet(Task task) {
         def project = task.getProject()
         def wtp = project.eclipse.wtp
 
-        if(project.vaadin.version.startsWith('6')){
+        if (project.vaadin.version.startsWith('6')) {
             wtp.facet.facet(name: 'com.vaadin.integration.eclipse.core', version: '1.0')
         } else {
             wtp.facet.facet(name: 'com.vaadin.integration.eclipse.core', version: '7.0')
@@ -92,27 +92,27 @@ public class TaskListener implements TaskExecutionListener{
         wtp.facet.facet(name: 'java', version: project.sourceCompatibility)
     }
 
-	private void ensureWidgetsetGeneratorExists(Task task){
-		def project = task.getProject()
-		if(project.vaadin.widgetsetGenerator != null ){
-			String name = project.vaadin.widgetsetGenerator.tokenize('.').last()
-            String pkg = project.vaadin.widgetsetGenerator.replaceAll('.'+ name,'')
+    private void ensureWidgetsetGeneratorExists(Task task) {
+        def project = task.getProject()
+        if (project.vaadin.widgetsetGenerator != null) {
+            String name = project.vaadin.widgetsetGenerator.tokenize('.').last()
+            String pkg = project.vaadin.widgetsetGenerator.replaceAll('.' + name, '')
             String filename = name + ".java"
-			File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
-    		File f = new File(javaDir.canonicalPath + '/' + pkg.replaceAll(/\./,'/') + '/' + filename)
-    		if(!f.exists()){
-    			project.tasks.createVaadinWidgetsetGenerator.run()	
-    		}
+            File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
+            File f = new File(javaDir.canonicalPath + '/' + pkg.replaceAll(/\./, '/') + '/' + filename)
+            if (!f.exists()) {
+                project.tasks.createVaadinWidgetsetGenerator.run()
+            }
         }
-	}
+    }
 
-    private void configureAddonMetadata(Task task){
+    private void configureAddonMetadata(Task task) {
         def project = task.getProject()
 
         // Resolve widgetset
         def widgetset = project.vaadin.widgetset
-        if(widgetset == null){
-            if(project.vaadin.version.startsWith('6')){
+        if (widgetset == null) {
+            if (project.vaadin.version.startsWith('6')) {
                 widgetset = 'com.vaadin.terminal.gwt.DefaultWidgetSet'
             } else {
                 widgetset = 'com.vaadin.DefaultWidgetSet'
@@ -120,7 +120,7 @@ public class TaskListener implements TaskExecutionListener{
         }
 
         // Add metadata to jar manifest
-        project.tasks.jar.manifest.attributes (
+        project.tasks.jar.manifest.attributes(
                 'Vaadin-Package-Version': 1,
                 'Vaadin-Widgetsets': widgetset,
                 'Vaadin-License-Title': project.vaadin.addon.license,
@@ -130,19 +130,19 @@ public class TaskListener implements TaskExecutionListener{
         )
     }
 
-    private void configureJRebel(Task task){
+    private void configureJRebel(Task task) {
         def project = task.getProject()
         def rebelFile = project.sourceSets.main.output.classesDir.absolutePath + '/rebel.xml'
         def srcWebApp = project.webAppDir.absolutePath
         def writer = new FileWriter(rebelFile)
 
         new MarkupBuilder(writer).application() {
-            classpath{
-                dir( name:project.sourceSets.main.output.classesDir.absolutePath )
+            classpath {
+                dir(name: project.sourceSets.main.output.classesDir.absolutePath)
             }
-            web{
-                link(target:'/'){
-                    dir(name:srcWebApp)
+            web {
+                link(target: '/') {
+                    dir(name: srcWebApp)
                 }
             }
         }

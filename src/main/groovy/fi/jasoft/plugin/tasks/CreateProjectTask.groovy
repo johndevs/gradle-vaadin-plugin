@@ -19,75 +19,75 @@ import fi.jasoft.plugin.Util;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.plugins.WarPluginConvention;
-import org.gradle.api.plugins.JavaPluginConvention; 
+import org.gradle.api.plugins.JavaPluginConvention;
 import fi.jasoft.plugin.TemplateUtil;
 
 class CreateProjectTask extends DefaultTask {
 
-	public CreateProjectTask(){
-		description = "Creates a new Vaadin Project."
-	}
+    public CreateProjectTask() {
+        description = "Creates a new Vaadin Project."
+    }
 
     @TaskAction
     public void run() {
 
-    	String applicationName = Util.readLine('\nApplication Name (MyApplication): ')
-    	if(applicationName == ''){
-    		applicationName = 'MyApplication'
-    	}
+        String applicationName = Util.readLine('\nApplication Name (MyApplication): ')
+        if (applicationName == '') {
+            applicationName = 'MyApplication'
+        }
 
-    	String applicationPackage;
-    	if(project.vaadin.widgetset != null){
-			String widgetsetName = project.vaadin.widgetset.tokenize('.').last()
-			applicationPackage = project.vaadin.widgetset[0..(-widgetsetName.size()-2)]
-		} else {
-			applicationPackage = Util.readLine("\nApplication Package (com.example.${applicationName.toLowerCase()}): ")
-			if(applicationPackage == ''){
-				applicationPackage = 'com.example.'+applicationName.toLowerCase()
-			}
-		}
+        String applicationPackage;
+        if (project.vaadin.widgetset != null) {
+            String widgetsetName = project.vaadin.widgetset.tokenize('.').last()
+            applicationPackage = project.vaadin.widgetset[0..(-widgetsetName.size() - 2)]
+        } else {
+            applicationPackage = Util.readLine("\nApplication Package (com.example.${applicationName.toLowerCase()}): ")
+            if (applicationPackage == '') {
+                applicationPackage = 'com.example.' + applicationName.toLowerCase()
+            }
+        }
 
-		File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
-		File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-		File uidir = new File(javaDir.canonicalPath + '/' + applicationPackage.replaceAll(/\./,'/'))
-		File webinf = new File(webAppDir.canonicalPath + '/WEB-INF')
+        File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
+        File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
+        File uidir = new File(javaDir.canonicalPath + '/' + applicationPackage.replaceAll(/\./, '/'))
+        File webinf = new File(webAppDir.canonicalPath + '/WEB-INF')
 
-		webAppDir.mkdirs()
-		uidir.mkdirs()
-		webinf.mkdirs()
+        webAppDir.mkdirs()
+        uidir.mkdirs()
+        webinf.mkdirs()
 
-		def substitutions = [:]
-    	substitutions['%PACKAGE%'] = applicationPackage
-    	substitutions['%APPLICATION_NAME%'] = applicationName
-        substitutions['%PUSH%'] = Util.isPushSupportedAndEnabled(project) ? '\n@Push': ''
+        def substitutions = [:]
+        substitutions['%PACKAGE%'] = applicationPackage
+        substitutions['%APPLICATION_NAME%'] = applicationName
+        substitutions['%PUSH%'] = Util.isPushSupportedAndEnabled(project) ? '\n@Push' : ''
         substitutions['%PUSH_IMPORT%'] = Util.isPushSupportedAndEnabled(project) ? "\nimport com.vaadin.annotations.Push;" : ''
         substitutions['%THEME%'] = Util.isAddonStylesSupported(project) ? "@Theme(\"${applicationName}\")" : ''
         substitutions['%THEME_IMPORT%'] = Util.isAddonStylesSupported(project) ? "\nimport com.vaadin.annotations.Theme;" : ''
 
-		if(project.vaadin.version.startsWith("6")){
-			TemplateUtil.writeTemplate("MyApplication.java", uidir, applicationName+".java", substitutions)
-			if(project.vaadin.widgetset == null){
-				TemplateUtil.writeTemplate("web.xml.vaadin6", webinf, "web.xml", substitutions)	
-			} else {
-				substitutions['%WIDGETSET%'] = project.vaadin.widgetset
-				TemplateUtil.writeTemplate("web.xml.vaadin6.widgetset", webinf, "web.xml", substitutions)	
-				TemplateUtil.ensureWidgetPresent(project)
-			}
-			
-		} else {
-			TemplateUtil.writeTemplate('MyUI.java', uidir, applicationName+"UI.java", substitutions)
-			if(project.vaadin.widgetset == null){
-				TemplateUtil.writeTemplate('web.xml', webinf, substitutions) 
-			} else {
-				substitutions['%WIDGETSET%'] = project.vaadin.widgetset
-				TemplateUtil.writeTemplate('web.xml.widgetset', webinf, "web.xml", substitutions) 
-				TemplateUtil.ensureWidgetPresent(project)
-			}
+        if (project.vaadin.version.startsWith("6")) {
+            TemplateUtil.writeTemplate("MyApplication.java", uidir, applicationName + ".java", substitutions)
+            if (project.vaadin.widgetset == null) {
+                TemplateUtil.writeTemplate("web.xml.vaadin6", webinf, "web.xml", substitutions)
+            } else {
+                substitutions['%WIDGETSET%'] = project.vaadin.widgetset
+                TemplateUtil.writeTemplate("web.xml.vaadin6.widgetset", webinf, "web.xml", substitutions)
+                TemplateUtil.ensureWidgetPresent(project)
+            }
 
-            if(!project.vaadin.version.startsWith('7.0'))        {
+        } else {
+            TemplateUtil.writeTemplate('MyUI.java', uidir, applicationName + "UI.java", substitutions)
+            if (project.vaadin.widgetset == null) {
+                TemplateUtil.writeTemplate('web.xml', webinf, substitutions)
+            } else {
+                substitutions['%WIDGETSET%'] = project.vaadin.widgetset
+                TemplateUtil.writeTemplate('web.xml.widgetset', webinf, "web.xml", substitutions)
+                TemplateUtil.ensureWidgetPresent(project)
+            }
+
+            if (!project.vaadin.version.startsWith('7.0')) {
                 project.tasks.createVaadinTheme.createTheme(applicationName)
             }
-		}
+        }
     }
 }
 

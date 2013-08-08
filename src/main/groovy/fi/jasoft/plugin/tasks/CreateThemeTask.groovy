@@ -23,25 +23,25 @@ import org.gradle.api.plugins.WarPluginConvention
 
 class CreateThemeTask extends DefaultTask {
 
-	public CreateThemeTask() {
-		description = "Creates a new Vaadin Theme"
-	}
+    public CreateThemeTask() {
+        description = "Creates a new Vaadin Theme"
+    }
 
-	 @TaskAction
+    @TaskAction
     public void run() {
 
-         String themeName = Util.readLine('\nTheme Name (MyTheme): ')
-         if(themeName == ''){
-             themeName = 'MyTheme'
-         }
+        String themeName = Util.readLine('\nTheme Name (MyTheme): ')
+        if (themeName == '') {
+            themeName = 'MyTheme'
+        }
 
-         createTheme(themeName)
+        createTheme(themeName)
     }
 
     public void createTheme(String themeName) {
 
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-        File themeDir = new File(webAppDir.canonicalPath + '/VAADIN/themes/'+themeName)
+        File themeDir = new File(webAppDir.canonicalPath + '/VAADIN/themes/' + themeName)
         themeDir.mkdirs()
 
         def substitutions = [:]
@@ -49,10 +49,10 @@ class CreateThemeTask extends DefaultTask {
         substitutions['%THEME_NAME%'] = themeName
         substitutions['%THEME_IMPORT_FILE%'] = themeName.toLowerCase() + '.scss'
 
-        if(project.vaadin.version.startsWith("6")){
+        if (project.vaadin.version.startsWith("6")) {
             TemplateUtil.writeTemplate('MyTheme.css', themeDir, 'styles.css', substitutions)
 
-        } else if (project.vaadin.version.startsWith('7.0')){
+        } else if (project.vaadin.version.startsWith('7.0')) {
             TemplateUtil.writeTemplate('MyTheme.scss.vaadin70', themeDir, 'styles.scss', substitutions)
 
         } else {

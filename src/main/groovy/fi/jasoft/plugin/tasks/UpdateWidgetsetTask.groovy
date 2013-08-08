@@ -21,16 +21,16 @@ import fi.jasoft.plugin.TemplateUtil
 
 class UpdateWidgetsetTask extends DefaultTask {
 
-	public UpdateWidgetsetTask(){
-		description = "Updates the widgetset xml file"
-	}
+    public UpdateWidgetsetTask() {
+        description = "Updates the widgetset xml file"
+    }
 
-	@TaskAction
-	public void run() {
-		if(project.vaadin.widgetset == null){
-			return;	
-		}
+    @TaskAction
+    public void run() {
+        if (project.vaadin.widgetset == null) {
+            return;
+        }
 
-		TemplateUtil.ensureWidgetPresent(project)
-	}
+        TemplateUtil.ensureWidgetPresent(project)
+    }
 }

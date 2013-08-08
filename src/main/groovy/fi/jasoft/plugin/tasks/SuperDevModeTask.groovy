@@ -24,19 +24,19 @@ import fi.jasoft.plugin.ApplicationServer
 import java.lang.Process
 import fi.jasoft.plugin.TemplateUtil
 
-class SuperDevModeTask extends DefaultTask  {
+class SuperDevModeTask extends DefaultTask {
 
     private Process appServerProcess;
 
-    public SuperDevModeTask(){
+    public SuperDevModeTask() {
         dependsOn(project.tasks.classes)
         description = "Run Super Development Mode for easier client widget development."
     }
 
     @TaskAction
-    public void run() {  
-    	
-        if(!project.vaadin.devmode.superDevMode){
+    public void run() {
+
+        if (!project.vaadin.devmode.superDevMode) {
             println "SuperDevMode is a experimental feature and is not enabled for project by default. To enable it set vaadin.devmode.superDevMode to true"
             return;
         }
@@ -45,7 +45,7 @@ class SuperDevModeTask extends DefaultTask  {
 
         server.start()
 
-        if(project.vaadin.debug){
+        if (project.vaadin.debug) {
             Util.openBrowser(project, "http://localhost:${project.vaadin.serverPort}/?superdevmode&debug")
         } else {
             Util.openBrowser(project, "http://localhost:${project.vaadin.serverPort}/?superdevmode")
@@ -56,24 +56,24 @@ class SuperDevModeTask extends DefaultTask  {
         server.terminate()
     }
 
-    private runCodeServer(){
+    private runCodeServer() {
 
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
         File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
-        File widgetsetsDir = new File(webAppDir.canonicalPath+'/VAADIN/widgetsets')
+        File widgetsetsDir = new File(webAppDir.canonicalPath + '/VAADIN/widgetsets')
         widgetsetsDir.mkdirs()
         String widgetset = project.vaadin.widgetset == null ? 'com.vaadin.terminal.gwt.DefaultWidgetSet' : project.vaadin.widgetset
 
         def classpath = project.configurations.jetty8 + Util.getClassPath(project)
 
-        project.javaexec{
+        project.javaexec {
             setMain('com.google.gwt.dev.codeserver.CodeServer')
             setClasspath(classpath)
             setArgs([
                     '-port', 9876,
                     '-workDir', widgetsetsDir.canonicalPath,
                     '-src', javaDir.canonicalPath,
-                    widgetset ])
+                    widgetset])
             jvmArgs('-Dgwt.compiler.skip=true')
         }
     }
