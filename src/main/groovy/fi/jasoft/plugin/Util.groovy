@@ -105,4 +105,16 @@ class Util {
         }
     }
 
+    public static boolean isServlet3Project(Project project) {
+        String version = project.vaadin.version
+        if (version == '+') {
+            return true
+        }
+        if (version.startsWith('7') && !version.startsWith('7.0')) {
+            return true
+        }
+    }
+
+
+
 }

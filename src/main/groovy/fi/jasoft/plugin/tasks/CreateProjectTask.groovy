@@ -31,6 +31,11 @@ class CreateProjectTask extends DefaultTask {
     @TaskAction
     public void run() {
 
+        if (Util.isServlet3Project(project)){
+            project.tasks.createVaadinServlet3Project.run()
+            return
+        }
+
         String applicationName = Util.readLine('\nApplication Name (MyApplication): ')
         if (applicationName == '') {
             applicationName = 'MyApplication'
