@@ -147,7 +147,7 @@ class VaadinPluginExtension {
         int localWorkers = Runtime.getRuntime().availableProcessors()
         boolean draftCompile = false
         boolean strict = false
-        String userAgent = "ie8,ie9,gecko1_8,safari,opera"
+        String userAgent = null
         String[] jvmArgs = null
         String version = "2.3.0"
         String extraArgs

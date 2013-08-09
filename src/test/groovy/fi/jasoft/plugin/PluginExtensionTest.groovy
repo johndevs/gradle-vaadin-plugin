@@ -79,7 +79,7 @@ class PluginExtensionTest extends PluginTestBase {
         assert vaadin.gwt.localWorkers == Runtime.getRuntime().availableProcessors()
         assert vaadin.gwt.draftCompile == false
         assert vaadin.gwt.strict == false
-        assert vaadin.gwt.userAgent == "ie8,ie9,gecko1_8,safari,opera"
+        assert vaadin.gwt.userAgent == null
         assert vaadin.gwt.jvmArgs == null
         assert vaadin.gwt.version == "2.3.0"
         assert vaadin.gwt.extraArgs == null

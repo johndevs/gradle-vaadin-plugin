@@ -115,7 +115,17 @@ class TemplateUtil {
         substitutions['%INHERITS%'] = inherits
         substitutions['%WIDGETSET%'] = project.vaadin.widgetset
         substitutions['%SUPERDEVMODE%'] = String.valueOf(project.vaadin.devmode.superDevMode)
-        substitutions['%USERAGENT%'] = project.vaadin.gwt.userAgent
+
+        def ua = 'ie8,ie9,gecko1_8,safari,opera'
+        if(project.vaadin.gwt.userAgent == null){
+            if (Util.isIE10UserAgentSupported(project)){
+                 ua += ',ie10'
+            }
+        } else {
+            ua = project.vaadin.gwt.userAgent
+        }
+
+        substitutions['%USERAGENT%'] = ua
         substitutions['%SOURCE%'] = sourcePaths
 
         String name, pkg, filename
