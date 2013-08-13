@@ -24,6 +24,19 @@ import java.util.jar.Attributes
 
 class TemplateUtil {
 
+    protected static String getTemplateContent(String template) {
+        if (template == null){
+            throw new IllegalArgumentException("Template name cannot be null")
+        }
+
+        InputStream templateStream = TemplateUtil.class.getClassLoader().getResourceAsStream("templates/${template}.template")
+        if (templateStream == null) {
+            throw new FileNotFoundException("The template file "+template+ ".template could not be found.")
+        }
+
+        return templateStream.getText()
+    }
+
     public static void writeTemplate(String template, File targetDir, String targetFileName) {
         writeTemplate(template, targetDir, targetFileName, [:])
     }
@@ -33,18 +46,22 @@ class TemplateUtil {
     }
 
     public static void writeTemplate(String template, File targetDir, String targetFileName, Map substitutions) {
-        InputStream templateStream = TemplateUtil.class.getClassLoader().getResourceAsStream("templates/${template}.template")
-        if (templateStream == null) {
-            println "Failed to open template file templates/${template}.template"
-            return;
-        }
+        String content = TemplateUtil.getTemplateContent(template)
 
-        String content = templateStream.getText().toString()
         substitutions.each { key, value ->
             content = content.replaceAll(key, value)
         }
 
         File targetFile = new File(targetDir.canonicalPath + '/' + targetFileName)
+        if(!targetFile.exists()){
+            targetFile.parentFile.mkdirs()
+            targetFile.createNewFile()
+        }
+
+        if (!targetFile.canWrite()){
+             throw new FileNotFoundException("Could not write to target file "+targetFile.canonicalPath)
+        }
+
         targetFile.write(content)
     }
 
