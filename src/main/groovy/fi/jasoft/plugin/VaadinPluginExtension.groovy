@@ -153,6 +153,7 @@ class VaadinPluginExtension {
         String extraArgs
         String[] sourcePaths = ['client', 'shared']
         boolean collapsePermutations = false
+        String[] extraInherits
 
         void style(String style) {
             this.style = style
@@ -192,6 +193,10 @@ class VaadinPluginExtension {
 
         void extraArgs(String extraArgs) {
             this.extraArgs = extraArgs
+        }
+
+        void extraInherits(String[] inherits) {
+            this.extraInherits = inherits
         }
 
         void sourcePaths(String[] sourcePaths) {

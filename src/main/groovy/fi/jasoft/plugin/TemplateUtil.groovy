@@ -100,6 +100,8 @@ class TemplateUtil {
 
     public static void updateWidgetset(File widgetsetFile, Project project) {
         String inherits = ""
+
+        // Scan classpath for Vaadin addons and inherit their widgetsets
         project.configurations.compile.each {
             JarInputStream jarStream = new JarInputStream(it.newDataInputStream());
             Manifest mf = jarStream.getManifest();
@@ -116,6 +118,13 @@ class TemplateUtil {
                         }
                     }
                 }
+            }
+        }
+
+        // Custom inherits
+        if(project.vaadin.gwt.extraInherits != null){
+            for(String inherit : project.vaadin.gwt.extraInherits) {
+                inherits += "\t<inherits name=\"${inherit}\" />\n"
             }
         }
 
