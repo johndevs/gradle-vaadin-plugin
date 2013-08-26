@@ -143,6 +143,7 @@ class VaadinPluginExtension {
     class GWT {
         String style = "OBF"
         int optimize = 0
+        boolean logging = true
         String logLevel = "INFO"
         int localWorkers = Runtime.getRuntime().availableProcessors()
         boolean draftCompile = false
@@ -154,6 +155,7 @@ class VaadinPluginExtension {
         String[] sourcePaths = ['client', 'shared']
         boolean collapsePermutations = false
         String[] extraInherits
+
 
         void style(String style) {
             this.style = style
@@ -205,6 +207,10 @@ class VaadinPluginExtension {
 
         void collapsePermutations(boolean collapse) {
             this.collapsePermutations = collapse
+        }
+
+        void logging(boolean logging) {
+            this.logging = logging
         }
     }
 

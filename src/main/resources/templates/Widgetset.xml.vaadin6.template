@@ -4,6 +4,7 @@
 <module>
     <inherits name="com.vaadin.terminal.gwt.DefaultWidgetSet" />
     <set-property name="user.agent" value="%USERAGENT%" />
+%LOGGING%
 %INHERITS%
 %COLLAPSE_PERMUTATIONS%
 </module>

@@ -220,6 +220,12 @@ class TemplateUtil {
             substitutions['%COLLAPSE_PERMUTATIONS%'] = ''
         }
 
+        if (project.vaadin.gwt.logging) {
+            substitutions['%LOGGING%'] = ''
+        } else {
+            substitutions['%LOGGING%'] = "\t<set-property name=\"gwt.logging.enabled\" value=\"FALSE\"/>"
+        }
+
         if (project.vaadin.version.startsWith('6')) {
             TemplateUtil.writeTemplate('Widgetset.xml.vaadin6', widgetsetDir, moduleXML, substitutions)
         } else {
