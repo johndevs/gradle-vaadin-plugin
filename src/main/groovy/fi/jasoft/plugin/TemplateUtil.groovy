@@ -37,19 +37,19 @@ class TemplateUtil {
         return templateStream.getText()
     }
 
-    public static void writeTemplate(String template, File targetDir, String targetFileName) {
-        writeTemplate(template, targetDir, targetFileName, [:])
-    }
-
     public static void writeTemplate(String template, File targetDir, Map substitutions) {
         writeTemplate(template, targetDir, template, substitutions)
     }
 
-    public static void writeTemplate(String template, File targetDir, String targetFileName, Map substitutions) {
+    public static void writeTemplate(String template, File targetDir, String targetFileName=template, Map substitutions=[:], boolean removeBlankLines=false) {
         String content = TemplateUtil.getTemplateContent(template)
 
         substitutions.each { key, value ->
             content = content.replaceAll(key, value)
+        }
+
+        if (removeBlankLines){
+            content = content.replaceAll("(?m)^[ \t]*\r?\n", "")
         }
 
         File targetFile = new File(targetDir.canonicalPath + '/' + targetFileName)
@@ -227,9 +227,9 @@ class TemplateUtil {
         }
 
         if (project.vaadin.version.startsWith('6')) {
-            TemplateUtil.writeTemplate('Widgetset.xml.vaadin6', widgetsetDir, moduleXML, substitutions)
+            TemplateUtil.writeTemplate('Widgetset.xml.vaadin6', widgetsetDir, moduleXML, substitutions, true)
         } else {
-            TemplateUtil.writeTemplate('Widgetset.xml', widgetsetDir, moduleXML, substitutions)
+            TemplateUtil.writeTemplate('Widgetset.xml', widgetsetDir, moduleXML, substitutions,true)
         }
     }
 
