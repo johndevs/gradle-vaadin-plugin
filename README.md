@@ -1,7 +1,8 @@
 # Introduction
 The Vaadin Gradle plugin allows you to easily build Vaadin projects with Gradle. It helps with the most tedious tasks when building a Vaadin project like building the widgetset and running development mode. It also helps you to quickly get started by providing tasks for project, component and theme creation.
 
-Build automatically tested on Travis CI: https://travis-ci.org/johndevs/gradle-vaadin-plugin
+Build automatically tested on Travis CI
+[![Build Status](https://travis-ci.org/johndevs/gradle-vaadin-plugin.png?branch=master)](https://travis-ci.org/johndevs/gradle-vaadin-plugin)
 
 
 # Using the plugin
