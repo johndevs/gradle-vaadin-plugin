@@ -16,6 +16,8 @@ or to use a specific version of the plugin
     
 If you are behind a proxy and cannot use the plugin url directly you then you can download the plugin jar from http://vaadin.com/addon/vaadin-plugin-for-gradle and include it in your build.gradle like so:
 ```
+apply plugin: 'vaadin'
+
 buildscript {
     repositories {        
         flatDir dirs: '<Directory where the plugin jar can be found>'
