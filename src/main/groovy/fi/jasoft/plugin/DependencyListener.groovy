@@ -48,6 +48,10 @@ class DependencyListener implements ProjectEvaluationListener {
         } else {
             createVaadin7Configuration(project, version)
         }
+
+        if (project.vaadin.testbench.enabled){
+            createTestbenchConfiguration(project)
+        }
     }
 
     private static void addRepositories(Project project) {
@@ -135,6 +139,15 @@ class DependencyListener implements ProjectEvaluationListener {
             project.sourceSets.main.compileClasspath += project.configurations['vaadin-client']
             project.sourceSets.test.compileClasspath += project.configurations['vaadin-client']
             project.sourceSets.test.runtimeClasspath += project.configurations['vaadin-client']
+        }
+    }
+
+    private static void createTestbenchConfiguration(Project project){
+        if (!project.configurations.hasProperty('vaadin-testbench')){
+            project.configurations.create('vaadin-testbench')
+            project.dependencies.add('vaadin-testbench',"com.vaadin:vaadin-testbench:${project.vaadin.testbench.version}")
+            project.sourceSets.test.compileClasspath += project.configurations['vaadin-testbench']
+            project.sourceSets.test.runtimeClasspath += project.configurations['vaadin-testbench']
         }
     }
 }

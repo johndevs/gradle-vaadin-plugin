@@ -22,6 +22,9 @@ import org.gradle.api.tasks.TaskState
 
 public class TaskListener implements TaskExecutionListener {
 
+    private TestbenchHub testbenchHub;
+
+
     public void beforeExecute(Task task) {
         def project = task.getProject()
         if (!project.hasProperty('vaadin')) {
@@ -61,10 +64,20 @@ public class TaskListener implements TaskExecutionListener {
         if (task.getName() == 'war') {
             configureJRebel(task)
         }
+
+        if (task.getName() == 'test' && project.vaadin.testbench.enabled){
+            testbenchHub = new TestbenchHub(project)
+            testbenchHub.start()
+        }
     }
 
     public void afterExecute(Task task, TaskState state) {
+        def project = task.getProject()
 
+        if (task.getName() == 'test' && project.vaadin.testbench.enabled){
+            testbenchHub.terminate()
+            testbenchHub = null
+        }
     }
 
     private void configureEclipsePlugin(Task task) {

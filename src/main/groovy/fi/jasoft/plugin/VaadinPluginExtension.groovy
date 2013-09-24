@@ -50,6 +50,8 @@ class VaadinPluginExtension {
 
     GWT gwt = new GWT()
 
+    TestBench testbench = new TestBench()
+
     SourceDirectorySet mainSourceSet = null
 
     boolean push = false
@@ -133,6 +135,11 @@ class VaadinPluginExtension {
 
     JRebel jrebel(closure) {
         closure.delegate = jrebel
+        closure()
+    }
+
+    TestBench testbench(closure) {
+        closure.delegate = testbench
         closure()
     }
 
@@ -284,6 +291,19 @@ class VaadinPluginExtension {
 
         void location(String location) {
             this.location = location
+        }
+    }
+
+    class TestBench {
+        boolean enabled = true
+        String version = "3.+"
+
+        void enabled(boolean enabled) {
+            this.enabled = enabled
+        }
+
+        void version(String version) {
+            this.version = version
         }
     }
 
