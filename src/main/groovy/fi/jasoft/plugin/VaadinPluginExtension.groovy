@@ -305,6 +305,8 @@ class VaadinPluginExtension {
         void version(String version) {
             this.version = version
         }
+
+
     }
 
 }

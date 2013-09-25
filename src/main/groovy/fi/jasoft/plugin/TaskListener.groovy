@@ -22,7 +22,8 @@ import org.gradle.api.tasks.TaskState
 
 public class TaskListener implements TaskExecutionListener {
 
-    private TestbenchHub testbenchHub;
+    private TestbenchHub testbenchHub
+    private TestbenchNode testbenchNode
 
 
     public void beforeExecute(Task task) {
@@ -68,6 +69,9 @@ public class TaskListener implements TaskExecutionListener {
         if (task.getName() == 'test' && project.vaadin.testbench.enabled){
             testbenchHub = new TestbenchHub(project)
             testbenchHub.start()
+
+            testbenchNode = new TestbenchNode(project)
+            testbenchNode.start()
         }
     }
 
@@ -75,6 +79,9 @@ public class TaskListener implements TaskExecutionListener {
         def project = task.getProject()
 
         if (task.getName() == 'test' && project.vaadin.testbench.enabled){
+            testbenchNode.terminate()
+            testbenchNode = null
+
             testbenchHub.terminate()
             testbenchHub = null
         }
