@@ -295,7 +295,7 @@ class VaadinPluginExtension {
     }
 
     class TestBench {
-        boolean enabled = true
+        boolean enabled = false
         String version = "3.+"
 
         void enabled(boolean enabled) {

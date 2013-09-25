@@ -67,6 +67,10 @@ class Util {
         return sourceSet
     }
 
+    public static SourceDirectorySet getTestSourceSet(Project project) {
+        return project.sourceSets.test.java
+    }
+
     public static boolean isPushSupportedAndEnabled(Project project) {
         if (!project.vaadin.push) {
             return false

@@ -17,6 +17,7 @@ package fi.jasoft.plugin
 
 import fi.jasoft.plugin.tasks.CreateCompositeTask
 import fi.jasoft.plugin.tasks.CreateServlet3ProjectTask
+import fi.jasoft.plugin.tasks.CreateTestbenchTestTask
 import fi.jasoft.plugin.tasks.UpdateAddonStylesTask;
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -78,6 +79,8 @@ class GradleVaadinPlugin implements Plugin<Project> {
         project.tasks.create(name: 'vaadinRun', type: RunTask, group: 'Vaadin')
         project.tasks.create(name: 'updateWidgetset', type: UpdateWidgetsetTask, group: 'Vaadin')
         project.tasks.create(name: 'updateAddonStyles', type: UpdateAddonStylesTask, group: 'Vaadin')
+
+        project.tasks.create(name: 'createTestbenchTest', type: CreateTestbenchTestTask, group: 'Vaadin Testbench')
 
         // Add debug information to all compilation results
         project.tasks.compileJava.options.debugOptions.debugLevel = 'source,lines,vars'
