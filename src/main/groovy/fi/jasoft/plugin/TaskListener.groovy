@@ -23,7 +23,10 @@ import org.gradle.api.tasks.TaskState
 public class TaskListener implements TaskExecutionListener {
 
     private TestbenchHub testbenchHub
+
     private TestbenchNode testbenchNode
+
+    ApplicationServer testbenchAppServer
 
 
     public void beforeExecute(Task task) {
@@ -72,6 +75,9 @@ public class TaskListener implements TaskExecutionListener {
 
             testbenchNode = new TestbenchNode(project)
             testbenchNode.start()
+
+            testbenchAppServer = new ApplicationServer(project)
+            testbenchAppServer.start()
         }
     }
 
@@ -79,6 +85,10 @@ public class TaskListener implements TaskExecutionListener {
         def project = task.getProject()
 
         if (task.getName() == 'test' && project.vaadin.testbench.enabled){
+
+            testbenchAppServer.terminate()
+            testbenchAppServer = null
+
             testbenchNode.terminate()
             testbenchNode = null
 
@@ -94,6 +104,7 @@ public class TaskListener implements TaskExecutionListener {
         cp.defaultOutputDir = project.file('build/classes/main')
         cp.plusConfigurations += project.configurations.vaadin
         cp.plusConfigurations += project.configurations['vaadin-client']
+        cp.plusConfigurations += project.configurations['vaadin-testbench']
         cp.plusConfigurations += project.configurations.jetty8
     }
 
