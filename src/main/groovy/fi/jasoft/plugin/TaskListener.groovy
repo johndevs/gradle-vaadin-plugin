@@ -19,6 +19,7 @@ import groovy.xml.MarkupBuilder;
 import org.gradle.api.execution.TaskExecutionListener
 import org.gradle.api.Task
 import org.gradle.api.tasks.TaskState
+import org.gradle.api.tasks.bundling.War
 
 public class TaskListener implements TaskExecutionListener {
 
@@ -60,6 +61,10 @@ public class TaskListener implements TaskExecutionListener {
 
         if (task.getName() == 'war') {
             configureJRebel(task)
+
+            // Exclude unit cache
+            War war = (War) task;
+            war.exclude('VAADIN/gwt-unitCache/**')
         }
     }
 
