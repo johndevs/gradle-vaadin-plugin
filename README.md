@@ -78,7 +78,10 @@ The following configuration options are available
 * ``vaadin.gwt.draftCompile`` - Should GWT draft compile be used. Default is false.
 * ``vaadin.gwt.strict`` - Should the GWT Compiler be run in strict mode. Default is false.
 * ``vaadin.gwt.userAgent`` - The browsers you want to support. All browser are supported by default.
-* ``vaadin.gwt.jvmArgs`` - Additional JVM arguments passed to the widgetset compiler. Default is ''.
+* ``vaadin.gwt.jvmArgs`` - Additional JVM arguments passed to the widgetset compiler. Default is ''. Example:
+```
+gwt.jvmArgs = ['-Xmx500M', '-XX:MaxPermSize=256M']
+```
 * ``vaadin.gwt.extraArgs`` - Extra compiler arguments that should be passed to the widgetset compiler.
 * ``vaadin.gwt.sourcePaths`` - Source folders where GWT code that should be compiled to JS is found. Default is 'client' and 'shared'.
 * ``vaadin.gwt.collapsePermutations`` - Should all permutations be compiled into a single js file for faster compilation time (but larger file size).
