@@ -15,6 +15,8 @@
 */
 package fi.jasoft.plugin
 
+import fi.jasoft.plugin.tasks.BuildJavadocJarTask
+import fi.jasoft.plugin.tasks.BuildSourcesJarTask
 import fi.jasoft.plugin.tasks.CreateCompositeTask
 import fi.jasoft.plugin.tasks.CreateServlet3ProjectTask
 import fi.jasoft.plugin.tasks.CreateTestbenchTestTask
@@ -80,6 +82,9 @@ class GradleVaadinPlugin implements Plugin<Project> {
         project.tasks.create(name: 'updateWidgetset', type: UpdateWidgetsetTask, group: 'Vaadin')
         project.tasks.create(name: 'updateAddonStyles', type: UpdateAddonStylesTask, group: 'Vaadin')
 
+        project.tasks.create(name: 'sourcesJar', type: BuildSourcesJarTask, group: 'Vaadin Utility')
+        project.tasks.create(name: 'javadocJar', type: BuildJavadocJarTask, group: 'Vaadin Utility')
+
         project.tasks.create(name: 'createTestbenchTest', type: CreateTestbenchTestTask, group: 'Vaadin Testbench')
 
         // Add debug information to all compilation results
@@ -104,5 +109,10 @@ class GradleVaadinPlugin implements Plugin<Project> {
         project.clean.dependsOn(project.tasks.cleanThemes)
         project.clean.dependsOn(project.tasks.cleanSuperdevmode)
         project.clean.dependsOn(project.tasks.cleanDevmode)
+
+        // Utilities
+        project.artifacts.add('archives', project.tasks.sourcesJar)
+        project.artifacts.add('archives', project.tasks.javadocJar)
     }
+
 }

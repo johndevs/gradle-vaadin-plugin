@@ -59,10 +59,6 @@ public class TaskListener implements TaskExecutionListener {
 
         if (task.getName() == 'jar') {
             configureAddonMetadata(task)
-
-            // Notify users that sources are not present in the jar
-            task.getLogger().lifecycle("Please note that the jar archive will NOT by default include the source files.\n" +
-                    "You can add them to the jar by adding jar{ from sourceSets.main.allJava } to build.gradle.")
         }
 
         if (task.getName() == 'war') {
@@ -78,6 +74,10 @@ public class TaskListener implements TaskExecutionListener {
 
             testbenchAppServer = new ApplicationServer(project)
             testbenchAppServer.start()
+        }
+
+        if (task.getName() == 'javadoc'){
+            task.classpath += Util.getClassPath(project)
         }
     }
 
