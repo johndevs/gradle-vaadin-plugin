@@ -1,9 +1,3 @@
-package fi.jasoft.plugin.tasks
-
-import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.TaskAction
-import org.gradle.api.tasks.bundling.Jar
-
 /*
 * Copyright 2013 John Ahlroos
 *
@@ -19,6 +13,10 @@ import org.gradle.api.tasks.bundling.Jar
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
+package fi.jasoft.plugin.tasks
+
+import org.gradle.api.tasks.bundling.Jar
+
 class BuildSourcesJarTask extends Jar {
 
     public BuildSourcesJarTask() {
