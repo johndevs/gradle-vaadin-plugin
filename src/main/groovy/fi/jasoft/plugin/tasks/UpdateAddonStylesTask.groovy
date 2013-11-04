@@ -23,6 +23,8 @@ import org.gradle.api.tasks.TaskAction
 
 class UpdateAddonStylesTask extends DefaultTask {
 
+    public static final String NAME = 'updateAddonStyles'
+
     UpdateAddonStylesTask() {
         description = 'Updates the addons.scss file with addon styles.'
     }

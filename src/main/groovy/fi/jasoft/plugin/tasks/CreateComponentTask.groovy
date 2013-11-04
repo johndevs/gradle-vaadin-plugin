@@ -22,6 +22,8 @@ import fi.jasoft.plugin.TemplateUtil;
 
 class CreateComponentTask extends DefaultTask {
 
+    public static final String NAME = 'createVaadinComponent'
+
     public CreateComponentTask() {
         description = "Creates a new Vaadin Component."
     }
@@ -74,7 +76,7 @@ class CreateComponentTask extends DefaultTask {
         if (project.vaadin.widgetset != null) {
             String compile = Util.readLine("\nCompile widgetset (Y/N)[Y]: ")
             if (compile == '' || compile == 'Y') {
-                project.widgetset.run()
+                project.tasks[CompileWidgetsetTask.NAME].run()
             }
         }
     }

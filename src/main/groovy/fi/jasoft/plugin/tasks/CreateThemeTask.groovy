@@ -23,6 +23,8 @@ import org.gradle.api.plugins.WarPluginConvention
 
 class CreateThemeTask extends DefaultTask {
 
+    public static final String NAME = 'createVaadinTheme'
+
     public CreateThemeTask() {
         description = "Creates a new Vaadin Theme"
     }
@@ -58,7 +60,7 @@ class CreateThemeTask extends DefaultTask {
         } else {
             TemplateUtil.writeTemplate('styles.scss', themeDir, 'styles.scss', substitutions)
             TemplateUtil.writeTemplate('MyTheme.scss', themeDir, substitutions['%THEME_IMPORT_FILE%'], substitutions)
-            project.tasks.updateAddonStyles.run()
+            project.tasks[UpdateAddonStylesTask.NAME].run()
         }
     }
 }

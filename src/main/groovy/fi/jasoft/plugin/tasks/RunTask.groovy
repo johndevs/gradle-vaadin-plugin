@@ -25,9 +25,11 @@ import fi.jasoft.plugin.Util
 
 public class RunTask extends DefaultTask {
 
+    public static final String NAME = 'vaadinRun'
+
     public RunTask() {
-        dependsOn(project.tasks.widgetset)
-        dependsOn(project.tasks.themes)
+        dependsOn(CompileWidgetsetTask.NAME)
+        dependsOn(CompileThemeTask.NAME)
         description = 'Runs the Vaadin application on an embedded Jetty ApplicationServer'
     }
 

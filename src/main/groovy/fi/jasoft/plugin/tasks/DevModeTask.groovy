@@ -27,8 +27,10 @@ import java.lang.Process;
 
 class DevModeTask extends DefaultTask {
 
+    public static final String NAME = 'devmode'
+
     public DevModeTask() {
-        dependsOn(project.tasks.classes)
+        dependsOn('classes',UpdateWidgetsetTask.NAME)
         description = "Run Development Mode for easier debugging and development of client widgets."
     }
 
@@ -39,8 +41,6 @@ class DevModeTask extends DefaultTask {
             project.logger.error("No widgetset defined. Please define a widgetset by using the vaadin.widgetset property.")
             return
         }
-
-        TemplateUtil.ensureWidgetPresent(project)
 
         if (project.vaadin.devmode.noserver) {
             runDevelopmentMode()

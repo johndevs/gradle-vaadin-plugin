@@ -24,6 +24,8 @@ import fi.jasoft.plugin.TemplateUtil;
 
 class CreateProjectTask extends DefaultTask {
 
+    public static final String NAME = 'createVaadinProject'
+
     public CreateProjectTask() {
         description = "Creates a new Vaadin Project."
     }
@@ -76,7 +78,6 @@ class CreateProjectTask extends DefaultTask {
             } else {
                 substitutions['%WIDGETSET%'] = project.vaadin.widgetset
                 TemplateUtil.writeTemplate("web.xml.vaadin6.widgetset", webinf, "web.xml", substitutions)
-                TemplateUtil.ensureWidgetPresent(project)
             }
 
         } else {
@@ -86,13 +87,14 @@ class CreateProjectTask extends DefaultTask {
             } else {
                 substitutions['%WIDGETSET%'] = project.vaadin.widgetset
                 TemplateUtil.writeTemplate('web.xml.widgetset', webinf, "web.xml", substitutions)
-                TemplateUtil.ensureWidgetPresent(project)
             }
 
             if (!project.vaadin.version.startsWith('7.0')) {
                 project.tasks.createVaadinTheme.createTheme(applicationName)
             }
         }
+
+        project.tasks[UpdateWidgetsetTask.NAME].run()
     }
 }
 
