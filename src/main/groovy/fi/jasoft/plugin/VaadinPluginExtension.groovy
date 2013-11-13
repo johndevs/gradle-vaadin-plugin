@@ -26,7 +26,9 @@ class VaadinPluginExtension {
 
     String version = "7+"
 
-    String servletVersion = "2.5"
+    // Only used by the wtp plugin, should be removed
+    @Deprecated
+    String servletVersion = "3.0"
 
     boolean debug = true
 
