@@ -43,7 +43,7 @@ public class ApplicationServer {
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
         FileCollection cp = project.configurations.jetty8 + Util.getClassPath(project)
 
-        File logDir = new File('build/jetty/')
+        File logDir = project.file('build/jetty/')
         logDir.mkdirs()
 
         appServerProcess = ['java']
@@ -83,7 +83,7 @@ public class ApplicationServer {
 
         appServerProcess.add(webAppDir.canonicalPath + '/')
 
-        File classesDir = new File("build/classes");
+        File classesDir = project.file("build/classes")
         appServerProcess.add(classesDir.canonicalPath + '/')
 
         // Execute server
