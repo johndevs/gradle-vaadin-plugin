@@ -25,6 +25,11 @@ class DependencyListener implements ProjectEvaluationListener {
 
     void beforeEvaluate(Project project) {
 
+        // Check to see if we are using the eclipse plugin instead of the eclipse-wtp plugin
+        if (project.plugins.findPlugin('eclipse') && !project.plugins.findPlugin('eclipse-wtp')){
+            project.getLogger().warn("You are using the eclipse plugin which does not support all " +
+                    "features of the Vaadin plugin. Please use the eclipse-wtp plugin instead.")
+        }
     }
 
     void afterEvaluate(Project project, ProjectState state) {
