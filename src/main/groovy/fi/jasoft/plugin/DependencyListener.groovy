@@ -60,6 +60,10 @@ class DependencyListener implements ProjectEvaluationListener {
             project.repositories.mavenRepo(name: 'Vaadin addons', url: 'http://maven.vaadin.com/vaadin-addons')
         }
 
+        if (project.repositories.findByName('Vaadin snapshots') == null) {
+            project.repositories.mavenRepo(name: 'Vaadin snapshots', url: 'http://oss.sonatype.org/content/repositories/vaadin-snapshots')
+        }
+
         if (project.repositories.findByName('Jasoft.fi Maven repository') == null) {
             project.repositories.mavenRepo(name: 'Jasoft.fi Maven repository', url: 'http://mvn.jasoft.fi/maven2')
         }
