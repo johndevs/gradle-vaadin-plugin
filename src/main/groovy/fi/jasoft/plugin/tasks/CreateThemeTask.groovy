@@ -33,7 +33,7 @@ class CreateThemeTask extends DefaultTask {
     public void run() {
 
         String themeName = Util.readLine('\nTheme Name (MyTheme): ')
-        if (themeName == '') {
+        if (themeName == null || themeName == '') {
             themeName = 'MyTheme'
         }
 

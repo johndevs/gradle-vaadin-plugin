@@ -36,7 +36,7 @@ class CreateServlet3ProjectTask extends DefaultTask {
     public void run() {
 
         String applicationName = Util.readLine('\nApplication Name (MyApplication): ')
-        if (applicationName == '') {
+        if (applicationName == null || applicationName == '') {
             applicationName = 'MyApplication'
         }
 
@@ -46,7 +46,7 @@ class CreateServlet3ProjectTask extends DefaultTask {
             applicationPackage = project.vaadin.widgetset[0..(-widgetsetName.size() - 2)]
         } else {
             applicationPackage = Util.readLine("\nApplication Package (com.example.${applicationName.toLowerCase()}): ")
-            if (applicationPackage == '') {
+            if (applicationPackage == null || applicationPackage == '') {
                 applicationPackage = 'com.example.' + applicationName.toLowerCase()
             }
         }
