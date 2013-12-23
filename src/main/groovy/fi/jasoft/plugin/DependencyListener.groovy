@@ -39,9 +39,6 @@ class DependencyListener implements ProjectEvaluationListener {
         }
 
         // Repositories
-        project.repositories.mavenCentral()
-        project.repositories.mavenLocal()
-
         addRepositories(project)
 
         createJetty8Configuration(project)
@@ -56,16 +53,51 @@ class DependencyListener implements ProjectEvaluationListener {
     }
 
     private static void addRepositories(Project project) {
+
+        def gradleVersion = project.getGradle().gradleVersion;
+
+        // Ensure maven central and maven local are included
+        project.repositories.mavenCentral()
+        project.repositories.mavenLocal()
+
         if (project.repositories.findByName('Vaadin addons') == null) {
-            project.repositories.mavenRepo(name: 'Vaadin addons', url: 'http://maven.vaadin.com/vaadin-addons')
+            if (gradleVersion >= 1.9){
+                project.repositories.maven({
+                    name = 'Vaadin addons'
+                    url = 'http://maven.vaadin.com/vaadin-addons'
+                })
+            }  else {
+                project.repositories.mavenRepo(
+                    name: 'Vaadin addons',
+                    url: 'http://maven.vaadin.com/vaadin-addons')
+            }
+
         }
 
         if (project.repositories.findByName('Vaadin snapshots') == null) {
-            project.repositories.mavenRepo(name: 'Vaadin snapshots', url: 'http://oss.sonatype.org/content/repositories/vaadin-snapshots')
+            if (gradleVersion >= 1.9){
+                project.repositories.maven({
+                    name = 'Vaadin snapshots'
+                    url = 'http://oss.sonatype.org/content/repositories/vaadin-snapshots'
+                })
+            } else {
+                project.repositories.mavenRepo(
+                    name: 'Vaadin snapshots',
+                    url: 'http://oss.sonatype.org/content/repositories/vaadin-snapshots')
+            }
         }
 
         if (project.repositories.findByName('Jasoft.fi Maven repository') == null) {
-            project.repositories.mavenRepo(name: 'Jasoft.fi Maven repository', url: 'http://mvn.jasoft.fi/maven2')
+            if (gradleVersion >= 1.9){
+                project.repositories.maven({
+                    name = 'Jasoft.fi Maven repository'
+                    url = 'http://mvn.jasoft.fi/maven2'
+                })
+            } else {
+                project.repositories.mavenRepo(
+                    name:  'Jasoft.fi Maven repository',
+                    url: 'http://mvn.jasoft.fi/maven2')
+            }
         }
 
         if (new File("/home/johnnie/Repositories/gradle-vaadin-plugin/build/libs").exists()) {
