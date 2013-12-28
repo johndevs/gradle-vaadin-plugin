@@ -26,6 +26,8 @@ import fi.jasoft.plugin.TemplateUtil;
 
 class CreateServlet3ProjectTask extends DefaultTask {
 
+    public static final NAME = 'createVaadinServlet3Project'
+
     public CreateServlet3ProjectTask() {
         description = "Creates a new Vaadin Project bases on Java Servlet 3.0"
     }
@@ -34,7 +36,7 @@ class CreateServlet3ProjectTask extends DefaultTask {
     public void run() {
 
         String applicationName = Util.readLine('\nApplication Name (MyApplication): ')
-        if (applicationName == '') {
+        if (applicationName == null || applicationName == '') {
             applicationName = 'MyApplication'
         }
 
@@ -44,7 +46,7 @@ class CreateServlet3ProjectTask extends DefaultTask {
             applicationPackage = project.vaadin.widgetset[0..(-widgetsetName.size() - 2)]
         } else {
             applicationPackage = Util.readLine("\nApplication Package (com.example.${applicationName.toLowerCase()}): ")
-            if (applicationPackage == '') {
+            if (applicationPackage == null || applicationPackage == '') {
                 applicationPackage = 'com.example.' + applicationName.toLowerCase()
             }
         }
@@ -74,8 +76,10 @@ class CreateServlet3ProjectTask extends DefaultTask {
         TemplateUtil.writeTemplate("MyServlet.java", uidir, applicationName + "Servlet.java", substitutions)
 
         if (Util.isAddonStylesSupported(project)) {
-            project.tasks.createVaadinTheme.createTheme(applicationName)
+            project.tasks[CreateThemeTask.NAME].createTheme(applicationName)
         }
+
+        project.tasks[UpdateWidgetsetTask.NAME].run()
     }
 }
 

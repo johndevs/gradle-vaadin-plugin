@@ -24,6 +24,8 @@ import fi.jasoft.plugin.TemplateUtil;
 
 class CreateProjectTask extends DefaultTask {
 
+    public static final String NAME = 'createVaadinProject'
+
     public CreateProjectTask() {
         description = "Creates a new Vaadin Project."
     }
@@ -37,7 +39,7 @@ class CreateProjectTask extends DefaultTask {
         }
 
         String applicationName = Util.readLine('\nApplication Name (MyApplication): ')
-        if (applicationName == '') {
+        if (applicationName == null || applicationName == '') {
             applicationName = 'MyApplication'
         }
 
@@ -47,7 +49,7 @@ class CreateProjectTask extends DefaultTask {
             applicationPackage = project.vaadin.widgetset[0..(-widgetsetName.size() - 2)]
         } else {
             applicationPackage = Util.readLine("\nApplication Package (com.example.${applicationName.toLowerCase()}): ")
-            if (applicationPackage == '') {
+            if (applicationPackage == null || applicationPackage == '') {
                 applicationPackage = 'com.example.' + applicationName.toLowerCase()
             }
         }
@@ -76,7 +78,6 @@ class CreateProjectTask extends DefaultTask {
             } else {
                 substitutions['%WIDGETSET%'] = project.vaadin.widgetset
                 TemplateUtil.writeTemplate("web.xml.vaadin6.widgetset", webinf, "web.xml", substitutions)
-                TemplateUtil.ensureWidgetPresent(project)
             }
 
         } else {
@@ -86,13 +87,14 @@ class CreateProjectTask extends DefaultTask {
             } else {
                 substitutions['%WIDGETSET%'] = project.vaadin.widgetset
                 TemplateUtil.writeTemplate('web.xml.widgetset', webinf, "web.xml", substitutions)
-                TemplateUtil.ensureWidgetPresent(project)
             }
 
             if (!project.vaadin.version.startsWith('7.0')) {
                 project.tasks.createVaadinTheme.createTheme(applicationName)
             }
         }
+
+        project.tasks[UpdateWidgetsetTask.NAME].run()
     }
 }
 

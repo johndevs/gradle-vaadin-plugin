@@ -21,6 +21,8 @@ import fi.jasoft.plugin.TemplateUtil
 
 class UpdateWidgetsetTask extends DefaultTask {
 
+    public static final String NAME = 'updateWidgetset'
+
     public UpdateWidgetsetTask() {
         description = "Updates the widgetset xml file"
     }

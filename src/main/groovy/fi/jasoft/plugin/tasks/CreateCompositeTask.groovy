@@ -23,6 +23,8 @@ import org.gradle.api.tasks.TaskAction
 
 public class CreateCompositeTask extends DefaultTask {
 
+    public static final String NAME = 'createVaadinComposite'
+
     public CreateCompositeTask() {
         description = "Creates a new Vaadin Composite."
     }
@@ -31,7 +33,7 @@ public class CreateCompositeTask extends DefaultTask {
     public void run() {
 
         String componentName = Util.readLine('\nComposite Name (MyComposite): ')
-        if (componentName == '') {
+        if (componentName == null || componentName == '') {
             componentName = 'MyComposite'
         }
 
@@ -44,7 +46,7 @@ public class CreateCompositeTask extends DefaultTask {
 
         } else {
             componentPackage = Util.readLine("\nComposite Package (com.example.${componentName.toLowerCase()}): ")
-            if (componentPackage == '') {
+            if (componentPackage == null || componentPackage == '') {
                 componentPackage = "com.example.${componentName.toLowerCase()}"
             }
         }

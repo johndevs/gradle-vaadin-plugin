@@ -24,8 +24,10 @@ import org.gradle.api.file.FileCollection;
 
 class CompileWidgetsetTask extends DefaultTask {
 
+    public static final NAME = 'widgetset'
+
     public CompileWidgetsetTask() {
-        dependsOn(project.tasks.classes)
+        dependsOn('classes', UpdateWidgetsetTask.NAME)
 
         description = "Compiles Vaadin Addons and components into Javascript."
 

@@ -25,9 +25,11 @@ import fi.jasoft.plugin.Util
 
 public class RunTask extends DefaultTask {
 
+    public static final String NAME = 'vaadinRun'
+
     public RunTask() {
-        dependsOn(project.tasks.widgetset)
-        dependsOn(project.tasks.themes)
+        dependsOn(CompileWidgetsetTask.NAME)
+        dependsOn(CompileThemeTask.NAME)
         description = 'Runs the Vaadin application on an embedded Jetty ApplicationServer'
     }
 
@@ -44,8 +46,12 @@ public class RunTask extends DefaultTask {
         if (project.vaadin.plugin.terminateOnEnter) {
             server.start()
             project.logger.lifecycle('Press [Enter] to terminate server...')
-            Util.readLine("")
-            server.terminate()
+            if(Util.readLine("") == null){
+                project.logger.warn("Could not retrieve console. Use [CTRL+C] to terminate server.")
+                server.startAndBlock()
+            } else {
+                server.terminate()
+            }
         } else {
             server.startAndBlock()
         }

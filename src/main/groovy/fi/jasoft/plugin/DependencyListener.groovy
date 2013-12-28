@@ -25,6 +25,11 @@ class DependencyListener implements ProjectEvaluationListener {
 
     void beforeEvaluate(Project project) {
 
+        // Check to see if we are using the eclipse plugin instead of the eclipse-wtp plugin
+        if (project.plugins.findPlugin('eclipse') && !project.plugins.findPlugin('eclipse-wtp')){
+            project.getLogger().warn("You are using the eclipse plugin which does not support all " +
+                    "features of the Vaadin plugin. Please use the eclipse-wtp plugin instead.")
+        }
     }
 
     void afterEvaluate(Project project, ProjectState state) {
@@ -34,9 +39,6 @@ class DependencyListener implements ProjectEvaluationListener {
         }
 
         // Repositories
-        project.repositories.mavenCentral()
-        project.repositories.mavenLocal()
-
         addRepositories(project)
 
         createJetty8Configuration(project)
@@ -55,17 +57,56 @@ class DependencyListener implements ProjectEvaluationListener {
     }
 
     private static void addRepositories(Project project) {
+
+        def gradleVersion = Double.parseDouble(project.getGradle().gradleVersion);
+
+        // Ensure maven central and maven local are included
+        project.repositories.mavenCentral()
+        project.repositories.mavenLocal()
+
         if (project.repositories.findByName('Vaadin addons') == null) {
-            project.repositories.mavenRepo(name: 'Vaadin addons', url: 'http://maven.vaadin.com/vaadin-addons')
+            if (gradleVersion >= 1.9){
+                project.repositories.maven({
+                    name = 'Vaadin addons'
+                    url = 'http://maven.vaadin.com/vaadin-addons'
+                })
+            }  else {
+                project.repositories.mavenRepo(
+                    name: 'Vaadin addons',
+                    url: 'http://maven.vaadin.com/vaadin-addons')
+            }
+
+        }
+
+        if (project.repositories.findByName('Vaadin snapshots') == null) {
+            if (gradleVersion >= 1.9){
+                project.repositories.maven({
+                    name = 'Vaadin snapshots'
+                    url = 'http://oss.sonatype.org/content/repositories/vaadin-snapshots'
+                })
+            } else {
+                project.repositories.mavenRepo(
+                    name: 'Vaadin snapshots',
+                    url: 'http://oss.sonatype.org/content/repositories/vaadin-snapshots')
+            }
         }
 
         if (project.repositories.findByName('Jasoft.fi Maven repository') == null) {
-            project.repositories.mavenRepo(name: 'Jasoft.fi Maven repository', url: 'http://mvn.jasoft.fi/maven2')
+            if (gradleVersion >= 1.9){
+                project.repositories.maven({
+                    name = 'Jasoft.fi Maven repository'
+                    url = 'http://mvn.jasoft.fi/maven2'
+                })
+            } else {
+                project.repositories.mavenRepo(
+                    name:  'Jasoft.fi Maven repository',
+                    url: 'http://mvn.jasoft.fi/maven2')
+            }
         }
 
-        if (new File("/home/johnnie/Repositories/gradle-vaadin-plugin/build/libs").exists()) {
-            //FIXME For Development so the development plugin is found
-            project.repositories.flatDir(dirs: '/home/johnnie/Repositories/gradle-vaadin-plugin/build/libs')
+        if (new File(GradleVaadinPlugin.getDebugDir()).exists()) {
+            project.logger.lifecycle("Using development libs found at "+GradleVaadinPlugin.getDebugDir())
+            project.repositories.flatDir(dirs: GradleVaadinPlugin.getDebugDir())
         }
     }
 

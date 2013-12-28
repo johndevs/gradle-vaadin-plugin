@@ -10,9 +10,10 @@
  * use the vaadin.plugin script in your projects.
  */ 
 buildscript {
+    def gradlePluginDirectory = '/home/johnnie/Repositories/gradle-vaadin-plugin/build/libs'
+
     repositories {
-	    mavenCentral()
-    	flatDir dirs: '/home/johnnie/Repositories/gradle-vaadin-plugin/build/libs'
+    	flatDir dirs: gradlePluginDirectory
     }
 
     dependencies {
@@ -22,13 +23,4 @@ buildscript {
 
 if (!project.plugins.findPlugin(fi.jasoft.plugin.GradleVaadinPlugin)) {
     project.apply(plugin: fi.jasoft.plugin.GradleVaadinPlugin)
-}
-
-/*
- * Convienience task for enabling the gradle wrapper 
- */
-task enableWrapper(type: Wrapper) {
-    gradleVersion = '1.5'
-    description = "Configures the Gradle wrapper for this project"
-    group = "Gradle"
 }

@@ -26,10 +26,12 @@ import fi.jasoft.plugin.TemplateUtil
 
 class SuperDevModeTask extends DefaultTask {
 
+    public static final String NAME = 'superdevmode'
+
     private Process appServerProcess;
 
     public SuperDevModeTask() {
-        dependsOn(project.tasks.classes)
+        dependsOn('classes', UpdateWidgetsetTask.NAME)
         description = "Run Super Development Mode for easier client widget development."
     }
 

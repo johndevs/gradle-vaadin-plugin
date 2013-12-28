@@ -22,6 +22,8 @@ import org.gradle.api.file.FileTree
 
 class CompileThemeTask extends DefaultTask {
 
+    public static final String NAME = 'themes'
+
     public CompileThemeTask() {
         description = "Compiles a Vaadin SASS theme into CSS"
 

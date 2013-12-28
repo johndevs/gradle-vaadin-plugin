@@ -39,17 +39,22 @@ import fi.jasoft.plugin.tasks.CreateWidgetsetGeneratorTask
 class GradleVaadinPlugin implements Plugin<Project> {
 
     public static final PLUGIN_VERSION
-
     public static final PLUGIN_PROPERTIES
+    public static final PLUGIN_DEBUG_DIR
 
     static {
         PLUGIN_PROPERTIES = new Properties()
         PLUGIN_PROPERTIES.load(GradleVaadinPlugin.class.getResourceAsStream('/plugin.properties'))
         PLUGIN_VERSION = PLUGIN_PROPERTIES.getProperty('version')
+        PLUGIN_DEBUG_DIR = PLUGIN_PROPERTIES.getProperty("debugdir")
     }
 
     static String getVersion() {
         return PLUGIN_VERSION
+    }
+
+    static String getDebugDir() {
+        return PLUGIN_DEBUG_DIR
     }
 
     void apply(Project project) {
@@ -67,20 +72,20 @@ class GradleVaadinPlugin implements Plugin<Project> {
         project.plugins.apply(WarPlugin)
 
         // Tasks
-        project.tasks.create(name: 'createVaadinProject', type: CreateProjectTask, group: 'Vaadin')
-        project.tasks.create(name: 'createVaadinServlet3Project', type: CreateServlet3ProjectTask, group: 'Vaadin')
-        project.tasks.create(name: 'createVaadinComponent', type: CreateComponentTask, group: 'Vaadin')
-        project.tasks.create(name: 'createVaadinComposite', type: CreateCompositeTask, group: 'Vaadin')
-        project.tasks.create(name: 'createVaadinTheme', type: CreateThemeTask, group: 'Vaadin')
-        project.tasks.create(name: 'createVaadinWidgetsetGenerator', type: CreateWidgetsetGeneratorTask, group: 'Vaadin')
+        project.tasks.create(name: CreateProjectTask.NAME, type: CreateProjectTask, group: 'Vaadin')
+        project.tasks.create(name: CreateServlet3ProjectTask.NAME, type: CreateServlet3ProjectTask, group: 'Vaadin')
+        project.tasks.create(name: CreateComponentTask.NAME, type: CreateComponentTask, group: 'Vaadin')
+        project.tasks.create(name: CreateCompositeTask.NAME, type: CreateCompositeTask, group: 'Vaadin')
+        project.tasks.create(name: CreateThemeTask.NAME, type: CreateThemeTask, group: 'Vaadin')
+        project.tasks.create(name: CreateWidgetsetGeneratorTask.NAME, type: CreateWidgetsetGeneratorTask, group: 'Vaadin')
 
-        project.tasks.create(name: 'widgetset', type: CompileWidgetsetTask, group: 'Vaadin')
-        project.tasks.create(name: 'devmode', type: DevModeTask, group: 'Vaadin')
-        project.tasks.create(name: 'superdevmode', type: SuperDevModeTask, group: 'Vaadin')
-        project.tasks.create(name: 'themes', type: CompileThemeTask, group: 'Vaadin')
-        project.tasks.create(name: 'vaadinRun', type: RunTask, group: 'Vaadin')
-        project.tasks.create(name: 'updateWidgetset', type: UpdateWidgetsetTask, group: 'Vaadin')
-        project.tasks.create(name: 'updateAddonStyles', type: UpdateAddonStylesTask, group: 'Vaadin')
+        project.tasks.create(name: CompileWidgetsetTask.NAME, type: CompileWidgetsetTask, group: 'Vaadin')
+        project.tasks.create(name: DevModeTask.NAME, type: DevModeTask, group: 'Vaadin')
+        project.tasks.create(name: SuperDevModeTask.NAME, type: SuperDevModeTask, group: 'Vaadin')
+        project.tasks.create(name: CompileThemeTask.NAME, type: CompileThemeTask, group: 'Vaadin')
+        project.tasks.create(name: RunTask.NAME, type: RunTask, group: 'Vaadin')
+        project.tasks.create(name: UpdateWidgetsetTask.NAME, type: UpdateWidgetsetTask, group: 'Vaadin')
+        project.tasks.create(name: UpdateAddonStylesTask.NAME, type: UpdateAddonStylesTask, group: 'Vaadin')
 
         project.tasks.create(name: 'sourcesJar', type: BuildSourcesJarTask, group: 'Vaadin Utility')
         project.tasks.create(name: 'javadocJar', type: BuildJavadocJarTask, group: 'Vaadin Utility')
@@ -94,14 +99,14 @@ class GradleVaadinPlugin implements Plugin<Project> {
         project.sourceSets.test.runtimeClasspath += project.files(project.sourceSets.main.java.srcDirs)
 
         // War project should build the widgetset and themes
-        project.war.dependsOn(project.tasks.widgetset)
-        project.war.dependsOn(project.tasks.themes)
+        project.war.dependsOn(CompileWidgetsetTask.NAME)
+        project.war.dependsOn(CompileThemeTask.NAME)
 
         // Ensure widgetset is up-2-date
-        project.processResources.dependsOn(project.tasks.updateWidgetset)
+        project.processResources.dependsOn(UpdateWidgetsetTask.NAME)
 
         // Ensure addon themes are up2date
-        project.processResources.dependsOn(project.tasks.updateAddonStyles)
+        project.processResources.dependsOn(UpdateAddonStylesTask.NAME)
 
         // Cleanup plugin outputs
         project.clean.dependsOn(project.tasks.cleanWidgetset)

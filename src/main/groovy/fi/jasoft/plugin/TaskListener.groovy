@@ -18,7 +18,9 @@ package fi.jasoft.plugin
 import groovy.xml.MarkupBuilder;
 import org.gradle.api.execution.TaskExecutionListener
 import org.gradle.api.Task
+import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.TaskState
+import org.gradle.api.tasks.bundling.War
 
 public class TaskListener implements TaskExecutionListener {
 
@@ -63,6 +65,10 @@ public class TaskListener implements TaskExecutionListener {
 
         if (task.getName() == 'war') {
             configureJRebel(task)
+
+            // Exclude unit cache
+            War war = (War) task;
+            war.exclude('VAADIN/gwt-unitCache/**')
         }
 
         if (task.getName() == 'test' && project.vaadin.testbench.enabled){
@@ -167,17 +173,25 @@ public class TaskListener implements TaskExecutionListener {
 
     private void configureJRebel(Task task) {
         def project = task.getProject()
-        def rebelFile = project.sourceSets.main.output.classesDir.absolutePath + '/rebel.xml'
-        def srcWebApp = project.webAppDir.absolutePath
-        def writer = new FileWriter(rebelFile)
 
-        new MarkupBuilder(writer).application() {
-            classpath {
-                dir(name: project.sourceSets.main.output.classesDir.absolutePath)
-            }
-            web {
-                link(target: '/') {
-                    dir(name: srcWebApp)
+        if(project.vaadin.jrebel.enabled) {
+
+            // Ensure classes dir exists
+            project.sourceSets.main.output.classesDir.mkdirs();
+
+            File rebelFile = new File(project.sourceSets.main.output.classesDir.absolutePath + '/rebel.xml')
+
+            def srcWebApp = project.webAppDir.absolutePath
+            def writer = new FileWriter(rebelFile)
+
+            new MarkupBuilder(writer).application() {
+                classpath {
+                    dir(name: project.sourceSets.main.output.classesDir.absolutePath)
+                }
+                web {
+                    link(target: '/') {
+                        dir(name: srcWebApp)
+                    }
                 }
             }
         }
