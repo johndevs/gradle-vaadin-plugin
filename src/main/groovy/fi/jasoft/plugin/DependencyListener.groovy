@@ -54,7 +54,7 @@ class DependencyListener implements ProjectEvaluationListener {
 
     private static void addRepositories(Project project) {
 
-        def gradleVersion = project.getGradle().gradleVersion;
+        def gradleVersion = Double.parseDouble(project.getGradle().gradleVersion);
 
         // Ensure maven central and maven local are included
         project.repositories.mavenCentral()
@@ -100,9 +100,9 @@ class DependencyListener implements ProjectEvaluationListener {
             }
         }
 
-        if (new File("/home/johnnie/Repositories/gradle-vaadin-plugin/build/libs").exists()) {
-            //FIXME For Development so the development plugin is found
-            project.repositories.flatDir(dirs: '/home/johnnie/Repositories/gradle-vaadin-plugin/build/libs')
+        if (new File(GradleVaadinPlugin.getDebugDir()).exists()) {
+            project.logger.lifecycle("Using development libs found at "+GradleVaadinPlugin.getDebugDir())
+            project.repositories.flatDir(dirs: GradleVaadinPlugin.getDebugDir())
         }
     }
 

@@ -36,17 +36,22 @@ import fi.jasoft.plugin.tasks.CreateWidgetsetGeneratorTask
 class GradleVaadinPlugin implements Plugin<Project> {
 
     public static final PLUGIN_VERSION
-
     public static final PLUGIN_PROPERTIES
+    public static final PLUGIN_DEBUG_DIR
 
     static {
         PLUGIN_PROPERTIES = new Properties()
         PLUGIN_PROPERTIES.load(GradleVaadinPlugin.class.getResourceAsStream('/plugin.properties'))
         PLUGIN_VERSION = PLUGIN_PROPERTIES.getProperty('version')
+        PLUGIN_DEBUG_DIR = PLUGIN_PROPERTIES.getProperty("debugdir")
     }
 
     static String getVersion() {
         return PLUGIN_VERSION
+    }
+
+    static String getDebugDir() {
+        return PLUGIN_DEBUG_DIR
     }
 
     void apply(Project project) {

@@ -89,9 +89,13 @@ processResources {
     // Create pom.xml for Vaadin directory
     dependsOn project.createPOMforVaadinDirectory
 
-    // Apply version
+    // Apply build properties
+    def debugDir = project.file(".").getAbsolutePath()+'/build/libs'
     from(sourceSets.main.resources.srcDirs){
-        filter(ReplaceTokens, tokens: [version: project.version])
+        filter(ReplaceTokens, tokens: [
+                version: project.version,
+                debugdir: debugDir
+        ])
     }
 }
 
