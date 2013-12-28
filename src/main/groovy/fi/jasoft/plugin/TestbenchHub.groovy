@@ -54,7 +54,7 @@ class TestbenchHub {
             process.consumeProcessOutputStream(new FileOutputStream(log))
         }
 
-        project.logger.info("Testbench Hub started http://localhost:4444.")
+        project.logger.lifecycle("Testbench Hub started http://localhost:4444.")
     }
 
     public terminate() {
@@ -64,7 +64,7 @@ class TestbenchHub {
         process.destroy()
         process = null;
 
-        project.logger.info("Testbench hub terminated")
+        project.logger.lifecycle("Testbench hub terminated")
     }
 
 }

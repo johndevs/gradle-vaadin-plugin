@@ -61,7 +61,7 @@ class TestbenchNode {
             process.consumeProcessOutputStream(new FileOutputStream(log))
         }
 
-        project.logger.info("Testbench node started.")
+        project.logger.lifecycle("Testbench node started.")
     }
 
     public terminate() {
@@ -71,6 +71,6 @@ class TestbenchNode {
         process.destroy()
         process = null;
 
-        project.logger.info("Testbench node terminated")
+        project.logger.lifecycle("Testbench node terminated")
     }
 }
