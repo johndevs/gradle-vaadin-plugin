@@ -39,6 +39,8 @@ class GradleVaadinPlugin implements Plugin<Project> {
     public static final PLUGIN_PROPERTIES
     public static final PLUGIN_DEBUG_DIR
 
+    public static int PLUGINS_IN_PROJECT = 0;
+
     static {
         PLUGIN_PROPERTIES = new Properties()
         PLUGIN_PROPERTIES.load(GradleVaadinPlugin.class.getResourceAsStream('/plugin.properties'))
@@ -54,16 +56,28 @@ class GradleVaadinPlugin implements Plugin<Project> {
         return PLUGIN_DEBUG_DIR
     }
 
+    static int getNumberOfPluginsInProject() {
+        return PLUGINS_IN_PROJECT
+    }
+
+    static boolean isFirstPlugin() {
+        return PLUGINS_IN_PROJECT == 1;
+    }
+
     void apply(Project project) {
 
-        project.logger.quiet("Using Gradle Vaadin Plugin " + PLUGIN_VERSION)
+        PLUGINS_IN_PROJECT++;
+
+        if (isFirstPlugin()){
+            project.logger.quiet("Using Gradle Vaadin Plugin " + PLUGIN_VERSION)
+        }
 
         // Extensions
         project.extensions.create('vaadin', VaadinPluginExtension)
 
         // Dependency resolution
-        project.getGradle().addProjectEvaluationListener(new DependencyListener());
-        project.getGradle().getTaskGraph().addTaskExecutionListener(new TaskListener())
+        project.getGradle().addProjectEvaluationListener(new DependencyListener())
+        project.getGradle().getTaskGraph().addTaskExecutionListener(new TaskListener(project))
 
         // Plugins
         project.plugins.apply(WarPlugin)

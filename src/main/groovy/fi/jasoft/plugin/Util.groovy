@@ -115,6 +115,22 @@ class Util {
         }
     }
 
+    public static boolean isRootProject(Project project) {
 
+        // Check if project is the root project
+        if (project.hasProperty('vaadin') && project.equals(project.getRootProject())){
+            return true
+        }
 
+        // If not traverse upwards and see if there are any other vaadin projects in the hierarchy
+        while(!project.equals(project.getRootProject())){
+            project = project.getRootProject()
+            if (project.hasProperty('vaadin')){
+                return false
+            }
+        }
+
+        // no other vaadin projects found upwards, this is the root project
+        return true
+    }
 }
