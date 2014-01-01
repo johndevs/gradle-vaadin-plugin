@@ -1,9 +1,11 @@
 package fi.jasoft.plugin
 
-import org.gradle.api.file.SourceDirectorySet
-import org.gradle.testfixtures.ProjectBuilder
-import org.junit.After
-import org.junit.Before
+import fi.jasoft.plugin.configuration.AddonConfiguration
+import fi.jasoft.plugin.configuration.DevelopmentModeConfiguration
+import fi.jasoft.plugin.configuration.GWTConfiguration
+import fi.jasoft.plugin.configuration.JRebelConfiguration
+import fi.jasoft.plugin.configuration.VaadinPluginConfiguration
+import fi.jasoft.plugin.configuration.VaadinPluginExtension
 import org.junit.Test
 
 /*
@@ -41,11 +43,11 @@ class PluginExtensionTest extends PluginTestBase {
         assert vaadin.manageDependencies == true
         assert vaadin.serverPort == 8080
         assert vaadin.jvmArgs == null
-        assert vaadin.jrebel instanceof VaadinPluginExtension.JRebel
-        assert vaadin.devmode instanceof VaadinPluginExtension.DevMode
-        assert vaadin.plugin instanceof VaadinPluginExtension.VaadinPluginConfiguration
-        assert vaadin.addon instanceof VaadinPluginExtension.Addon
-        assert vaadin.gwt instanceof VaadinPluginExtension.GWT
+        assert vaadin.jrebel instanceof JRebelConfiguration
+        assert vaadin.devmode instanceof DevelopmentModeConfiguration
+        assert vaadin.plugin instanceof VaadinPluginConfiguration
+        assert vaadin.addon instanceof AddonConfiguration
+        assert vaadin.gwt instanceof GWTConfiguration
         assert vaadin.mainSourceSet == null
         assert vaadin.push == false
     }
@@ -72,7 +74,7 @@ class PluginExtensionTest extends PluginTestBase {
     @Test
     void areGWTPropertiesConfigured(){
         VaadinPluginExtension vaadin = project.extensions.vaadin
-        assert vaadin.gwt instanceof VaadinPluginExtension.GWT
+        assert vaadin.gwt instanceof GWTConfiguration
         assert vaadin.gwt.style == "OBF"
         assert vaadin.gwt.optimize == 0
         assert vaadin.gwt.logLevel == "INFO"
@@ -109,7 +111,7 @@ class PluginExtensionTest extends PluginTestBase {
     @Test
     void areDevModePropertiesConfigured(){
         VaadinPluginExtension vaadin = project.extensions.vaadin
-        assert vaadin.devmode instanceof VaadinPluginExtension.DevMode
+        assert vaadin.devmode instanceof DevelopmentModeConfiguration
         assert vaadin.devmode.noserver == false
         assert vaadin.devmode.superDevMode == false
         assert vaadin.devmode.bindAddress == '127.0.0.1'
@@ -130,7 +132,7 @@ class PluginExtensionTest extends PluginTestBase {
     @Test
     void areVaadinPluginConfigurationPropertiesConfigured(){
         VaadinPluginExtension vaadin = project.extensions.vaadin
-        assert vaadin.plugin instanceof VaadinPluginExtension.VaadinPluginConfiguration
+        assert vaadin.plugin instanceof VaadinPluginConfiguration
         assert vaadin.plugin.terminateOnEnter == true
         assert vaadin.plugin.logToConsole == false
         assert vaadin.plugin.openInBrowser == true
@@ -149,7 +151,7 @@ class PluginExtensionTest extends PluginTestBase {
     @Test
     void areAddonPropertiesConfigured(){
         VaadinPluginExtension vaadin = project.extensions.vaadin
-        assert vaadin.addon instanceof VaadinPluginExtension.Addon
+        assert vaadin.addon instanceof AddonConfiguration
         assert vaadin.addon.author == ''
         assert vaadin.addon.license == ''
         assert vaadin.addon.title == ''
@@ -168,7 +170,7 @@ class PluginExtensionTest extends PluginTestBase {
     @Test
     void areJRebelPropertiesConfigured(){
         VaadinPluginExtension vaadin = project.extensions.vaadin
-        assert vaadin.jrebel instanceof VaadinPluginExtension.JRebel
+        assert vaadin.jrebel instanceof JRebelConfiguration
         assert vaadin.jrebel.enabled == false
         assert vaadin.jrebel.location == null
     }
