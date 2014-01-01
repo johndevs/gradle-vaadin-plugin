@@ -1,5 +1,6 @@
-package fi.jasoft.plugin
+package fi.jasoft.plugin.testbench
 
+import fi.jasoft.plugin.Util
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 
@@ -30,7 +31,10 @@ class TestbenchHub {
 
     public start(){
 
-        File logDir = new File('build/testbench/')
+        def host = project.vaadin.testbench.hub.host
+        def port = project.vaadin.testbench.hub.port
+
+        File logDir = project.file('build/testbench/')
         logDir.mkdirs()
 
         FileCollection cp = project.configurations['vaadin-testbench'] + Util.getClassPath(project)
@@ -44,6 +48,13 @@ class TestbenchHub {
         process.add('-role')
         process.add('hub')
 
+        process.add('-host')
+        process.add(host)
+
+        process.add('-port')
+        process.add(port)
+
+
         // Execute server
         process = process.execute()
 
@@ -54,7 +65,10 @@ class TestbenchHub {
             process.consumeProcessOutputStream(new FileOutputStream(log))
         }
 
-        project.logger.lifecycle("Testbench Hub started http://localhost:4444.")
+        // Wait for hub to start
+        sleep(3000)
+
+        project.logger.lifecycle("Testbench Hub started on http://$host:$port")
     }
 
     public terminate() {

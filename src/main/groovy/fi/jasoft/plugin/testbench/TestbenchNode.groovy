@@ -1,5 +1,6 @@
-package fi.jasoft.plugin
+package fi.jasoft.plugin.testbench
 
+import fi.jasoft.plugin.Util
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 
@@ -30,7 +31,12 @@ class TestbenchNode {
 
     public start(){
 
-        File logDir = new File('build/testbench/')
+        def host = project.vaadin.testbench.node.host
+        def port = project.vaadin.testbench.node.port
+        def hub = project.vaadin.testbench.node.hub
+        def browsers = project.vaadin.testbench.node.browsers
+
+        File logDir = project.file('build/testbench/')
         logDir.mkdirs()
 
         FileCollection cp = project.configurations['vaadin-testbench'] + Util.getClassPath(project)
@@ -46,10 +52,20 @@ class TestbenchNode {
         process.add('node')
 
         process.add('-hub')
-        process.add('http://localhost:4444/grid/register')
+        process.add(hub)
+
+        process.add('-host')
+        process.add(host)
 
         process.add('-port')
-        process.add('4445')
+        process.add(port)
+
+        for(browser in browsers){
+            process.add('-browser')
+            process.add( browser.inject([]) { result, entry ->
+                result << "${entry.key}=${entry.value}"
+            }.join(','))
+        }
 
         // Execute server
         process = process.execute()
@@ -61,7 +77,11 @@ class TestbenchNode {
             process.consumeProcessOutputStream(new FileOutputStream(log))
         }
 
-        project.logger.lifecycle("Testbench node started.")
+        // Wait for node to start and connect to hub
+        sleep(10000)
+
+        project.logger.lifecycle("Testbench Node started on http://$host:$port/wd/hub")
+
     }
 
     public terminate() {
@@ -71,6 +91,6 @@ class TestbenchNode {
         process.destroy()
         process = null;
 
-        project.logger.lifecycle("Testbench node terminated")
+        project.logger.lifecycle("Testbench node terminated.")
     }
 }

@@ -142,6 +142,7 @@ class VaadinPluginExtension {
 
     TestBench testbench(closure) {
         closure.delegate = testbench
+        closure.resolveStrategy = Closure.DELEGATE_FIRST
         closure()
     }
 
@@ -297,8 +298,123 @@ class VaadinPluginExtension {
     }
 
     class TestBench {
+
+        class TestBenchHub {
+            boolean enabled = false
+            String host = 'localhost'
+            int port = 4444
+
+            void enabled(boolean enabled) {
+                this.enabled = enabled
+            }
+
+            void host(String host){
+                this.host = host
+            }
+
+            void port(int port){
+                this.port = port
+            }
+        }
+
+        class TestBenchNode {
+            /**
+             * Should the node be enabled
+             */
+            boolean enabled = false
+
+            /**
+             * The hostname of the node
+             */
+            String host = 'localhost'
+
+            /**
+             * The port of the node
+             */
+            int port = 4445
+
+            /**
+             * The hub to connect to.
+             */
+            String hub = 'http://localhost:4444/grid/register'
+
+            /* A list of browser configurations:
+             * e.g.
+             *
+             *   browser = [
+             *       [ browserName: 'firefox', version: 3.6, maxInstances: 5, platform: 'LINUX' ],
+             *       [ browserName: 'chrome', version: 22, maxInstances: 1, platform: 'WINDOWS' ]
+             *   ]
+             *
+             *   See http://code.google.com/p/selenium/wiki/Grid2 for more information about available browsers and
+             *   settings. The browser setting will be stringingified into the -browser parameter for the hub.
+             */
+            List<Map> browsers = []
+
+            /**
+             * Should the node be started when launching the tests
+             *
+             * @param enabled
+             *      <code>true</code> if it should.
+             */
+            void enabled(boolean enabled) {
+                this.enabled = enabled
+            }
+
+            /**
+             * The host name or ip address where the node should be run
+             *
+             * @param host
+             *      Host name or ip address for the node
+             */
+            void host(String host){
+                this.host = host
+            }
+
+            /**
+             * The port on which the node should be run
+             *
+             * @param port
+             *      The port number for the node
+             */
+            void port(int port){
+                this.port = port
+            }
+
+            /* A list of browser configurations:
+             * <p>
+             * See http://code.google.com/p/selenium/wiki/Grid2 for more information about available browsers and
+             * settings. The browser setting will be converted into the -browser parameter for the node.
+             *
+             * @param browser e.g.
+             *
+             *   browser = [
+             *       [ browserName: 'firefox', version: 3.6, maxInstances: 5, platform: 'LINUX' ],
+             *       [ browserName: 'chrome', version: 22, maxInstances: 1, platform: 'WINDOWS' ]
+             *   ]
+             *
+             */
+            void browsers(List<Map> browsers) {
+                this.browsers = browsers
+            }
+
+            /**
+             * The url for where the hub is running
+             *
+             * @param hub
+             *      URL in the for http://localhost:4444/grid/register
+             */
+            void hub(String hub){
+                this.hub = hub
+            }
+        }
+
         boolean enabled = false
         String version = "3.+"
+        boolean runApplication = true
+
+        TestBenchHub hub = new TestBenchHub()
+        TestBenchNode node = new TestBenchNode()
 
         void enabled(boolean enabled) {
             this.enabled = enabled
@@ -308,7 +424,21 @@ class VaadinPluginExtension {
             this.version = version
         }
 
+        void runApplication(boolean run) {
+            this.runApplication = run
+        }
 
+        TestBenchHub hub(closure) {
+            closure.delegate = hub
+            closure.resolveStrategy = Closure.DELEGATE_FIRST
+            closure()
+        }
+
+        TestBenchNode node(closure) {
+            closure.delegate = node
+            closure.resolveStrategy = Closure.DELEGATE_FIRST
+            closure()
+        }
     }
 
 }

@@ -121,5 +121,7 @@ public class ApplicationServer {
         appServerProcess.err.close()
         appServerProcess.destroy()
         appServerProcess = null;
+
+        project.logger.lifecycle("Application server terminated.")
     }
 }

@@ -15,10 +15,11 @@
 */
 package fi.jasoft.plugin
 
+import fi.jasoft.plugin.testbench.TestbenchHub
+import fi.jasoft.plugin.testbench.TestbenchNode
 import groovy.xml.MarkupBuilder;
 import org.gradle.api.execution.TaskExecutionListener
 import org.gradle.api.Task
-import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.TaskState
 import org.gradle.api.tasks.bundling.War
 
@@ -72,14 +73,24 @@ public class TaskListener implements TaskExecutionListener {
         }
 
         if (task.getName() == 'test' && project.vaadin.testbench.enabled){
-            testbenchHub = new TestbenchHub(project)
-            testbenchHub.start()
 
-            testbenchNode = new TestbenchNode(project)
-            testbenchNode.start()
+            if (project.vaadin.testbench.hub.enabled){
+                testbenchHub = new TestbenchHub(project)
+                testbenchHub.start()
+            }
 
-            testbenchAppServer = new ApplicationServer(project)
-            testbenchAppServer.start()
+            if (project.vaadin.testbench.node.enabled){
+                testbenchNode = new TestbenchNode(project)
+                testbenchNode.start()
+            }
+
+            if (project.vaadin.testbench.runApplication){
+                testbenchAppServer = new ApplicationServer(project)
+                testbenchAppServer.start()
+
+                // Ensure everything is up and running before continuing with the tests
+                sleep(5000)
+            }
         }
 
         if (task.getName() == 'javadoc'){
@@ -92,14 +103,20 @@ public class TaskListener implements TaskExecutionListener {
 
         if (task.getName() == 'test' && project.vaadin.testbench.enabled){
 
-            testbenchAppServer.terminate()
-            testbenchAppServer = null
+            if (testbenchAppServer != null){
+                testbenchAppServer.terminate()
+                testbenchAppServer = null
+            }
 
-            testbenchNode.terminate()
-            testbenchNode = null
+            if (testbenchNode != null){
+                testbenchNode.terminate()
+                testbenchNode = null
+            }
 
-            testbenchHub.terminate()
-            testbenchHub = null
+            if (testbenchHub != null){
+                testbenchHub.terminate()
+                testbenchHub = null
+            }
         }
     }
 
