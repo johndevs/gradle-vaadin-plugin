@@ -180,13 +180,17 @@ class TemplateUtil {
             substitutions['%WIDGETSET_GENERATOR%'] = ''
         }
 
-        File[] clientSCSS = getClientSCSSFiles(project)
+        substitutions['%SASS_LINKER%'] = ''
+        substitutions['%STYLESHEETS%'] = ''
+
+        // Retrieve SCSS files
+        File[] clientSCSS = getFilesFromPublicFolder(project, 'scss')
         if (clientSCSS.length > 0) {
             String linkerString = "\t<define-linker name=\"scssintegration\" class=\"com.vaadin.sass.linker.SassLinker\" />\n" +
                     "\t<add-linker name=\"scssintegration\" />";
             substitutions['%SASS_LINKER%'] = linkerString
 
-            StringBuilder stylesheets = new StringBuilder()
+            StringBuilder stylesheets = new StringBuilder(substitutions['%STYLESHEETS%'])
             clientSCSS.each {
 
                 // Get the relative path to the public folder
@@ -208,10 +212,29 @@ class TemplateUtil {
             }
 
             substitutions['%STYLESHEETS%'] = stylesheets.toString()
+        }
 
-        } else {
-            substitutions['%SASS_LINKER%'] = ''
-            substitutions['%STYLESHEETS%'] = ''
+        // Retrive CSS files
+        File[] clientCSS = getFilesFromPublicFolder(project, 'css')
+        if (clientCSS.length > 0) {
+            StringBuilder stylesheets = new StringBuilder(substitutions['%STYLESHEETS%'])
+            clientCSS.each {
+
+                // Get the relative path to the public folder
+                String path = it.parent.substring(it.parent.lastIndexOf('public') + 'public'.length())
+                if (path.startsWith('/')) {
+                    path = path.substring(1);
+                }
+
+                // Recreate relative path to css file
+                path = path + '/' + it.name
+                if (path.startsWith('/')) {
+                    path = path.substring(1);
+                }
+
+                stylesheets.append("\t<stylesheet src=\"${path}\"/>\n")
+            }
+            substitutions['%STYLESHEETS%'] = stylesheets.toString()
         }
 
         if (project.vaadin.gwt.collapsePermutations) {
@@ -233,17 +256,25 @@ class TemplateUtil {
         }
     }
 
+    /**
+     * Searches for SCSS files in the public folder and returns them
+     */
+    @Deprecated
     public static File[] getClientSCSSFiles(Project project) {
+        return getFilesFromPublicFolder(project, 'scss')
+    }
+
+    public static File[] getFilesFromPublicFolder(Project project, String prefix) {
 
         def files = []
         project.sourceSets.main.resources.srcDirs.each {
-            project.fileTree(it.absolutePath).include('**/*/public/**/*.scss').each {
+            project.fileTree(it.absolutePath).include("**/*/public/**/*.$prefix").each {
                 files.add(it)
             }
         }
 
         Util.getMainSourceSet(project).srcDirs.each {
-            project.fileTree(it.absolutePath).include('**/*/public/**/*.scss').each {
+            project.fileTree(it.absolutePath).include("**/*/public/**/*.$prefix").each {
                 files.add(it)
             }
         }
