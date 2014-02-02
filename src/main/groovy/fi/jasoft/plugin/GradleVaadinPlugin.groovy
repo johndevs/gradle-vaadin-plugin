@@ -21,6 +21,7 @@ import fi.jasoft.plugin.tasks.BuildSourcesJarTask
 import fi.jasoft.plugin.tasks.CreateCompositeTask
 import fi.jasoft.plugin.tasks.CreateServlet3ProjectTask
 import fi.jasoft.plugin.tasks.CreateTestbenchTestTask
+import fi.jasoft.plugin.tasks.DirectorySearchTask
 import fi.jasoft.plugin.tasks.UpdateAddonStylesTask;
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -92,6 +93,8 @@ class GradleVaadinPlugin implements Plugin<Project> {
         project.tasks.create(name: 'javadocJar', type: BuildJavadocJarTask, group: 'Vaadin Utility')
 
         project.tasks.create(name: 'createTestbenchTest', type: CreateTestbenchTestTask, group: 'Vaadin Testbench')
+
+        project.tasks.create(name: DirectorySearchTask.NAME, type: DirectorySearchTask, group: 'Vaadin Directory')
 
         // Add debug information to all compilation results
         project.tasks.compileJava.options.debugOptions.debugLevel = 'source,lines,vars'
