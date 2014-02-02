@@ -28,7 +28,7 @@ class DirectorySearchTask extends DefaultTask {
 
     public static final String NAME = 'addons'
 
-    private final String directoryUrl = 'https://vaadin.com/Directory/resource/addon/all?detailed=true&vaadin='
+    private final String directoryUrl = 'https://vaadin.com/Directory/resource/addon/all?detailed=true'
 
     private final File cachedAddonResponse = project.file('build/cache/addons.json')
 
@@ -57,7 +57,7 @@ class DirectorySearchTask extends DefaultTask {
         def args = project.getProperties()
         def search = args.get('search', null)
         def sort = args.get('sort', null)
-        def verbose = Boolean.parseBoolean(args.get('verbose', 'true'))
+        def verbose = Boolean.parseBoolean(args.get('verbose', 'false'))
         listAddons(search,sort, verbose)
     }
 
@@ -65,7 +65,8 @@ class DirectorySearchTask extends DefaultTask {
         def json = new JsonSlurper().parseText(cachedAddonResponse.text)
         def dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
 
-        println '=== Addons ==='
+        println ' '
+
         json.addon.findAll{
             return (search == null  || it.name.toLowerCase().contains(search) || it.summary.toLowerCase().contains(search))
 
@@ -77,6 +78,7 @@ class DirectorySearchTask extends DefaultTask {
                case 'rating': return Double.parseDouble(it.avgRating)
                default: return null
            }
+
         }.each {
             if(verbose){
                 println 'Name: '+it.name
@@ -90,7 +92,9 @@ class DirectorySearchTask extends DefaultTask {
             } else {
                 print DirectorySearchTask.truncate(it.name.toString(), 29).padRight(30)
                 print DirectorySearchTask.truncate(it.summary.toString(), 49).padRight(50)
-                print (' Dependency: '+it.avgRating)
+                if(it.artifactId != null && it.groupId != null && it.version != null) {
+                    print(" \"${it.groupId}:${it.artifactId}:${it.version}\"")
+                }
             }
             println ' '
         }
