@@ -48,6 +48,8 @@ The following tasks are available in the plugin
 * ``themes`` - Compiles a Vaadin SASS theme into CSS
 * ``vaadinRun`` - Runs the Vaadin application on an embedded Jetty Server
 * ``widgetset`` - Compiles Vaadin Addons and components into Javascript.
+* ``addons`` - Search for addons in the Vaadin Directory. Optional parameters: -Psearch=<term> -Psort=[name|description|date|rating] -Pverbose=[true|false]
+
 
 # Plugin configurations
 The following configuration options are available
