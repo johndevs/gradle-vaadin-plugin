@@ -43,6 +43,7 @@ The following tasks are available in the plugin
 * ``createVaadinServlet3Project`` - Creates a new Vaadin project based on Servlet 3.0
 * ``createVaadinTheme`` - Creates a new Vaadin Theme
 * ``createVaadinWidgetsetGenerator`` - Creates a new widgetset generator for optimizing the widgetset
+* ``createTestbenchTest`` - Creates a new testbench JUnit test. (Requires Testbench enabled).
 * ``devmode`` - Run Development Mode for easier debugging and development of client widgets.
 * ``superdevmode`` - Run Super Development Mode for easier client widget development.
 * ``themes`` - Compiles a Vaadin SASS theme into CSS
@@ -94,10 +95,34 @@ gwt.jvmArgs = ['-Xmx500M', '-XX:MaxPermSize=256M']
 * ``vaadin.devmode.bindAddress`` - The address the DevMode server should be bound to. Default is 127.0.0.1. 
 * ``vaadin.devmode.codeServerPort`` - The port the DevMode server should be bound to. Default is 9997.
 
-## Vaadin Tooling configurations
+## Vaadin Tooling configurations 
+All Vaadin Tooling are free to try for 30 days but then requires a license. See https://vaadin.com/tools-and-services for more information.
+
+### Vaadin JRebel
+(Licence no longer available through Vaadin, contact http://zeroturnaround.com/ for licence)
+
 * ``vaadin.jrebel.enabled`` - Should JRebel be used when running the project. Default is false
 * ``vaadin.jrebel.location`` - Absolute path of jrebel.jar (required if ```jrebel.enabled``` is set to true)
- 
+
+### Vaadin Testbench
+* ``vaadin.testbench.enabled`` - Should Testbench be used for UI testing?. Default is false.
+* ``vaadin.testbench.version`` - Version of testbench to use. By default the latest release of the 3.x series.
+* ``vaadin.testbench.runApplication`` - Should the application be run on embedded Jetty before the tests are run. Default true.
+* ``vaadin.testbench.hub.enabled`` - Should a testbench hub be started when running tests. Default false.
+* ``vaadin.testbench.hub.host`` - The hostname of the hub
+* ``vaadin.testbench.hub.port`` - The port of the hub
+* ``vaadin.testbench.node.enabled`` - Should a testbench node be started when running tests. Default false.
+* ``vaadin.testbench.node.host`` - The hostname of the node
+* ``vaadin.testbench.node.port`` - The port of the node
+* ``vaadin.testbench.node.hub`` - The URL of the hub where the node should connect to. By default http://localhost:4444/grid/register'.
+* ``vaadin.testbench.node.browsers`` - A list of supported browsers by the hub. e.g. 
+```groovy 
+vaadin.testbench.node.browsers = [
+    [ browserName: 'firefox', version: 3.6, maxInstances: 5, platform: 'LINUX' ],
+    [ browserName: 'chrome', version: 22, maxInstances: 1, platform: 'WINDOWS' ]
+]
+```   
+
 ## Plugin configurations
 * ``vaadin.plugin.terminateOnEnter`` - Should the vaadinRun and devmode tasks be terminated on enter-key. Default true.
 * ``vaadin.plugin.logToConsole``- Should server logs be logged to the console or to a log file. Default is logging to file.
