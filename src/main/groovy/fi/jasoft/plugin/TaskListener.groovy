@@ -17,7 +17,8 @@ package fi.jasoft.plugin
 
 import fi.jasoft.plugin.testbench.TestbenchHub
 import fi.jasoft.plugin.testbench.TestbenchNode
-import groovy.xml.MarkupBuilder;
+import groovy.xml.MarkupBuilder
+import org.gradle.api.Project;
 import org.gradle.api.execution.TaskExecutionListener
 import org.gradle.api.Task
 import org.gradle.api.tasks.TaskState
@@ -31,10 +32,15 @@ public class TaskListener implements TaskExecutionListener {
 
     ApplicationServer testbenchAppServer
 
+    private final Project project
+
+    public TaskListener(Project project) {
+        this.project = project
+    }
 
     public void beforeExecute(Task task) {
-        def project = task.getProject()
-        if (!project.hasProperty('vaadin')) {
+
+        if (project != task.getProject() || !project.hasProperty('vaadin')) {
             return
         }
 
@@ -99,7 +105,10 @@ public class TaskListener implements TaskExecutionListener {
     }
 
     public void afterExecute(Task task, TaskState state) {
-        def project = task.getProject()
+
+        if (project != task.getProject() || !project.hasProperty('vaadin')) {
+            return
+        }
 
         if (task.getName() == 'test' && project.vaadin.testbench.enabled){
 
@@ -117,6 +126,12 @@ public class TaskListener implements TaskExecutionListener {
                 testbenchHub.terminate()
                 testbenchHub = null
             }
+        }
+
+        // Notify users that sources are not present in the jar
+        if (task.getName() == 'jar' && !state.getSkipped()){
+            task.getLogger().warn("Please note that the jar archive will NOT by default include the source files.\n" +
+                    "You can add them to the jar by adding jar{ from sourceSets.main.allJava } to build.gradle.")
         }
     }
 
