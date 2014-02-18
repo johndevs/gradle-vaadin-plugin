@@ -107,7 +107,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
         project.tasks.create(name: BuildSourcesJarTask.NAME, type: BuildSourcesJarTask, group: 'Vaadin Utility')
         project.tasks.create(name: BuildJavadocJarTask.NAME, type: BuildJavadocJarTask, group: 'Vaadin Utility')
 
-        project.tasks.create(name: 'createTestbenchTest', type: CreateTestbenchTestTask, group: 'Vaadin Testbench')
+        project.tasks.create(name: CreateTestbenchTestTask.NAME, type: CreateTestbenchTestTask, group: 'Vaadin Testbench')
 
         project.tasks.create(name: DirectorySearchTask.NAME, type: DirectorySearchTask, group: 'Vaadin Directory')
         project.tasks.create(name: CreateDirectoryZipTask.NAME, type: CreateDirectoryZipTask, group: 'Vaadin Directory')
