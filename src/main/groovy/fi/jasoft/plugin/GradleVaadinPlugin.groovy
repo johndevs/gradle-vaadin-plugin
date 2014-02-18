@@ -19,6 +19,7 @@ import fi.jasoft.plugin.configuration.VaadinPluginExtension
 import fi.jasoft.plugin.tasks.BuildJavadocJarTask
 import fi.jasoft.plugin.tasks.BuildSourcesJarTask
 import fi.jasoft.plugin.tasks.CreateCompositeTask
+import fi.jasoft.plugin.tasks.CreateDirectoryZipTask
 import fi.jasoft.plugin.tasks.CreateServlet3ProjectTask
 import fi.jasoft.plugin.tasks.CreateTestbenchTestTask
 import fi.jasoft.plugin.tasks.DirectorySearchTask
@@ -103,12 +104,13 @@ class GradleVaadinPlugin implements Plugin<Project> {
         project.tasks.create(name: UpdateWidgetsetTask.NAME, type: UpdateWidgetsetTask, group: 'Vaadin')
         project.tasks.create(name: UpdateAddonStylesTask.NAME, type: UpdateAddonStylesTask, group: 'Vaadin')
 
-        project.tasks.create(name: 'sourcesJar', type: BuildSourcesJarTask, group: 'Vaadin Utility')
-        project.tasks.create(name: 'javadocJar', type: BuildJavadocJarTask, group: 'Vaadin Utility')
+        project.tasks.create(name: BuildSourcesJarTask.NAME, type: BuildSourcesJarTask, group: 'Vaadin Utility')
+        project.tasks.create(name: BuildJavadocJarTask.NAME, type: BuildJavadocJarTask, group: 'Vaadin Utility')
 
         project.tasks.create(name: 'createTestbenchTest', type: CreateTestbenchTestTask, group: 'Vaadin Testbench')
 
         project.tasks.create(name: DirectorySearchTask.NAME, type: DirectorySearchTask, group: 'Vaadin Directory')
+        project.tasks.create(name: CreateDirectoryZipTask.NAME, type: CreateDirectoryZipTask, group: 'Vaadin Directory')
 
         // Add debug information to all compilation results
         project.tasks.compileJava.options.debugOptions.debugLevel = 'source,lines,vars'

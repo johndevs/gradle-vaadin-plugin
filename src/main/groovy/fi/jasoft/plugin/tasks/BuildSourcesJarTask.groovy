@@ -19,6 +19,8 @@ import org.gradle.api.tasks.bundling.Jar
 
 class BuildSourcesJarTask extends Jar {
 
+    public static final String NAME = 'sourcesJar'
+
     public BuildSourcesJarTask() {
         description = "Creates a sources jar for the project"
         classifier = 'sources'

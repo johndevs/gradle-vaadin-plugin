@@ -15,12 +15,14 @@
 */
 package fi.jasoft.plugin
 
+import fi.jasoft.plugin.tasks.CreateDirectoryZipTask
 import fi.jasoft.plugin.testbench.TestbenchHub
 import fi.jasoft.plugin.testbench.TestbenchNode
 import groovy.xml.MarkupBuilder
 import org.gradle.api.Project;
 import org.gradle.api.execution.TaskExecutionListener
 import org.gradle.api.Task
+import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.TaskState
 import org.gradle.api.tasks.bundling.War
 
@@ -100,7 +102,13 @@ public class TaskListener implements TaskExecutionListener {
         }
 
         if (task.getName() == 'javadoc'){
-            task.classpath += Util.getClassPath(project)
+            task.source = Util.getMainSourceSet(project)
+            task.failOnError = false
+        }
+
+        if (task.getName() == CreateDirectoryZipTask.NAME){
+            configureAddonZipMetadata(task)
+
         }
     }
 
@@ -193,7 +201,7 @@ public class TaskListener implements TaskExecutionListener {
         }
 
         // Add metadata to jar manifest
-        project.tasks.jar.manifest.attributes(
+        task.manifest.attributes(
                 'Vaadin-Package-Version': 1,
                 'Vaadin-Widgetsets': widgetset,
                 'Vaadin-License-Title': project.vaadin.addon.license,
@@ -201,6 +209,28 @@ public class TaskListener implements TaskExecutionListener {
                 'Implementation-Version': project.version != null ? project.version : '',
                 'Implementation-Vendor': project.vaadin.addon.author,
         )
+    }
+
+    private void configureAddonZipMetadata(Task task) {
+
+        // Create metadata file
+        def buildDir = project.file('build/tmp/zip')
+        buildDir.mkdirs()
+
+        def meta = project.file(buildDir.absolutePath+'/META-INF')
+        meta.mkdirs()
+
+        def manifest = project.file(meta.absolutePath+'/MANIFEST.MF')
+        manifest.createNewFile()
+
+        manifest << """
+            Vaadin-Package-Version = 1
+            Vaadin-License-Title = ${project.vaadin.addon.license}
+            Implementation-Title = ${project.vaadin.addon.title}
+            Implementation-Version = ${project.version != null ? project.version : ''}
+            Implementation-Vendor = ${project.vaadin.addon.author}
+            Vaadin-Addon = libs/${project.jar.archiveName}
+        """.stripIndent()
     }
 
     private void configureJRebel(Task task) {
