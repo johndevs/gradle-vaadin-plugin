@@ -52,6 +52,8 @@ The following tasks are available in the plugin
 * ``addons`` - Search for addons in the Vaadin Directory. Optional parameters: -Psearch=<term> -Psort=[name|description|date|rating] -Pverbose=[true|false]
 * ``jar`` - Create Vaadin Directory compatible Addon jar out of the project. Metadata can be configurated with the vaadin.addon.* properties.
 * ``zip`` - Create Vaadin Directory compatible Addon zip archive of the project. Metadata can be configurated with the vaadin.addon.* properties.
+* ``javadocJar`` - Generate javadoc from project and package it as a jar.
+* ``sourcesJar`` - Packages all sources a a jar.
 
 
 # Plugin configurations
