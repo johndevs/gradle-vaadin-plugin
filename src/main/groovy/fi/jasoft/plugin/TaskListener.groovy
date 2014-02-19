@@ -26,6 +26,8 @@ import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.TaskState
 import org.gradle.api.tasks.bundling.War
 
+import java.util.jar.Manifest
+
 public class TaskListener implements TaskExecutionListener {
 
     private TestbenchHub testbenchHub
@@ -187,6 +189,19 @@ public class TaskListener implements TaskExecutionListener {
         }
     }
 
+    private File getManifest(){
+        def sources = Util.getMainSourceSet(project).srcDirs.asList() + project.sourceSets.main.resources.srcDirs.asList()
+        File manifest = null
+        sources.each {
+            project.fileTree(it).matching({
+                include '**/META-INF/MANIFEST.MF'
+            }).each {
+                manifest = it
+            }
+        }
+        return manifest
+    }
+
     private void configureAddonMetadata(Task task) {
         def project = task.getProject()
 
@@ -200,14 +215,31 @@ public class TaskListener implements TaskExecutionListener {
             }
         }
 
+        // Scan for existing manifest in source folder and reuse if possible
+        File manifest = getManifest()
+        if (manifest != null){
+            project.logger.warn("Manifest found in project, possibly overwriting existing values.")
+            task.manifest.from(manifest)
+        }
+
+        //Validate values
+        if (project.vaadin.addon.title == ''){
+            project.logger.warn("No vaadin.addon.title has been specified, jar not compatible with Vaadin Directory.")
+        }
+
+        if (project.version == 'unspecified') {
+            project.logger.warn("No version specified for the project, jar not compatible with Vaadin Directory.")
+        }
+
         // Add metadata to jar manifest
         task.manifest.attributes(
                 'Vaadin-Package-Version': 1,
                 'Vaadin-Widgetsets': widgetset,
                 'Vaadin-License-Title': project.vaadin.addon.license,
                 'Implementation-Title': project.vaadin.addon.title,
-                'Implementation-Version': project.version != null ? project.version : '',
+                'Implementation-Version': project.version,
                 'Implementation-Vendor': project.vaadin.addon.author,
+                'Built-By': "Gradle Vaadin Plugin ${GradleVaadinPlugin.PLUGIN_VERSION}"
         )
     }
 
