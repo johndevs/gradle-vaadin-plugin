@@ -73,6 +73,7 @@ The following configuration options are available
 * ``vaadin.mainSourceSet`` - Defines the main source set where all source files will be generated.
 * ``vaadin.push`` - Should vaadin push be enabled for the application. Default is false.
 * ``vaadin.debug`` - Should the application be run in debug mode. Default is true.
+* ``vaadin.profiler`` - Should the vaadin client side profiler be enabled. Default is false.
 
 ## Vaadin GWT configurations
 * ``vaadin.gwt.version`` - GWT version used with Vaadin 6. Defaults to 2.3.0. 
