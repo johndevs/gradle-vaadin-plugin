@@ -52,6 +52,11 @@ class VaadinPluginExtension {
     boolean debug = true
 
     /**
+     * Should the Vaadin client side profiler be used
+     */
+    boolean profiler = true
+
+    /**
      * The port the debugger listens to
      */
     int debugPort = 8000
@@ -160,6 +165,15 @@ class VaadinPluginExtension {
      */
     void debug(boolean debug) {
         this.debug = debug
+    }
+
+    /**
+     * @see VaadinPluginExtension#profiler
+     *
+     * @param profilerEnabled
+     */
+    void profiler(boolean profilerEnabled) {
+        this.profiler = profilerEnabled
     }
 
     /**

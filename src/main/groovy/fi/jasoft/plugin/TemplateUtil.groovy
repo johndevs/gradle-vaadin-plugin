@@ -153,6 +153,7 @@ class TemplateUtil {
 
         substitutions['%USERAGENT%'] = ua
         substitutions['%SOURCE%'] = sourcePaths
+        substitutions['%PROFILER_ENABLED%'] = project.vaadin.profiler ? 'true' : 'false'
 
         String name, pkg, filename
         if (project.vaadin.widgetsetGenerator == null) {

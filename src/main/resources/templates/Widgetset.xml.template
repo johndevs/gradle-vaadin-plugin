@@ -6,6 +6,7 @@
 %INHERITS%
 	<set-configuration-property name="devModeRedirectEnabled" value="%SUPERDEVMODE%" />
 	<set-property name="user.agent" value="%USERAGENT%" />
+	<set-property name="vaadin.profiler" value="%PROFILER_ENABLED%" />
 %LOGGING%
 %WIDGETSET_GENERATOR%
 %SASS_LINKER%
