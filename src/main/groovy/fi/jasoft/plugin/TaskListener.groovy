@@ -22,9 +22,9 @@ import groovy.xml.MarkupBuilder
 import org.gradle.api.Project;
 import org.gradle.api.execution.TaskExecutionListener
 import org.gradle.api.Task
-import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.TaskState
 import org.gradle.api.tasks.bundling.War
+import fi.jasoft.plugin.DependencyListener.Configuration
 
 import java.util.jar.Manifest
 
@@ -146,24 +146,35 @@ public class TaskListener implements TaskExecutionListener {
     }
 
     private void configureEclipsePlugin(Task task) {
-        def project = task.getProject()
         def cp = project.eclipse.classpath
+        def conf =  project.configurations
+
+        // Always download sources
         cp.downloadSources = true
+
+        // Set class output dir to eclipse default
         cp.defaultOutputDir = project.file('build/classes/main')
-        cp.plusConfigurations += project.configurations.vaadin
-        cp.plusConfigurations += project.configurations['vaadin-client']
-        cp.plusConfigurations += project.configurations['vaadin-testbench']
-        cp.plusConfigurations += project.configurations.jetty8
+
+        // Add dependencies to eclipse classpath
+        cp.plusConfigurations += conf[Configuration.SERVER.caption()]
+        cp.plusConfigurations += conf[Configuration.CLIENT.caption()]
+        cp.plusConfigurations += conf[Configuration.JETTY8.caption()]
+
+        if (project.vaadin.testbench.enabled){
+            cp.plusConfigurations += conf[Configuration.TESTBENCH.caption()]
+        }
+
+        if (Util.isPushSupportedAndEnabled(project)){
+            cp.plusConfigurations += conf[Configuration.PUSH.caption()]
+        }
     }
 
     private void configureEclipseWtpPluginComponent(Task task) {
-        def project = task.getProject()
         def wtp = project.eclipse.wtp
-        wtp.component.plusConfigurations += project.configurations.vaadin
+        wtp.component.plusConfigurations += project.configurations[Configuration.SERVER.caption()]
     }
 
     private void configureEclipseWtpPluginFacet(Task task) {
-        def project = task.getProject()
         def wtp = project.eclipse.wtp
 
         if (project.vaadin.version.startsWith('6')) {
@@ -176,13 +187,13 @@ public class TaskListener implements TaskExecutionListener {
     }
 
     private void ensureWidgetsetGeneratorExists(Task task) {
-        def project = task.getProject()
-        if (project.vaadin.widgetsetGenerator != null) {
-            String name = project.vaadin.widgetsetGenerator.tokenize('.').last()
-            String pkg = project.vaadin.widgetsetGenerator.replaceAll('.' + name, '')
+        def generator = project.vaadin.widgetsetGenerator
+        if (generator != null) {
+            String name = generator.tokenize('.').last()
+            String pkg = generator.replaceAll('.' + name, '')
             String filename = name + ".java"
             File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
-            File f = new File(javaDir.canonicalPath + '/' + pkg.replaceAll(/\./, '/') + '/' + filename)
+            File f = project.file(javaDir.canonicalPath + '/' + pkg.replaceAll(/\./, '/') + '/' + filename)
             if (!f.exists()) {
                 project.tasks.createVaadinWidgetsetGenerator.run()
             }
@@ -203,9 +214,8 @@ public class TaskListener implements TaskExecutionListener {
     }
 
     private void configureAddonMetadata(Task task) {
-        def project = task.getProject()
 
-        // Resolve widgetset
+         // Resolve widgetset
         def widgetset = project.vaadin.widgetset
         if (widgetset == null) {
             if (project.vaadin.version.startsWith('6')) {
@@ -266,21 +276,22 @@ public class TaskListener implements TaskExecutionListener {
     }
 
     private void configureJRebel(Task task) {
-        def project = task.getProject()
-
         if(project.vaadin.jrebel.enabled) {
 
-            // Ensure classes dir exists
-            project.sourceSets.main.output.classesDir.mkdirs();
+            def classes = project.sourceSets.main.output.classesDir
 
-            File rebelFile = new File(project.sourceSets.main.output.classesDir.absolutePath + '/rebel.xml')
+
+            // Ensure classes dir exists
+            classes.mkdirs();
+
+            File rebelFile = project.file(classes.absolutePath + '/rebel.xml')
 
             def srcWebApp = project.webAppDir.absolutePath
             def writer = new FileWriter(rebelFile)
 
             new MarkupBuilder(writer).application() {
                 classpath {
-                    dir(name: project.sourceSets.main.output.classesDir.absolutePath)
+                    dir(name: classes.absolutePath)
                 }
                 web {
                     link(target: '/') {
