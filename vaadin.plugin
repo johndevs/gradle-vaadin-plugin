@@ -8,22 +8,24 @@
  */ 
 buildscript {
     repositories {
-    	mavenRepo name: 'Jasoft.fi Repo', url: 'http://mvn.jasoft.fi/maven2'
+        def gradleVersion = Double.parseDouble(project.getGradle().gradleVersion);
+        if (gradleVersion >= 1.9){  
+             maven ({
+                 name = 'Jasoft.fi Maven Repository'
+                 url = 'http://mvn.jasoft.fi/maven2'
+             })
+        } else {
+             mavenRepo (
+                 name: 'Jasoft.fi Maven Repository',
+                 url: 'http://mvn.jasoft.fi/maven2'
+             )
+        }
     }
-    dependencies {
+   dependencies {
         classpath group: 'fi.jasoft.plugin', name: 'gradle-vaadin-plugin', version: '+'
     }
 }
-
 if (!project.plugins.findPlugin(fi.jasoft.plugin.GradleVaadinPlugin)) {
     project.apply(plugin: fi.jasoft.plugin.GradleVaadinPlugin)
 }
 
-/*
- * Convienience task for enabling the gradle wrapper 
- */
-task enableWrapper(type: Wrapper) {
-    gradleVersion = '1.5'
-    description = "Configures the Gradle wrapper for this project"
-    group = "Gradle"
-}
