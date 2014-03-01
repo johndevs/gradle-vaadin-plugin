@@ -71,6 +71,11 @@ class VaadinPluginExtension {
      */
     boolean manageDependencies = true
 
+	/**
+	 * Should the plugin manage repositories
+	 */
+	boolean manageRepositories = true
+	
     /**
      * The port the vaadin application should run on
      */

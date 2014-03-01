@@ -67,6 +67,7 @@ The following configuration options are available
 * ``vaadin.debugPort`` - On what port should the debugger listen. Default is 8000
 * ``vaadin.manageWidgetset`` - Should the plugin manage the widgetset for you. Default is true.
 * ``vaadin.manageDependencies`` - Should the plugin manage the Vaadin depencies for you. Default is true.
+* ``vaadin.manageRepositories`` - Should the plugin add repositories such as maven central and vaadin addons to the project.  Default is true.
 * ``vaadin.serverPort`` - The port the embedded server listens to. Default is 8080.
 * ``vaadin.jvmArgs`` - Additional JVM arguments passed to the vaadinRun task. Default is ''.
 * ``vaadin.addon.author`` - The author of the Vaadin addon. 
