@@ -41,6 +41,7 @@ class PluginExtensionTest extends PluginTestBase {
         assert vaadin.debugPort == 8000
         assert vaadin.manageWidgetset == true
         assert vaadin.manageDependencies == true
+        assert vaadin.manageRepositories == true
         assert vaadin.serverPort == 8080
         assert vaadin.jvmArgs == null
         assert vaadin.jrebel instanceof JRebelConfiguration

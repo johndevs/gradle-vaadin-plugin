@@ -70,8 +70,10 @@ class DependencyListener implements ProjectEvaluationListener {
             return
         }
 
-        // Repositories
-        addRepositories(project)
+        // Add repositories unless specified otherwise
+        if (project.vaadin.manageRepositories) {
+            addRepositories(project)
+        }
 
         createJetty8Configuration(project)
 
