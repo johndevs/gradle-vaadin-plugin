@@ -32,7 +32,8 @@ class DependencyListener implements ProjectEvaluationListener {
         CLIENT('vaadin-client'),
         TESTBENCH('vaadin-testbench'),
         JETTY8('jetty8'),
-        PUSH('vaadin-push')
+        PUSH('vaadin-push'),
+        JAVADOC('vaadin-javadoc');
 
         final private String caption
         public Configuration(String caption){ this.caption = caption }
@@ -81,6 +82,8 @@ class DependencyListener implements ProjectEvaluationListener {
         } else {
             createVaadin7Configuration(project, version)
         }
+
+        createJavadocConfiguration(project, version)
 
         if (project.vaadin.testbench.enabled){
             createTestbenchConfiguration(project)
@@ -160,6 +163,20 @@ class DependencyListener implements ProjectEvaluationListener {
 
             // Add server libs to war
             project.war.classpath(project.configurations[serverConf])
+        }
+    }
+
+    /**
+     * Creates the configuration for generating Javadoc
+     */
+    private static void createJavadocConfiguration(Project project, String version) {
+        def javadocConf = Configuration.JAVADOC.caption()
+        def dependencies = project.dependencies
+        if (!project.configurations.hasProperty(javadocConf)){
+            project.configurations.create(javadocConf)
+            dependencies.add(javadocConf, 'javax.portlet:portlet-api:2.0')
+            dependencies.add(javadocConf, 'javax.servlet:javax.servlet-api:3.0.1')
+            dependencies.add(javadocConf, "com.vaadin:vaadin-push:${version}")
         }
     }
 

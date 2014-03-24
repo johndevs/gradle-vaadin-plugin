@@ -105,7 +105,10 @@ public class TaskListener implements TaskExecutionListener {
 
         if (task.getName() == 'javadoc'){
             task.source = Util.getMainSourceSet(project)
+            task.classpath += project.configurations[Configuration.JAVADOC.caption()];
+            task.classpath += project.configurations[Configuration.SERVER.caption()];
             task.failOnError = false
+            task.options.addStringOption("sourcepath", "")
         }
 
         if (task.getName() == CreateDirectoryZipTask.NAME){
