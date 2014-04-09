@@ -179,9 +179,8 @@ public class TaskListener implements TaskExecutionListener {
 
     private void configureEclipseWtpPluginFacet(Task task) {
         def wtp = project.eclipse.wtp
-
         wtp.facet.facet(name: 'com.vaadin.integration.eclipse.core', version: '7.0')
-        wtp.facet.facet(name: 'jst.web', version: project.vaadin.servletVersion)
+        wtp.facet.facet(name: 'jst.web', version: '3.0')
         wtp.facet.facet(name: 'java', version: project.sourceCompatibility)
     }
 

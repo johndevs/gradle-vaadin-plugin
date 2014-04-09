@@ -78,7 +78,6 @@ class DependencyListener implements ProjectEvaluationListener {
         createJetty8Configuration(project)
 
         def version = project.vaadin.version
-        def gwtVersion = project.vaadin.gwt.version
 
         createVaadin7Configuration(project, version)
 

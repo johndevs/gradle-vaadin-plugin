@@ -66,11 +66,6 @@ class GWTConfiguration {
     String[] jvmArgs = null
 
     /**
-     * The version of GWT used when compiling. Only used with Vaadin 6.
-     */
-    String version = "2.3.0"
-
-    /**
      * Extra arguments passed to the compiler
      */
     String extraArgs
@@ -165,16 +160,6 @@ class GWTConfiguration {
      */
     void jvmArgs(String[] jvmArgs) {
         this.jvmArgs = jvmArgs
-    }
-
-    /**
-     * @see GWTConfiguration#version
-     *
-     * @param version
-     */
-    @Deprecated
-    void version(String version) {
-        this.version = version
     }
 
     /**

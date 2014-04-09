@@ -36,7 +36,6 @@ class PluginExtensionTest extends PluginTestBase {
         assert vaadin.widgetset == null
         assert vaadin.widgetsetGenerator == null
         assert vaadin.version == "7+"
-        assert vaadin.servletVersion == "3.0"
         assert vaadin.debug == true
         assert vaadin.debugPort == 8000
         assert vaadin.manageWidgetset == true
@@ -59,7 +58,6 @@ class PluginExtensionTest extends PluginTestBase {
             widgetset 'com.example.Widgetset'
             widgetsetGenerator 'com.example.generator'
             version  "7+"
-            servletVersion "2.5"
             debug true
             debugPort 8000
             manageWidgetset true
@@ -84,7 +82,6 @@ class PluginExtensionTest extends PluginTestBase {
         assert vaadin.gwt.strict == false
         assert vaadin.gwt.userAgent == null
         assert vaadin.gwt.jvmArgs == null
-        assert vaadin.gwt.version == "2.3.0"
         assert vaadin.gwt.extraArgs == null
         assert vaadin.gwt.sourcePaths == ['client', 'shared'] as String[]
         assert vaadin.gwt.collapsePermutations == false

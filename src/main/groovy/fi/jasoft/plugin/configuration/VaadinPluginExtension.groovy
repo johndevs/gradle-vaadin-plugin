@@ -39,14 +39,6 @@ class VaadinPluginExtension {
     String version = "7+"
 
     /**
-     * The servlet version for the project.
-     *
-     *  Only used by the wtp plugin, should be removed
-     */
-    @Deprecated
-    String servletVersion = "3.0"
-
-    /**
      * Should application be run in debug mode. When running in production set this to true
      */
     boolean debug = true
@@ -151,16 +143,6 @@ class VaadinPluginExtension {
      */
     void version(String version) {
         this.version = version
-    }
-
-    /**
-     * @see VaadinPluginExtension#servletVersion
-     *
-     * @param servletVersion
-     */
-    @Deprecated
-    void servletVersion(String servletVersion) {
-        this.servletVersion = servletVersion
     }
 
     /**
