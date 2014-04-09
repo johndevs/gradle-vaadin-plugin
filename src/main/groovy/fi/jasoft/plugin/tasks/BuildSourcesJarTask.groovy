@@ -19,7 +19,7 @@ import org.gradle.api.tasks.bundling.Jar
 
 class BuildSourcesJarTask extends Jar {
 
-    public static final String NAME = 'sourcesJar'
+    public static final String NAME = 'vaadinSourcesJar'
 
     public BuildSourcesJarTask() {
         description = "Creates a sources jar for the project"

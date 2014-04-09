@@ -23,7 +23,7 @@ import org.gradle.api.plugins.WarPluginConvention
 
 class CreateThemeTask extends DefaultTask {
 
-    public static final String NAME = 'createVaadinTheme'
+    public static final String NAME = 'vaadinCreateTheme'
 
     public CreateThemeTask() {
         description = "Creates a new Vaadin Theme"

@@ -22,7 +22,7 @@ import fi.jasoft.plugin.TemplateUtil;
 
 class CreateComponentTask extends DefaultTask {
 
-    public static final String NAME = 'createVaadinComponent'
+    public static final String NAME = 'vaadinCreateComponent'
 
     public CreateComponentTask() {
         description = "Creates a new Vaadin Component."

@@ -23,7 +23,7 @@ import org.gradle.api.tasks.TaskAction
 
 public class CreateCompositeTask extends DefaultTask {
 
-    public static final String NAME = 'createVaadinComposite'
+    public static final String NAME = 'vaadinCreateComposite'
 
     public CreateCompositeTask() {
         description = "Creates a new Vaadin Composite."

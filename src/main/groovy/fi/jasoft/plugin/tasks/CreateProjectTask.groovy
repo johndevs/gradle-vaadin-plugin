@@ -24,7 +24,7 @@ import fi.jasoft.plugin.TemplateUtil;
 
 class CreateProjectTask extends DefaultTask {
 
-    public static final String NAME = 'createVaadinProject'
+    public static final String NAME = 'vaadinCreateProject'
 
     public CreateProjectTask() {
         description = "Creates a new Vaadin Project."

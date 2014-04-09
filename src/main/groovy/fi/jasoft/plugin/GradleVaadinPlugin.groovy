@@ -129,15 +129,15 @@ class GradleVaadinPlugin implements Plugin<Project> {
         project.processResources.dependsOn(UpdateAddonStylesTask.NAME)
 
         // Cleanup plugin outputs
-        project.clean.dependsOn(project.tasks.cleanWidgetset)
-        project.clean.dependsOn(project.tasks.cleanVaadinRun)
-        project.clean.dependsOn(project.tasks.cleanThemes)
-        project.clean.dependsOn(project.tasks.cleanSuperdevmode)
-        project.clean.dependsOn(project.tasks.cleanDevmode)
+        project.clean.dependsOn(project.tasks['clean' + CompileWidgetsetTask.NAME.capitalize()])
+        project.clean.dependsOn(project.tasks['clean' + RunTask.NAME.capitalize()])
+        project.clean.dependsOn(project.tasks['clean' + CompileThemeTask.NAME.capitalize()])
+        project.clean.dependsOn(project.tasks['clean' + SuperDevModeTask.NAME.capitalize()])
+        project.clean.dependsOn(project.tasks['clean' + DevModeTask.NAME.capitalize()])
 
         // Utilities
-        project.artifacts.add('archives', project.tasks.sourcesJar)
-        project.artifacts.add('archives', project.tasks.javadocJar)
+        project.artifacts.add('archives', project.tasks[BuildSourcesJarTask.NAME])
+        project.artifacts.add('archives', project.tasks[BuildJavadocJarTask.NAME])
     }
 
 }

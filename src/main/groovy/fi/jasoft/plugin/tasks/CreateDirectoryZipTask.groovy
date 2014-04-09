@@ -20,7 +20,7 @@ import org.gradle.api.tasks.bundling.Zip
 
 class CreateDirectoryZipTask extends Zip {
 
-    public static final String NAME = 'zip'
+    public static final String NAME = 'vaadinAddonZip'
 
     CreateDirectoryZipTask(){
 

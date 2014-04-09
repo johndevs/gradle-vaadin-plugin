@@ -26,7 +26,7 @@ import fi.jasoft.plugin.TemplateUtil
 
 class SuperDevModeTask extends DefaultTask {
 
-    public static final String NAME = 'superdevmode'
+    public static final String NAME = 'vaadinSuperDevMode'
 
     private Process appServerProcess;
 

@@ -27,7 +27,7 @@ import java.lang.Process;
 
 class DevModeTask extends DefaultTask {
 
-    public static final String NAME = 'devmode'
+    public static final String NAME = 'vaadinDevMode'
 
     public DevModeTask() {
         dependsOn('classes',UpdateWidgetsetTask.NAME)

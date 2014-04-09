@@ -22,7 +22,7 @@ import fi.jasoft.plugin.TemplateUtil;
 
 class CreateWidgetsetGeneratorTask extends DefaultTask {
 
-    public static final String NAME = 'createVaadinWidgetsetGenerator'
+    public static final String NAME = 'vaadinCreateWidgetsetGenerator'
 
     public CreateWidgetsetGeneratorTask() {
         description = "Creates a new widgetset generator for optimizing the widgetset"
