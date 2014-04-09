@@ -56,22 +56,14 @@ class CreateComponentTask extends DefaultTask {
         substitutions['%COMPONENT_NAME%'] = componentName
         substitutions['%COMPONENT_STYLENAME%'] = componentName.toLowerCase()
 
-        if (project.vaadin.version.startsWith("6")) {
-            substitutions['%PACKAGE_CLIENT%'] = widgetsetPackage + '.client.ui'
-            File clientui = new File(widgetsetDir.canonicalPath + '/client/ui')
-            clientui.mkdirs()
+        substitutions['%PACKAGE_CLIENT%'] = widgetsetPackage + '.client.' + componentName.toLowerCase()
+        File clientui = new File(widgetsetDir.canonicalPath + '/client/' + componentName.toLowerCase())
+        clientui.mkdirs()
 
-            TemplateUtil.writeTemplate("MyComponent.java.vaadin6", componentDir, componentName + ".java", substitutions)
-            TemplateUtil.writeTemplate("VMyComponent.java.vaadin6", clientui, "V${componentName}.java", substitutions)
-        } else {
-            substitutions['%PACKAGE_CLIENT%'] = widgetsetPackage + '.client.' + componentName.toLowerCase()
-            File clientui = new File(widgetsetDir.canonicalPath + '/client/' + componentName.toLowerCase())
-            clientui.mkdirs()
+        TemplateUtil.writeTemplate("MyComponent.java", componentDir, componentName + ".java", substitutions)
+        TemplateUtil.writeTemplate("MyComponentWidget.java", clientui, componentName + "Widget.java", substitutions)
+        TemplateUtil.writeTemplate("MyComponentConnector.java", clientui, componentName + "Connector.java", substitutions)
 
-            TemplateUtil.writeTemplate("MyComponent.java", componentDir, componentName + ".java", substitutions)
-            TemplateUtil.writeTemplate("MyComponentWidget.java", clientui, componentName + "Widget.java", substitutions)
-            TemplateUtil.writeTemplate("MyComponentConnector.java", clientui, componentName + "Connector.java", substitutions)
-        }
 
         if (project.vaadin.widgetset != null) {
             String compile = Util.readLine("\nCompile widgetset (Y/N)[Y]: ")

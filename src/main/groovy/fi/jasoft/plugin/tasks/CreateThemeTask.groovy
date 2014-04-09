@@ -51,10 +51,7 @@ class CreateThemeTask extends DefaultTask {
         substitutions['%THEME_NAME%'] = themeName
         substitutions['%THEME_IMPORT_FILE%'] = themeName.toLowerCase() + '.scss'
 
-        if (project.vaadin.version.startsWith("6")) {
-            TemplateUtil.writeTemplate('MyTheme.css', themeDir, 'styles.css', substitutions)
-
-        } else if (project.vaadin.version.startsWith('7.0')) {
+        if (project.vaadin.version.startsWith('7.0')) {
             TemplateUtil.writeTemplate('MyTheme.scss.vaadin70', themeDir, 'styles.scss', substitutions)
 
         } else {
