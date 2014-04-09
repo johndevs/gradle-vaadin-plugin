@@ -20,7 +20,7 @@ import fi.jasoft.plugin.tasks.BuildJavadocJarTask
 import fi.jasoft.plugin.tasks.BuildSourcesJarTask
 import fi.jasoft.plugin.tasks.CreateCompositeTask
 import fi.jasoft.plugin.tasks.CreateDirectoryZipTask
-import fi.jasoft.plugin.tasks.CreateServlet3ProjectTask
+import fi.jasoft.plugin.tasks.CreateProjectTask
 import fi.jasoft.plugin.tasks.CreateTestbenchTestTask
 import fi.jasoft.plugin.tasks.DirectorySearchTask
 import fi.jasoft.plugin.tasks.UpdateAddonStylesTask;
@@ -28,7 +28,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.WarPlugin
 
-import fi.jasoft.plugin.tasks.CreateProjectTask
+
 import fi.jasoft.plugin.tasks.CreateComponentTask
 import fi.jasoft.plugin.tasks.CreateThemeTask
 import fi.jasoft.plugin.tasks.CompileWidgetsetTask
@@ -90,7 +90,6 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
         // Tasks
         project.tasks.create(name: CreateProjectTask.NAME, type: CreateProjectTask, group: 'Vaadin')
-        project.tasks.create(name: CreateServlet3ProjectTask.NAME, type: CreateServlet3ProjectTask, group: 'Vaadin')
         project.tasks.create(name: CreateComponentTask.NAME, type: CreateComponentTask, group: 'Vaadin')
         project.tasks.create(name: CreateCompositeTask.NAME, type: CreateCompositeTask, group: 'Vaadin')
         project.tasks.create(name: CreateThemeTask.NAME, type: CreateThemeTask, group: 'Vaadin')

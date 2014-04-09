@@ -16,7 +16,9 @@
 package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.Util;
-import org.gradle.api.DefaultTask;
+import org.gradle.api.DefaultTask
+import org.gradle.api.artifacts.ExternalModuleDependency
+import org.gradle.api.artifacts.ProjectDependency;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.plugins.WarPluginConvention;
 import org.gradle.api.plugins.JavaPluginConvention;
@@ -24,7 +26,7 @@ import fi.jasoft.plugin.TemplateUtil;
 
 class CreateProjectTask extends DefaultTask {
 
-    public static final String NAME = 'vaadinCreateProject'
+    public static final NAME = 'vaadinCreateProject'
 
     public CreateProjectTask() {
         description = "Creates a new Vaadin Project."
@@ -32,11 +34,6 @@ class CreateProjectTask extends DefaultTask {
 
     @TaskAction
     public void run() {
-
-        if (Util.isServlet3Project(project)){
-            project.tasks.createVaadinServlet3Project.run()
-            return
-        }
 
         String applicationName = Util.readLine('\nApplication Name (MyApplication): ')
         if (applicationName == null || applicationName == '') {
@@ -55,13 +52,9 @@ class CreateProjectTask extends DefaultTask {
         }
 
         File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
-        File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
         File uidir = new File(javaDir.canonicalPath + '/' + applicationPackage.replaceAll(/\./, '/'))
-        File webinf = new File(webAppDir.canonicalPath + '/WEB-INF')
 
-        webAppDir.mkdirs()
         uidir.mkdirs()
-        webinf.mkdirs()
 
         def substitutions = [:]
         substitutions['%PACKAGE%'] = applicationPackage
@@ -70,28 +63,20 @@ class CreateProjectTask extends DefaultTask {
         substitutions['%PUSH_IMPORT%'] = Util.isPushSupportedAndEnabled(project) ? "\nimport com.vaadin.annotations.Push;" : ''
         substitutions['%THEME%'] = Util.isAddonStylesSupported(project) ? "@Theme(\"${applicationName}\")" : ''
         substitutions['%THEME_IMPORT%'] = Util.isAddonStylesSupported(project) ? "\nimport com.vaadin.annotations.Theme;" : ''
+        substitutions['%ASYNC_SUPPORTED%'] = Util.isPushSupportedAndEnabled(project) ? "\n    asyncSupported=true," : ''
 
-        if (project.vaadin.version.startsWith("6")) {
-            TemplateUtil.writeTemplate("MyApplication.java", uidir, applicationName + ".java", substitutions)
-            if (project.vaadin.widgetset == null) {
-                TemplateUtil.writeTemplate("web.xml.vaadin6", webinf, "web.xml", substitutions)
-            } else {
-                substitutions['%WIDGETSET%'] = project.vaadin.widgetset
-                TemplateUtil.writeTemplate("web.xml.vaadin6.widgetset", webinf, "web.xml", substitutions)
-            }
-
+        if (project.vaadin.widgetset != null) {
+            substitutions['%WIDGETSETPARAM%'] = ",\n\t\t@WebInitParam(name=\"widgetset\", value=\"${project.vaadin.widgetset}\")"
         } else {
-            TemplateUtil.writeTemplate('MyUI.java', uidir, applicationName + "UI.java", substitutions)
-            if (project.vaadin.widgetset == null) {
-                TemplateUtil.writeTemplate('web.xml', webinf, substitutions)
-            } else {
-                substitutions['%WIDGETSET%'] = project.vaadin.widgetset
-                TemplateUtil.writeTemplate('web.xml.widgetset', webinf, "web.xml", substitutions)
-            }
+            substitutions['%WIDGETSETPARAM%'] = ''
+        }
 
-            if (!project.vaadin.version.startsWith('7.0')) {
-                project.tasks.createVaadinTheme.createTheme(applicationName)
-            }
+        TemplateUtil.writeTemplate('MyUI.java', uidir, applicationName + "UI.java", substitutions)
+
+        TemplateUtil.writeTemplate("MyServlet.java", uidir, applicationName + "Servlet.java", substitutions)
+
+        if (Util.isAddonStylesSupported(project)) {
+            project.tasks[CreateThemeTask.NAME].createTheme(applicationName)
         }
 
         project.tasks[UpdateWidgetsetTask.NAME].run()
