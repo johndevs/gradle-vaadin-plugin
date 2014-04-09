@@ -87,7 +87,7 @@ class Util {
     }
 
     public static boolean isAddonStylesSupported(Project project) {
-        return !project.vaadin.version.startsWith('6') && !project.vaadin.version.startsWith('7.0')
+        return !project.vaadin.version.startsWith('7.0')
     }
 
     public static void openBrowser(Project project, String url, int delay = 3000) {

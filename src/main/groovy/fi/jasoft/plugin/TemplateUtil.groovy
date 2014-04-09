@@ -250,11 +250,7 @@ class TemplateUtil {
             substitutions['%LOGGING%'] = "\t<set-property name=\"gwt.logging.enabled\" value=\"FALSE\"/>"
         }
 
-        if (project.vaadin.version.startsWith('6')) {
-            TemplateUtil.writeTemplate('Widgetset.xml.vaadin6', widgetsetDir, moduleXML, substitutions, true)
-        } else {
-            TemplateUtil.writeTemplate('Widgetset.xml', widgetsetDir, moduleXML, substitutions,true)
-        }
+        TemplateUtil.writeTemplate('Widgetset.xml', widgetsetDir, moduleXML, substitutions,true)
     }
 
     /**

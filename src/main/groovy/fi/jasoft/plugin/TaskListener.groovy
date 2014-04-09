@@ -180,11 +180,7 @@ public class TaskListener implements TaskExecutionListener {
     private void configureEclipseWtpPluginFacet(Task task) {
         def wtp = project.eclipse.wtp
 
-        if (project.vaadin.version.startsWith('6')) {
-            wtp.facet.facet(name: 'com.vaadin.integration.eclipse.core', version: '1.0')
-        } else {
-            wtp.facet.facet(name: 'com.vaadin.integration.eclipse.core', version: '7.0')
-        }
+        wtp.facet.facet(name: 'com.vaadin.integration.eclipse.core', version: '7.0')
         wtp.facet.facet(name: 'jst.web', version: project.vaadin.servletVersion)
         wtp.facet.facet(name: 'java', version: project.sourceCompatibility)
     }
@@ -221,11 +217,7 @@ public class TaskListener implements TaskExecutionListener {
          // Resolve widgetset
         def widgetset = project.vaadin.widgetset
         if (widgetset == null) {
-            if (project.vaadin.version.startsWith('6')) {
-                widgetset = 'com.vaadin.terminal.gwt.DefaultWidgetSet'
-            } else {
-                widgetset = 'com.vaadin.DefaultWidgetSet'
-            }
+            widgetset = 'com.vaadin.DefaultWidgetSet'
         }
 
         // Scan for existing manifest in source folder and reuse if possible

@@ -79,11 +79,8 @@ class DependencyListener implements ProjectEvaluationListener {
 
         def version = project.vaadin.version
         def gwtVersion = project.vaadin.gwt.version
-        if (version.startsWith("6")) {
-            createVaadin6Configuration(project, version, gwtVersion)
-        } else {
-            createVaadin7Configuration(project, version)
-        }
+
+        createVaadin7Configuration(project, version)
 
         createJavadocConfiguration(project, version)
 

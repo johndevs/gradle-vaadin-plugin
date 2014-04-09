@@ -41,11 +41,6 @@ class CompileThemeTask extends DefaultTask {
 
     @TaskAction
     public void exec() {
-        if (project.vaadin.version.startsWith('6')) {
-            project.logger.error("SASS themes are not compatible with Vaadin 6.")
-            return;
-        }
-
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
         FileTree themes = project.fileTree(dir: webAppDir.canonicalPath + '/VAADIN/themes', include: '**/styles.scss')
         themes.each { File theme ->
