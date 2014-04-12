@@ -98,7 +98,6 @@ class PluginExtensionTest extends PluginTestBase {
                 strict false
                 userAgent "ie8,ie9,gecko1_8,safari,opera"
                 jvmArgs null
-                version "2.3.0"
                 extraArgs null
                 sourcePaths (['client', 'shared'] as String[])
                 collapsePermutations false
