@@ -48,12 +48,12 @@ class GWTConfiguration {
     /**
      * Should draft compile be used
      */
-    boolean draftCompile = false
+    boolean draftCompile = true
 
     /**
      * Should strict compiling be used
      */
-    boolean strict = false
+    boolean strict = true
 
     /**
      * What user agents (browsers should be used. By defining null all user agents are used.
@@ -68,7 +68,7 @@ class GWTConfiguration {
     /**
      * Extra arguments passed to the compiler
      */
-    String extraArgs
+    String extraArgs = null
 
     /**
      * Source paths where the compiler will look for source files
@@ -78,7 +78,7 @@ class GWTConfiguration {
     /**
      * Should the compiler permutations be collapsed to save time
      */
-    boolean collapsePermutations = false
+    boolean collapsePermutations = true
 
     /**
      * Extra module inherits

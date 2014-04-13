@@ -78,13 +78,13 @@ class PluginExtensionTest extends PluginTestBase {
         assert vaadin.gwt.optimize == 0
         assert vaadin.gwt.logLevel == "INFO"
         assert vaadin.gwt.localWorkers == Runtime.getRuntime().availableProcessors()
-        assert vaadin.gwt.draftCompile == false
-        assert vaadin.gwt.strict == false
+        assert vaadin.gwt.draftCompile == true
+        assert vaadin.gwt.strict == true
         assert vaadin.gwt.userAgent == null
         assert vaadin.gwt.jvmArgs == null
         assert vaadin.gwt.extraArgs == null
         assert vaadin.gwt.sourcePaths == ['client', 'shared'] as String[]
-        assert vaadin.gwt.collapsePermutations == false
+        assert vaadin.gwt.collapsePermutations == true
     }
 
     @Test
