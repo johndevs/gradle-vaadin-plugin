@@ -2,15 +2,38 @@
 <!DOCTYPE module PUBLIC "-//Vaadin//DTD Vaadin 7//EN" "https://raw.github.com/vaadin/gwt/master/distro-source/core/src/gwt-module.dtd">
 <!-- WS Compiler: manually edited -->
 <module>
-	<inherits name="com.vaadin.DefaultWidgetSet" />
-%INHERITS%
-	<set-configuration-property name="devModeRedirectEnabled" value="%SUPERDEVMODE%" />
-	<set-property name="user.agent" value="%USERAGENT%" />
-	<set-property name="vaadin.profiler" value="%PROFILER_ENABLED%" />
-%LOGGING%
-%WIDGETSET_GENERATOR%
-%SASS_LINKER%
-%STYLESHEETS%
-%SOURCE%
-%COLLAPSE_PERMUTATIONS%
+    <% inherits.each { widgetset -> %>
+        <inherits name="${widgetset}" />
+    <% } %>
+
+    <% configurationProperties.each { name, value ->  %>
+        <set-configuration-property name="${name}" value="${value}" />
+    <% } %>
+
+    <% properties.each { name, value ->  %>
+        <set-property name="${name}" value="${value}" />
+    <% } %>
+
+    <% linkers.each { name, clazz -> %>
+        <define-linker name="${name}" class="${clazz}" />
+        <add-linker name="${name}" />
+    <% } %>
+
+    <% sourcePaths.each { path -> %>
+        <source path="${path}" />
+    <% } %>
+
+    <% stylesheets.each { path -> %>
+        <stylesheet src="${path}" />
+    <% } %>
+
+    <% if(widgetsetGenerator) { %>
+        <generate-with class="${widgetsetGenerator}">
+            <when-type-assignable class="com.vaadin.client.metadata.ConnectorBundleLoader" />
+        </generate-with>
+    <% } %>
+
+    <% if(collapsePermutations) { %>
+        <collapse-all-properties />
+    <% } %>
 </module>
