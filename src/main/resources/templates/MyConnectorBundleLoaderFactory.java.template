@@ -1,4 +1,4 @@
-package %PACKAGE_CLIENT%;
+package ${packageName};
 
 import java.util.LinkedList;
 import java.util.List;
@@ -8,7 +8,7 @@ import com.vaadin.server.widgetsetutils.ConnectorBundleLoaderFactory;
 import com.vaadin.shared.ui.Connect;
 import com.vaadin.shared.ui.Connect.LoadStyle;
 
-public class %CLASS_NAME% extends
+public class ${className} extends
         ConnectorBundleLoaderFactory {
 
     private static final List<Class> eagerComponents = new LinkedList<Class>();

@@ -36,6 +36,11 @@ class CreateWidgetsetGeneratorTask extends DefaultTask {
             return
         }
 
+        createWidgetsetGeneratorClass()
+    }
+
+    private void createWidgetsetGeneratorClass() {
+
         File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
 
         String name, pkg, filename
@@ -55,9 +60,9 @@ class CreateWidgetsetGeneratorTask extends DefaultTask {
         dir.mkdirs()
 
         def substitutions = [:]
-        substitutions['%PACKAGE_CLIENT%'] = pkg
-        substitutions['%CLASS_NAME%'] = filename.replaceAll('.java', '')
+        substitutions['packageName'] = pkg
+        substitutions['className'] = filename.replaceAll('.java', '')
 
-        TemplateUtil.writeTemplate('MyConnectorBundleLoaderFactory.java', dir, filename, substitutions)
+        TemplateUtil.writeTemplate2('MyConnectorBundleLoaderFactory.java', dir, filename, substitutions)
     }
 }
