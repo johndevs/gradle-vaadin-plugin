@@ -1,12 +1,15 @@
-package %PACKAGE%;
+package ${applicationPackage};
 
 import javax.servlet.annotation.WebInitParam;
 import javax.servlet.annotation.WebServlet;
 import com.vaadin.server.VaadinServlet;
 
-@WebServlet(%ASYNC_SUPPORTED%
+@WebServlet(
+    asyncSupported=${asyncEnabled},
     urlPatterns={"/*","/VAADIN/*"},
     initParams={
-        @WebInitParam(name="ui", value="%PACKAGE%.%APPLICATION_NAME%UI")%WIDGETSETPARAM%
+        <% print initParams.collect({ name, value ->
+            "@WebInitParam(name=\"${name}\", value=\"${value}\")"
+        }).join(',\n\t') %>
     })
-public class %APPLICATION_NAME%Servlet extends VaadinServlet { }
+public class ${applicationName}Servlet extends VaadinServlet { }

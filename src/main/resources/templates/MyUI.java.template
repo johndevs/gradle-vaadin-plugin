@@ -1,11 +1,13 @@
-package %PACKAGE%;
+package ${applicationPackage};
 
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.Label;%PUSH_IMPORT%%THEME_IMPORT%
+import com.vaadin.ui.Label;
 
-%THEME%%PUSH%
-public class %APPLICATION_NAME%UI extends UI{
+<% imports.each { pkg -> print "import $pkg;" } %>
+
+<% annotations.each { annotation -> print "@${annotation}" } %>
+public class ${applicationName}UI extends UI{
 	
 	@Override
 	protected void init(VaadinRequest request){

@@ -28,6 +28,10 @@ class CreateProjectTask extends DefaultTask {
 
     public static final NAME = 'vaadinCreateProject'
 
+    private String applicationName
+
+    private String applicationPackage
+
     public CreateProjectTask() {
         description = "Creates a new Vaadin Project."
     }
@@ -35,12 +39,11 @@ class CreateProjectTask extends DefaultTask {
     @TaskAction
     public void run() {
 
-        String applicationName = Util.readLine('\nApplication Name (MyApplication): ')
+        applicationName = Util.readLine('\nApplication Name (MyApplication): ')
         if (applicationName == null || applicationName == '') {
             applicationName = 'MyApplication'
         }
 
-        String applicationPackage;
         if (project.vaadin.widgetset != null) {
             String widgetsetName = project.vaadin.widgetset.tokenize('.').last()
             applicationPackage = project.vaadin.widgetset[0..(-widgetsetName.size() - 2)]
@@ -51,35 +54,85 @@ class CreateProjectTask extends DefaultTask {
             }
         }
 
-        File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
-        File uidir = new File(javaDir.canonicalPath + '/' + applicationPackage.replaceAll(/\./, '/'))
-
-        uidir.mkdirs()
-
-        def substitutions = [:]
-        substitutions['%PACKAGE%'] = applicationPackage
-        substitutions['%APPLICATION_NAME%'] = applicationName
-        substitutions['%PUSH%'] = Util.isPushSupportedAndEnabled(project) ? '\n@Push' : ''
-        substitutions['%PUSH_IMPORT%'] = Util.isPushSupportedAndEnabled(project) ? "\nimport com.vaadin.annotations.Push;" : ''
-        substitutions['%THEME%'] = Util.isAddonStylesSupported(project) ? "@Theme(\"${applicationName}\")" : ''
-        substitutions['%THEME_IMPORT%'] = Util.isAddonStylesSupported(project) ? "\nimport com.vaadin.annotations.Theme;" : ''
-        substitutions['%ASYNC_SUPPORTED%'] = Util.isPushSupportedAndEnabled(project) ? "\n    asyncSupported=true," : ''
-
-        if (project.vaadin.widgetset != null) {
-            substitutions['%WIDGETSETPARAM%'] = ",\n\t\t@WebInitParam(name=\"widgetset\", value=\"${project.vaadin.widgetset}\")"
-        } else {
-            substitutions['%WIDGETSETPARAM%'] = ''
-        }
-
-        TemplateUtil.writeTemplate('MyUI.java', uidir, applicationName + "UI.java", substitutions)
-
-        TemplateUtil.writeTemplate("MyServlet.java", uidir, applicationName + "Servlet.java", substitutions)
+        createUIClass()
+        createServletClass()
 
         if (Util.isAddonStylesSupported(project)) {
             project.tasks[CreateThemeTask.NAME].createTheme(applicationName)
         }
 
         project.tasks[UpdateWidgetsetTask.NAME].run()
+    }
+
+    private void createUIClass(){
+
+        def substitutions = [:]
+
+        substitutions['applicationName'] = applicationName
+        substitutions['applicationPackage'] = applicationPackage
+
+        //#######################################################################
+
+        def imports = []
+
+        if (Util.isPushSupportedAndEnabled(project)){
+            imports.add('com.vaadin.annotations.Push')
+        }
+
+        if(Util.isAddonStylesSupported(project)){
+            imports.add('com.vaadin.annotations.Theme')
+        }
+
+        substitutions['imports'] = imports
+
+        //#######################################################################
+
+        def annotations = []
+
+        if (Util.isPushSupportedAndEnabled(project)){
+            annotations.add('Push')
+        }
+
+        if(Util.isAddonStylesSupported(project)){
+            annotations.add("Theme(\"${applicationName}\")")
+        }
+
+        substitutions['annotations'] = annotations
+
+        //#######################################################################
+
+        File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
+        File uidir = new File(javaDir.canonicalPath + '/' + applicationPackage.replaceAll(/\./, '/'))
+        uidir.mkdirs()
+
+        TemplateUtil.writeTemplate2('MyUI.java', uidir, applicationName + "UI.java", substitutions)
+    }
+
+    private void createServletClass() {
+
+        def substitutions = [:]
+
+        substitutions['applicationName'] = applicationName
+        substitutions['applicationPackage'] = applicationPackage
+        substitutions['asyncEnabled'] = Util.isPushSupportedAndEnabled(project)
+
+        //#######################################################################
+
+        def initParams = ['ui': "$applicationPackage.${applicationName}UI"]
+
+        if (project.vaadin.widgetset != null) {
+            initParams.put('widgetset', String.valueOf(project.vaadin.widgetset))
+        }
+
+        substitutions['initParams'] = initParams
+
+        //#######################################################################
+
+        File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
+        File uidir = new File(javaDir.canonicalPath + '/' + applicationPackage.replaceAll(/\./, '/'))
+        uidir.mkdirs()
+
+        TemplateUtil.writeTemplate2("MyServlet.java", uidir, applicationName + "Servlet.java", substitutions)
     }
 }
 
