@@ -1,10 +1,10 @@
-package %PACKAGE%;
+package ${componentServerPackage};
 
 import com.vaadin.ui.AbstractComponent;
 
 /**
  * Server side implementation of the component
  */
-public class %COMPONENT_NAME% extends AbstractComponent {
+public class ${componentName} extends AbstractComponent {
 
 }

@@ -1,19 +1,19 @@
-package %PACKAGE_CLIENT%;
+package ${componentClientPackage};
 
 import com.vaadin.client.ui.AbstractComponentConnector;
 import com.vaadin.shared.ui.Connect;
-import %PACKAGE%.%COMPONENT_NAME%;
-import %PACKAGE_CLIENT%.%COMPONENT_NAME%Widget;
+import ${componentServerPackage}.${componentName};
+import ${componentClientPackage}.${componentName}Widget;
 
 /**
  * Connects the server side component with the client side widget
  */
-@Connect(%COMPONENT_NAME%.class)
-public class %COMPONENT_NAME%Connector extends AbstractComponentConnector {
+@Connect(${componentName}.class)
+public class ${componentName}Connector extends AbstractComponentConnector {
 
     @Override
-    public %COMPONENT_NAME%Widget getWidget() {
-        return (%COMPONENT_NAME%Widget) super.getWidget();
+    public ${componentName}Widget getWidget() {
+        return (${componentName}Widget) super.getWidget();
     }
 }
 

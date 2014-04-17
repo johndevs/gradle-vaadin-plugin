@@ -24,6 +24,8 @@ class CreateComponentTask extends DefaultTask {
 
     public static final String NAME = 'vaadinCreateComponent'
 
+    private String componentName
+
     public CreateComponentTask() {
         description = "Creates a new Vaadin Component."
     }
@@ -36,10 +38,22 @@ class CreateComponentTask extends DefaultTask {
             return
         }
 
-        String componentName = Util.readLine('\nComponent Name (MyComponent): ')
+        componentName = Util.readLine('\nComponent Name (MyComponent): ')
         if (componentName == null || componentName == '') {
             componentName = 'MyComponent'
         }
+
+        createComponentClasses()
+
+        if (project.vaadin.widgetset != null) {
+            String compile = Util.readLine("\nCompile widgetset (Y/N)[Y]: ")
+            if (compile == null || compile == '' || compile == 'Y') {
+                project.tasks[CompileWidgetsetTask.NAME].run()
+            }
+        }
+    }
+
+    private void createComponentClasses() {
 
         File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
         File widgetsetFile = new File(javaDir.canonicalPath + '/' + project.vaadin.widgetset.replaceAll(/\./, '/') + ".gwt.xml")
@@ -48,28 +62,20 @@ class CreateComponentTask extends DefaultTask {
 
         componentDir.mkdirs()
 
+        File clientui = new File(widgetsetDir.canonicalPath + '/client/' + componentName.toLowerCase())
+        clientui.mkdirs()
+
         String widgetsetName = project.vaadin.widgetset.tokenize('.').last()
         String widgetsetPackage = project.vaadin.widgetset.replaceAll('.' + widgetsetName, '')
 
         def substitutions = [:]
-        substitutions['%PACKAGE%'] = widgetsetPackage + '.server.' + componentName.toLowerCase()
-        substitutions['%COMPONENT_NAME%'] = componentName
-        substitutions['%COMPONENT_STYLENAME%'] = componentName.toLowerCase()
+        substitutions['componentServerPackage'] = widgetsetPackage + '.server.' + componentName.toLowerCase()
+        substitutions['componentClientPackage'] = widgetsetPackage + '.client.' + componentName.toLowerCase()
+        substitutions['componentName'] = componentName
+        substitutions['componentStylename'] = componentName.toLowerCase()
 
-        substitutions['%PACKAGE_CLIENT%'] = widgetsetPackage + '.client.' + componentName.toLowerCase()
-        File clientui = new File(widgetsetDir.canonicalPath + '/client/' + componentName.toLowerCase())
-        clientui.mkdirs()
-
-        TemplateUtil.writeTemplate("MyComponent.java", componentDir, componentName + ".java", substitutions)
-        TemplateUtil.writeTemplate("MyComponentWidget.java", clientui, componentName + "Widget.java", substitutions)
-        TemplateUtil.writeTemplate("MyComponentConnector.java", clientui, componentName + "Connector.java", substitutions)
-
-
-        if (project.vaadin.widgetset != null) {
-            String compile = Util.readLine("\nCompile widgetset (Y/N)[Y]: ")
-            if (compile == null || compile == '' || compile == 'Y') {
-                project.tasks[CompileWidgetsetTask.NAME].run()
-            }
-        }
+        TemplateUtil.writeTemplate2("MyComponent.java", componentDir, componentName + ".java", substitutions)
+        TemplateUtil.writeTemplate2("MyComponentWidget.java", clientui, componentName + "Widget.java", substitutions)
+        TemplateUtil.writeTemplate2("MyComponentConnector.java", clientui, componentName + "Connector.java", substitutions)
     }
 }
