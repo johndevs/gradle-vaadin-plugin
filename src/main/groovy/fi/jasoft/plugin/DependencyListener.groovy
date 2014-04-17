@@ -23,7 +23,6 @@ import org.gradle.api.plugins.WarPluginConvention
 
 class DependencyListener implements ProjectEvaluationListener {
 
-
     /**
      * Added configurations to project
      */
@@ -36,29 +35,34 @@ class DependencyListener implements ProjectEvaluationListener {
         JAVADOC('vaadin-javadoc');
 
         final private String caption
-        public Configuration(String caption){ this.caption = caption }
-        public caption(){ return caption }
+
+        public Configuration(String caption) { this.caption = caption }
+
+        public caption() { return caption }
     }
 
     /**
      * Added repositories to project
      */
     static enum Repositories {
-        ADDONS('Vaadin addons',                 'http://maven.vaadin.com/vaadin-addons'),
-        SNAPSHOTS('Vaadin snapshots',           'http://oss.sonatype.org/content/repositories/vaadin-snapshots'),
-        JASOFT('Jasoft.fi Maven repository',    'http://mvn.jasoft.fi/maven2')
+        ADDONS('Vaadin addons', 'http://maven.vaadin.com/vaadin-addons'),
+        SNAPSHOTS('Vaadin snapshots', 'http://oss.sonatype.org/content/repositories/vaadin-snapshots'),
+        JASOFT('Jasoft.fi Maven repository', 'http://mvn.jasoft.fi/maven2')
 
         final private String caption
         final private String url
-        Repositories(String caption, String url){ this.caption = caption; this.url=url }
-        public caption(){ return caption}
-        public url(){ return url}
+
+        Repositories(String caption, String url) { this.caption = caption; this.url = url }
+
+        public caption() { return caption }
+
+        public url() { return url }
     }
 
     void beforeEvaluate(Project project) {
 
         // Check to see if we are using the eclipse plugin instead of the eclipse-wtp plugin
-        if (project.plugins.findPlugin('eclipse') && !project.plugins.findPlugin('eclipse-wtp')){
+        if (project.plugins.findPlugin('eclipse') && !project.plugins.findPlugin('eclipse-wtp')) {
             project.getLogger().warn("You are using the eclipse plugin which does not support all " +
                     "features of the Vaadin plugin. Please use the eclipse-wtp plugin instead.")
         }
@@ -83,7 +87,7 @@ class DependencyListener implements ProjectEvaluationListener {
 
         createJavadocConfiguration(project, version)
 
-        if (project.vaadin.testbench.enabled){
+        if (project.vaadin.testbench.enabled) {
             createTestbenchConfiguration(project)
         }
     }
@@ -100,15 +104,15 @@ class DependencyListener implements ProjectEvaluationListener {
         // Add repositories
         Repositories.values().each { repository ->
             if (repositories.findByName(repository.caption()) == null) {
-                if (gradleVersion >= 1.9){
+                if (gradleVersion >= 1.9) {
                     repositories.maven({
                         name = repository.caption()
                         url = repository.url()
                     })
-                }  else {
+                } else {
                     repositories.mavenRepo(
-                        name: repository.caption(),
-                        url: repository.url()
+                            name: repository.caption(),
+                            url: repository.url()
                     )
                 }
             }
@@ -118,18 +122,18 @@ class DependencyListener implements ProjectEvaluationListener {
         if (new File(GradleVaadinPlugin.getDebugDir()).exists()
                 && repositories.findByName('Gradle Vaadin plugin development repository') == null) {
 
-            if (GradleVaadinPlugin.isFirstPlugin()){
-                project.logger.lifecycle("Using development libs found at "+GradleVaadinPlugin.getDebugDir())
+            if (GradleVaadinPlugin.isFirstPlugin()) {
+                project.logger.lifecycle("Using development libs found at " + GradleVaadinPlugin.getDebugDir())
             }
 
             repositories.flatDir(name: 'Gradle Vaadin plugin development repository', dirs: GradleVaadinPlugin.getDebugDir())
         }
     }
 
-    private static void createJetty8Configuration(Project project){
+    private static void createJetty8Configuration(Project project) {
         def conf = Configuration.JETTY8.caption()
         def dependencies = project.dependencies
-        if(!project.configurations.hasProperty(conf)){
+        if (!project.configurations.hasProperty(conf)) {
             project.configurations.create(conf)
             dependencies.add(conf, 'org.eclipse.jetty.aggregate:jetty-all-server:8.1.10.v20130312')
             dependencies.add(conf, 'fi.jasoft.plugin:gradle-vaadin-plugin:' + GradleVaadinPlugin.getVersion())
@@ -144,7 +148,7 @@ class DependencyListener implements ProjectEvaluationListener {
         def serverConf = Configuration.SERVER.caption()
         def jetty8Conf = Configuration.JETTY8.caption()
 
-        if(!project.configurations.hasProperty(serverConf)){
+        if (!project.configurations.hasProperty(serverConf)) {
             project.configurations.create(serverConf)
 
             def sources = project.sourceSets.main
@@ -170,7 +174,7 @@ class DependencyListener implements ProjectEvaluationListener {
     private static void createJavadocConfiguration(Project project, String version) {
         def javadocConf = Configuration.JAVADOC.caption()
         def dependencies = project.dependencies
-        if (!project.configurations.hasProperty(javadocConf)){
+        if (!project.configurations.hasProperty(javadocConf)) {
             project.configurations.create(javadocConf)
             dependencies.add(javadocConf, 'javax.portlet:portlet-api:2.0')
             dependencies.add(javadocConf, 'javax.servlet:javax.servlet-api:3.0.1')
@@ -236,12 +240,12 @@ class DependencyListener implements ProjectEvaluationListener {
         }
     }
 
-    private static void createGWTConfiguration(Project project){
+    private static void createGWTConfiguration(Project project) {
         def conf = Configuration.CLIENT.caption()
         def sources = project.sourceSets.main
         def testSources = project.sourceSets.test
 
-        if(!project.configurations.hasProperty(conf)){
+        if (!project.configurations.hasProperty(conf)) {
             project.configurations.create(conf)
 
             sources.compileClasspath += project.configurations[conf]
@@ -250,25 +254,25 @@ class DependencyListener implements ProjectEvaluationListener {
         }
     }
 
-    private static void createTestbenchConfiguration(Project project){
+    private static void createTestbenchConfiguration(Project project) {
         def conf = Configuration.TESTBENCH.caption()
         def testSources = project.sourceSets.test
 
-        if (!project.configurations.hasProperty(conf)){
+        if (!project.configurations.hasProperty(conf)) {
             project.configurations.create(conf)
-            project.dependencies.add(conf,"com.vaadin:vaadin-testbench:${project.vaadin.testbench.version}")
+            project.dependencies.add(conf, "com.vaadin:vaadin-testbench:${project.vaadin.testbench.version}")
 
             testSources.compileClasspath += project.configurations[conf]
             testSources.runtimeClasspath += project.configurations[conf]
         }
     }
 
-    private static void createPushConfiguration(Project project, String version){
+    private static void createPushConfiguration(Project project, String version) {
         def conf = Configuration.PUSH.caption()
         def sources = project.sourceSets.main
         def testSources = project.sourceSets.test
 
-        if (!project.configurations.hasProperty(conf)){
+        if (!project.configurations.hasProperty(conf)) {
             project.configurations.create(conf)
             project.dependencies.add(conf, "com.vaadin:vaadin-push:${version}")
 

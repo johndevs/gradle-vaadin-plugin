@@ -60,7 +60,7 @@ class CreateProjectTask extends DefaultTask {
         project.tasks[UpdateWidgetsetTask.NAME].run()
     }
 
-    private void createUIClass(){
+    private void createUIClass() {
 
         def substitutions = [:]
 
@@ -71,11 +71,11 @@ class CreateProjectTask extends DefaultTask {
 
         def imports = []
 
-        if (Util.isPushSupportedAndEnabled(project)){
+        if (Util.isPushSupportedAndEnabled(project)) {
             imports.add('com.vaadin.annotations.Push')
         }
 
-        if(Util.isAddonStylesSupported(project)){
+        if (Util.isAddonStylesSupported(project)) {
             imports.add('com.vaadin.annotations.Theme')
         }
 
@@ -85,11 +85,11 @@ class CreateProjectTask extends DefaultTask {
 
         def annotations = []
 
-        if (Util.isPushSupportedAndEnabled(project)){
+        if (Util.isPushSupportedAndEnabled(project)) {
             annotations.add('Push')
         }
 
-        if(Util.isAddonStylesSupported(project)){
+        if (Util.isAddonStylesSupported(project)) {
             annotations.add("Theme(\"${applicationName}\")")
         }
 

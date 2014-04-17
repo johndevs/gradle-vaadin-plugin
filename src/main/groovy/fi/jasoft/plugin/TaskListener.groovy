@@ -80,19 +80,19 @@ public class TaskListener implements TaskExecutionListener {
             war.exclude('VAADIN/gwt-unitCache/**')
         }
 
-        if (task.getName() == 'test' && project.vaadin.testbench.enabled){
+        if (task.getName() == 'test' && project.vaadin.testbench.enabled) {
 
-            if (project.vaadin.testbench.hub.enabled){
+            if (project.vaadin.testbench.hub.enabled) {
                 testbenchHub = new TestbenchHub(project)
                 testbenchHub.start()
             }
 
-            if (project.vaadin.testbench.node.enabled){
+            if (project.vaadin.testbench.node.enabled) {
                 testbenchNode = new TestbenchNode(project)
                 testbenchNode.start()
             }
 
-            if (project.vaadin.testbench.runApplication){
+            if (project.vaadin.testbench.runApplication) {
                 testbenchAppServer = new ApplicationServer(project)
                 testbenchAppServer.start()
 
@@ -101,7 +101,7 @@ public class TaskListener implements TaskExecutionListener {
             }
         }
 
-        if (task.getName() == 'javadoc'){
+        if (task.getName() == 'javadoc') {
             task.source = Util.getMainSourceSet(project)
             task.classpath += project.configurations[Configuration.JAVADOC.caption()];
             task.classpath += project.configurations[Configuration.SERVER.caption()];
@@ -109,7 +109,7 @@ public class TaskListener implements TaskExecutionListener {
             task.options.addStringOption("sourcepath", "")
         }
 
-        if (task.getName() == CreateDirectoryZipTask.NAME){
+        if (task.getName() == CreateDirectoryZipTask.NAME) {
             configureAddonZipMetadata(task)
 
         }
@@ -121,26 +121,26 @@ public class TaskListener implements TaskExecutionListener {
             return
         }
 
-        if (task.getName() == 'test' && project.vaadin.testbench.enabled){
+        if (task.getName() == 'test' && project.vaadin.testbench.enabled) {
 
-            if (testbenchAppServer != null){
+            if (testbenchAppServer != null) {
                 testbenchAppServer.terminate()
                 testbenchAppServer = null
             }
 
-            if (testbenchNode != null){
+            if (testbenchNode != null) {
                 testbenchNode.terminate()
                 testbenchNode = null
             }
 
-            if (testbenchHub != null){
+            if (testbenchHub != null) {
                 testbenchHub.terminate()
                 testbenchHub = null
             }
         }
 
         // Notify users that sources are not present in the jar
-        if (task.getName() == 'jar' && !state.getSkipped()){
+        if (task.getName() == 'jar' && !state.getSkipped()) {
             task.getLogger().warn("Please note that the jar archive will NOT by default include the source files.\n" +
                     "You can add them to the jar by adding jar{ from sourceSets.main.allJava } to build.gradle.")
         }
@@ -148,7 +148,7 @@ public class TaskListener implements TaskExecutionListener {
 
     private void configureEclipsePlugin(Task task) {
         def cp = project.eclipse.classpath
-        def conf =  project.configurations
+        def conf = project.configurations
 
         // Always download sources
         cp.downloadSources = true
@@ -161,11 +161,11 @@ public class TaskListener implements TaskExecutionListener {
         cp.plusConfigurations += conf[Configuration.CLIENT.caption()]
         cp.plusConfigurations += conf[Configuration.JETTY8.caption()]
 
-        if (project.vaadin.testbench.enabled){
+        if (project.vaadin.testbench.enabled) {
             cp.plusConfigurations += conf[Configuration.TESTBENCH.caption()]
         }
 
-        if (Util.isPushSupportedAndEnabled(project)){
+        if (Util.isPushSupportedAndEnabled(project)) {
             cp.plusConfigurations += conf[Configuration.PUSH.caption()]
         }
     }
@@ -196,7 +196,7 @@ public class TaskListener implements TaskExecutionListener {
         }
     }
 
-    private File getManifest(){
+    private File getManifest() {
         def sources = Util.getMainSourceSet(project).srcDirs.asList() + project.sourceSets.main.resources.srcDirs.asList()
         File manifest = null
         sources.each {
@@ -211,7 +211,7 @@ public class TaskListener implements TaskExecutionListener {
 
     private void configureAddonMetadata(Task task) {
 
-         // Resolve widgetset
+        // Resolve widgetset
         def widgetset = project.vaadin.widgetset
         if (widgetset == null) {
             widgetset = 'com.vaadin.DefaultWidgetSet'
@@ -219,13 +219,13 @@ public class TaskListener implements TaskExecutionListener {
 
         // Scan for existing manifest in source folder and reuse if possible
         File manifest = getManifest()
-        if (manifest != null){
+        if (manifest != null) {
             project.logger.warn("Manifest found in project, possibly overwriting existing values.")
             task.manifest.from(manifest)
         }
 
         //Validate values
-        if (project.vaadin.addon.title == ''){
+        if (project.vaadin.addon.title == '') {
             project.logger.warn("No vaadin.addon.title has been specified, jar not compatible with Vaadin Directory.")
         }
 
@@ -251,10 +251,10 @@ public class TaskListener implements TaskExecutionListener {
         def buildDir = project.file('build/tmp/zip')
         buildDir.mkdirs()
 
-        def meta = project.file(buildDir.absolutePath+'/META-INF')
+        def meta = project.file(buildDir.absolutePath + '/META-INF')
         meta.mkdirs()
 
-        def manifest = project.file(meta.absolutePath+'/MANIFEST.MF')
+        def manifest = project.file(meta.absolutePath + '/MANIFEST.MF')
         manifest.createNewFile()
 
         manifest << """
@@ -268,10 +268,9 @@ public class TaskListener implements TaskExecutionListener {
     }
 
     private void configureJRebel(Task task) {
-        if(project.vaadin.jrebel.enabled) {
+        if (project.vaadin.jrebel.enabled) {
 
             def classes = project.sourceSets.main.output.classesDir
-
 
             // Ensure classes dir exists
             classes.mkdirs();

@@ -25,11 +25,11 @@ class TestbenchHub {
 
     private process;
 
-    TestbenchHub(Project project){
+    TestbenchHub(Project project) {
         this.project = project
     }
 
-    public start(){
+    public start() {
 
         def host = project.vaadin.testbench.hub.host
         def port = project.vaadin.testbench.hub.port
@@ -53,7 +53,6 @@ class TestbenchHub {
 
         process.add('-port')
         process.add(port)
-
 
         // Execute server
         process = process.execute()

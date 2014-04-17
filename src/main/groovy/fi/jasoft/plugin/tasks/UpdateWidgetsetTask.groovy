@@ -101,7 +101,7 @@ class UpdateWidgetsetTask extends DefaultTask {
         }
 
         // Custom inherits
-        if(project.vaadin.gwt.extraInherits != null){
+        if (project.vaadin.gwt.extraInherits != null) {
             inherits.addAll(project.vaadin.gwt.extraInherits)
         }
 
@@ -122,11 +122,11 @@ class UpdateWidgetsetTask extends DefaultTask {
 
         //###################################################################
 
-        def properties =[:]
+        def properties = [:]
 
         def ua = 'ie8,ie9,gecko1_8,safari,opera'
-        if(project.vaadin.gwt.userAgent == null){
-            if (Util.isIE10UserAgentSupported(project)){
+        if (project.vaadin.gwt.userAgent == null) {
+            if (Util.isIE10UserAgentSupported(project)) {
                 ua += ',ie10'
             }
         } else {
@@ -226,7 +226,6 @@ class UpdateWidgetsetTask extends DefaultTask {
         substitutions['collapsePermutations'] = project.vaadin.gwt.collapsePermutations
 
         //###################################################################
-
 
         // Write widgetset file
         File widgetsetDir = new File(widgetsetFile.parent)

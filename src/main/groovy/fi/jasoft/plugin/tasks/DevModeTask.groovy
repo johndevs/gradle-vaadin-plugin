@@ -26,7 +26,7 @@ class DevModeTask extends DefaultTask {
     public static final String NAME = 'vaadinDevMode'
 
     public DevModeTask() {
-        dependsOn('classes',UpdateWidgetsetTask.NAME)
+        dependsOn('classes', UpdateWidgetsetTask.NAME)
         description = "Run Development Mode for easier debugging and development of client widgets."
     }
 

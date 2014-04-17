@@ -49,7 +49,7 @@ class TestBenchHubConfiguration {
      *
      * @param host
      */
-    void host(String host){
+    void host(String host) {
         this.host = host
     }
 
@@ -58,7 +58,7 @@ class TestBenchHubConfiguration {
      *
      * @param port
      */
-    void port(int port){
+    void port(int port) {
         this.port = port
     }
 }

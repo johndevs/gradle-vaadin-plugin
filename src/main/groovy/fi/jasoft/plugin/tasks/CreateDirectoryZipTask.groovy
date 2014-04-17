@@ -22,17 +22,17 @@ class CreateDirectoryZipTask extends Zip {
 
     public static final String NAME = 'vaadinAddonZip'
 
-    CreateDirectoryZipTask(){
+    CreateDirectoryZipTask() {
 
         description = 'Creates an addon Zip archive compatible with Vaadin Directory.'
 
         // Zip includes addon jar + sources + javadoc jars
-        from ([project.tasks[BuildJavadocJarTask.NAME], project.tasks[BuildSourcesJarTask.NAME], project.tasks.jar]) {
+        from([project.tasks[BuildJavadocJarTask.NAME], project.tasks[BuildSourcesJarTask.NAME], project.tasks.jar]) {
             into('libs')
         }
 
         // Include javadoc as files
-        from (project.tasks.javadoc.destinationDir) {
+        from(project.tasks.javadoc.destinationDir) {
             into('javadoc')
         }
 

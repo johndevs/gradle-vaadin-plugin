@@ -43,7 +43,7 @@ public class RunTask extends DefaultTask {
         if (project.vaadin.plugin.terminateOnEnter) {
             server.start()
             project.logger.lifecycle('Press [Enter] to terminate server...')
-            if(Util.readLine("") == null){
+            if (Util.readLine("") == null) {
                 project.logger.warn("Could not retrieve console. Use [CTRL+C] to terminate server.")
                 server.startAndBlock()
             } else {

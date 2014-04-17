@@ -20,28 +20,28 @@ import org.gradle.api.Project
 
 class TemplateUtil {
 
-    public static void writeTemplate(String templateFileName, File targetDir, String targetFileName=templateFileName, Map substitutions=[:], boolean removeBlankLines=false) {
+    public static void writeTemplate(String templateFileName, File targetDir, String targetFileName = templateFileName, Map substitutions = [:], boolean removeBlankLines = false) {
         def templateUrl = TemplateUtil.class.getClassLoader().getResource("templates/${templateFileName}.template")
         if (templateUrl == null) {
             throw new FileNotFoundException("Could not find template 'templates/${templateFileName}.template'")
         }
 
         def engine = new SimpleTemplateEngine()
-        def template = engine.createTemplate(templateUrl).make(substitutions.withDefault {null})
+        def template = engine.createTemplate(templateUrl).make(substitutions.withDefault { null })
         def content = template.toString()
 
-        if (removeBlankLines){
+        if (removeBlankLines) {
             content = content.replaceAll("(?m)^[ \t]*\r?\n", "")
         }
 
         File targetFile = new File(targetDir.canonicalPath + '/' + targetFileName)
-        if(!targetFile.exists()){
+        if (!targetFile.exists()) {
             targetFile.parentFile.mkdirs()
             targetFile.createNewFile()
         }
 
-        if (!targetFile.canWrite()){
-            throw new FileNotFoundException("Could not write to target file "+targetFile.canonicalPath)
+        if (!targetFile.canWrite()) {
+            throw new FileNotFoundException("Could not write to target file " + targetFile.canonicalPath)
         }
 
         targetFile.write(content)

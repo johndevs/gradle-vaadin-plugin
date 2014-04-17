@@ -69,7 +69,7 @@ class TestBenchNodeConfiguration {
      * @param host
      *      Host name or ip address for the node
      */
-    void host(String host){
+    void host(String host) {
         this.host = host
     }
 
@@ -79,7 +79,7 @@ class TestBenchNodeConfiguration {
      * @param port
      *      The port number for the node
      */
-    void port(int port){
+    void port(int port) {
         this.port = port
     }
 
@@ -96,6 +96,7 @@ class TestBenchNodeConfiguration {
      *   ]
      *
      */
+
     void browsers(List<Map> browsers) {
         this.browsers = browsers
     }
@@ -106,7 +107,7 @@ class TestBenchNodeConfiguration {
      * @param hub
      *      URL in the for http://localhost:4444/grid/register
      */
-    void hub(String hub){
+    void hub(String hub) {
         this.hub = hub
     }
 }

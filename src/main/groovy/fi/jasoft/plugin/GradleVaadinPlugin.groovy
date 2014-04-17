@@ -56,7 +56,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
         PLUGINS_IN_PROJECT++;
 
-        if (isFirstPlugin()){
+        if (isFirstPlugin()) {
             project.logger.quiet("Using Gradle Vaadin Plugin " + PLUGIN_VERSION)
         }
 

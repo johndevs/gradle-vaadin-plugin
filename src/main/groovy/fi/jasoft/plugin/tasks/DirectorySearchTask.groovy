@@ -32,20 +32,20 @@ class DirectorySearchTask extends DefaultTask {
 
     private final int maxCacheAge = TimeUnit.MILLISECONDS.convert(1, TimeUnit.HOURS)
 
-    DirectorySearchTask(){
-       description = "Lists addons in the Vaadin Directory"
+    DirectorySearchTask() {
+        description = "Lists addons in the Vaadin Directory"
     }
 
     @TaskAction
     void run() {
 
-        if (!cachedAddonResponse.exists()){
+        if (!cachedAddonResponse.exists()) {
             project.logger.info("Fetching addon listing from vaadin.com...")
             cachedAddonResponse.parentFile.mkdirs()
             cachedAddonResponse.createNewFile()
             cachedAddonResponse.write(directoryUrl.toURL().text)
 
-        } else if (new Date(cachedAddonResponse.lastModified()).before(new Date(System.currentTimeMillis()-maxCacheAge))){
+        } else if (new Date(cachedAddonResponse.lastModified()).before(new Date(System.currentTimeMillis() - maxCacheAge))) {
             project.logger.info("Fetching addon listing from vaadin.com...")
             cachedAddonResponse.write(directoryUrl.toURL().text)
         } else {
@@ -56,41 +56,41 @@ class DirectorySearchTask extends DefaultTask {
         def search = args.get('search', null)
         def sort = args.get('sort', null)
         def verbose = Boolean.parseBoolean(args.get('verbose', 'false'))
-        listAddons(search,sort, verbose)
+        listAddons(search, sort, verbose)
     }
 
-    private void listAddons(String search, String sort, boolean verbose){
+    private void listAddons(String search, String sort, boolean verbose) {
         def json = new JsonSlurper().parseText(cachedAddonResponse.text)
         def dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
 
         println ' '
 
-        json.addon.findAll{
-            return (search == null  || it.name.toLowerCase().contains(search) || it.summary.toLowerCase().contains(search))
+        json.addon.findAll {
+            return (search == null || it.name.toLowerCase().contains(search) || it.summary.toLowerCase().contains(search))
 
         }.sort {
-           switch(sort){
-               case 'name': return it.name
-               case 'description': return it.summary
-               case 'date': return dateFormat.parse(it.oldestRelease.toString())
-               case 'rating': return Double.parseDouble(it.avgRating)
-               default: return null
-           }
+            switch (sort) {
+                case 'name': return it.name
+                case 'description': return it.summary
+                case 'date': return dateFormat.parse(it.oldestRelease.toString())
+                case 'rating': return Double.parseDouble(it.avgRating)
+                default: return null
+            }
 
         }.each {
-            if(verbose){
-                println 'Name: '+it.name
-                println 'Description: '+it.summary
-                println 'Url: '+it.linkUrl
-                println 'Rating: '+it.avgRating
-                if(it.artifactId != null && it.groupId != null && it.version != null) {
+            if (verbose) {
+                println 'Name: ' + it.name
+                println 'Description: ' + it.summary
+                println 'Url: ' + it.linkUrl
+                println 'Rating: ' + it.avgRating
+                if (it.artifactId != null && it.groupId != null && it.version != null) {
                     println("Dependency: \"${it.groupId}:${it.artifactId}:${it.version}\"")
                 }
 
             } else {
                 print DirectorySearchTask.truncate(it.name.toString(), 29).padRight(30)
                 print DirectorySearchTask.truncate(it.summary.toString(), 49).padRight(50)
-                if(it.artifactId != null && it.groupId != null && it.version != null) {
+                if (it.artifactId != null && it.groupId != null && it.version != null) {
                     print(" \"${it.groupId}:${it.artifactId}:${it.version}\"")
                 }
             }
@@ -99,11 +99,11 @@ class DirectorySearchTask extends DefaultTask {
     }
 
     private static String truncate(String str, Integer maxLength) {
-        if (str == null){
+        if (str == null) {
             return ''
         }
-        if (str.length() > maxLength){
-            return str[0..(maxLength-2)]+"\u2026"
+        if (str.length() > maxLength) {
+            return str[0..(maxLength - 2)] + "\u2026"
         }
         return str
     }

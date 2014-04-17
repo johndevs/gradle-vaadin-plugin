@@ -25,11 +25,11 @@ class TestbenchNode {
 
     private process;
 
-    TestbenchNode(Project project){
+    TestbenchNode(Project project) {
         this.project = project
     }
 
-    public start(){
+    public start() {
 
         def host = project.vaadin.testbench.node.host
         def port = project.vaadin.testbench.node.port
@@ -60,9 +60,9 @@ class TestbenchNode {
         process.add('-port')
         process.add(port)
 
-        for(browser in browsers){
+        for (browser in browsers) {
             process.add('-browser')
-            process.add( browser.inject([]) { result, entry ->
+            process.add(browser.inject([]) { result, entry ->
                 result << "${entry.key}=${entry.value}"
             }.join(','))
         }
