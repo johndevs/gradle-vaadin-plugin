@@ -1,4 +1,4 @@
-package %PACKAGE%;
+package ${packageName};
 
 import static org.junit.Assert.*;
 
@@ -9,7 +9,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import com.vaadin.testbench.TestBench;
 import com.vaadin.testbench.TestBenchTestCase;
 
-public class %TEST_NAME% extends TestBenchTestCase {
+public class ${testName} extends TestBenchTestCase {
 
 	private WebDriver driver;
 
@@ -25,7 +25,7 @@ public class %TEST_NAME% extends TestBenchTestCase {
 		driver = TestBench.createDriver(new FirefoxDriver());
 		
 		// URL where the tested application can be accessed
-		baseUrl = "%APPLICATION_URL%";
+		baseUrl = "${appUrl}";
 	}
 
 	/*

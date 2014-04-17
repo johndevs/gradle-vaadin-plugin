@@ -24,6 +24,10 @@ class CreateTestbenchTestTask extends DefaultTask {
 
     public static final String NAME = 'vaadinCreateTestbenchTest'
 
+    private String testName
+
+    private String testPackage
+
     public CreateTestbenchTestTask(){
         description = "Creates a new Testbench test"
     }
@@ -31,15 +35,20 @@ class CreateTestbenchTestTask extends DefaultTask {
     @TaskAction
     public run(){
 
-        String testName = Util.readLine('\nTest Name (MyTest): ')
+        testName = Util.readLine('\nTest Name (MyTest): ')
         if (testName == '') {
             testName = 'MyTest'
         }
 
-        String testPackage = Util.readLine('\nTest package (com.example.tests): ')
+        testPackage = Util.readLine('\nTest package (com.example.tests): ')
         if (testPackage == '') {
             testPackage = 'com.example.tests'
         }
+
+        createTestClass()
+    }
+
+    private void createTestClass() {
 
         File javaDir = Util.getTestSourceSet(project).srcDirs.iterator().next()
         File packageDir = new File(javaDir.canonicalPath+"/"+testPackage.replaceAll(/\./, '/'))
@@ -47,10 +56,10 @@ class CreateTestbenchTestTask extends DefaultTask {
         packageDir.mkdirs()
 
         def substitutions = [:]
-        substitutions['%PACKAGE%'] = testPackage
-        substitutions['%TEST_NAME%'] = testName
-        substitutions['%APPLICATION_URL%'] = "http://localhost:${project.vaadin.serverPort}"
+        substitutions['packageName'] = testPackage
+        substitutions['testName'] = testName
+        substitutions['appUrl'] = "http://localhost:${project.vaadin.serverPort}"
 
-        TemplateUtil.writeTemplate("MyTest.java",packageDir,testName+".java",substitutions)
+        TemplateUtil.writeTemplate2("MyTest.java",packageDir,testName+".java",substitutions)
     }
 }
