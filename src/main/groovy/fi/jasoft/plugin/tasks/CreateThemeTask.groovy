@@ -25,6 +25,8 @@ class CreateThemeTask extends DefaultTask {
 
     public static final String NAME = 'vaadinCreateTheme'
 
+    private String themeName
+
     public CreateThemeTask() {
         description = "Creates a new Vaadin Theme"
     }
@@ -32,7 +34,7 @@ class CreateThemeTask extends DefaultTask {
     @TaskAction
     public void run() {
 
-        String themeName = Util.readLine('\nTheme Name (MyTheme): ')
+        themeName = Util.readLine('\nTheme Name (MyTheme): ')
         if (themeName == null || themeName == '') {
             themeName = 'MyTheme'
         }
@@ -47,17 +49,13 @@ class CreateThemeTask extends DefaultTask {
         themeDir.mkdirs()
 
         def substitutions = [:]
-        substitutions['%THEME%'] = themeName.toLowerCase()
-        substitutions['%THEME_NAME%'] = themeName
-        substitutions['%THEME_IMPORT_FILE%'] = themeName.toLowerCase() + '.scss'
+        substitutions['themeName'] = themeName
+        substitutions['theme'] = substitutions['themeName'].toLowerCase()
+        substitutions['themeImport'] = substitutions['theme'] + '.scss'
 
-        if (project.vaadin.version.startsWith('7.0')) {
-            TemplateUtil.writeTemplate('MyTheme.scss.vaadin70', themeDir, 'styles.scss', substitutions)
+        TemplateUtil.writeTemplate2('styles.scss', themeDir, 'styles.scss', substitutions)
+        TemplateUtil.writeTemplate2('MyTheme.scss', themeDir, substitutions['themeImport'], substitutions)
 
-        } else {
-            TemplateUtil.writeTemplate('styles.scss', themeDir, 'styles.scss', substitutions)
-            TemplateUtil.writeTemplate('MyTheme.scss', themeDir, substitutions['%THEME_IMPORT_FILE%'], substitutions)
-            project.tasks[UpdateAddonStylesTask.NAME].run()
-        }
+        project.tasks[UpdateAddonStylesTask.NAME].run()
     }
 }

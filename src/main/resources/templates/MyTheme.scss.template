@@ -1,6 +1,6 @@
 @import "../reindeer/reindeer.scss";
 
-@mixin %THEME% {
+@mixin ${theme} {
 	@include reindeer;
 
 	/* Add your theme selectors here */

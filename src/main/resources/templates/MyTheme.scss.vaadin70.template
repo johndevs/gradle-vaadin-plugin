@@ -1,7 +1,0 @@
-@import "../reindeer/reindeer.scss";
-
-.%THEME_NAME% {
-	@include reindeer;
-
-	/* Add your theme selectors here */
-}

@@ -1,9 +1,9 @@
 @import "addons.scss";
-@import "%THEME_IMPORT_FILE%";
+@import "${themeImport}";
 
 /* This file prefixes all rules with the theme name to avoid causing conflicts with other themes. */
-/* The actual styles should be defined in %THEME_IMPORT_FILE% */
-.%THEME_NAME% {
+/* The actual styles should be defined in ${themeImport} */
+.${themeName} {
   @include addons;
-  @include %THEME%;
+  @include ${theme};
 }
