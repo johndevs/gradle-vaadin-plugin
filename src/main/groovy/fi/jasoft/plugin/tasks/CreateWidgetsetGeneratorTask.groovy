@@ -63,6 +63,6 @@ class CreateWidgetsetGeneratorTask extends DefaultTask {
         substitutions['packageName'] = pkg
         substitutions['className'] = filename.replaceAll('.java', '')
 
-        TemplateUtil.writeTemplate2('MyConnectorBundleLoaderFactory.java', dir, filename, substitutions)
+        TemplateUtil.writeTemplate('MyConnectorBundleLoaderFactory.java', dir, filename, substitutions)
     }
 }

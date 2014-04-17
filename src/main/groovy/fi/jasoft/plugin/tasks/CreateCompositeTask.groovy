@@ -65,6 +65,6 @@ public class CreateCompositeTask extends DefaultTask {
         substitutions['componentPackage'] = componentPackage
         substitutions['componentName'] = componentName
 
-        TemplateUtil.writeTemplate2("MyComposite.java", componentDir, componentName + ".java", substitutions)
+        TemplateUtil.writeTemplate("MyComposite.java", componentDir, componentName + ".java", substitutions)
     }
 }

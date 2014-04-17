@@ -1,6 +1,5 @@
 package fi.jasoft.plugin
 
-import org.junit.Before
 import org.junit.Test
 
 /*
@@ -27,7 +26,7 @@ class TemplateUtilTest extends PluginTestBase {
         substitutions['color'] = 'brown'
         substitutions['obsticle'] = 'dog'
 
-        TemplateUtil.writeTemplate2("MyTestTemplate.java", testDir, "quick-fox.txt", substitutions)
+        TemplateUtil.writeTemplate("MyTestTemplate.java", testDir, "quick-fox.txt", substitutions)
 
         File resultFile = new File(testDir.canonicalPath+"/quick-fox.txt")
         String resultContent = resultFile.getText()

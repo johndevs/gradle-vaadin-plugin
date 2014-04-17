@@ -60,6 +60,6 @@ class CreateTestbenchTestTask extends DefaultTask {
         substitutions['testName'] = testName
         substitutions['appUrl'] = "http://localhost:${project.vaadin.serverPort}"
 
-        TemplateUtil.writeTemplate2("MyTest.java",packageDir,testName+".java",substitutions)
+        TemplateUtil.writeTemplate("MyTest.java",packageDir,testName+".java",substitutions)
     }
 }

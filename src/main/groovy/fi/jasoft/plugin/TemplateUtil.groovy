@@ -25,51 +25,7 @@ import java.util.jar.Attributes
 
 class TemplateUtil {
 
-    @Deprecated
-    protected static String getTemplateContent(String template) {
-        if (template == null){
-            throw new IllegalArgumentException("Template name cannot be null")
-        }
-
-        InputStream templateStream = TemplateUtil.class.getClassLoader().getResourceAsStream("templates/${template}.template")
-        if (templateStream == null) {
-            throw new FileNotFoundException("The template file "+template+ ".template could not be found.")
-        }
-
-        return templateStream.getText()
-    }
-
-    @Deprecated
-    public static void writeTemplate(String template, File targetDir, Map substitutions) {
-        writeTemplate(template, targetDir, template, substitutions)
-    }
-
-    @Deprecated
-    public static void writeTemplate(String template, File targetDir, String targetFileName=template, Map substitutions=[:], boolean removeBlankLines=false) {
-        String content = TemplateUtil.getTemplateContent(template)
-
-        substitutions.each { key, value ->
-            content = content.replaceAll(key, value)
-        }
-
-        if (removeBlankLines){
-            content = content.replaceAll("(?m)^[ \t]*\r?\n", "")
-        }
-
-        File targetFile = new File(targetDir.canonicalPath + '/' + targetFileName)
-        if(!targetFile.exists()){
-            targetFile.parentFile.mkdirs()
-            targetFile.createNewFile()
-        }
-
-        if (!targetFile.canWrite()){
-             throw new FileNotFoundException("Could not write to target file "+targetFile.canonicalPath)
-        }
-
-        targetFile.write(content)
-    }
-
-    public static void writeTemplate2(String templateFileName, File targetDir, String targetFileName=templateFileName, Map substitutions=[:], boolean removeBlankLines=false) {
+    public static void writeTemplate(String templateFileName, File targetDir, String targetFileName=templateFileName, Map substitutions=[:], boolean removeBlankLines=false) {
         def templateUrl = TemplateUtil.class.getClassLoader().getResource("templates/${templateFileName}.template")
         if (templateUrl == null) {
             throw new FileNotFoundException("Could not find template 'templates/${templateFileName}.template'")
@@ -94,14 +50,6 @@ class TemplateUtil {
         }
 
         targetFile.write(content)
-    }
-
-    /**
-     * Searches for SCSS files in the public folder and returns them
-     */
-    @Deprecated
-    public static File[] getClientSCSSFiles(Project project) {
-        return getFilesFromPublicFolder(project, 'scss')
     }
 
     public static File[] getFilesFromPublicFolder(Project project, String prefix) {

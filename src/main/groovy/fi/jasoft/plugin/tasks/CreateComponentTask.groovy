@@ -74,8 +74,8 @@ class CreateComponentTask extends DefaultTask {
         substitutions['componentName'] = componentName
         substitutions['componentStylename'] = componentName.toLowerCase()
 
-        TemplateUtil.writeTemplate2("MyComponent.java", componentDir, componentName + ".java", substitutions)
-        TemplateUtil.writeTemplate2("MyComponentWidget.java", clientui, componentName + "Widget.java", substitutions)
-        TemplateUtil.writeTemplate2("MyComponentConnector.java", clientui, componentName + "Connector.java", substitutions)
+        TemplateUtil.writeTemplate("MyComponent.java", componentDir, componentName + ".java", substitutions)
+        TemplateUtil.writeTemplate("MyComponentWidget.java", clientui, componentName + "Widget.java", substitutions)
+        TemplateUtil.writeTemplate("MyComponentConnector.java", clientui, componentName + "Connector.java", substitutions)
     }
 }

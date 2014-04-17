@@ -53,8 +53,8 @@ class CreateThemeTask extends DefaultTask {
         substitutions['theme'] = substitutions['themeName'].toLowerCase()
         substitutions['themeImport'] = substitutions['theme'] + '.scss'
 
-        TemplateUtil.writeTemplate2('styles.scss', themeDir, 'styles.scss', substitutions)
-        TemplateUtil.writeTemplate2('MyTheme.scss', themeDir, substitutions['themeImport'], substitutions)
+        TemplateUtil.writeTemplate('styles.scss', themeDir, 'styles.scss', substitutions)
+        TemplateUtil.writeTemplate('MyTheme.scss', themeDir, substitutions['themeImport'], substitutions)
 
         project.tasks[UpdateAddonStylesTask.NAME].run()
     }

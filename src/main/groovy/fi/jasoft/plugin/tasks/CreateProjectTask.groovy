@@ -17,11 +17,7 @@ package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.Util;
 import org.gradle.api.DefaultTask
-import org.gradle.api.artifacts.ExternalModuleDependency
-import org.gradle.api.artifacts.ProjectDependency;
-import org.gradle.api.tasks.TaskAction;
-import org.gradle.api.plugins.WarPluginConvention;
-import org.gradle.api.plugins.JavaPluginConvention;
+import org.gradle.api.tasks.TaskAction
 import fi.jasoft.plugin.TemplateUtil;
 
 class CreateProjectTask extends DefaultTask {
@@ -105,7 +101,7 @@ class CreateProjectTask extends DefaultTask {
         File uidir = new File(javaDir.canonicalPath + '/' + applicationPackage.replaceAll(/\./, '/'))
         uidir.mkdirs()
 
-        TemplateUtil.writeTemplate2('MyUI.java', uidir, applicationName + "UI.java", substitutions)
+        TemplateUtil.writeTemplate('MyUI.java', uidir, applicationName + "UI.java", substitutions)
     }
 
     private void createServletClass() {
@@ -132,7 +128,7 @@ class CreateProjectTask extends DefaultTask {
         File uidir = new File(javaDir.canonicalPath + '/' + applicationPackage.replaceAll(/\./, '/'))
         uidir.mkdirs()
 
-        TemplateUtil.writeTemplate2("MyServlet.java", uidir, applicationName + "Servlet.java", substitutions)
+        TemplateUtil.writeTemplate("MyServlet.java", uidir, applicationName + "Servlet.java", substitutions)
     }
 }
 

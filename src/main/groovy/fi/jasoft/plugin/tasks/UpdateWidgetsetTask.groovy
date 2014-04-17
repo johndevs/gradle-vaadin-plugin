@@ -231,6 +231,6 @@ class UpdateWidgetsetTask extends DefaultTask {
         // Write widgetset file
         File widgetsetDir = new File(widgetsetFile.parent)
         String moduleXML = project.vaadin.widgetset.tokenize('.').last() + ".gwt.xml"
-        TemplateUtil.writeTemplate2('Widgetset.xml', widgetsetDir, moduleXML, substitutions, true)
+        TemplateUtil.writeTemplate('Widgetset.xml', widgetsetDir, moduleXML, substitutions, true)
     }
 }
