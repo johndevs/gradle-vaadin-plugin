@@ -13,13 +13,13 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fi.jasoft.plugin;
+package fi.jasoft.plugin
 
-import org.gradle.api.ProjectEvaluationListener;
-import org.gradle.api.Project;
-import org.gradle.api.ProjectState;
-import org.gradle.api.plugins.WarPluginConvention;
-import org.gradle.api.file.FileTree;
+import org.gradle.api.Project
+import org.gradle.api.ProjectEvaluationListener
+import org.gradle.api.ProjectState
+import org.gradle.api.file.FileTree
+import org.gradle.api.plugins.WarPluginConvention
 
 class DependencyListener implements ProjectEvaluationListener {
 

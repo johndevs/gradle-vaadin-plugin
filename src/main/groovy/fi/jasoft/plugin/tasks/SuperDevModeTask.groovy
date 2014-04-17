@@ -15,14 +15,11 @@
 */
 package fi.jasoft.plugin.tasks
 
-import fi.jasoft.plugin.Util;
-import org.gradle.api.DefaultTask;
-import org.gradle.api.tasks.TaskAction;
-import org.gradle.api.file.FileCollection
-import org.gradle.api.plugins.WarPluginConvention
 import fi.jasoft.plugin.ApplicationServer
-import java.lang.Process
-import fi.jasoft.plugin.TemplateUtil
+import fi.jasoft.plugin.Util
+import org.gradle.api.DefaultTask
+import org.gradle.api.plugins.WarPluginConvention
+import org.gradle.api.tasks.TaskAction
 
 class SuperDevModeTask extends DefaultTask {
 

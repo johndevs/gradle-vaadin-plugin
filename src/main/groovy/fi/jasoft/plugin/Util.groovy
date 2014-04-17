@@ -18,7 +18,6 @@ package fi.jasoft.plugin
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.SourceDirectorySet
-import org.gradle.api.tasks.SourceSet;
 
 class Util {
 

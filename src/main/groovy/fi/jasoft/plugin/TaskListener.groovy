@@ -15,18 +15,16 @@
 */
 package fi.jasoft.plugin
 
+import fi.jasoft.plugin.DependencyListener.Configuration
 import fi.jasoft.plugin.tasks.CreateDirectoryZipTask
 import fi.jasoft.plugin.testbench.TestbenchHub
 import fi.jasoft.plugin.testbench.TestbenchNode
 import groovy.xml.MarkupBuilder
-import org.gradle.api.Project;
-import org.gradle.api.execution.TaskExecutionListener
+import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.execution.TaskExecutionListener
 import org.gradle.api.tasks.TaskState
 import org.gradle.api.tasks.bundling.War
-import fi.jasoft.plugin.DependencyListener.Configuration
-
-import java.util.jar.Manifest
 
 public class TaskListener implements TaskExecutionListener {
 

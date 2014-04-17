@@ -15,10 +15,10 @@
 */
 package fi.jasoft.plugin.tasks
 
-import fi.jasoft.plugin.Util;
-import org.gradle.api.DefaultTask;
-import org.gradle.api.tasks.TaskAction;
-import fi.jasoft.plugin.TemplateUtil;
+import fi.jasoft.plugin.TemplateUtil
+import fi.jasoft.plugin.Util
+import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.TaskAction
 
 class CreateWidgetsetGeneratorTask extends DefaultTask {
 

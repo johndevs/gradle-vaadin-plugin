@@ -13,14 +13,10 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fi.jasoft.plugin;
+package fi.jasoft.plugin
 
-
-import org.gradle.api.Project;
-import org.gradle.api.file.FileCollection;
-
-import java.io.File;
-import java.io.FileOutputStream;
+import org.gradle.api.Project
+import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.WarPluginConvention
 
 public class ApplicationServer {

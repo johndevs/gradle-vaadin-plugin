@@ -15,13 +15,8 @@
 */
 package fi.jasoft.plugin
 
-import groovy.text.SimpleTemplateEngine;
+import groovy.text.SimpleTemplateEngine
 import org.gradle.api.Project
-import java.util.jar.JarEntry
-import java.util.jar.JarFile
-import java.util.jar.JarInputStream
-import java.util.jar.Manifest
-import java.util.jar.Attributes
 
 class TemplateUtil {
 

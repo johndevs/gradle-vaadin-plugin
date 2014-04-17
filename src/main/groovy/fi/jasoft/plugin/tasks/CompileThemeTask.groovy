@@ -13,12 +13,12 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fi.jasoft.plugin.tasks;
+package fi.jasoft.plugin.tasks
 
-import org.gradle.api.DefaultTask;
-import org.gradle.api.tasks.TaskAction
-import org.gradle.api.plugins.WarPluginConvention;
+import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileTree
+import org.gradle.api.plugins.WarPluginConvention
+import org.gradle.api.tasks.TaskAction
 
 class CompileThemeTask extends DefaultTask {
 

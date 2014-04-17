@@ -16,28 +16,10 @@
 package fi.jasoft.plugin
 
 import fi.jasoft.plugin.configuration.VaadinPluginExtension
-import fi.jasoft.plugin.tasks.BuildJavadocJarTask
-import fi.jasoft.plugin.tasks.BuildSourcesJarTask
-import fi.jasoft.plugin.tasks.CreateCompositeTask
-import fi.jasoft.plugin.tasks.CreateDirectoryZipTask
-import fi.jasoft.plugin.tasks.CreateProjectTask
-import fi.jasoft.plugin.tasks.CreateTestbenchTestTask
-import fi.jasoft.plugin.tasks.DirectorySearchTask
-import fi.jasoft.plugin.tasks.UpdateAddonStylesTask;
+import fi.jasoft.plugin.tasks.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.WarPlugin
-
-
-import fi.jasoft.plugin.tasks.CreateComponentTask
-import fi.jasoft.plugin.tasks.CreateThemeTask
-import fi.jasoft.plugin.tasks.CompileWidgetsetTask
-import fi.jasoft.plugin.tasks.DevModeTask
-import fi.jasoft.plugin.tasks.SuperDevModeTask
-import fi.jasoft.plugin.tasks.CompileThemeTask
-import fi.jasoft.plugin.tasks.UpdateWidgetsetTask
-import fi.jasoft.plugin.tasks.RunTask
-import fi.jasoft.plugin.tasks.CreateWidgetsetGeneratorTask
 
 class GradleVaadinPlugin implements Plugin<Project> {
 

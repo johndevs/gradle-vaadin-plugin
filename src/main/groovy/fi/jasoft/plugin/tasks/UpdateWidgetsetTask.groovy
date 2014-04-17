@@ -15,11 +15,11 @@
 */
 package fi.jasoft.plugin.tasks
 
-import fi.jasoft.plugin.Util;
+import fi.jasoft.plugin.TemplateUtil
+import fi.jasoft.plugin.Util
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskAction
-import fi.jasoft.plugin.TemplateUtil
 
 import java.util.jar.Attributes
 import java.util.jar.JarInputStream
