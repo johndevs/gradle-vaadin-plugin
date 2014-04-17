@@ -25,6 +25,10 @@ public class CreateCompositeTask extends DefaultTask {
 
     public static final String NAME = 'vaadinCreateComposite'
 
+    private String componentName
+
+    private String componentPackage
+
     public CreateCompositeTask() {
         description = "Creates a new Vaadin Composite."
     }
@@ -32,13 +36,11 @@ public class CreateCompositeTask extends DefaultTask {
     @TaskAction
     public void run() {
 
-        String componentName = Util.readLine('\nComposite Name (MyComposite): ')
+        componentName = Util.readLine('\nComposite Name (MyComposite): ')
         if (componentName == null || componentName == '') {
             componentName = 'MyComposite'
         }
 
-        File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
-        String componentPackage
         if (project.vaadin.widgetset) {
             String widgetsetClass = project.vaadin.widgetset
             String widgetsetPackage = widgetsetClass.substring(0, widgetsetClass.lastIndexOf("."))
@@ -51,14 +53,18 @@ public class CreateCompositeTask extends DefaultTask {
             }
         }
 
-        File componentDir = new File(javaDir.canonicalPath + '/' + componentPackage.replaceAll(/\./, '/'))
+        createCompositeClass()
+    }
 
+    private void createCompositeClass() {
+        File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
+        File componentDir = new File(javaDir.canonicalPath + '/' + componentPackage.replaceAll(/\./, '/'))
         componentDir.mkdirs()
 
         def substitutions = [:]
-        substitutions['%PACKAGE%'] = componentPackage
-        substitutions['%COMPONENT_NAME%'] = componentName
+        substitutions['componentPackage'] = componentPackage
+        substitutions['componentName'] = componentName
 
-        TemplateUtil.writeTemplate("MyComposite.java", componentDir, componentName + ".java", substitutions)
+        TemplateUtil.writeTemplate2("MyComposite.java", componentDir, componentName + ".java", substitutions)
     }
 }
