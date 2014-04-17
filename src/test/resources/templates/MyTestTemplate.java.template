@@ -1,1 +1,1 @@
-The quick %COLOR% fox jumps over the lazy %OBSTICLE%
+The quick ${color} fox jumps over the lazy ${obsticle}

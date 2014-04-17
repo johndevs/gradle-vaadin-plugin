@@ -21,25 +21,13 @@ import org.junit.Test
 class TemplateUtilTest extends PluginTestBase {
 
     @Test
-    void writeTemplate(){
-        TemplateUtil.writeTemplate("MyTestTemplate.java", testDir, "MyCoolApplication.java")
-        File resultFile = new File(testDir.canonicalPath+"/MyCoolApplication.java")
-
-        String resultContent = resultFile.getText()
-        assert resultContent.size() > 0
-
-        String template = TemplateUtil.class.getClassLoader().getResourceAsStream("templates/MyTestTemplate.java.template").getText()
-        assert template == resultContent
-    }
-
-    @Test
     void writeTemplateWithSubstitutions(){
 
         def substitutions = [:]
-        substitutions['%COLOR%'] = 'brown'
-        substitutions['%OBSTICLE%'] = 'dog'
+        substitutions['color'] = 'brown'
+        substitutions['obsticle'] = 'dog'
 
-        TemplateUtil.writeTemplate("MyTestTemplate.java", testDir, "quick-fox.txt", substitutions)
+        TemplateUtil.writeTemplate2("MyTestTemplate.java", testDir, "quick-fox.txt", substitutions)
 
         File resultFile = new File(testDir.canonicalPath+"/quick-fox.txt")
         String resultContent = resultFile.getText()
