@@ -37,24 +37,24 @@ repositories {
 # Plugin tasks
 The following tasks are available in the plugin
 
-* ``createVaadinComponent`` - Creates a new Vaadin Component.
-* ``createVaadinComposite`` - Creates a new Vaadin Composite for use with VisualDesigner.
-* ``createVaadinProject`` - Creates a new Vaadin Project.
-* ``createVaadinServlet3Project`` - Creates a new Vaadin project based on Servlet 3.0
-* ``createVaadinTheme`` - Creates a new Vaadin Theme
-* ``createVaadinWidgetsetGenerator`` - Creates a new widgetset generator for optimizing the widgetset
-* ``createTestbenchTest`` - Creates a new testbench JUnit test. (Requires Testbench enabled).
-* ``devmode`` - Run Development Mode for easier debugging and development of client widgets.
-* ``superdevmode`` - Run Super Development Mode for easier client widget development.
-* ``themes`` - Compiles a Vaadin SASS theme into CSS
+* ``vaadinCreateComponent`` - Creates a new Vaadin Component.
+* ``vaadinCreateComposite`` - Creates a new Vaadin Composite for use with VisualDesigner.
+* ``vaadinCreateProject`` - Creates a new Vaadin Project.
+* ``vaadinCreateTheme`` - Creates a new Vaadin Theme
+* ``vaadinCreateWidgetsetGenerator`` - Creates a new widgetset generator for optimizing the widgetset
+* ``vaadinCreateTestbenchTest`` - Creates a new testbench JUnit test. (Requires Testbench enabled).
+* ``vaadinDevMode`` - Run Development Mode for easier debugging and development of client widgets.
+* ``vaadinSuperDevMode`` - Run Super Development Mode for easier client widget development.
+* ``vaadinCompileThemes`` - Compiles a Vaadin SASS theme into CSS
+* ``vaadinCompileWidgetset`` - Compiles Vaadin Addons and components into Javascript.
 * ``vaadinRun`` - Runs the Vaadin application on an embedded Jetty Server
-* ``widgetset`` - Compiles Vaadin Addons and components into Javascript.
-* ``addons`` - Search for addons in the Vaadin Directory. Optional parameters: -Psearch=<term> -Psort=[name|description|date|rating] -Pverbose=[true|false]
-* ``jar`` - Create Vaadin Directory compatible Addon jar out of the project. Metadata can be configurated with the vaadin.addon.* properties.
-* ``zip`` - Create Vaadin Directory compatible Addon zip archive of the project. Metadata can be configurated with the vaadin.addon.* properties.
-* ``javadocJar`` - Generate javadoc from project and package it as a jar.
-* ``sourcesJar`` - Packages all sources a a jar.
+* ``vaadinAddons`` - Search for addons in the Vaadin Directory. Optional parameters: -Psearch=<term> -Psort=[name|description|date|rating] -Pverbose=[true|false]
+* ``vaadinAddonZip`` - Create Vaadin Directory compatible Addon zip archive of the project. Metadata can be configurated with the vaadin.addon.* properties.
+* ``vaadinJavadocJar`` - Generate javadoc from project and package it as a jar.
+* ``vaadinSourcesJar`` - Packages all sources a a jar.
 
+Not provided by the Vaadin plugin directly but inherited from other dependent plugins.
+* ``jar`` - Create Vaadin Directory compatible Addon jar out of the project. Metadata can be configurated with the vaadin.addon.* properties.
 
 # Plugin configurations
 The following configuration options are available

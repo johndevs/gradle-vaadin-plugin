@@ -24,7 +24,7 @@ import org.gradle.api.file.FileCollection;
 
 class CompileWidgetsetTask extends DefaultTask {
 
-    public static final NAME = 'vaadinWidgetset'
+    public static final NAME = 'vaadinCompileWidgetset'
 
     public CompileWidgetsetTask() {
         dependsOn('classes', UpdateWidgetsetTask.NAME)
