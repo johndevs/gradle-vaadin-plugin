@@ -15,6 +15,7 @@
 */
 package fi.jasoft.plugin
 
+import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project
 import org.gradle.api.ProjectEvaluationListener
 import org.gradle.api.ProjectState
@@ -74,14 +75,19 @@ class DependencyListener implements ProjectEvaluationListener {
             return
         }
 
+        String version = project.vaadin.version
+
+        if(version !=null && version.startsWith("6")){
+            project.logger.error("Plugin no longer supports Vaadin 6, to use Vaadin 6 apply an older version of the plugin.")
+            throw new InvalidUserDataException("Unsupported Vaadin version.")
+        }
+
         // Add repositories unless specified otherwise
         if (project.vaadin.manageRepositories) {
             addRepositories(project)
         }
 
         createJetty8Configuration(project)
-
-        def version = project.vaadin.version
 
         createVaadin7Configuration(project, version)
 
