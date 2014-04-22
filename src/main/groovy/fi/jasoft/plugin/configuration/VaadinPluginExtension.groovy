@@ -209,6 +209,15 @@ class VaadinPluginExtension {
     }
 
     /**
+     * @see VaadinPluginExtension#manageRepositories
+     *
+     * @param manage
+     */
+    void manageRepositories(boolean manage) {
+        this.manageRepositories = manage
+    }
+
+    /**
      * @see VaadinPluginExtension#serverPort
      *
      * @param port
