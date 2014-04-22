@@ -36,7 +36,7 @@ class VaadinPluginExtension {
     /**
      * The vaadin version to use. By default latest Vaadin 7 version.
      */
-    String version = "7+"
+    String version = "7.1.+"
 
     /**
      * The servlet version for the project.
