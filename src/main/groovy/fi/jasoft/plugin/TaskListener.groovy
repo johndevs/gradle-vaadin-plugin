@@ -58,6 +58,10 @@ public class TaskListener implements TaskExecutionListener {
             if (task.getName() == 'eclipseWtpComponent') {
                 configureEclipseWtpPluginComponent(task)
             }
+
+            if(task.getName() == 'ideaModule'){
+               configureIdeaModule(task)
+            }
         }
 
         if (task.getName() == 'eclipseWtpFacet') {
@@ -167,6 +171,31 @@ public class TaskListener implements TaskExecutionListener {
 
         if (Util.isPushSupportedAndEnabled(project)) {
             cp.plusConfigurations += conf[Configuration.PUSH.caption()]
+        }
+    }
+
+    private void configureIdeaModule(Task task) {
+        def conf = project.configurations
+        def module = project.idea.module
+
+        // Module name is project name
+        module.name = project.name
+
+        // Download sources and javadoc
+        module.downloadJavadoc = true
+        module.downloadSources = true
+
+        // Add configurations to classpath
+        module.scopes.put(Configuration.SERVER.caption(), ['plus':Collections.singletonList(conf[Configuration.SERVER.caption()])])
+        module.scopes.put(Configuration.CLIENT.caption(), ['plus':Collections.singletonList(conf[Configuration.CLIENT.caption()])])
+        module.scopes.put(Configuration.JETTY8.caption(), ['plus':Collections.singletonList(conf[Configuration.JETTY8.caption()])])
+
+        if (project.vaadin.testbench.enabled) {
+            module.scopes.put(Configuration.TESTBENCH.caption(), ['plus':Collections.singletonList(conf[Configuration.TESTBENCH.caption()])])
+        }
+
+        if (Util.isPushSupportedAndEnabled(project)) {
+            module.scopes.put(Configuration.PUSH.caption(), ['plus':Collections.singletonList(conf[Configuration.PUSH.caption()])])
         }
     }
 
