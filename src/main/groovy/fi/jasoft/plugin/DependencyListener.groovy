@@ -208,10 +208,12 @@ class DependencyListener implements ProjectEvaluationListener {
         def dependencies = project.dependencies
 
         // Theme compiler
-        File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-        FileTree themes = project.fileTree(dir: webAppDir.canonicalPath + '/VAADIN/themes', include: '**/styles.scss')
-        if (!themes.isEmpty()) {
-            dependencies.add(serverConf, "com.vaadin:vaadin-theme-compiler:${version}")
+        if(!Util.isSassCompilerSupported(project)){
+            File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
+            FileTree themes = project.fileTree(dir: webAppDir.canonicalPath + '/VAADIN/themes', include: '**/styles.scss')
+            if (!themes.isEmpty()) {
+                dependencies.add(serverConf, "com.vaadin:vaadin-theme-compiler:${version}")
+            }
         }
 
         // Client compiler or pre-compiled theme
