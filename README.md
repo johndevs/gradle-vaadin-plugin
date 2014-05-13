@@ -55,6 +55,7 @@ The following tasks are available in the plugin
 
 Not provided by the Vaadin plugin directly but inherited from other dependent plugins.
 * ``jar`` - Create Vaadin Directory compatible Addon jar out of the project. Metadata can be configurated with the vaadin.addon.* properties.
+* ``war``- Create a WAR archive of the project which can run on any application server.
 
 # Plugin configurations
 The following configuration options are available. 
