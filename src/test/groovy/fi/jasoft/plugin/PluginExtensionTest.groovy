@@ -35,7 +35,7 @@ class PluginExtensionTest extends PluginTestBase {
         VaadinPluginExtension vaadin = project.extensions.vaadin;
         assert vaadin.widgetset == null
         assert vaadin.widgetsetGenerator == null
-        assert vaadin.version == "7+"
+        assert vaadin.version == "7.1.+"
         assert vaadin.debug == true
         assert vaadin.debugPort == 8000
         assert vaadin.manageWidgetset == true

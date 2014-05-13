@@ -136,4 +136,14 @@ class Util {
         // no other vaadin projects found upwards, this is the root project
         return true
     }
+
+    public static boolean isSassCompilerSupported(Project project) {
+
+        // Sass compiler is supported 7.2+
+        String version = project.vaadin.version
+        if(version.startsWith("6") || version.startsWith("7.0") || version.startsWith("7.1") ){
+            return false
+        }
+        return true
+    }
 }

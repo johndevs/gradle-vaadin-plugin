@@ -57,7 +57,9 @@ Not provided by the Vaadin plugin directly but inherited from other dependent pl
 * ``jar`` - Create Vaadin Directory compatible Addon jar out of the project. Metadata can be configurated with the vaadin.addon.* properties.
 
 # Plugin configurations
-The following configuration options are available
+The following configuration options are available. 
+
+For a better example of an actual working build.gradle using these options see https://gist.github.com/johndevs/11184881 .
 
 ## Vaadin Project configurations
 * ``vaadin.version`` - Vaadin version (Vaadin 6 and 7 supported). Defaults to latest Vaadin 7
