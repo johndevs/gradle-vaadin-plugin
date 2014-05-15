@@ -15,9 +15,11 @@
 */
 package fi.jasoft.plugin
 
+import groovy.io.FileType
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.SourceDirectorySet
+import org.gradle.api.plugins.WarPluginConvention
 
 class Util {
 
@@ -145,5 +147,24 @@ class Util {
             return false
         }
         return true
+    }
+
+    public static List findAddonSassStylesInProject(Project project) {
+        File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
+        File addonsDir = project.file(webAppDir.canonicalPath+'/VAADIN/addons')
+
+        def paths = []
+
+        if(addonsDir.exists()){
+            addonsDir.traverse(type: FileType.DIRECTORIES) {
+                def themeName = it.getName()
+                def fileNameRegExp = ~/$themeName\.s?css/
+                it.traverse(type: FileType.FILES, nameFilter : fileNameRegExp) {
+                    paths += "/VAADIN/addons/$themeName/"+it.getName()
+                }
+            }
+        }
+
+        return paths
     }
 }

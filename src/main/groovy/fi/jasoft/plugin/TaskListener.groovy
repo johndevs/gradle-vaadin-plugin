@@ -266,10 +266,13 @@ public class TaskListener implements TaskExecutionListener {
             project.logger.warn("No version specified for the project, jar not compatible with Vaadin Directory.")
         }
 
+        def styles = Util.findAddonSassStylesInProject(project).join(',')
+
         // Add metadata to jar manifest
         task.manifest.attributes(
                 'Vaadin-Package-Version': 1,
                 'Vaadin-Widgetsets': widgetset,
+                'Vaadin-Stylesheets': styles,
                 'Vaadin-License-Title': project.vaadin.addon.license,
                 'Implementation-Title': project.vaadin.addon.title,
                 'Implementation-Version': project.version,
