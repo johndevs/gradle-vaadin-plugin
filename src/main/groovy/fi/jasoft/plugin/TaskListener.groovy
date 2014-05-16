@@ -294,13 +294,13 @@ public class TaskListener implements TaskExecutionListener {
         manifest.createNewFile()
 
         manifest << """
-            Vaadin-Package-Version = 1
-            Vaadin-License-Title = ${project.vaadin.addon.license}
-            Implementation-Title = ${project.vaadin.addon.title}
-            Implementation-Version = ${project.version != null ? project.version : ''}
-            Implementation-Vendor = ${project.vaadin.addon.author}
-            Vaadin-Addon = libs/${project.jar.archiveName}
-        """.stripIndent()
+            Vaadin-Package-Version: 1
+            Vaadin-License-Title: ${project.vaadin.addon.license}
+            Implementation-Title: ${project.vaadin.addon.title}
+            Implementation-Version: ${project.version != null ? project.version : ''}
+            Implementation-Vendor: ${project.vaadin.addon.author}
+            Vaadin-Addon: libs/${project.jar.archiveName}
+        """.stripIndent().trim()
     }
 
     private void configureJRebel(Task task) {
