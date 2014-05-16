@@ -41,6 +41,7 @@ The following tasks are available in the plugin
 * ``vaadinCreateComposite`` - Creates a new Vaadin Composite for use with VisualDesigner.
 * ``vaadinCreateProject`` - Creates a new Vaadin Project.
 * ``vaadinCreateTheme`` - Creates a new Vaadin Theme
+* ``vaadinCreateAddonTheme`` - Creates a new Vaadin addon theme
 * ``vaadinCreateWidgetsetGenerator`` - Creates a new widgetset generator for optimizing the widgetset
 * ``vaadinCreateTestbenchTest`` - Creates a new testbench JUnit test. (Requires Testbench enabled).
 * ``vaadinDevMode`` - Run Development Mode for easier debugging and development of client widgets.
