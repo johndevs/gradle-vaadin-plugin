@@ -13,13 +13,13 @@ You do not need to compile the plugin from scratch if you want to use it. You on
 or to use a specific version of the plugin
 
     apply from: 'http://plugins.jasoft.fi/vaadin.plugin?version=x.x.x'
-    
+
 If you are behind a proxy and cannot use the plugin url directly you then you can download the plugin jar from http://vaadin.com/addon/vaadin-plugin-for-gradle and include it in your build.gradle like so:
 ```
 apply plugin: 'vaadin'
 
 buildscript {
-    repositories {        
+    repositories {
         flatDir dirs: '<Directory where the plugin jar can be found>'
     }
 
@@ -32,7 +32,7 @@ repositories {
         flatDir dirs: '<Directory where the plugin jar can be found>'
 }
 ```
-    
+
 
 # Plugin tasks
 The following tasks are available in the plugin
@@ -58,7 +58,7 @@ Not provided by the Vaadin plugin directly but inherited from other dependent pl
 * ``war``- Create a WAR archive of the project which can run on any application server.
 
 # Plugin configurations
-The following configuration options are available. 
+The following configuration options are available.
 
 For a better example of an actual working build.gradle using these options see https://gist.github.com/johndevs/11184881 .
 
@@ -72,9 +72,10 @@ For a better example of an actual working build.gradle using these options see h
 * ``vaadin.manageRepositories`` - Should the plugin add repositories such as maven central and vaadin addons to the project.  Default is true.
 * ``vaadin.serverPort`` - The port the embedded server listens to. Default is 8080.
 * ``vaadin.jvmArgs`` - Additional JVM arguments passed to the vaadinRun task. Default is ''.
-* ``vaadin.addon.author`` - The author of the Vaadin addon. 
+* ``vaadin.addon.author`` - The author of the Vaadin addon.
 * ``vaadin.addon.license`` - The licence of the Vaadin addon.
 * ``vaadin.addon.title`` - The title for the addon as seen in the Vaadin Directory.
+* ``vaadin.addon.styles`` - An array of paths relative to webroot (eg. '/VAADIN/addons/myaddon/myaddon.scss') where CSS and SCSS files for an addon can be found.
 * ``vaadin.mainSourceSet`` - Defines the main source set where all source files will be generated.
 * ``vaadin.push`` - Should vaadin push be enabled for the application. Default is false.
 * ``vaadin.debug`` - Should the application be run in debug mode. Default is true.
@@ -99,10 +100,10 @@ gwt.jvmArgs = ['-Xmx500M', '-XX:MaxPermSize=256M']
 ## Vaadin Devmode configurations
 * ``vaadin.devmode.noserver`` - Do not run the embedded Jetty server when running devmode. Default is false.
 * ``vaadin.devmode.superDevMode`` - Add support for super devmode. Default is false.
-* ``vaadin.devmode.bindAddress`` - The address the DevMode server should be bound to. Default is 127.0.0.1. 
+* ``vaadin.devmode.bindAddress`` - The address the DevMode server should be bound to. Default is 127.0.0.1.
 * ``vaadin.devmode.codeServerPort`` - The port the DevMode server should be bound to. Default is 9997.
 
-## Vaadin Tooling configurations 
+## Vaadin Tooling configurations
 All Vaadin Tooling are free to try for 30 days but then requires a license. See https://vaadin.com/tools-and-services for more information.
 
 ### Vaadin JRebel
@@ -122,15 +123,15 @@ All Vaadin Tooling are free to try for 30 days but then requires a license. See 
 * ``vaadin.testbench.node.host`` - The hostname of the node
 * ``vaadin.testbench.node.port`` - The port of the node
 * ``vaadin.testbench.node.hub`` - The URL of the hub where the node should connect to. By default http://localhost:4444/grid/register'.
-* ``vaadin.testbench.node.browsers`` - A list of supported browsers by the hub. e.g. 
-```groovy 
+* ``vaadin.testbench.node.browsers`` - A list of supported browsers by the hub. e.g.
+```groovy
 vaadin.testbench.node.browsers = [
     [ browserName: 'firefox', version: 3.6, maxInstances: 5, platform: 'LINUX' ],
     [ browserName: 'chrome', version: 22, maxInstances: 1, platform: 'WINDOWS' ]
 ]
-```   
+```
 
 ## Plugin configurations
 * ``vaadin.plugin.terminateOnEnter`` - Should the vaadinRun and devmode tasks be terminated on enter-key. Default true.
 * ``vaadin.plugin.logToConsole``- Should server logs be logged to the console or to a log file. Default is logging to file.
-* ``vaadin.plugin.openInBrowser`` - Should the application be opened in a browser tab after the application is launched. Default true. 
+* ``vaadin.plugin.openInBrowser`` - Should the application be opened in a browser tab after the application is launched. Default true.
