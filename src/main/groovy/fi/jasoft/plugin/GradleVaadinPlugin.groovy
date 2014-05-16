@@ -83,7 +83,9 @@ class GradleVaadinPlugin implements Plugin<Project> {
         project.tasks.create(name: CompileThemeTask.NAME, type: CompileThemeTask, group: 'Vaadin')
         project.tasks.create(name: RunTask.NAME, type: RunTask, group: 'Vaadin')
         project.tasks.create(name: UpdateWidgetsetTask.NAME, type: UpdateWidgetsetTask, group: 'Vaadin')
+
         project.tasks.create(name: UpdateAddonStylesTask.NAME, type: UpdateAddonStylesTask, group: 'Vaadin')
+        project.tasks.create(name: CreateAddonThemeTask.NAME, type: CreateAddonThemeTask, group: 'Vaadin')
 
         project.tasks.create(name: BuildSourcesJarTask.NAME, type: BuildSourcesJarTask, group: 'Vaadin Utility')
         project.tasks.create(name: BuildJavadocJarTask.NAME, type: BuildJavadocJarTask, group: 'Vaadin Utility')
