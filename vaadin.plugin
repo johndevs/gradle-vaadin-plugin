@@ -8,17 +8,23 @@
  */ 
 buildscript {
     repositories {
-        def gradleVersion = Double.parseDouble(project.getGradle().gradleVersion);
-        if (gradleVersion >= 1.9){  
-             maven ({
-                 name = 'Jasoft.fi Maven Repository'
-                 url = 'http://mvn.jasoft.fi/maven2'
-             })
-        } else {
-             mavenRepo (
-                 name: 'Jasoft.fi Maven Repository',
-                 url: 'http://mvn.jasoft.fi/maven2'
-             )
+        def gradleVersion = project.getGradle().getGradleVersion().split("\\.")
+        def gradleMajorVersion = Integer.parseInt(gradleVersion[0])
+        def gradleMinorVersion =  Integer.parseInt(gradleVersion[1])
+
+        def repositoryName = 'Jasoft.fi Maven Repository'
+        def repositoryUrl = 'http://mvn.jasoft.fi/maven2'
+
+        if(gradleMinorVersion < 9){
+            mavenRepo(
+                name: repositoryName,
+                url: repositoryUrl
+            )
+        }  else {
+            maven({
+               name = repositoryName
+               url = repositoryUrl
+            })
         }
     }
    dependencies {

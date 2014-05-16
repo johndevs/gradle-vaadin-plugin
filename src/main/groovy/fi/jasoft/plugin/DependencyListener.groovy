@@ -100,7 +100,10 @@ class DependencyListener implements ProjectEvaluationListener {
 
     private static void addRepositories(Project project) {
 
-        def gradleVersion = Double.parseDouble(project.getGradle().gradleVersion);
+        def gradleVersion = project.getGradle().getGradleVersion().split("\\.")
+        def gradleMajorVersion = Integer.parseInt(gradleVersion[0])
+        def gradleMinorVersion =  Integer.parseInt(gradleVersion[1])
+
         def repositories = project.repositories
 
         // Ensure maven central and maven local are included
@@ -110,16 +113,16 @@ class DependencyListener implements ProjectEvaluationListener {
         // Add repositories
         Repositories.values().each { repository ->
             if (repositories.findByName(repository.caption()) == null) {
-                if (gradleVersion >= 1.9) {
-                    repositories.maven({
-                        name = repository.caption()
-                        url = repository.url()
-                    })
-                } else {
+                if(gradleMinorVersion < 9){
                     repositories.mavenRepo(
                             name: repository.caption(),
                             url: repository.url()
                     )
+                }  else {
+                    repositories.maven({
+                        name = repository.caption()
+                        url = repository.url()
+                    })
                 }
             }
         }

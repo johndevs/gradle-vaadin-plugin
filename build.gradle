@@ -99,7 +99,6 @@ processResources {
     }
 }
 
-
 jar {
     manifest{
         attributes(
