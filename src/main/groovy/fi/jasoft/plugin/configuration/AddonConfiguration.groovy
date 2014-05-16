@@ -36,6 +36,11 @@ class AddonConfiguration {
     String title = ''
 
     /**
+     * Array of paths (eg. /VAADIN/addons/myaddon/myaddon.scss) to stylesheets packaged with the addon
+     */
+    String[] styles = []
+
+    /**
      * @see AddonConfiguration#author
      *
      * @param author
@@ -60,5 +65,14 @@ class AddonConfiguration {
      */
     void title(String title) {
         this.title = title
+    }
+
+    /**
+     * @see AddonConfiguration#styles
+     *
+     * @param styles
+     */
+    void styles(String[] styles) {
+        this.styles = styles
     }
 }

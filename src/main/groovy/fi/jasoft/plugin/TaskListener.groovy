@@ -266,13 +266,23 @@ public class TaskListener implements TaskExecutionListener {
             project.logger.warn("No version specified for the project, jar not compatible with Vaadin Directory.")
         }
 
-        def styles = Util.findAddonSassStylesInProject(project).join(',')
+        // Get stylesheets
+        def styles = Util.findAddonSassStylesInProject(project)
+        if(project.vaadin.addon.styles != null){
+            project.vaadin.addon.styles.each({ path ->
+                if(path.endsWith('scss') || path.endsWith('.css')){
+                    styles.add(path)
+                } else {
+                    project.logger.warn("Could not add '"+path+"' to jar manifest. Only CSS and SCSS files are supported as addon styles.")
+                }
+            })
+        }
 
         // Add metadata to jar manifest
         task.manifest.attributes(
                 'Vaadin-Package-Version': 1,
                 'Vaadin-Widgetsets': widgetset,
-                'Vaadin-Stylesheets': styles,
+                'Vaadin-Stylesheets': styles.join(','),
                 'Vaadin-License-Title': project.vaadin.addon.license,
                 'Implementation-Title': project.vaadin.addon.title,
                 'Implementation-Version': project.version,
