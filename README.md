@@ -97,6 +97,7 @@ gwt.jvmArgs = ['-Xmx500M', '-XX:MaxPermSize=256M']
 * ``vaadin.gwt.extraArgs`` - Extra compiler arguments that should be passed to the widgetset compiler.
 * ``vaadin.gwt.sourcePaths`` - Source folders where GWT code that should be compiled to JS is found. Default is 'client' and 'shared'.
 * ``vaadin.gwt.collapsePermutations`` - Should all permutations be compiled into a single js file for faster compilation time (but larger file size).
+* ``vaadin.gwt.gwtSdkFirstInClasspath`` - Should GWT be placed first in the classpath when compiling the widgetset.
 
 ## Vaadin Devmode configurations
 * ``vaadin.devmode.noserver`` - Do not run the embedded Jetty server when running devmode. Default is false.

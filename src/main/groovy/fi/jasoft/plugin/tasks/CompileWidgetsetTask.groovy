@@ -15,6 +15,7 @@
 */
 package fi.jasoft.plugin.tasks
 
+import fi.jasoft.plugin.DependencyListener
 import fi.jasoft.plugin.Util
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection
@@ -73,6 +74,11 @@ class CompileWidgetsetTask extends DefaultTask {
         new File(webAppDir.canonicalPath + '/VAADIN/gwt-unitCache').mkdirs()
 
         FileCollection classpath = Util.getClassPath(project)
+
+        if(project.vaadin.gwt.gwtSdkFirstInClasspath){
+            FileCollection gwtCompilerClasspath = project.configurations[DependencyListener.Configuration.CLIENT.caption()];
+            classpath = gwtCompilerClasspath + classpath.minus(gwtCompilerClasspath);
+        }
 
         project.javaexec {
             setClasspath(classpath)

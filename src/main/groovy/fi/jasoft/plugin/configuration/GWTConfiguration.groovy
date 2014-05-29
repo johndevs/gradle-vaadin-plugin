@@ -86,6 +86,11 @@ class GWTConfiguration {
     String[] extraInherits
 
     /**
+     * Should GWT be placed first in the classpath when compiling the widgetset.
+     */
+    boolean gwtSdkFirstInClasspath = false
+
+    /**
      * @see GWTConfiguration#style
      *
      * @param style
@@ -205,5 +210,14 @@ class GWTConfiguration {
      */
     void logging(boolean logging) {
         this.logging = logging
+    }
+
+    /**
+     * @see GWTConfiguration#gwtSdkFirstInClasspath
+     *
+     * @param first
+     */
+    void gwtSdkFirstInClasspath(boolean first) {
+        this.gwtSdkFirstInClasspath = first
     }
 }
