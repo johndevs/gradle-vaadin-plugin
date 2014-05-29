@@ -35,7 +35,7 @@ class VaadinPluginExtension {
     /**
      * The vaadin version to use. By default latest Vaadin 7 version.
      */
-    String version = "7.1.+"
+    String version = "7.2.+"
 
     /**
      * Should application be run in debug mode. When running in production set this to true
