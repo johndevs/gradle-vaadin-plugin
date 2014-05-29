@@ -144,7 +144,7 @@ class DependencyListener implements ProjectEvaluationListener {
         def dependencies = project.dependencies
         if (!project.configurations.hasProperty(conf)) {
             project.configurations.create(conf)
-            dependencies.add(conf, 'org.eclipse.jetty.aggregate:jetty-all-server:8.1.10.v20130312')
+            dependencies.add(conf, 'org.eclipse.jetty.aggregate:jetty-all-server:8.1.15.v20140411')
             dependencies.add(conf, 'fi.jasoft.plugin:gradle-vaadin-plugin:' + GradleVaadinPlugin.getVersion())
             dependencies.add(conf, 'asm:asm-all:3.3.1')
             dependencies.add(conf, 'javax.servlet.jsp:jsp-api:2.2')
