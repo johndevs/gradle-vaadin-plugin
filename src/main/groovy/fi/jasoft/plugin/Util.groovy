@@ -150,8 +150,8 @@ class Util {
     }
 
     public static List findAddonSassStylesInProject(Project project) {
-        File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-        File addonsDir = project.file(webAppDir.canonicalPath+'/VAADIN/addons')
+        File resourceDir = project.sourceSets.main.resources.srcDirs.iterator().next()
+        File addonsDir = project.file(resourceDir.canonicalPath+'/VAADIN/addons')
 
         def paths = []
 

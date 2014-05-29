@@ -52,9 +52,8 @@ class CreateAddonThemeTask extends DefaultTask {
     }
 
     public void createTheme(String themeName) {
-
-        File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-        File themeDir = new File(webAppDir.canonicalPath + '/VAADIN/addons/' + themeName)
+        File resourceDir = project.sourceSets.main.resources.srcDirs.iterator().next()
+        File themeDir = new File(resourceDir.canonicalPath + '/VAADIN/addons/' + themeName)
         themeDir.mkdirs()
 
         def substitutions = [:]
