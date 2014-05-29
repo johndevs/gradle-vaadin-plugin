@@ -16,8 +16,10 @@
 package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.ApplicationServer
+import fi.jasoft.plugin.DependencyListener
 import fi.jasoft.plugin.Util
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskAction
 
@@ -25,10 +27,8 @@ class SuperDevModeTask extends DefaultTask {
 
     public static final String NAME = 'vaadinSuperDevMode'
 
-    private Process appServerProcess;
-
     public SuperDevModeTask() {
-        dependsOn('classes', UpdateWidgetsetTask.NAME)
+        dependsOn(CompileWidgetsetTask.NAME)
         description = "Run Super Development Mode for easier client widget development."
     }
 
@@ -63,17 +63,26 @@ class SuperDevModeTask extends DefaultTask {
         widgetsetsDir.mkdirs()
         String widgetset = project.vaadin.widgetset == null ? 'com.vaadin.terminal.gwt.DefaultWidgetSet' : project.vaadin.widgetset
 
-        def classpath = project.configurations.jetty8 + Util.getClassPath(project)
+        def jettyClasspath = project.configurations[DependencyListener.Configuration.JETTY8.caption()];
+        def classpath = jettyClasspath + Util.getClassPath(project)
+
+        if(project.vaadin.gwt.gwtSdkFirstInClasspath){
+            FileCollection gwtCompilerClasspath = project.configurations[DependencyListener.Configuration.CLIENT.caption()];
+            classpath = jettyClasspath + gwtCompilerClasspath + classpath.minus(gwtCompilerClasspath+jettyClasspath);
+        }
 
         project.javaexec {
             setMain('com.google.gwt.dev.codeserver.CodeServer')
             setClasspath(classpath)
             setArgs([
+                    '-bindAddress', project.vaadin.devmode.bindAddress,
                     '-port', 9876,
                     '-workDir', widgetsetsDir.canonicalPath,
                     '-src', javaDir.canonicalPath,
-                    widgetset])
-            jvmArgs('-Dgwt.compiler.skip=true')
+                    '-logLevel', project.vaadin.gwt.logLevel,
+                    '-noprecompile',
+                    widgetset]
+            )
         }
     }
 }

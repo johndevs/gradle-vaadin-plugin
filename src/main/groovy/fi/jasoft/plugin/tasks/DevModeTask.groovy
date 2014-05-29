@@ -16,8 +16,10 @@
 package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.ApplicationServer
+import fi.jasoft.plugin.DependencyListener
 import fi.jasoft.plugin.Util
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskAction
 
@@ -65,7 +67,13 @@ class DevModeTask extends DefaultTask {
 
     protected void runDevelopmentMode() {
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
+
         def classpath = Util.getClassPath(project)
+
+        if(project.vaadin.gwt.gwtSdkFirstInClasspath){
+            FileCollection gwtCompilerClasspath = project.configurations[DependencyListener.Configuration.CLIENT.caption()];
+            classpath = gwtCompilerClasspath + classpath.minus(gwtCompilerClasspath);
+        }
 
         project.javaexec {
             setMain('com.google.gwt.dev.DevMode')
