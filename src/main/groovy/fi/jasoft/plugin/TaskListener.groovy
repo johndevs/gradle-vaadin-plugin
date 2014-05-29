@@ -185,6 +185,11 @@ public class TaskListener implements TaskExecutionListener {
         // Module name is project name
         module.name = project.name
 
+        module.inheritOutputDirs = false
+        module.outputDir = project.file('build/classes/main')
+        module.testOutputDir = project.file('build/classes/test')
+
+
         // Download sources and javadoc
         module.downloadJavadoc = true
         module.downloadSources = true
