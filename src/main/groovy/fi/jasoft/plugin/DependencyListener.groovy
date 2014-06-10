@@ -232,7 +232,8 @@ class DependencyListener implements ProjectEvaluationListener {
             dependencies.add(clientConf, "com.vaadin:vaadin-client-compiler:${version}", {
 
                 // Project already has jetty, no need for it to be included again
-                exclude([group: 'org.mortbay.jetty'])
+                exclude([group: 'org.mortbay.jetty'])  // pre 7.2.2
+                exclude([group: 'org.eclipse.jetty'])
             })
 
             dependencies.add(clientConf, "com.vaadin:vaadin-client:${version}")
