@@ -45,7 +45,7 @@ class VaadinPluginExtension {
     /**
      * Should the Vaadin client side profiler be used
      */
-    boolean profiler = true
+    boolean profiler = false
 
     /**
      * The port the debugger listens to
