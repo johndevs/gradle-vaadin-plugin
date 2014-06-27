@@ -21,7 +21,7 @@ import org.gradle.api.plugins.WarPluginConvention
 
 public class ApplicationServer {
 
-    private appServerProcess;
+    private Process process;
 
     private final project;
 
@@ -31,7 +31,7 @@ public class ApplicationServer {
 
     public start() {
 
-        if (appServerProcess != null) {
+        if (process != null) {
             project.logger.error('Server is already running.')
             return
         }
@@ -42,7 +42,7 @@ public class ApplicationServer {
         File logDir = project.file('build/jetty/')
         logDir.mkdirs()
 
-        appServerProcess = ['java']
+        def appServerProcess = ['java']
 
         // Debug
         if (project.vaadin.debug) {
@@ -83,13 +83,13 @@ public class ApplicationServer {
         appServerProcess.add(classesDir.canonicalPath + '/')
 
         // Execute server
-        appServerProcess = appServerProcess.execute()
+        process = appServerProcess.execute()
 
         if (project.vaadin.plugin.logToConsole) {
-            appServerProcess.consumeProcessOutput(System.out, System.out)
+            process.consumeProcessOutput(System.out, System.out)
         } else {
             File log = new File(logDir.canonicalPath + '/jetty8-devMode.log')
-            appServerProcess.consumeProcessOutputStream(new FileOutputStream(log))
+            process.consumeProcessOutputStream(new FileOutputStream(log))
         }
 
         def resultStr = "Application running on http://0.0.0.0:${project.vaadin.serverPort} "
@@ -103,21 +103,15 @@ public class ApplicationServer {
         project.logger.lifecycle(resultStr)
     }
 
-
     public startAndBlock() {
         start()
         project.logger.lifecycle('Press [Ctrl+C] to terminate server...')
-        appServerProcess.waitFor()
+        process.waitFor()
         terminate()
     }
 
     public terminate() {
-        appServerProcess.in.close()
-        appServerProcess.out.close()
-        appServerProcess.err.close()
-        appServerProcess.destroy()
-        appServerProcess = null;
-
+        process.waitForOrKill(100)
         project.logger.lifecycle("Application server terminated.")
     }
 }
