@@ -165,20 +165,21 @@ public class TaskListener implements TaskExecutionListener {
         cp.defaultOutputDir = project.file('build/classes/main')
 
         // Add dependencies to eclipse classpath
-        cp.plusConfigurations += conf[Configuration.SERVER.caption()]
-        cp.plusConfigurations += conf[Configuration.CLIENT.caption()]
-        cp.plusConfigurations += conf[Configuration.JETTY8.caption()]
+        cp.plusConfigurations += [conf[Configuration.SERVER.caption()]]
+        cp.plusConfigurations += [conf[Configuration.CLIENT.caption()]]
+        cp.plusConfigurations += [conf[Configuration.JETTY8.caption()]]
 
         if (project.vaadin.testbench.enabled) {
-            cp.plusConfigurations += conf[Configuration.TESTBENCH.caption()]
+            cp.plusConfigurations += [conf[Configuration.TESTBENCH.caption()]]
         }
 
         if (Util.isPushSupportedAndEnabled(project)) {
-            cp.plusConfigurations += conf[Configuration.PUSH.caption()]
+            cp.plusConfigurations += [conf[Configuration.PUSH.caption()]]
         }
     }
 
     private void configureIdeaModule(Task task) {
+
         def conf = project.configurations
         def module = project.idea.module
 
@@ -195,16 +196,16 @@ public class TaskListener implements TaskExecutionListener {
         module.downloadSources = true
 
         // Add configurations to classpath
-        module.scopes.put(Configuration.SERVER.caption(), ['plus':Collections.singletonList(conf[Configuration.SERVER.caption()])])
-        module.scopes.put(Configuration.CLIENT.caption(), ['plus':Collections.singletonList(conf[Configuration.CLIENT.caption()])])
-        module.scopes.put(Configuration.JETTY8.caption(), ['plus':Collections.singletonList(conf[Configuration.JETTY8.caption()])])
+        module.scopes.COMPILE.plus += [conf[Configuration.SERVER.caption()]]
+        module.scopes.COMPILE.plus += [conf[Configuration.CLIENT.caption()]]
+        module.scopes.PROVIDED.plus += [conf[Configuration.JETTY8.caption()]]
 
         if (project.vaadin.testbench.enabled) {
-            module.scopes.put(Configuration.TESTBENCH.caption(), ['plus':Collections.singletonList(conf[Configuration.TESTBENCH.caption()])])
+            module.scopes.TEST.plus += [conf[Configuration.TESTBENCH.caption()]]
         }
 
         if (Util.isPushSupportedAndEnabled(project)) {
-            module.scopes.put(Configuration.PUSH.caption(), ['plus':Collections.singletonList(conf[Configuration.PUSH.caption()])])
+            module.scopes.RUNTIME.plus += [conf[Configuration.JETTY8.caption()]]
         }
     }
 
