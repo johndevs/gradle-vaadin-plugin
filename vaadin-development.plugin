@@ -10,7 +10,7 @@
  * use the vaadin.plugin script in your projects.
  */ 
 buildscript {
-    def gradlePluginDirectory = '/home/johnnie/Repositories/gradle-vaadin-plugin/build/libs'
+    def gradlePluginDirectory =  System.getProperty("user.home")+'/Repositories/gradle-vaadin-plugin/build/libs'
 
     repositories {
     	flatDir dirs: gradlePluginDirectory
