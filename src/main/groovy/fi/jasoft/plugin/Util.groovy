@@ -52,10 +52,10 @@ class Util {
                     project.sourceSets.main.compileClasspath
 
         Util.getMainSourceSet(project).srcDirs.each {
-            classpath += project.files(it)
+            classpath += [project.files(it)]
         }
         project.sourceSets.main.resources.srcDirs.each {
-            classpath += project.files(it)
+            classpath += [project.files(it)]
         }
         return classpath
     }
@@ -160,7 +160,7 @@ class Util {
                 def themeName = it.getName()
                 def fileNameRegExp = ~/$themeName\.s?css/
                 it.traverse(type: FileType.FILES, nameFilter : fileNameRegExp) {
-                    paths += "/VAADIN/addons/$themeName/"+it.getName()
+                    paths += ["/VAADIN/addons/$themeName/"+it.getName()]
                 }
             }
         }

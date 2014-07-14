@@ -163,14 +163,14 @@ class DependencyListener implements ProjectEvaluationListener {
             def sources = project.sourceSets.main
             def testSources = project.sourceSets.test
 
-            sources.compileClasspath += project.configurations[serverConf]
-            testSources.compileClasspath += project.configurations[serverConf]
-            testSources.runtimeClasspath += project.configurations[serverConf]
+            sources.compileClasspath += [project.configurations[serverConf]]
+            testSources.compileClasspath += [project.configurations[serverConf]]
+            testSources.runtimeClasspath += [project.configurations[serverConf]]
 
             // For servlet 3 support
-            sources.compileClasspath += project.configurations[jetty8Conf]
-            testSources.compileClasspath += project.configurations[jetty8Conf]
-            testSources.runtimeClasspath += project.configurations[jetty8Conf]
+            sources.compileClasspath += [project.configurations[jetty8Conf]]
+            testSources.compileClasspath += [project.configurations[jetty8Conf]]
+            testSources.runtimeClasspath += [project.configurations[jetty8Conf]]
 
             // Add server libs to war
             project.war.classpath(project.configurations[serverConf])
@@ -260,9 +260,9 @@ class DependencyListener implements ProjectEvaluationListener {
         if (!project.configurations.hasProperty(conf)) {
             project.configurations.create(conf)
 
-            sources.compileClasspath += project.configurations[conf]
-            testSources.compileClasspath += project.configurations[conf]
-            testSources.runtimeClasspath += project.configurations[conf]
+            sources.compileClasspath += [project.configurations[conf]]
+            testSources.compileClasspath += [project.configurations[conf]]
+            testSources.runtimeClasspath += [project.configurations[conf]]
         }
     }
 
@@ -274,8 +274,8 @@ class DependencyListener implements ProjectEvaluationListener {
             project.configurations.create(conf)
             project.dependencies.add(conf, "com.vaadin:vaadin-testbench:${project.vaadin.testbench.version}")
 
-            testSources.compileClasspath += project.configurations[conf]
-            testSources.runtimeClasspath += project.configurations[conf]
+            testSources.compileClasspath += [project.configurations[conf]]
+            testSources.runtimeClasspath += [project.configurations[conf]]
         }
     }
 
@@ -288,9 +288,9 @@ class DependencyListener implements ProjectEvaluationListener {
             project.configurations.create(conf)
             project.dependencies.add(conf, "com.vaadin:vaadin-push:${version}")
 
-            sources.compileClasspath += project.configurations[conf]
-            testSources.compileClasspath += project.configurations[conf]
-            testSources.runtimeClasspath += project.configurations[conf]
+            sources.compileClasspath += [project.configurations[conf]]
+            testSources.compileClasspath += [project.configurations[conf]]
+            testSources.runtimeClasspath += [project.configurations[conf]]
         }
     }
 }

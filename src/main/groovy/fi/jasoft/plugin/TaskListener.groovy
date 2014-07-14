@@ -108,10 +108,10 @@ public class TaskListener implements TaskExecutionListener {
         if (task.getName() == 'javadoc') {
             task.source = Util.getMainSourceSet(project)
             if (project.configurations.findByName(Configuration.JAVADOC.caption()) != null) {
-                task.classpath += project.configurations[Configuration.JAVADOC.caption()]
+                task.classpath += [project.configurations[Configuration.JAVADOC.caption()]]
             }
             if (project.configurations.findByName(Configuration.SERVER.caption()) != null) {
-                task.classpath += project.configurations[Configuration.SERVER.caption()]
+                task.classpath += [project.configurations[Configuration.SERVER.caption()]]
             }
             task.failOnError = false
             task.options.addStringOption("sourcepath", "")
@@ -211,7 +211,7 @@ public class TaskListener implements TaskExecutionListener {
 
     private void configureEclipseWtpPluginComponent(Task task) {
         def wtp = project.eclipse.wtp
-        wtp.component.plusConfigurations += project.configurations[Configuration.SERVER.caption()]
+        wtp.component.plusConfigurations += [project.configurations[Configuration.SERVER.caption()]]
     }
 
     private void configureEclipseWtpPluginFacet(Task task) {
