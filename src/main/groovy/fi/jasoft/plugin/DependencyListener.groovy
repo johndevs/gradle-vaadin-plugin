@@ -191,22 +191,6 @@ class DependencyListener implements ProjectEvaluationListener {
         }
     }
 
-    private static void createVaadin6Configuration(Project project, String version, String gwtVersion) {
-        createCommonVaadinConfiguration(project)
-
-        def serverConf = Configuration.SERVER.caption()
-        def clientConf = Configuration.CLIENT.caption()
-        def dependencies = project.dependencies
-
-        dependencies.add(serverConf, "com.vaadin:vaadin:${version}")
-
-        if (project.vaadin.widgetset != null) {
-            dependencies.add(clientConf, "com.google.gwt:gwt-user:" + gwtVersion)
-            dependencies.add(clientConf, "com.google.gwt:gwt-dev:" + gwtVersion)
-            dependencies.add(clientConf, "javax.validation:validation-api:1.0.0.GA")
-        }
-    }
-
     private static void createVaadin7Configuration(Project project, String version) {
 
         // Create common configuration for both Vaadin 6 and Vaadin 7
