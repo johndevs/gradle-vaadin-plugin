@@ -3,6 +3,8 @@ package fi.jasoft.plugin
 import org.gradle.api.plugins.WarPlugin
 import org.junit.Test
 
+import static org.junit.Assert.assertTrue
+
 /*
 * Copyright 2014 John Ahlroos
 *
@@ -22,6 +24,6 @@ class PluginConfigurationTest extends PluginTestBase{
 
     @Test
     void areDependantPluginsIncluded(){
-        assert project.plugins.hasPlugin(WarPlugin)
+        assertTrue project.plugins.hasPlugin(WarPlugin)
     }
 }

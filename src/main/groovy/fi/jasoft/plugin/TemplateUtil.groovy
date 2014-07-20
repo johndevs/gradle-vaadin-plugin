@@ -17,10 +17,30 @@ package fi.jasoft.plugin
 
 import groovy.text.SimpleTemplateEngine
 import org.gradle.api.Project
+import org.gradle.api.file.FileTree
 
 class TemplateUtil {
 
-    public static void writeTemplate(String templateFileName, File targetDir, String targetFileName = templateFileName, Map substitutions = [:], boolean removeBlankLines = false) {
+    /**
+     * Write a template based file to a directory
+     *
+     * @templateFileName
+     *      The filename of the template without the .template postfix
+     *
+     * @targetDir
+     *      The directory where the file should be put
+     *
+     * @targetFileName
+     *      The filename of the resulting file. By default the same filename as the template.
+     *
+     * @substitutions
+     *      Map of substitutions in the template. By default none.
+     *
+     * @removeBlankLines
+     *      Should resulting blank lines be removed. By default false.
+     *
+     */
+    static writeTemplate(templateFileName, targetDir, targetFileName = templateFileName, substitutions = [:], removeBlankLines = false) {
         def templateUrl = TemplateUtil.class.getClassLoader().getResource("templates/${templateFileName}.template")
         if (templateUrl == null) {
             throw new FileNotFoundException("Could not find template 'templates/${templateFileName}.template'")
@@ -47,21 +67,22 @@ class TemplateUtil {
         targetFile.write(content)
     }
 
-    public static File[] getFilesFromPublicFolder(Project project, String prefix) {
-
-        def files = []
-        project.sourceSets.main.resources.srcDirs.each {
-            project.fileTree(it.absolutePath).include("**/*/public/**/*.$prefix").each {
-                files.add(it)
-            }
-        }
-
-        Util.getMainSourceSet(project).srcDirs.each {
-            project.fileTree(it.absolutePath).include("**/*/public/**/*.$prefix").each {
-                files.add(it)
-            }
-        }
-
-        return files;
+    /**
+     * Returns files from the public folder in the project. The public folder can either be located in the resources or
+     * main source set folders. By default returns all the files, but can be limited to a set of files with a specific
+     * postfix (e.g. .css)
+     *
+     * @project
+     *      The project which public folder should be searched in
+     *
+     * @postfix
+     *      The optional postfix (e.g. css)
+     */
+    static File[] getFilesFromPublicFolder(Project project, String postfix='*') {
+        (project.sourceSets.main.resources + Util.getMainSourceSet(project).srcDirTrees.collect {
+            project.fileTree(it.dir)
+        } as FileTree).matching {
+            include "**/*/public/**/*.$postfix"
+        }.files
     }
 }

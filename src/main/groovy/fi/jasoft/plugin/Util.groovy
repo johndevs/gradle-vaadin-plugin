@@ -60,12 +60,22 @@ class Util {
         return classpath
     }
 
-    public static SourceDirectorySet getMainSourceSet(Project project) {
-        def sourceSet = project.vaadin.mainSourceSet
-        if (sourceSet == null) {
-            sourceSet = project.sourceSets.main.java
+    /**
+     * Returns the main source set where project source files are stored
+     *
+     * @param project
+     *      The project to get the source set from
+     *
+     * @return
+     *      The source set
+     */
+    static SourceDirectorySet getMainSourceSet(Project project) {
+        if(project.vaadin.mainSourceSet){
+            project.vaadin.mainSourceSet
+        } else {
+            // fallback to java source set
+            project.sourceSets.main.java
         }
-        return sourceSet
     }
 
     public static SourceDirectorySet getTestSourceSet(Project project) {

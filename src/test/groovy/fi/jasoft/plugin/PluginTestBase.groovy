@@ -35,6 +35,7 @@ class PluginTestBase {
     @After
     void tearDown(){
         plugin = null
+        project = null
         if(testDir.exists()){
             testDir.deleteDir()
         }
