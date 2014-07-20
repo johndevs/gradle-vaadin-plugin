@@ -113,3 +113,9 @@ jar {
         )
     }
 }
+
+test {
+    testLogging {
+        exceptionFormat "full"
+    }
+}
