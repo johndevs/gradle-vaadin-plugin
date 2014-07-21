@@ -1,0 +1,37 @@
+/*
+ * Bootstrap script for the Gradle Vaadin Plugin.
+ *
+ * The script will add the latest version of the plugin to the build script
+ * dependencies and apply the plugin to the project. If you do not want
+ * this behaviour you can copy&paste the below configuration into your
+ * own build script and define your own repository and version for the plugin.
+ */ 
+buildscript {
+    repositories {
+        def gradleVersion = project.getGradle().getGradleVersion().split("\\.")
+        def gradleMajorVersion = Integer.parseInt(gradleVersion[0])
+        def gradleMinorVersion =  Integer.parseInt(gradleVersion[1])
+
+        def repositoryName = 'Jasoft.fi Maven Repository'
+        def repositoryUrl = 'http://mvn.jasoft.fi/maven2'
+
+        if(gradleMinorVersion < 9 && gradleMajorVersion == 1){
+            mavenRepo(
+                name: repositoryName,
+                url: repositoryUrl
+            )
+        }  else {
+            maven({
+               name = repositoryName
+               url = repositoryUrl
+            })
+        }
+    }
+   dependencies {
+        classpath group: 'fi.jasoft.plugin', name: 'gradle-vaadin-plugin', version: '+'
+    }
+}
+if (!project.plugins.findPlugin(fi.jasoft.plugin.GradleVaadinGroovyPlugin)) {
+    project.apply(plugin: fi.jasoft.plugin.GradleVaadinGroovyPlugin)
+}
+
