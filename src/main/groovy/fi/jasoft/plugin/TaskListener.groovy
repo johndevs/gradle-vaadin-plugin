@@ -161,9 +161,6 @@ public class TaskListener implements TaskExecutionListener {
         // Always download sources
         cp.downloadSources = true
 
-        // Set class output dir to eclipse default
-        cp.defaultOutputDir = project.file('build/classes/main')
-
         // Add dependencies to eclipse classpath
         cp.plusConfigurations += [conf[Configuration.SERVER.caption()]]
         cp.plusConfigurations += [conf[Configuration.CLIENT.caption()]]
