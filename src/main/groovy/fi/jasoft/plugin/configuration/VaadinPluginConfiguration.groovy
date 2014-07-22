@@ -36,6 +36,11 @@ class VaadinPluginConfiguration {
     boolean openInBrowser = true
 
     /**
+     * The directory where Eclipse will output its compiled classes.
+     */
+    String eclipseOutputDir = null
+
+    /**
      * @see VaadinPluginConfiguration#logToConsole
      *
      * @param logToConsole
@@ -61,4 +66,14 @@ class VaadinPluginConfiguration {
     void openInBrowser(boolean openInBrowser) {
         this.openInBrowser = openInBrowser
     }
+
+    /**
+     * @see VaadinPluginConfiguration#eclipseOutputDir
+     *
+     * @param eclipseOutputDir
+     */
+    void eclipseOutputDir(String eclipseOutputDir) {
+        this.eclipseOutputDir = eclipseOutputDir
+    }
+
 }
