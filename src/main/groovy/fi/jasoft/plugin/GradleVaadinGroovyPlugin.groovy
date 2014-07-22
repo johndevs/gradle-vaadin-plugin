@@ -19,7 +19,8 @@ class GradleVaadinGroovyPlugin extends GradleVaadinPlugin {
         project.extensions.create('vaadin-groovy', VaadinPluginGroovyExtension)
 
         // Dependencies
-        project.getGradle().addProjectEvaluationListener(new GroovyDependencyListener())
+        project.gradle.addProjectEvaluationListener(new GroovyDependencyListener())
+        project.gradle.taskGraph.addTaskExecutionListener(new GroovyTaskListener(project))
 
         // Plugins
         project.plugins.apply(GroovyPlugin)
