@@ -29,15 +29,22 @@ targetCompatibility = 1.7
 
 uploadArchives {
     repositories.mavenDeployer {
-        def repo = System.getProperty('PLUGIN_MAVEN_REPOSITORY', '<plugin repository not defined>') 
+        def repo = System.getProperty('PLUGIN_MAVEN_REPOSITORY', '<plugin repository not defined>')
+        def snapshots = System.getProperty('PLUGIN_MAVEN_SNAPSHOT_REPOSITORY', '<plugin repository not defined>')
         def user = System.getProperty('PLUGIN_MAVEN_REPOSITORY_USER', '<user not defined>')
         def password = System.getProperty('PLUGIN_MAVEN_REPOSITORY_PASSWORD', '<password not defined>')
 
         name = 'sshDeployer' 
         configuration = configurations.deployerJars
+
         repository(url: repo) {
             authentication(userName: user, password: password)
         }
+
+        snapshotRepository(url: snapshots) {
+            authentication(userName: user, password: password)
+        }
+
 	    pom.project {
 	            licenses {
 	                license {
