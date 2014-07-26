@@ -1,0 +1,15 @@
+package ${applicationPackage}
+
+import javax.servlet.annotation.WebInitParam
+import javax.servlet.annotation.WebServlet
+import com.vaadin.server.VaadinServlet
+
+@WebServlet(
+    asyncSupported=${asyncEnabled},
+    urlPatterns=['/*','/VAADIN/*'],
+    initParams=[
+        <% print initParams.collect({ name, value ->
+            "@WebInitParam(name='${name}', value='${value}')"
+        }).join(',\n\t') %>
+    ])
+class ${applicationName}Servlet extends VaadinServlet { }

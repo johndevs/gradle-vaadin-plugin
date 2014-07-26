@@ -177,4 +177,8 @@ class Util {
 
         return paths
     }
+
+    def static boolean isGroovyProject(Project project){
+        project.plugins.findPlugin(fi.jasoft.plugin.GradleVaadinGroovyPlugin)
+    }
 }

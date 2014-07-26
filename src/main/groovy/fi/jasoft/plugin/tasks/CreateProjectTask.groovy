@@ -18,6 +18,7 @@ package fi.jasoft.plugin.tasks
 import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
 import org.gradle.api.DefaultTask
+import org.gradle.api.Project
 import org.gradle.api.tasks.TaskAction
 
 class CreateProjectTask extends DefaultTask {
@@ -50,8 +51,8 @@ class CreateProjectTask extends DefaultTask {
             }
         }
 
-        createUIClass()
-        createServletClass()
+        createUIClass(project)
+        createServletClass(project)
 
         if (Util.isAddonStylesSupported(project)) {
             project.tasks[CreateThemeTask.NAME].createTheme(applicationName)
@@ -60,7 +61,7 @@ class CreateProjectTask extends DefaultTask {
         project.tasks[UpdateWidgetsetTask.NAME].run()
     }
 
-    private void createUIClass() {
+    private void createUIClass(Project project) {
 
         def substitutions = [:]
 
@@ -101,10 +102,14 @@ class CreateProjectTask extends DefaultTask {
         File uidir = new File(javaDir.canonicalPath + '/' + applicationPackage.replaceAll(/\./, '/'))
         uidir.mkdirs()
 
-        TemplateUtil.writeTemplate('MyUI.java', uidir, applicationName + "UI.java", substitutions)
+        if(Util.isGroovyProject(project)){
+            TemplateUtil.writeTemplate('MyUI.groovy', uidir, applicationName + "UI.groovy", substitutions)
+        } else {
+            TemplateUtil.writeTemplate('MyUI.java', uidir, applicationName + "UI.java", substitutions)
+        }
     }
 
-    private void createServletClass() {
+    private void createServletClass(Project project) {
 
         def substitutions = [:]
 
@@ -128,7 +133,11 @@ class CreateProjectTask extends DefaultTask {
         File uidir = new File(javaDir.canonicalPath + '/' + applicationPackage.replaceAll(/\./, '/'))
         uidir.mkdirs()
 
-        TemplateUtil.writeTemplate("MyServlet.java", uidir, applicationName + "Servlet.java", substitutions)
+        if(Util.isGroovyProject(project)){
+            TemplateUtil.writeTemplate("MyServlet.groovy", uidir, applicationName + "Servlet.groovy", substitutions)
+        } else {
+            TemplateUtil.writeTemplate("MyServlet.java", uidir, applicationName + "Servlet.java", substitutions)
+        }
     }
 }
 
