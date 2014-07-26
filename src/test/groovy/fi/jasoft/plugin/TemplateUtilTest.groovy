@@ -34,7 +34,7 @@ class TemplateUtilTest extends PluginTestBase {
 
         File resultFile = new File(testDir.canonicalPath + "/quick-fox.txt")
 
-        assertEquals 'The quick brown fox jumps over the lazy dog', resultFile.getText()
+        assertEquals 'The quick brown fox jumps over the lazy dog', resultFile.text
     }
 
     @Test
@@ -45,14 +45,15 @@ class TemplateUtilTest extends PluginTestBase {
         // Get files
         def files = TemplateUtil.getFilesFromPublicFolder(project)
         assertEquals 3, files.size()
-        assertEquals 'This is a text file', files[0].text
-        assertEquals 'This is a css file', files[1].text
-        assertEquals 'This is a java file', files[2].text
+
+        assertEquals 'This is a css file',  files.find { it.name == 'file.css'}.text
+        assertEquals 'This is a java file',  files.find { it.name == 'file.java'}.text
+        assertEquals 'This is a text file',  files.find { it.name == 'file.txt'}.text
 
         // Get files with postfix
         files = TemplateUtil.getFilesFromPublicFolder(project, 'css')
         assertEquals 1, files.size()
-        assertEquals 'This is a css file', files[0].text
+        assertEquals 'This is a css file', files.find { it.name == 'file.css'}.text
     }
 
     @Test
