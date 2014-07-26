@@ -34,6 +34,9 @@ class GradleVaadinGroovyPlugin extends GradleVaadinPlugin {
        // Change main source set
        project.vaadin.mainSourceSet = project.sourceSets.main.groovy
 
+       // Change test source set
+       project.vaadin.mainTestSourceSet = project.sourceSets.test.groovy
+
 
    }
 }

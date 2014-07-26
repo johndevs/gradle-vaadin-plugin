@@ -1,0 +1,54 @@
+package ${packageName}
+
+import static org.junit.Assert.*
+
+import org.junit.*
+import org.openqa.selenium.*
+import org.openqa.selenium.firefox.FirefoxDriver
+
+import com.vaadin.testbench.TestBench
+import com.vaadin.testbench.TestBenchTestCase
+
+class ${testName} extends TestBenchTestCase {
+
+	def WebDriver driver
+
+	def String baseUrl
+
+	/*
+	 * Executed before the test is run
+	 */
+	@Before
+	void setUp() {
+		
+		// Using the Firefox driver (firefox need to be installed)
+		driver = TestBench.createDriver(new FirefoxDriver());
+		
+		// URL where the tested application can be accessed
+		baseUrl = "${appUrl}";
+	}
+
+	/*
+	 * Executed after the test has been run
+	 */
+	@After
+	void tearDown() {
+		
+		// Terminate the driver
+		driver.quit();
+	}
+
+	@Test
+	void testCase1() {
+		
+		// Open application page in the browser
+		driver.get(concatUrl(baseUrl, "/"));
+		
+		// Get the body element from the page
+		WebElement body = driver.findElement(By.tagName("body"));
+		
+		// Assert there are something in the body
+		assertTrue(body.text.length() > 0);
+	}
+
+}

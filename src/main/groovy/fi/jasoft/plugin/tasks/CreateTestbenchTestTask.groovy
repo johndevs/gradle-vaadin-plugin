@@ -50,7 +50,7 @@ class CreateTestbenchTestTask extends DefaultTask {
 
     private void createTestClass() {
 
-        File javaDir = Util.getTestSourceSet(project).srcDirs.iterator().next()
+        File javaDir = Util.getMainTestSourceSet(project).srcDirs.iterator().next()
         File packageDir = new File(javaDir.canonicalPath + "/" + testPackage.replaceAll(/\./, '/'))
 
         packageDir.mkdirs()
@@ -60,6 +60,10 @@ class CreateTestbenchTestTask extends DefaultTask {
         substitutions['testName'] = testName
         substitutions['appUrl'] = "http://localhost:${project.vaadin.serverPort}"
 
-        TemplateUtil.writeTemplate("MyTest.java", packageDir, testName + ".java", substitutions)
+        if(Util.isGroovyProject(project)){
+            TemplateUtil.writeTemplate("MyTest.groovy", packageDir, testName + ".groovy", substitutions)
+        } else {
+            TemplateUtil.writeTemplate("MyTest.java", packageDir, testName + ".java", substitutions)
+        }
     }
 }

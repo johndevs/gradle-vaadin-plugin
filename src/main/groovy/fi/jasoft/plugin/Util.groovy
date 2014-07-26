@@ -78,8 +78,13 @@ class Util {
         }
     }
 
-    public static SourceDirectorySet getTestSourceSet(Project project) {
-        return project.sourceSets.test.java
+    public static SourceDirectorySet getMainTestSourceSet(Project project) {
+        if(project.vaadin.mainTestSourceSet){
+            project.vaadin.mainTestSourceSet
+        } else {
+            // fallback to java source set
+            project.sourceSets.test.java
+        }
     }
 
     public static boolean isPushSupportedAndEnabled(Project project) {

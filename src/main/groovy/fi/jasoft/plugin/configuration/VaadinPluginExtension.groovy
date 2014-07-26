@@ -113,6 +113,11 @@ class VaadinPluginExtension {
     SourceDirectorySet mainSourceSet = null
 
     /**
+     * THe directory for the main test source set. By default src/test/java.
+     */
+    SourceDirectorySet mainTestSourceSet = null
+
+    /**
      * Should server push be enabled.
      */
     boolean push = false
@@ -232,6 +237,15 @@ class VaadinPluginExtension {
      */
     void mainSourceSet(SourceDirectorySet set) {
         this.mainSourceSet = set
+    }
+
+    /**
+     * @see VaadinPluginExtension#mainSourceSet
+     *
+     * @param set
+     */
+    void mainTestSourceSet(SourceDirectorySet set) {
+        this.mainTestSourceSet = set
     }
 
     /**
