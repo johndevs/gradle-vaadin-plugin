@@ -1,2 +1,2 @@
 language: groovy
-script: ./gradlew test
+script: ./gradlew clean test
