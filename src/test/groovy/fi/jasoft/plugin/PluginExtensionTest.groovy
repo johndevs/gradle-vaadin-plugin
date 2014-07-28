@@ -50,6 +50,7 @@ class PluginExtensionTest extends PluginTestBase {
         assert vaadin.gwt instanceof GWTConfiguration
         assert vaadin.mainSourceSet == null
         assert vaadin.push == false
+        assert vaadin.eclipseOutputDir == null
     }
 
     @Test

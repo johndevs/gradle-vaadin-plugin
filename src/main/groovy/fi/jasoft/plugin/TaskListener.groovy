@@ -161,6 +161,14 @@ public class TaskListener implements TaskExecutionListener {
         // Always download sources
         cp.downloadSources = true
 
+        // Set Eclipse's class output dir
+        if (project.vaadin.eclipseOutputDir == null) {
+            cp.defaultOutputDir = project.sourceSets.main.output.classesDir
+        }
+        else {
+            cp.defaultOutputDir = project.file(project.vaadin.eclipseOutputDir)
+        }
+
         // Add dependencies to eclipse classpath
         cp.plusConfigurations += [conf[Configuration.SERVER.caption()]]
         cp.plusConfigurations += [conf[Configuration.CLIENT.caption()]]

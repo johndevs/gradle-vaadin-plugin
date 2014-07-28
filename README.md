@@ -81,6 +81,7 @@ For a better example of an actual working build.gradle using these options see h
 * ``vaadin.push`` - Should vaadin push be enabled for the application. Default is false.
 * ``vaadin.debug`` - Should the application be run in debug mode. Default is true.
 * ``vaadin.profiler`` - Should the vaadin client side profiler be enabled. Default is false.
+* ``vaadin.eclipseOutputDir`` - The directory where Eclipse will output its compiled classes. Default is project.sourceSets.main.output.classesDir.
 
 ## Vaadin GWT configurations
 * ``vaadin.gwt.style`` - Compilation style of the GWT compiler. Default is OBF.
