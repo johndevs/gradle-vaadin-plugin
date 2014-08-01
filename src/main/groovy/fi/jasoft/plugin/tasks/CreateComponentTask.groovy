@@ -55,15 +55,17 @@ class CreateComponentTask extends DefaultTask {
 
     private void createComponentClasses() {
 
-        File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
-        File widgetsetFile = new File(javaDir.canonicalPath + '/' + project.vaadin.widgetset.replaceAll(/\./, '/') + ".gwt.xml")
-        File widgetsetDir = new File(widgetsetFile.parent)
-        File componentDir = new File(widgetsetDir.canonicalPath + '/server/' + componentName.toLowerCase())
+        def widgetsetRelativePath = project.vaadin.widgetset.replaceAll(/\./, '/') + '.gwt.xml'
+        def widgetsetPackagePath = widgetsetRelativePath.split("\\/").getAt(0..<-1).join('/')
+
+        def serverDir = Util.getMainSourceSet(project, true).srcDirs.iterator().next()
+        def clientDir = Util.getMainSourceSet(project, true).srcDirs.iterator().next()
+
+        def componentDir = (serverDir.canonicalPath + '/' + widgetsetPackagePath + '/server/' + componentName.toLowerCase() ) as File
+        def widgetDir = (clientDir.canonicalPath + '/' + widgetsetPackagePath + '/client/' + componentName.toLowerCase() ) as File
 
         componentDir.mkdirs()
-
-        File clientui = new File(widgetsetDir.canonicalPath + '/client/' + componentName.toLowerCase())
-        clientui.mkdirs()
+        widgetDir.mkdirs()
 
         String widgetsetName = project.vaadin.widgetset.tokenize('.').last()
         String widgetsetPackage = project.vaadin.widgetset.replaceAll('.' + widgetsetName, '')
@@ -75,7 +77,7 @@ class CreateComponentTask extends DefaultTask {
         substitutions['componentStylename'] = componentName.toLowerCase()
 
         TemplateUtil.writeTemplate("MyComponent.java", componentDir, componentName + ".java", substitutions)
-        TemplateUtil.writeTemplate("MyComponentWidget.java", clientui, componentName + "Widget.java", substitutions)
-        TemplateUtil.writeTemplate("MyComponentConnector.java", clientui, componentName + "Connector.java", substitutions)
+        TemplateUtil.writeTemplate("MyComponentWidget.java", widgetDir, componentName + "Widget.java", substitutions)
+        TemplateUtil.writeTemplate("MyComponentConnector.java", widgetDir, componentName + "Connector.java", substitutions)
     }
 }

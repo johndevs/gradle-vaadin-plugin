@@ -41,7 +41,7 @@ class CreateWidgetsetGeneratorTask extends DefaultTask {
 
     private void createWidgetsetGeneratorClass() {
 
-        File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
+        def javaDir = Util.getMainSourceSet(project, true).srcDirs.iterator().next()
 
         String name, pkg, filename
         if (project.vaadin.widgetsetGenerator == null) {
@@ -55,7 +55,7 @@ class CreateWidgetsetGeneratorTask extends DefaultTask {
             filename = name + ".java"
         }
 
-        File dir = new File(javaDir.canonicalPath + '/' + pkg.replaceAll(/\./, '/'))
+        def dir = (javaDir.canonicalPath + '/' + pkg.replaceAll(/\./, '/')) as File
 
         dir.mkdirs()
 

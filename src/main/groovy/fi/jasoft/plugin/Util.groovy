@@ -54,6 +54,14 @@ class Util {
         Util.getMainSourceSet(project).srcDirs.each {
             classpath += [project.files(it)]
         }
+
+        if(Util.isGroovyProject(project)){
+            // Groovy projects might still have java files (client side code)
+            project.sourceSets.main.java.srcDirs.each {
+                classpath += [project.files(it)]
+            }
+        }
+
         project.sourceSets.main.resources.srcDirs.each {
             classpath += [project.files(it)]
         }
@@ -69,20 +77,20 @@ class Util {
      * @return
      *      The source set
      */
-    static SourceDirectorySet getMainSourceSet(Project project) {
+    static SourceDirectorySet getMainSourceSet(project, forceDefaultJavaSourceset=false) {
         if(project.vaadin.mainSourceSet) {
             project.vaadin.mainSourceSet
-        } else if(Util.isGroovyProject(project)) {
+        } else if(Util.isGroovyProject(project) && !forceDefaultJavaSourceset) {
             project.sourceSets.main.groovy
         } else {
             project.sourceSets.main.java
         }
     }
 
-    public static SourceDirectorySet getMainTestSourceSet(Project project) {
+    static SourceDirectorySet getMainTestSourceSet(project, forceDefaultJavaSourceset=false) {
         if(project.vaadin.mainTestSourceSet) {
             project.vaadin.mainTestSourceSet
-        } else if(Util.isGroovyProject(project)) {
+        } else if(Util.isGroovyProject(project) && !forceDefaultJavaSourceset) {
             project.sourceSets.test.groovy
         } else {
             project.sourceSets.test.java
