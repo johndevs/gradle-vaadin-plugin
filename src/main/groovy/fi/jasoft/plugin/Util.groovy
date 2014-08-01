@@ -70,19 +70,21 @@ class Util {
      *      The source set
      */
     static SourceDirectorySet getMainSourceSet(Project project) {
-        if(project.vaadin.mainSourceSet){
+        if(project.vaadin.mainSourceSet) {
             project.vaadin.mainSourceSet
+        } else if(Util.isGroovyProject(project)) {
+            project.sourceSets.main.groovy
         } else {
-            // fallback to java source set
             project.sourceSets.main.java
         }
     }
 
     public static SourceDirectorySet getMainTestSourceSet(Project project) {
-        if(project.vaadin.mainTestSourceSet){
+        if(project.vaadin.mainTestSourceSet) {
             project.vaadin.mainTestSourceSet
+        } else if(Util.isGroovyProject(project)) {
+            project.sourceSets.test.groovy
         } else {
-            // fallback to java source set
             project.sourceSets.test.java
         }
     }

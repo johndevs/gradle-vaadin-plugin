@@ -24,19 +24,5 @@ class GradleVaadinGroovyPlugin extends GradleVaadinPlugin {
 
         // Plugins
         project.plugins.apply(GroovyPlugin)
-
-        // Modify defaults of vaadin plugin to suit Groovy projects
-       configureVaadinPlugin(project)
     }
-
-   def configureVaadinPlugin(Project project) {
-
-       // Change main source set
-       project.vaadin.mainSourceSet = project.sourceSets.main.groovy
-
-       // Change test source set
-       project.vaadin.mainTestSourceSet = project.sourceSets.test.groovy
-
-
-   }
 }
