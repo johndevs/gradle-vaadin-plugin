@@ -1,0 +1,14 @@
+package ${componentPackage}
+
+import com.vaadin.ui.CssLayout
+import com.vaadin.ui.CustomComponent
+
+class ${componentName} extends CustomComponent {
+
+	${componentName}() {
+        // The root of the composite where all components gets added. All composites require a root layout to work.
+        compositionRoot = new CssLayout()
+
+		// TODO add user code here
+	}
+}

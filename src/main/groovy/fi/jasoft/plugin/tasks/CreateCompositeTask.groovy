@@ -65,6 +65,11 @@ public class CreateCompositeTask extends DefaultTask {
         substitutions['componentPackage'] = componentPackage
         substitutions['componentName'] = componentName
 
-        TemplateUtil.writeTemplate("MyComposite.java", componentDir, componentName + ".java", substitutions)
+        if(Util.isGroovyProject(project)){
+            TemplateUtil.writeTemplate("MyComposite.groovy", componentDir, componentName + ".groovy", substitutions)
+        } else {
+            TemplateUtil.writeTemplate("MyComposite.java", componentDir, componentName + ".java", substitutions)
+        }
+
     }
 }
