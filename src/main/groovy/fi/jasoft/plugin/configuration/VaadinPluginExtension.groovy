@@ -118,11 +118,6 @@ class VaadinPluginExtension {
     boolean push = false
 
     /**
-     * The directory where Eclipse will output its compiled classes.
-     */
-    String eclipseOutputDir = null
-
-    /**
      * @see VaadinPluginExtension#widgetset
      *
      * @param widgetset
@@ -228,15 +223,6 @@ class VaadinPluginExtension {
      */
     void push(boolean push) {
         this.push = push
-    }
-
-    /**
-     * @see VaadinPluginExtension#eclipseOutputDir
-     *
-     * @param eclipseOutputDir
-     */
-    void eclipseOutputDir(String eclipseOutputDir) {
-        this.eclipseOutputDir = eclipseOutputDir
     }
 
     /**
