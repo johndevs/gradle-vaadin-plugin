@@ -63,7 +63,7 @@ class SuperDevModeTask extends DefaultTask {
         widgetsetsDir.mkdirs()
         String widgetset = project.vaadin.widgetset == null ? 'com.vaadin.terminal.gwt.DefaultWidgetSet' : project.vaadin.widgetset
 
-        def jettyClasspath = project.configurations[DependencyListener.Configuration.JETTY8.caption()];
+        def jettyClasspath = project.configurations[DependencyListener.Configuration.JETTY9.caption()];
         def classpath = jettyClasspath + Util.getClassPath(project)
 
         if(project.vaadin.gwt.gwtSdkFirstInClasspath){

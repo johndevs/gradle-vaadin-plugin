@@ -167,7 +167,7 @@ public class TaskListener implements TaskExecutionListener {
         // Add dependencies to eclipse classpath
         cp.plusConfigurations += [conf[Configuration.SERVER.caption()]]
         cp.plusConfigurations += [conf[Configuration.CLIENT.caption()]]
-        cp.plusConfigurations += [conf[Configuration.JETTY8.caption()]]
+        cp.plusConfigurations += [conf[Configuration.JETTY9.caption()]]
 
         if (project.vaadin.testbench.enabled) {
             cp.plusConfigurations += [conf[Configuration.TESTBENCH.caption()]]
@@ -198,14 +198,14 @@ public class TaskListener implements TaskExecutionListener {
         // Add configurations to classpath
         module.scopes.COMPILE.plus += [conf[Configuration.SERVER.caption()]]
         module.scopes.COMPILE.plus += [conf[Configuration.CLIENT.caption()]]
-        module.scopes.PROVIDED.plus += [conf[Configuration.JETTY8.caption()]]
+        module.scopes.PROVIDED.plus += [conf[Configuration.JETTY9.caption()]]
 
         if (project.vaadin.testbench.enabled) {
             module.scopes.TEST.plus += [conf[Configuration.TESTBENCH.caption()]]
         }
 
         if (Util.isPushSupportedAndEnabled(project)) {
-            module.scopes.RUNTIME.plus += [conf[Configuration.JETTY8.caption()]]
+            module.scopes.RUNTIME.plus += [conf[Configuration.JETTY9.caption()]]
         }
     }
 

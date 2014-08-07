@@ -15,21 +15,25 @@
 */
 package fi.jasoft.plugin.server;
 
-import org.eclipse.jetty.util.thread.QueuedThreadPool;
+import org.eclipse.jetty.annotations.AnnotationConfiguration;
+import org.eclipse.jetty.deploy.DeploymentManager;
+import org.eclipse.jetty.deploy.PropertiesConfigurationManager;
+import org.eclipse.jetty.deploy.providers.WebAppProvider;
+import org.eclipse.jetty.jmx.MBeanContainer;
+import org.eclipse.jetty.plus.webapp.EnvConfiguration;
+import org.eclipse.jetty.plus.webapp.PlusConfiguration;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.*;
+import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.resource.FileResource;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.resource.ResourceCollection;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.webapp.*;
-import org.eclipse.jetty.plus.webapp.*;
-import org.eclipse.jetty.server.handler.*;
-import org.eclipse.jetty.server.*;
-import org.eclipse.jetty.annotations.*;
-
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.net.URLClassLoader;
+import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,33 +57,45 @@ public class ApplicationServerRunner {
         String classes = args[2];
 
         List<String> resources = new ArrayList<String>();
+        List<Resource> resources2 = new ArrayList<Resource>();
         if(new File(webapp).exists()){
             resources.add(webapp);
+            resources2.add(new FileResource(new File(webapp).toURI()));
         }
         if(new File(classes).exists()){
             resources.add(classes);
+            resources2.add(new FileResource(new File(classes).toURI()));
         }
 
         // For debugging
-        // System.setProperty("org.eclipse.jetty.LEVEL", "DEBUG");
+        //System.setProperty("org.eclipse.jetty.LEVEL", "DEBUG");
 
         Server server = new Server(port);
+    
+        // Setup JMX
+        MBeanContainer mbContainer=new MBeanContainer(ManagementFactory.getPlatformMBeanServer());
+        server.addBean(mbContainer);
 
         // Static file handler
         WebAppContext handler = new WebAppContext();
         handler.setConfigurations(new Configuration[] {
-                new RJRAnnotationConfiguration(resources), new WebXmlConfiguration(),
-                new WebInfConfiguration(), new TagLibConfiguration(),
-                new PlusConfiguration(), new MetaInfConfiguration(),
-                new FragmentConfiguration(), new EnvConfiguration() });
+                new WebXmlConfiguration(),
+                new WebInfConfiguration(),
+                new PlusConfiguration(),
+                new MetaInfConfiguration(),
+                new FragmentConfiguration(),
+                new EnvConfiguration(),
+                new AnnotationConfiguration(),
+                new JettyWebXmlConfiguration(),
+        });
         handler.setContextPath("/");
-
         handler.setBaseResource(new ResourceCollection(resources.toArray(new String[resources.size()])));
-
         handler.setParentLoaderPriority(true);
-        handler.setClassLoader(Thread.currentThread().getContextClassLoader());
-
+        handler.setExtraClasspath(classes);
+        handler.setClassLoader(new WebAppClassLoader(ApplicationServerRunner.class.getClassLoader(), handler));
+        handler.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern",".*/build/classes/.*");
         server.setHandler(handler);
+
         server.start();
         server.join();
     }
