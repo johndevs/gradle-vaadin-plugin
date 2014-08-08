@@ -18,6 +18,7 @@ package fi.jasoft.plugin.configuration
 /**
  * Configuration options for the testbench hub
  */
+@PluginConfiguration
 class TestBenchHubConfiguration {
 
     /**
@@ -34,31 +35,4 @@ class TestBenchHubConfiguration {
      * The port the hub should be run on
      */
     int port = 4444
-
-    /**
-     * @see TestBenchHubConfiguration#enabled
-     *
-     * @param enabled
-     */
-    void enabled(boolean enabled) {
-        this.enabled = enabled
-    }
-
-    /**
-     * @see TestBenchHubConfiguration#host
-     *
-     * @param host
-     */
-    void host(String host) {
-        this.host = host
-    }
-
-    /**
-     * @see TestBenchHubConfiguration#port
-     *
-     * @param port
-     */
-    void port(int port) {
-        this.port = port
-    }
 }

@@ -18,6 +18,7 @@ package fi.jasoft.plugin.configuration
 /**
  * Configuration for Development Mode
  */
+@PluginConfiguration
 class DevelopmentModeConfiguration {
 
     /**
@@ -39,40 +40,4 @@ class DevelopmentModeConfiguration {
      * To what port should development mode bind itself to.
      */
     int codeServerPort = 9997
-
-    /**
-     * @see DevelopmentModeConfiguration#noserver
-     *
-     * @param noserver
-     */
-    void noserver(boolean noserver) {
-        this.noserver = noserver
-    }
-
-    /**
-     * @see DevelopmentModeConfiguration#superDevMode
-     *
-     * @param superDevMode
-     */
-    void superDevMode(boolean superDevMode) {
-        this.superDevMode = superDevMode
-    }
-
-    /**
-     * @see DevelopmentModeConfiguration#bindAddress
-     *
-     * @param bindAddress
-     */
-    void bindAddress(String bindAddress) {
-        this.bindAddress = bindAddress
-    }
-
-    /**
-     * @see DevelopmentModeConfiguration#codeServerPort
-     *
-     * @param codeServerPort
-     */
-    void codeServerPort(int codeServerPort) {
-        this.codeServerPort = codeServerPort
-    }
 }

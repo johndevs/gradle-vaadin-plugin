@@ -53,14 +53,13 @@ class DependencyListener implements ProjectEvaluationListener {
         SNAPSHOTS('Vaadin snapshots', 'http://oss.sonatype.org/content/repositories/vaadin-snapshots'),
         JASOFT('Jasoft.fi Maven repository', 'http://mvn.jasoft.fi/maven2')
 
-        final private String caption
-        final private String url
+        def String caption
+        def String url
 
-        Repositories(String caption, String url) { this.caption = caption; this.url = url }
-
-        public caption() { return caption }
-
-        public url() { return url }
+        Repositories(String caption, String url) {
+            this.caption = caption;
+            this.url = url
+        }
     }
 
     void beforeEvaluate(Project project) {
@@ -120,10 +119,10 @@ class DependencyListener implements ProjectEvaluationListener {
 
         // Add repositories
         Repositories.values().each { repository ->
-            if (repositories.findByName(repository.caption()) == null) {
+            if (repositories.findByName(repository.caption) == null) {
                 repositories.maven({
-                    name = repository.caption()
-                    url = repository.url()
+                    name = repository.caption
+                    url = repository.url
                 })
             }
         }

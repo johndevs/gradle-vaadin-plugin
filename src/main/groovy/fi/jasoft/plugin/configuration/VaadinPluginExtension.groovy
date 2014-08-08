@@ -20,6 +20,7 @@ import org.gradle.api.file.SourceDirectorySet
 /**
  * Plugin configuration extension
  */
+@PluginConfiguration
 class VaadinPluginExtension {
 
     /**
@@ -80,32 +81,34 @@ class VaadinPluginExtension {
     /**
      * The configuration for JRebel
      */
-    JRebelConfiguration jrebel = new JRebelConfiguration()
+    final JRebelConfiguration jrebel = new JRebelConfiguration()
 
     /**
      * The configuration for Development mode
      */
-    DevelopmentModeConfiguration devmode = new DevelopmentModeConfiguration()
+    final DevelopmentModeConfiguration devmode = new DevelopmentModeConfiguration()
 
     /**
      * The configuration for the plugin itself
      */
-    VaadinPluginConfiguration plugin = new VaadinPluginConfiguration()
+    final VaadinPluginConfiguration plugin = new VaadinPluginConfiguration()
 
     /**
      * Configuration options for addons
      */
-    AddonConfiguration addon = new AddonConfiguration()
+    final AddonConfiguration addon = new AddonConfiguration()
+
+
 
     /**
      * Configuration options for GWT
      */
-    GWTConfiguration gwt = new GWTConfiguration()
+    final GWTConfiguration gwt = new GWTConfiguration()
 
     /**
      * Configuration options for TestBench
      */
-    TestBenchConfiguration testbench = new TestBenchConfiguration()
+    final TestBenchConfiguration testbench = new TestBenchConfiguration()
 
     /**
      * The directory for the main source set. By default src/main/java .
@@ -121,202 +124,4 @@ class VaadinPluginExtension {
      * Should server push be enabled.
      */
     boolean push = false
-
-    /**
-     * @see VaadinPluginExtension#widgetset
-     *
-     * @param widgetset
-     */
-    void widgetset(String widgetset) {
-        this.widgetset = widgetset
-    }
-
-    /**
-     * @see VaadinPluginExtension#widgetsetGenerator
-     *
-     * @param widgetsetGenerator
-     */
-    void widgetsetGenerator(String widgetsetGenerator) {
-        this.widgetsetGenerator = widgetsetGenerator
-    }
-
-    /**
-     * @see VaadinPluginExtension#version
-     *
-     * @param version
-     */
-    void version(String version) {
-        this.version = version
-    }
-
-    /**
-     * @see VaadinPluginExtension#debug
-     *
-     * @param debug
-     */
-    void debug(boolean debug) {
-        this.debug = debug
-    }
-
-    /**
-     * @see VaadinPluginExtension#profiler
-     *
-     * @param profilerEnabled
-     */
-    void profiler(boolean profilerEnabled) {
-        this.profiler = profilerEnabled
-    }
-
-    /**
-     * @see VaadinPluginExtension#debugPort
-     *
-     * @param port
-     */
-    void debugPort(int port) {
-        this.debugPort = port
-    }
-
-    /**
-     * @see VaadinPluginExtension#manageWidgetset
-     *
-     * @param manage
-     */
-    void manageWidgetset(boolean manage) {
-        this.manageWidgetset = manage
-    }
-
-    /**
-     * @see VaadinPluginExtension#manageDependencies
-     *
-     * @param manage
-     */
-    void manageDependencies(boolean manage) {
-        this.manageDependencies = manage
-    }
-
-    /**
-     * @see VaadinPluginExtension#manageRepositories
-     *
-     * @param manage
-     */
-    void manageRepositories(boolean manage) {
-        this.manageRepositories = manage
-    }
-
-    /**
-     * @see VaadinPluginExtension#serverPort
-     *
-     * @param port
-     */
-    void serverPort(int port) {
-        this.serverPort = port;
-    }
-
-    /**
-     * @see VaadinPluginExtension#jvmArgs
-     *
-     * @param args
-     */
-    void jvmArgs(String[] args) {
-        this.jvmArgs = args
-    }
-
-    /**
-     * @see VaadinPluginExtension#push
-     *
-     * @param push
-     */
-    void push(boolean push) {
-        this.push = push
-    }
-
-    /**
-     * @see VaadinPluginExtension#mainSourceSet
-     *
-     * @param set
-     */
-    void mainSourceSet(SourceDirectorySet set) {
-        this.mainSourceSet = set
-    }
-
-    /**
-     * @see VaadinPluginExtension#mainSourceSet
-     *
-     * @param set
-     */
-    void mainTestSourceSet(SourceDirectorySet set) {
-        this.mainTestSourceSet = set
-    }
-
-    /**
-     * @see VaadinPluginExtension#addon
-     *
-     * @param closure
-     * @return
-     */
-    AddonConfiguration addon(closure) {
-        closure.delegate = addon
-        closure.resolveStrategy = Closure.DELEGATE_FIRST
-        closure()
-    }
-
-    /**
-     * @see VaadinPluginExtension#gwt
-     *
-     * @param closure
-     * @return
-     */
-    GWTConfiguration gwt(closure) {
-        closure.delegate = gwt
-        closure.resolveStrategy = Closure.DELEGATE_FIRST
-        closure()
-    }
-
-    /**
-     * @see VaadinPluginExtension#plugin
-     *
-     * @param closure
-     * @return
-     */
-    VaadinPluginConfiguration plugin(closure) {
-        closure.delegate = plugin
-        closure.resolveStrategy = Closure.DELEGATE_FIRST
-        closure()
-    }
-
-    /**
-     * @see VaadinPluginExtension#devmode
-     *
-     * @param closure
-     * @return
-     */
-    DevelopmentModeConfiguration devmode(closure) {
-        closure.delegate = devmode
-        closure.resolveStrategy = Closure.DELEGATE_FIRST
-        closure()
-    }
-
-    /**
-     * @see VaadinPluginExtension#jrebel
-     *
-     * @param closure
-     * @return
-     */
-    JRebelConfiguration jrebel(closure) {
-        closure.delegate = jrebel
-        closure.resolveStrategy = Closure.DELEGATE_FIRST
-        closure()
-    }
-
-    /**
-     * @see VaadinPluginExtension#testbench
-     *
-     * @param closure
-     * @return
-     */
-    TestBenchConfiguration testbench(closure) {
-        closure.delegate = testbench
-        closure.resolveStrategy = Closure.DELEGATE_FIRST
-        closure()
-    }
 }

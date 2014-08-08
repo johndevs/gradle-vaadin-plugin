@@ -18,6 +18,7 @@ package fi.jasoft.plugin.configuration
 /**
  * General configuration options for the plugin itself
  */
+@PluginConfiguration
 class VaadinPluginConfiguration {
 
     /**
@@ -39,41 +40,4 @@ class VaadinPluginConfiguration {
      * Should jetty restart when a class is changed in the build directory.
      */
     boolean jettyAutoRefresh = true
-
-    /**
-     * @see VaadinPluginConfiguration#logToConsole
-     *
-     * @param logToConsole
-     */
-    void logToConsole(boolean logToConsole) {
-        this.logToConsole = logToConsole
-    }
-
-    /**
-     * @see VaadinPluginConfiguration#openInBrowser
-     *
-     * @param openInBrowser
-     */
-    void openInBrowser(boolean openInBrowser) {
-        this.openInBrowser = openInBrowser
-    }
-
-    /**
-     * @see VaadinPluginConfiguration#eclipseOutputDir
-     *
-     * @param eclipseOutputDir
-     */
-    void eclipseOutputDir(String eclipseOutputDir) {
-        this.eclipseOutputDir = eclipseOutputDir
-    }
-
-    /**
-     * @see VaadinPluginConfiguration#jettyAutoRefresh
-     *
-     * @param jettyAutoRefresh
-     */
-    void jettyAutoRefresh(boolean jettyAutoRefresh) {
-        this.jettyAutoRefresh = jettyAutoRefresh
-    }
-
 }

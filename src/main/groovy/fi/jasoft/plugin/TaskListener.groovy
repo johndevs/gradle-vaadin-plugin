@@ -107,11 +107,11 @@ public class TaskListener implements TaskExecutionListener {
 
         if (task.getName() == 'javadoc') {
             task.source = Util.getMainSourceSet(project)
-            if (project.configurations.findByName(Configuration.JAVADOC.caption()) != null) {
-                task.classpath += [project.configurations[Configuration.JAVADOC.caption()]]
+            if (project.configurations.findByName(Configuration.JAVADOC.caption) != null) {
+                task.classpath += [project.configurations[Configuration.JAVADOC.caption]]
             }
-            if (project.configurations.findByName(Configuration.SERVER.caption()) != null) {
-                task.classpath += [project.configurations[Configuration.SERVER.caption()]]
+            if (project.configurations.findByName(Configuration.SERVER.caption) != null) {
+                task.classpath += [project.configurations[Configuration.SERVER.caption]]
             }
             task.failOnError = false
             task.options.addStringOption("sourcepath", "")
@@ -170,16 +170,16 @@ public class TaskListener implements TaskExecutionListener {
         }
 
         // Add dependencies to eclipse classpath
-        cp.plusConfigurations += [conf[Configuration.SERVER.caption()]]
-        cp.plusConfigurations += [conf[Configuration.CLIENT.caption()]]
-        cp.plusConfigurations += [conf[Configuration.JETTY9.caption()]]
+        cp.plusConfigurations += [conf[Configuration.SERVER.caption]]
+        cp.plusConfigurations += [conf[Configuration.CLIENT.caption]]
+        cp.plusConfigurations += [conf[Configuration.JETTY9.caption]]
 
         if (project.vaadin.testbench.enabled) {
-            cp.plusConfigurations += [conf[Configuration.TESTBENCH.caption()]]
+            cp.plusConfigurations += [conf[Configuration.TESTBENCH.caption]]
         }
 
         if (Util.isPushSupportedAndEnabled(project)) {
-            cp.plusConfigurations += [conf[Configuration.PUSH.caption()]]
+            cp.plusConfigurations += [conf[Configuration.PUSH.caption]]
         }
     }
 
@@ -201,22 +201,22 @@ public class TaskListener implements TaskExecutionListener {
         module.downloadSources = true
 
         // Add configurations to classpath
-        module.scopes.COMPILE.plus += [conf[Configuration.SERVER.caption()]]
-        module.scopes.COMPILE.plus += [conf[Configuration.CLIENT.caption()]]
-        module.scopes.PROVIDED.plus += [conf[Configuration.JETTY9.caption()]]
+        module.scopes.COMPILE.plus += [conf[Configuration.SERVER.caption]]
+        module.scopes.COMPILE.plus += [conf[Configuration.CLIENT.caption]]
+        module.scopes.PROVIDED.plus += [conf[Configuration.JETTY9.caption]]
 
         if (project.vaadin.testbench.enabled) {
-            module.scopes.TEST.plus += [conf[Configuration.TESTBENCH.caption()]]
+            module.scopes.TEST.plus += [conf[Configuration.TESTBENCH.caption]]
         }
 
         if (Util.isPushSupportedAndEnabled(project)) {
-            module.scopes.RUNTIME.plus += [conf[Configuration.JETTY9.caption()]]
+            module.scopes.RUNTIME.plus += [conf[Configuration.JETTY9.caption]]
         }
     }
 
     private void configureEclipseWtpPluginComponent(Task task) {
         def wtp = project.eclipse.wtp
-        wtp.component.plusConfigurations += [project.configurations[Configuration.SERVER.caption()]]
+        wtp.component.plusConfigurations += [project.configurations[Configuration.SERVER.caption]]
     }
 
     private void configureEclipseWtpPluginFacet(Task task) {

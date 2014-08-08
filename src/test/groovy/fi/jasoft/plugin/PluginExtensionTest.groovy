@@ -1,13 +1,3 @@
-package fi.jasoft.plugin
-
-import fi.jasoft.plugin.configuration.AddonConfiguration
-import fi.jasoft.plugin.configuration.DevelopmentModeConfiguration
-import fi.jasoft.plugin.configuration.GWTConfiguration
-import fi.jasoft.plugin.configuration.JRebelConfiguration
-import fi.jasoft.plugin.configuration.VaadinPluginConfiguration
-import fi.jasoft.plugin.configuration.VaadinPluginExtension
-import org.junit.Test
-
 /*
 * Copyright 2014 John Ahlroos
 *
@@ -23,6 +13,16 @@ import org.junit.Test
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
+package fi.jasoft.plugin
+
+import fi.jasoft.plugin.configuration.AddonConfiguration
+import fi.jasoft.plugin.configuration.DevelopmentModeConfiguration
+import fi.jasoft.plugin.configuration.GWTConfiguration
+import fi.jasoft.plugin.configuration.JRebelConfiguration
+import fi.jasoft.plugin.configuration.VaadinPluginConfiguration
+import fi.jasoft.plugin.configuration.VaadinPluginExtension
+import org.junit.Test
+
 class PluginExtensionTest extends PluginTestBase {
 
     @Test

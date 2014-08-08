@@ -60,7 +60,7 @@ class DevModeTask extends DefaultTask {
         def classpath = Util.getClassPath(project)
 
         if(project.vaadin.gwt.gwtSdkFirstInClasspath){
-            FileCollection gwtCompilerClasspath = project.configurations[DependencyListener.Configuration.CLIENT.caption()];
+            FileCollection gwtCompilerClasspath = project.configurations[DependencyListener.Configuration.CLIENT.caption];
             classpath = gwtCompilerClasspath + classpath.minus(gwtCompilerClasspath);
         }
 

@@ -32,6 +32,14 @@ dependencies {
     deploy 'org.apache.maven.wagon:wagon-ftp:2.2'
 }
 
+sourceSets {
+    ast {
+        groovy {
+            srcDirs = ['src/ast']
+        }
+    }
+}
+
 task sourcesJar(type: Jar) {
     from sourceSets.main.allSource
     classifier = 'sources'
@@ -43,6 +51,7 @@ artifacts {
     archives jar
     archives sourcesJar
 }
+
 
 uploadArchives {
     repositories.mavenDeployer {
@@ -128,6 +137,32 @@ task createPOMforVaadinDirectory {
             
         }
     }.writeTo(pomFile.canonicalPath)
+}
+
+task compileGroovyAstTransforms(type: GroovyCompile) {
+    groovyOptions.with {
+        fork = true
+        keepStubs = false
+        fileExtensions = ["groovy"]
+    }
+    source = sourceSets.ast.groovy.srcDirs
+    classpath = sourceSets.main.compileClasspath
+    destinationDir = sourceSets.ast.output.classesDir
+}
+
+compileGroovy {
+    dependsOn compileGroovyAstTransforms
+    classpath += files(sourceSets.ast.output.classesDir)
+}
+
+compileTestGroovy {
+    dependsOn compileGroovyAstTransforms
+    classpath += files(sourceSets.ast.output.classesDir)
+}
+
+
+test {
+    classpath += files(sourceSets.ast.output.classesDir)
 }
 
 processResources {

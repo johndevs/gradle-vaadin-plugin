@@ -18,6 +18,7 @@ package fi.jasoft.plugin.configuration
 /**
  * Configuration options for the testbench node
  */
+@PluginConfiguration
 class TestBenchNodeConfiguration {
 
     /**
@@ -51,63 +52,5 @@ class TestBenchNodeConfiguration {
      *   See http://code.google.com/p/selenium/wiki/Grid2 for more information about available browsers and
      *   settings. The browser setting will be stringingified into the -browser parameter for the hub.
      */
-    List<Map> browsers = []
-
-    /**
-     * Should the node be started when launching the tests
-     *
-     * @param enabled
-     *      <code>true</code> if it should.
-     */
-    void enabled(boolean enabled) {
-        this.enabled = enabled
-    }
-
-    /**
-     * The host name or ip address where the node should be run
-     *
-     * @param host
-     *      Host name or ip address for the node
-     */
-    void host(String host) {
-        this.host = host
-    }
-
-    /**
-     * The port on which the node should be run
-     *
-     * @param port
-     *      The port number for the node
-     */
-    void port(int port) {
-        this.port = port
-    }
-
-    /* A list of browser configurations:
-     * <p>
-     * See http://code.google.com/p/selenium/wiki/Grid2 for more information about available browsers and
-     * settings. The browser setting will be converted into the -browser parameter for the node.
-     *
-     * @param browser e.g.
-     *
-     *   browser = [
-     *       [ browserName: 'firefox', version: 3.6, maxInstances: 5, platform: 'LINUX' ],
-     *       [ browserName: 'chrome', version: 22, maxInstances: 1, platform: 'WINDOWS' ]
-     *   ]
-     *
-     */
-
-    void browsers(List<Map> browsers) {
-        this.browsers = browsers
-    }
-
-    /**
-     * The url for where the hub is running
-     *
-     * @param hub
-     *      URL in the for http://localhost:4444/grid/register
-     */
-    void hub(String hub) {
-        this.hub = hub
-    }
+    def browsers = []
 }

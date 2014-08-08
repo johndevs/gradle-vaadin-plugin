@@ -18,6 +18,7 @@ package fi.jasoft.plugin.configuration
 /**
  * Configuration options for addon projects
  */
+@PluginConfiguration
 class AddonConfiguration {
 
     /**
@@ -39,40 +40,4 @@ class AddonConfiguration {
      * Array of paths (eg. /VAADIN/addons/myaddon/myaddon.scss) to stylesheets packaged with the addon
      */
     String[] styles = []
-
-    /**
-     * @see AddonConfiguration#author
-     *
-     * @param author
-     */
-    void author(String author) {
-        this.author = author
-    }
-
-    /**
-     * @see AddonConfiguration#license
-     *
-     * @param license
-     */
-    void license(String license) {
-        this.license = license
-    }
-
-    /**
-     * @see AddonConfiguration#title
-     *
-     * @param title
-     */
-    void title(String title) {
-        this.title = title
-    }
-
-    /**
-     * @see AddonConfiguration#styles
-     *
-     * @param styles
-     */
-    void styles(String[] styles) {
-        this.styles = styles
-    }
 }

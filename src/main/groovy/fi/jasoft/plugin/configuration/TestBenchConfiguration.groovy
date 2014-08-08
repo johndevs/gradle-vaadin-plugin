@@ -18,6 +18,7 @@ package fi.jasoft.plugin.configuration
 /**
  * Configuration options for Testbench
  */
+@PluginConfiguration
 class TestBenchConfiguration {
 
     /**
@@ -38,61 +39,10 @@ class TestBenchConfiguration {
     /**
      * The Testbench Hub configuration
      */
-    TestBenchHubConfiguration hub = new TestBenchHubConfiguration()
+    final TestBenchHubConfiguration hub = new TestBenchHubConfiguration()
 
     /**
      * The Testbench node configuration
      */
-    TestBenchNodeConfiguration node = new TestBenchNodeConfiguration()
-
-    /**
-     * @see TestBenchConfiguration#enabled
-     *
-     * @param enabled
-     */
-    void enabled(boolean enabled) {
-        this.enabled = enabled
-    }
-
-    /**
-     * @see TestBenchConfiguration#version
-     *
-     * @param version
-     */
-    void version(String version) {
-        this.version = version
-    }
-
-    /**
-     * @see TestBenchConfiguration#runApplication
-     *
-     * @param run
-     */
-    void runApplication(boolean run) {
-        this.runApplication = run
-    }
-
-    /**
-     * @see TestBenchConfiguration#hub
-     *
-     * @param closure
-     * @return
-     */
-    TestBenchHubConfiguration hub(closure) {
-        closure.delegate = hub
-        closure.resolveStrategy = Closure.DELEGATE_FIRST
-        closure()
-    }
-
-    /**
-     * @see TestBenchConfiguration#node
-     *
-     * @param closure
-     * @return
-     */
-    TestBenchNodeConfiguration node(closure) {
-        closure.delegate = node
-        closure.resolveStrategy = Closure.DELEGATE_FIRST
-        closure()
-    }
+    final TestBenchNodeConfiguration node = new TestBenchNodeConfiguration()
 }

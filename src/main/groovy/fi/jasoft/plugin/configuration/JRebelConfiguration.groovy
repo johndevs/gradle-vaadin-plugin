@@ -18,6 +18,7 @@ package fi.jasoft.plugin.configuration
 /**
  * Class for configuring Jrebel
  */
+@PluginConfiguration
 class JRebelConfiguration {
 
     /**
@@ -29,22 +30,4 @@ class JRebelConfiguration {
      * The location of the jrebel JAR archive
      */
     String location
-
-    /**
-     * @see JRebelConfiguration#enabled
-     *
-     * @param enabled
-     */
-    void enabled(boolean enabled) {
-        this.enabled = enabled
-    }
-
-    /**
-     * @see JRebelConfiguration#location
-     *
-     * @param location
-     */
-    void location(String location) {
-        this.location = location
-    }
 }
