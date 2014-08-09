@@ -38,25 +38,25 @@ artifacts {
 
 uploadArchives {
     repositories.mavenDeployer {
-        def releaseRepository = System.getProperty('PLUGIN_MAVEN_RELEASE_REPOSITORY')
-        def releaseRepositoryUser = System.getProperty('PLUGIN_MAVEN_RELEASE_REPOSITORY_USER', '<release repository user not defined>')
-        def releaseRepositoryPassword = System.getProperty('PLUGIN_MAVEN_RELEASE_REPOSITORY_PASSWORD', '<release repository password not defined>')
+        def releaseRepositoryUrl = System.getProperty('PLUGIN_MAVEN_RELEASE_REPOSITORY')
+        def releaseRepositoryUser = System.getProperty('PLUGIN_MAVEN_RELEASE_REPOSITORY_USER')
+        def releaseRepositoryPassword = System.getProperty('PLUGIN_MAVEN_RELEASE_REPOSITORY_PASSWORD')
 
-        def snapshotRepository = System.getProperty('PLUGIN_MAVEN_SNAPSHOT_REPOSITORY')
-        def snapshotRepositoryUser = System.getProperty('PLUGIN_MAVEN_SNAPSHOT_REPOSITORY_USER', '<snapshot repository user not defined>')
-        def snapshotRepositoryPassword = System.getProperty('PLUGIN_MAVEN_SNAPSHOT_REPOSITORY_PASSWORD', '<snapshot repository password not defined>')
+        def snapshotRepositoryUrl = System.getProperty('PLUGIN_MAVEN_SNAPSHOT_REPOSITORY')
+        def snapshotRepositoryUser = System.getProperty('PLUGIN_MAVEN_SNAPSHOT_REPOSITORY_USER')
+        def snapshotRepositoryPassword = System.getProperty('PLUGIN_MAVEN_SNAPSHOT_REPOSITORY_PASSWORD')
 
         configuration = configurations.deploy
 
-        if(releaseRepository){
-            repository( url: releaseRepository) {
+        if(releaseRepositoryUrl){
+            repository( url: releaseRepositoryUrl) {
                 authentication(userName: releaseRepositoryUser, password: releaseRepositoryPassword)
             }
         }
 
-        if(snapshotRepository){
-            snapshotRepository( url: snapshotRepository) {
-                authentication(userName: snapshotRepositoryUser, password: snapshotRepositoryPassword)
+        if(snapshotRepositoryUrl){
+            snapshotRepository( url: snapshotRepositoryUrl ) {
+               authentication(userName: snapshotRepositoryUser, password: snapshotRepositoryPassword)
             }
         }
 
