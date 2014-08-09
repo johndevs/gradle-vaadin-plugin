@@ -38,21 +38,26 @@ artifacts {
 
 uploadArchives {
     repositories.mavenDeployer {
-        def releaseRepository = System.getProperty('PLUGIN_MAVEN_RELEASE_REPOSITORY', '<release repository not defined>')
+        def releaseRepository = System.getProperty('PLUGIN_MAVEN_RELEASE_REPOSITORY')
         def releaseRepositoryUser = System.getProperty('PLUGIN_MAVEN_RELEASE_REPOSITORY_USER', '<release repository user not defined>')
         def releaseRepositoryPassword = System.getProperty('PLUGIN_MAVEN_RELEASE_REPOSITORY_PASSWORD', '<release repository password not defined>')
 
-        def snapshotRepository = System.getProperty('PLUGIN_MAVEN_SNAPSHOT_REPOSITORY', '<snapshot repository not defined>')
+        def snapshotRepository = System.getProperty('PLUGIN_MAVEN_SNAPSHOT_REPOSITORY')
         def snapshotRepositoryUser = System.getProperty('PLUGIN_MAVEN_SNAPSHOT_REPOSITORY_USER', '<snapshot repository user not defined>')
         def snapshotRepositoryPassword = System.getProperty('PLUGIN_MAVEN_SNAPSHOT_REPOSITORY_PASSWORD', '<snapshot repository password not defined>')
 
         configuration = configurations.deploy
 
-        repository( url: releaseRepository) {
-            authentication(userName: releaseRepositoryUser, password: releaseRepositoryPassword)
+        if(releaseRepository){
+            repository( url: releaseRepository) {
+                authentication(userName: releaseRepositoryUser, password: releaseRepositoryPassword)
+            }
         }
-        snapshotRepository( url: snapshotRepository) {
-            authentication(userName: snapshotRepositoryUser, password: snapshotRepositoryPassword)
+
+        if(snapshotRepository){
+            snapshotRepository( url: snapshotRepository) {
+                authentication(userName: snapshotRepositoryUser, password: snapshotRepositoryPassword)
+            }
         }
 
 	    pom.project {
