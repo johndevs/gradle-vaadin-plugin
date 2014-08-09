@@ -64,7 +64,7 @@ uploadArchives {
 
 // Use wrapper
 task wrapper(type: Wrapper) { 
-	gradleVersion = '1.12'
+	gradleVersion = '2.0'
 }
 
 // Create pom.xml for Vaadin Directory
