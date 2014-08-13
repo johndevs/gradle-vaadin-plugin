@@ -20,6 +20,7 @@ import fi.jasoft.plugin.tasks.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.WarPlugin
+import org.gradle.tooling.UnsupportedVersionException
 
 class GradleVaadinPlugin implements Plugin<Project> {
 
@@ -54,11 +55,16 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
     void apply(Project project) {
 
+        if(!project.gradle.gradleVersion.startsWith("2")) {
+            throw new UnsupportedVersionException("Your gradle version ("+project.gradle.gradleVersion+") is too old. Plugin requires Gradle 2.0+")
+        }
+
         PLUGINS_IN_PROJECT++;
 
         if (isFirstPlugin()) {
             project.logger.quiet("Using Gradle Vaadin Plugin " + PLUGIN_VERSION)
         }
+
 
         // Extensions
         project.extensions.create('vaadin', VaadinPluginExtension)
