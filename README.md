@@ -5,14 +5,28 @@ Build automatically tested on Travis CI
 [![Build Status](https://travis-ci.org/johndevs/gradle-vaadin-plugin.png?branch=master)](https://travis-ci.org/johndevs/gradle-vaadin-plugin)
 
 
-# Using the plugin
+# Using the plugin 
+
 You do not need to compile the plugin from scratch if you want to use it. You only need to add the following line to your projects build.gradle to start using the plugin.
+
+## Java projects
 
     apply from: 'http://plugins.jasoft.fi/vaadin.plugin'
 
 or to use a specific version of the plugin
 
     apply from: 'http://plugins.jasoft.fi/vaadin.plugin?version=x.x.x'
+    
+## Groovy projects    
+    
+    apply from: 'http://plugins.jasoft.fi/vaadin-groovy.plugin'
+
+or to use a specific version of the plugin
+
+    apply from: 'http://plugins.jasoft.fi/vaadin-groovy.plugin?version=x.x.x'
+
+
+## Manually applying the plugin
 
 If you are behind a proxy and cannot use the plugin url directly you then you can download the plugin jar from http://vaadin.com/addon/vaadin-plugin-for-gradle and include it in your build.gradle like so:
 ```
