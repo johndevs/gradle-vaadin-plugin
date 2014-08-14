@@ -41,6 +41,11 @@ class VaadinPluginConfiguration {
     String eclipseOutputDir = null
 
     /**
+     * Should jetty restart when a class is changed in the build directory.
+     */
+    boolean jettyAutoRefresh = true
+
+    /**
      * @see VaadinPluginConfiguration#logToConsole
      *
      * @param logToConsole
@@ -74,6 +79,15 @@ class VaadinPluginConfiguration {
      */
     void eclipseOutputDir(String eclipseOutputDir) {
         this.eclipseOutputDir = eclipseOutputDir
+    }
+
+    /**
+     * @see VaadinPluginConfiguration#jettyAutoRefresh
+     *
+     * @param jettyAutoRefresh
+     */
+    void jettyAutoRefresh(boolean jettyAutoRefresh) {
+        this.jettyAutoRefresh = jettyAutoRefresh
     }
 
 }

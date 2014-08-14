@@ -20,6 +20,17 @@ import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.WarPluginConvention
 
+import java.nio.file.FileSystems
+import java.nio.file.FileVisitResult
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+import java.nio.file.SimpleFileVisitor
+import java.nio.file.StandardWatchEventKinds
+import java.nio.file.WatchEvent
+import java.nio.file.WatchService
+import java.nio.file.attribute.BasicFileAttributes
+
 public class ApplicationServer {
 
     private Process process;
@@ -102,6 +113,10 @@ public class ApplicationServer {
             resultStr += '(debugger off)'
         }
         project.logger.lifecycle(resultStr)
+
+        if(project.vaadin.debug && project.vaadin.plugin.jettyAutoRefresh) {
+            watchDirectoryForChanges()
+        }
     }
 
     public startAndBlock() {
@@ -114,5 +129,50 @@ public class ApplicationServer {
     public terminate() {
         process.waitForOrKill(100)
         project.logger.lifecycle("Application server terminated.")
+        process = null
+    }
+
+    def watchDirectoryForChanges() {
+
+        File classesDir = null
+        if (project.vaadin.plugin.eclipseOutputDir == null) {
+            classesDir = project.sourceSets.main.output.classesDir
+        } else {
+            classesDir = project.file(project.vaadin.plugin.eclipseOutputDir)
+        }
+
+        def classesPath = Paths.get(classesDir.canonicalPath)
+        def watchService = FileSystems.getDefault().newWatchService()
+
+        Files.walkFileTree classesPath, new SimpleFileVisitor<Path>() {
+
+            @Override
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs){
+                dir.register(watchService,
+                        StandardWatchEventKinds.ENTRY_CREATE,
+                        StandardWatchEventKinds.ENTRY_DELETE,
+                        StandardWatchEventKinds.ENTRY_MODIFY)
+                FileVisitResult.CONTINUE
+            }
+        }
+
+        project.logger.info "Watching directory $classesDir for changes..."
+
+        def restart = false
+        while(true) {
+            def key = watchService.take()
+            key.pollEvents().each { WatchEvent event ->
+                restart = true
+            }
+            if(!key.reset() || restart) break
+        }
+
+        project.logger.info "Stopped watching directory"
+
+        if(restart) {
+            terminate()
+            Thread.sleep(1000)
+            start()
+        }
     }
 }
