@@ -33,6 +33,15 @@ repositories {
 }
 ```
 
+# Versions
+
+|       | Gradle | Vaadin | Java | Jetty | Servlet | Major features    |
+|-------|--------|--------|------|-------|---------|-------------------|
+| 0.6.x |   1.x  |   6,7  |  6,7 |  8.1  | 2.5,3.0 | Servlet 3 support |
+| 0.7.x |   1.x  |   6,7  |  6,7 |  8.1  | 2.5,3.0 | Testbench 3, Directory addon zip, Directory Browser, Source & Javadoc jars | 
+| 0.8.x |   1.x  |    7   |   7  |  8.1  | 3.0 | Idea support, Addon SCSS themes, GWT first in classpath  | 
+| 0.9.x |   2.x  |    7   |  7,8 |  9.2  | 3.0 | Groovy support, Jetty 9, Jetty autorestart |
+
 
 # Plugin tasks
 The following tasks are available in the plugin
