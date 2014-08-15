@@ -85,7 +85,7 @@ public class ApplicationServer {
         }
 
         // Program args
-        appServerProcess.add('fi.jasoft.plugin.server.ApplicationServerRunner')
+        appServerProcess.add('fi.jasoft.plugin.ApplicationServerRunner')
 
         appServerProcess.add(project.vaadin.serverPort)
 
