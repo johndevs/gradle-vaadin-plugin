@@ -35,5 +35,6 @@
 
     <% if(collapsePermutations) { %>
         <collapse-all-properties />
+        <set-property name="compiler.useSymbolMaps" value="true" />
     <% } %>
 </module>
