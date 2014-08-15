@@ -5,14 +5,28 @@ Build automatically tested on Travis CI
 [![Build Status](https://travis-ci.org/johndevs/gradle-vaadin-plugin.png?branch=master)](https://travis-ci.org/johndevs/gradle-vaadin-plugin)
 
 
-# Using the plugin
+# Using the plugin 
+
 You do not need to compile the plugin from scratch if you want to use it. You only need to add the following line to your projects build.gradle to start using the plugin.
+
+## Java projects
 
     apply from: 'http://plugins.jasoft.fi/vaadin.plugin'
 
 or to use a specific version of the plugin
 
     apply from: 'http://plugins.jasoft.fi/vaadin.plugin?version=x.x.x'
+    
+## Groovy projects    
+    
+    apply from: 'http://plugins.jasoft.fi/vaadin-groovy.plugin'
+
+or to use a specific version of the plugin
+
+    apply from: 'http://plugins.jasoft.fi/vaadin-groovy.plugin?version=x.x.x'
+
+
+## Manually applying the plugin
 
 If you are behind a proxy and cannot use the plugin url directly you then you can download the plugin jar from http://vaadin.com/addon/vaadin-plugin-for-gradle and include it in your build.gradle like so:
 ```
@@ -32,6 +46,15 @@ repositories {
         flatDir dirs: '<Directory where the plugin jar can be found>'
 }
 ```
+
+# Versions
+
+|       | Gradle | Vaadin | Java | Jetty | Servlet | Major features    |
+|-------|--------|--------|------|-------|---------|-------------------|
+| 0.6.x |   1.x  |   6,7  |  6,7 |  8.1  | 2.5,3.0 | Servlet 3 support |
+| 0.7.x |   1.x  |   6,7  |  6,7 |  8.1  | 2.5,3.0 | Testbench 3, Directory addon zip, Directory Browser, Source & Javadoc jars | 
+| 0.8.x |   1.x  |    7   |   7  |  8.1  | 3.0 | Idea support, Addon SCSS themes, GWT first in classpath  | 
+| 0.9.x |   2.x  |    7   |  7,8 |  9.2  | 3.0 | Groovy support, Jetty 9, Jetty autorestart |
 
 
 # Plugin tasks
@@ -138,3 +161,4 @@ vaadin.testbench.node.browsers = [
 * ``vaadin.plugin.logToConsole``- Should server logs be logged to the console or to a log file. Default is logging to file.
 * ``vaadin.plugin.openInBrowser`` - Should the application be opened in a browser tab after the application is launched. Default true.
 * ``vaadin.plugin.eclipseOutputDir`` - The directory where Eclipse will output its compiled classes. Default is project.sourceSets.main.output.classesDir.
+* ``vaadin.plugin.jettyAutoRefresh`` - Should jetty automatically restart when a class is changed while jetty is running.
