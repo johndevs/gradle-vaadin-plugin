@@ -51,7 +51,7 @@ public class ApplicationServer {
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
         FileCollection cp = project.configurations[DependencyListener.Configuration.JETTY9.caption()] + Util.getClassPath(project)
 
-        File logDir = project.file('build/jetty/')
+        File logDir = project.file('build/logs/')
         logDir.mkdirs()
 
         def appServerProcess = ['java']

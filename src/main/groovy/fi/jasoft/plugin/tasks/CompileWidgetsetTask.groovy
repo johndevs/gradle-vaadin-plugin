@@ -80,36 +80,71 @@ class CompileWidgetsetTask extends DefaultTask {
             classpath = gwtCompilerClasspath + classpath.minus(gwtCompilerClasspath);
         }
 
-        project.javaexec {
-            setClasspath(classpath)
-            setMain('com.google.gwt.dev.Compiler')
+        def widgetsetCompileProcess = ['java']
 
-            def args = ['-style', project.vaadin.gwt.style] +
-                    ['-optimize', project.vaadin.gwt.optimize] +
-                    ['-war', targetDir.canonicalPath] +
-                    ['-logLevel', project.vaadin.gwt.logLevel] +
-                    ['-localWorkers', project.vaadin.gwt.localWorkers]
+        if (project.vaadin.gwt.jvmArgs) {
+            widgetsetCompileProcess += project.vaadin.gwt.jvmArgs
+        }
 
-            if (project.vaadin.gwt.draftCompile) {
-                args.add('-draftCompile')
+        widgetsetCompileProcess += ['-cp',  classpath.getAsPath()]
+
+        widgetsetCompileProcess += 'com.google.gwt.dev.Compiler'
+
+        widgetsetCompileProcess += ['-style', project.vaadin.gwt.style]
+        widgetsetCompileProcess += ['-optimize', project.vaadin.gwt.optimize]
+        widgetsetCompileProcess += ['-war', targetDir.canonicalPath]
+        widgetsetCompileProcess += ['-logLevel', project.vaadin.gwt.logLevel]
+        widgetsetCompileProcess += ['-localWorkers', project.vaadin.gwt.localWorkers]
+
+        if (project.vaadin.gwt.draftCompile) {
+            widgetsetCompileProcess += '-draftCompile'
+        }
+
+        if (project.vaadin.gwt.strict) {
+            widgetsetCompileProcess += '-strict'
+        }
+
+        if (project.vaadin.gwt.extraArgs) {
+            widgetsetCompileProcess += project.vaadin.gwt.extraArgs
+        }
+
+        widgetsetCompileProcess += project.vaadin.widgetset
+
+        def Process process = widgetsetCompileProcess.execute()
+
+        // Logging
+        File logDir = project.file('build/logs/')
+        logDir.mkdirs()
+
+        if(project.vaadin.plugin.logToConsole){
+            process.getInputStream().eachLine { output ->
+                if(output.contains("[WARN]")){
+                    project.logger.warn(output.replaceAll("\\[WARN\\]",'').trim())
+                } else {
+                    project.logger.info(output.trim())
+                }
             }
-
-            if (project.vaadin.gwt.strict) {
-                args.add('-strict')
+            process.getErrorStream().eachLine { output ->
+                project.logger.error(output.replaceAll("\\[ERROR\\]",'').trim())
             }
-
-            if (project.vaadin.gwt.extraArgs) {
-                args.add(project.vaadin.gwt.extraArgs)
-            }
-
-            args.add(project.vaadin.widgetset)
-
-            setArgs(args)
-
-            if (project.vaadin.gwt.jvmArgs != null) {
-                jvmArgs(project.vaadin.gwt.jvmArgs)
+        } else {
+            File logFile = new File(logDir.canonicalPath + '/widgetset-compile.log')
+            logFile.withWriter { out ->
+                process.getInputStream().eachLine { output ->
+                    if(output.contains("[WARN]")){
+                        out.println "[WARN] "+output.replaceAll("\\[WARN\\]",'').trim()
+                    } else {
+                        out.println "[INFO] "+output.trim()
+                    }
+                }
+                process.getErrorStream().eachLine { output ->
+                    out.println "[ERROR] "+output.replaceAll("\\[ERROR\\]",'').trim()
+                }
             }
         }
+
+        //Block
+        process.waitFor()
 
         /*
          * Compiler generates an extra WEB-INF folder into the widgetsets folder. Remove it.
