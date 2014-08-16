@@ -71,18 +71,22 @@ class SuperDevModeTask extends DefaultTask {
             classpath = jettyClasspath + gwtCompilerClasspath + classpath.minus(gwtCompilerClasspath+jettyClasspath);
         }
 
-        project.javaexec {
-            setMain('com.google.gwt.dev.codeserver.CodeServer')
-            setClasspath(classpath)
-            setArgs([
-                    '-bindAddress', project.vaadin.devmode.bindAddress,
-                    '-port', 9876,
-                    '-workDir', widgetsetsDir.canonicalPath,
-                    '-src', javaDir.canonicalPath,
-                    '-logLevel', project.vaadin.gwt.logLevel,
-                    '-noprecompile',
-                    widgetset]
-            )
-        }
+        def superdevmodeProcess = ['java',
+            '-cp', classpath.getAsPath(),
+            'com.google.gwt.dev.codeserver.CodeServer',
+            '-bindAddress', project.vaadin.devmode.bindAddress,
+            '-port', 9876,
+            '-workDir', widgetsetsDir.canonicalPath,
+            '-src', javaDir.canonicalPath,
+            '-logLevel', project.vaadin.gwt.logLevel,
+            '-noprecompile',
+            widgetset
+        ]
+
+        def process = superdevmodeProcess.execute()
+
+        Util.logProcess(project, process, 'superdevmode.log')
+
+        process.waitFor()
     }
 }
