@@ -112,38 +112,8 @@ class CompileWidgetsetTask extends DefaultTask {
 
         def Process process = widgetsetCompileProcess.execute()
 
-        // Logging
-        File logDir = project.file('build/logs/')
-        logDir.mkdirs()
+        Util.logProcess(project, process, 'widgetset-compile.log')
 
-        if(project.vaadin.plugin.logToConsole){
-            process.getInputStream().eachLine { output ->
-                if(output.contains("[WARN]")){
-                    project.logger.warn(output.replaceAll("\\[WARN\\]",'').trim())
-                } else {
-                    project.logger.info(output.trim())
-                }
-            }
-            process.getErrorStream().eachLine { output ->
-                project.logger.error(output.replaceAll("\\[ERROR\\]",'').trim())
-            }
-        } else {
-            File logFile = new File(logDir.canonicalPath + '/widgetset-compile.log')
-            logFile.withWriter { out ->
-                process.getInputStream().eachLine { output ->
-                    if(output.contains("[WARN]")){
-                        out.println "[WARN] "+output.replaceAll("\\[WARN\\]",'').trim()
-                    } else {
-                        out.println "[INFO] "+output.trim()
-                    }
-                }
-                process.getErrorStream().eachLine { output ->
-                    out.println "[ERROR] "+output.replaceAll("\\[ERROR\\]",'').trim()
-                }
-            }
-        }
-
-        //Block
         process.waitFor()
 
         /*

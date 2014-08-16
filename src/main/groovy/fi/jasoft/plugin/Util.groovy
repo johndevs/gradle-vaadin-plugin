@@ -201,12 +201,16 @@ class Util {
         if(project.vaadin.plugin.logToConsole){
             Thread.start 'Info logger', {
                 process.getInputStream().eachLine { output ->
-                    project.logger.info(output)
+                    if(output.contains("[WARN]")){
+                        project.logger.warn(output.replaceAll("\\[WARN\\]",'').trim())
+                    } else {
+                        project.logger.info(output.trim())
+                    }
                 }
             }
             Thread.start 'Error logger', {
-                process.getErrorStream().eachLine { output ->
-                    project.logger.error(output)
+                process.getErrorStream().eachLine { String output ->
+                    project.logger.error(output.replaceAll("\\[ERROR\\]",'').trim())
                 }
             }
         } else {
@@ -217,7 +221,11 @@ class Util {
             Thread.start 'Info logger', {
                 logFile.withWriterAppend { out ->
                     process.getInputStream().eachLine { output ->
-                        out.println output
+                        if(output.contains("[WARN]")){
+                            out.println "[WARN] "+output.replaceAll("\\[WARN\\]",'').trim()
+                        } else {
+                            out.println "[INFO] "+output.trim()
+                        }
                         out.flush()
                     }
                 }
@@ -225,7 +233,7 @@ class Util {
             Thread.start 'Error logger', {
                 logFile.withWriterAppend { out ->
                     process.getErrorStream().eachLine { output ->
-                        out.println output
+                        out.println "[ERROR] "+output.replaceAll("\\[ERROR\\]",'').trim()
                         out.flush()
                     }
                 }
