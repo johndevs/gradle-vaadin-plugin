@@ -196,4 +196,40 @@ class Util {
     def static boolean isGroovyProject(Project project){
         project.plugins.findPlugin(fi.jasoft.plugin.GradleVaadinGroovyPlugin)
     }
+
+    def static logProcess(final Project project, final Process process, final String filename) {
+        if(project.vaadin.plugin.logToConsole){
+            Thread.start 'Info logger', {
+                process.getInputStream().eachLine { output ->
+                    project.logger.info(output)
+                }
+            }
+            Thread.start 'Error logger', {
+                process.getErrorStream().eachLine { output ->
+                    project.logger.error(output)
+                }
+            }
+        } else {
+            File logDir = project.file('build/logs/')
+            logDir.mkdirs()
+
+            final File logFile = new File(logDir.canonicalPath + '/' + filename)
+            Thread.start 'Info logger', {
+                logFile.withWriterAppend { out ->
+                    process.getInputStream().eachLine { output ->
+                        out.println output
+                        out.flush()
+                    }
+                }
+            }
+            Thread.start 'Error logger', {
+                logFile.withWriterAppend { out ->
+                    process.getErrorStream().eachLine { output ->
+                        out.println output
+                        out.flush()
+                    }
+                }
+            }
+        }
+    }
 }

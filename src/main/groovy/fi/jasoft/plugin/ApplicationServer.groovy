@@ -51,9 +51,6 @@ public class ApplicationServer {
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
         FileCollection cp = project.configurations[DependencyListener.Configuration.JETTY9.caption()] + Util.getClassPath(project)
 
-        File logDir = project.file('build/logs/')
-        logDir.mkdirs()
-
         def appServerProcess = ['java']
 
         // Debug
@@ -97,25 +94,13 @@ public class ApplicationServer {
         // Execute server
         process = appServerProcess.execute()
 
-        // Logging
-        if(project.vaadin.plugin.logToConsole){
-            process.getInputStream().eachLine { output ->
-                project.logger.info(output)
-            }
-            process.getErrorStream().eachLine { output ->
-                project.logger.error(output)
-            }
-        } else {
-            File logFile = new File(logDir.canonicalPath + '/jetty.log')
-            logFile.withWriterAppend { out ->
-                process.getInputStream().eachLine { output ->
-                    out.println output
-                }
-                process.getErrorStream().eachLine { output ->
-                    out.println output
-                }
+        if(project.vaadin.debug && project.vaadin.plugin.jettyAutoRefresh) {
+            Thread.start 'Directory Watcher', {
+                watchDirectoryForChanges()
             }
         }
+
+        Util.logProcess(project, process, 'jetty.log')
 
         def resultStr = "Application running on http://0.0.0.0:${project.vaadin.serverPort} "
         if (project.vaadin.jrebel.enabled) {
@@ -127,9 +112,6 @@ public class ApplicationServer {
         }
         project.logger.lifecycle(resultStr)
 
-        if(project.vaadin.debug && project.vaadin.plugin.jettyAutoRefresh) {
-            watchDirectoryForChanges()
-        }
     }
 
     public startAndBlock() {
