@@ -98,9 +98,24 @@ public class ApplicationServer {
         process = appServerProcess.execute()
 
         // Logging
-        File logFile = new File(logDir.canonicalPath + '/jetty.log')
-        def out = project.vaadin.plugin.logToConsole ? System.out : new FileOutputStream(logFile)
-        process.consumeProcessOutput(out, out)
+        if(project.vaadin.plugin.logToConsole){
+            process.getInputStream().eachLine { output ->
+                project.logger.info(output)
+            }
+            process.getErrorStream().eachLine { output ->
+                project.logger.error(output)
+            }
+        } else {
+            File logFile = new File(logDir.canonicalPath + '/jetty.log')
+            logFile.withWriterAppend { out ->
+                process.getInputStream().eachLine { output ->
+                    out.println output
+                }
+                process.getErrorStream().eachLine { output ->
+                    out.println output
+                }
+            }
+        }
 
         def resultStr = "Application running on http://0.0.0.0:${project.vaadin.serverPort} "
         if (project.vaadin.jrebel.enabled) {
