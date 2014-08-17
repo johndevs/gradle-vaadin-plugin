@@ -15,7 +15,6 @@
 */
 package fi.jasoft.plugin
 
-import org.apache.tools.ant.taskdefs.optional.depend.Depend
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.WarPluginConvention
@@ -28,7 +27,6 @@ import java.nio.file.Paths
 import java.nio.file.SimpleFileVisitor
 import java.nio.file.StandardWatchEventKinds
 import java.nio.file.WatchEvent
-import java.nio.file.WatchService
 import java.nio.file.attribute.BasicFileAttributes
 
 public class ApplicationServer {

@@ -28,7 +28,7 @@ import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-class ApplicationServerRunner {
+public class ApplicationServerRunner {
 
     // Usage: 'ApplicationServerRunner [port] [webbappdir] [classesdir]'
     public static void main(String[] args) throws Exception {
