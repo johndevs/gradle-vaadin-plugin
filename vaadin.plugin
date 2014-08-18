@@ -12,8 +12,8 @@ buildscript {
         def gradleMajorVersion = Integer.parseInt(gradleVersion[0])
         def gradleMinorVersion =  Integer.parseInt(gradleVersion[1])
 
-        def repositoryName = 'Jasoft.fi Maven Repository'
-        def repositoryUrl = 'http://mvn.jasoft.fi/maven2'
+        def repositoryName = 'Bintray Repository'
+        def repositoryUrl = 'http://dl.bintray.com/johndevs/maven'
 
         if(gradleMinorVersion < 9 && gradleMajorVersion == 1){
             mavenRepo(
