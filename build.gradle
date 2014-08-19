@@ -20,6 +20,19 @@ dependencies {
     compile 'org.eclipse.jetty.aggregate:jetty-all-server:8.1.10.v20130312'
 }
 
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+    include 'fi/**/*.groovy'
+    include 'fi/**/*.java'
+}
+
+artifacts {
+    archives jar
+    archives sourcesJar
+}
+
 defaultTasks 'jar'
 group = "fi.jasoft.plugin"
 version = project.hasProperty('BUILD_VERSION') ? getProperty('BUILD_VERSION') : 'SNAPSHOT-'+ new Date().format('yyyyMMdd')
@@ -61,7 +74,7 @@ uploadArchives {
 
 // Use wrapper
 task wrapper(type: Wrapper) { 
-	gradleVersion = '1.12'
+	gradleVersion = '2.0'
 }
 
 // Create pom.xml for Vaadin Directory
