@@ -31,6 +31,7 @@ class DependencyListener implements ProjectEvaluationListener {
         SERVER('vaadin'),
         CLIENT('vaadin-client'),
         TESTBENCH('vaadin-testbench'),
+        @Deprecated JETTY8('jetty8'),
         JETTY9('jetty9'),
         PUSH('vaadin-push'),
         JAVADOC('vaadin-javadoc');
@@ -88,6 +89,11 @@ class DependencyListener implements ProjectEvaluationListener {
         }
 
         createJetty9Configuration(project)
+
+        if(project.vaadin.devmode.superDevMode) {
+            // To fix #125
+            createJetty8Configuration(project)
+        }
 
         createVaadin7Configuration(project, version)
 
@@ -151,6 +157,19 @@ class DependencyListener implements ProjectEvaluationListener {
             dependencies.add(conf, 'fi.jasoft.plugin:gradle-vaadin-plugin:' + GradleVaadinPlugin.getVersion())
             dependencies.add(conf, 'org.ow2.asm:asm:5.0.2')
             dependencies.add(conf, 'org.ow2.asm:asm-commons:5.0.2')
+            dependencies.add(conf, 'javax.servlet.jsp:jsp-api:2.2')
+        }
+    }
+
+    @Deprecated
+    def static createJetty8Configuration(Project project) {
+        def conf = Configuration.JETTY8.caption()
+        def dependencies = project.dependencies
+        if (!project.configurations.hasProperty(conf)) {
+            project.configurations.create(conf)
+            dependencies.add(conf, 'org.eclipse.jetty.aggregate:jetty-all-server:8.1.15.v20140411')
+            dependencies.add(conf, 'fi.jasoft.plugin:gradle-vaadin-plugin:' + GradleVaadinPlugin.getVersion())
+            dependencies.add(conf, 'asm:asm-all:3.3.1')
             dependencies.add(conf, 'javax.servlet.jsp:jsp-api:2.2')
         }
     }

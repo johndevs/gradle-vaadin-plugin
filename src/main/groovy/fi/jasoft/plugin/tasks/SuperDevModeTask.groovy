@@ -19,25 +19,31 @@ import fi.jasoft.plugin.ApplicationServer
 import fi.jasoft.plugin.DependencyListener
 import fi.jasoft.plugin.Util
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskAction
 
 class SuperDevModeTask extends DefaultTask {
 
-    public static final String NAME = 'vaadinSuperDevMode'
+    static final String NAME = 'vaadinSuperDevMode'
 
-    public SuperDevModeTask() {
+    def SuperDevModeTask() {
         dependsOn(CompileWidgetsetTask.NAME)
         description = "Run Super Development Mode for easier client widget development."
     }
 
     @TaskAction
-    public void run() {
+    def run() {
 
         if (!project.vaadin.devmode.superDevMode) {
-            println "SuperDevMode is a experimental feature and is not enabled for project by default. To enable it set vaadin.devmode.superDevMode to true"
-            return;
+            logger.error 'SuperDevMode is a experimental feature and is not enabled for project by default. To enable it set vaadin.devmode.superDevMode to true'
+            throw new GradleException("Property vaadin.devmode.superDevMode not set.")
+        }
+
+        if(!project.vaadin.widgetset) {
+            logger.error 'No widgetset defined (can be set with vaadin.widgetset in build.gradle)'
+            throw new GradleException("Property vaadin.widgetset not set.")
         }
 
         ApplicationServer server = new ApplicationServer(project)
@@ -55,7 +61,7 @@ class SuperDevModeTask extends DefaultTask {
         server.terminate()
     }
 
-    private runCodeServer() {
+    def runCodeServer() {
 
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
         File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
@@ -63,7 +69,7 @@ class SuperDevModeTask extends DefaultTask {
         widgetsetsDir.mkdirs()
         String widgetset = project.vaadin.widgetset == null ? 'com.vaadin.terminal.gwt.DefaultWidgetSet' : project.vaadin.widgetset
 
-        def jettyClasspath = project.configurations[DependencyListener.Configuration.JETTY9.caption()];
+        def jettyClasspath = project.configurations[DependencyListener.Configuration.JETTY8.caption()];
         def classpath = jettyClasspath + Util.getClassPath(project)
 
         if(project.vaadin.gwt.gwtSdkFirstInClasspath){
