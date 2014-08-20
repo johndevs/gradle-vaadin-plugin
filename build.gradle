@@ -4,18 +4,26 @@ apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'idea'
 
+
+defaultTasks 'jar'
+group = "fi.jasoft.plugin"
+version = project.hasProperty('BUILD_VERSION') ? getProperty('BUILD_VERSION') : 'SNAPSHOT-'+ new Date().format('yyyyMMdd')
+archivesBaseName ='gradle-vaadin-plugin'
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
 repositories{
 	mavenCentral()
 }
 
 configurations {
-    deployerJars
+    deploy
 }
 
 dependencies {
     compile gradleApi()
     compile localGroovy()
-    deployerJars "org.apache.maven.wagon:wagon-ftp:1.0-beta-2"
+    deploy 'org.apache.maven.wagon:wagon-ftp:2.2'
 
     compile 'org.eclipse.jetty.aggregate:jetty-all-server:8.1.10.v20130312'
 }
@@ -33,29 +41,28 @@ artifacts {
     archives sourcesJar
 }
 
-defaultTasks 'jar'
-group = "fi.jasoft.plugin"
-version = project.hasProperty('BUILD_VERSION') ? getProperty('BUILD_VERSION') : 'SNAPSHOT-'+ new Date().format('yyyyMMdd')
-archivesBaseName ='gradle-vaadin-plugin'
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
-
 uploadArchives {
     repositories.mavenDeployer {
-        def repo = System.getProperty('PLUGIN_MAVEN_REPOSITORY', '<plugin repository not defined>')
-        def snapshots = System.getProperty('PLUGIN_MAVEN_SNAPSHOT_REPOSITORY', '<plugin repository not defined>')
-        def user = System.getProperty('PLUGIN_MAVEN_REPOSITORY_USER', '<user not defined>')
-        def password = System.getProperty('PLUGIN_MAVEN_REPOSITORY_PASSWORD', '<password not defined>')
+        def releaseRepositoryUrl = System.getProperty('PLUGIN_MAVEN_RELEASE_REPOSITORY')
+        def releaseRepositoryUser = System.getProperty('PLUGIN_MAVEN_RELEASE_REPOSITORY_USER')
+        def releaseRepositoryPassword = System.getProperty('PLUGIN_MAVEN_RELEASE_REPOSITORY_PASSWORD')
 
-        name = 'sshDeployer' 
-        configuration = configurations.deployerJars
+        def snapshotRepositoryUrl = System.getProperty('PLUGIN_MAVEN_SNAPSHOT_REPOSITORY')
+        def snapshotRepositoryUser = System.getProperty('PLUGIN_MAVEN_SNAPSHOT_REPOSITORY_USER')
+        def snapshotRepositoryPassword = System.getProperty('PLUGIN_MAVEN_SNAPSHOT_REPOSITORY_PASSWORD')
 
-        repository(url: repo) {
-            authentication(userName: user, password: password)
+        configuration = configurations.deploy
+
+        if(releaseRepositoryUrl){
+            repository( url: releaseRepositoryUrl) {
+                authentication(userName: releaseRepositoryUser, password: releaseRepositoryPassword)
+            }
         }
 
-        snapshotRepository(url: snapshots) {
-            authentication(userName: user, password: password)
+        if(snapshotRepositoryUrl){
+            snapshotRepository( url: snapshotRepositoryUrl ) {
+               authentication(userName: snapshotRepositoryUser, password: snapshotRepositoryPassword)
+            }
         }
 
 	    pom.project {
@@ -66,6 +73,19 @@ uploadArchives {
 	                    distribution 'repo'
 	                }
 	            }
+
+	            developers {
+                    developer {
+                        id 'johndevs'
+                        name 'John Ahlroos'
+                    }
+                }
+
+                scm {
+                    url 'https://github.com/johndevs/gradle-vaadin-plugin'
+                    connection 'scm:git://github.com/johndevs/gradle-vaadin-plugin'
+                    developerConnection 'scm:git@github.com:johndevs/gradle-vaadin-plugin'
+                }
 	    }
 
 	    pom.scopeMappings.mappings.remove(configurations.compile)
