@@ -149,7 +149,7 @@ class DependencyListener implements ProjectEvaluationListener {
         def conf = Configuration.JETTY9.caption()
         def dependencies = project.dependencies
         if (!project.configurations.hasProperty(conf)) {
-            project.configurations.create(conf)
+            project.configurations.create(conf).extendsFrom(project.configurations.runtime)
             dependencies.add(conf, 'org.eclipse.jetty.aggregate:jetty-all:9.2.2.v20140723')
             dependencies.add(conf, 'org.eclipse.jetty:jetty-annotations:9.2.2.v20140723')
             dependencies.add(conf, 'org.eclipse.jetty:jetty-plus:9.2.2.v20140723')
@@ -166,7 +166,7 @@ class DependencyListener implements ProjectEvaluationListener {
         def conf = Configuration.JETTY8.caption()
         def dependencies = project.dependencies
         if (!project.configurations.hasProperty(conf)) {
-            project.configurations.create(conf)
+            project.configurations.create(conf).extendsFrom(project.configurations.runtime)
             dependencies.add(conf, 'org.eclipse.jetty.aggregate:jetty-all-server:8.1.15.v20140411')
             dependencies.add(conf, 'fi.jasoft.plugin:gradle-vaadin-plugin:' + GradleVaadinPlugin.getVersion())
             dependencies.add(conf, 'asm:asm-all:3.3.1')
@@ -181,7 +181,7 @@ class DependencyListener implements ProjectEvaluationListener {
         def jetty8Conf = Configuration.JETTY9.caption()
 
         if (!project.configurations.hasProperty(serverConf)) {
-            project.configurations.create(serverConf)
+            project.configurations.create(serverConf).extendsFrom(project.configurations.compile)
 
             def sources = project.sourceSets.main
             def testSources = project.sourceSets.test
@@ -265,7 +265,7 @@ class DependencyListener implements ProjectEvaluationListener {
         def testSources = project.sourceSets.test
 
         if (!project.configurations.hasProperty(conf)) {
-            project.configurations.create(conf)
+            project.configurations.create(conf).extendsFrom(project.configurations.compile)
 
             sources.compileClasspath += [project.configurations[conf]]
             testSources.compileClasspath += [project.configurations[conf]]
@@ -278,7 +278,11 @@ class DependencyListener implements ProjectEvaluationListener {
         def testSources = project.sourceSets.test
 
         if (!project.configurations.hasProperty(conf)) {
-            project.configurations.create(conf)
+            project.configurations.create(conf).extendsFrom(
+                    project.configurations.compile,
+                    project.configurations.runtime
+
+            )
             project.dependencies.add(conf, "com.vaadin:vaadin-testbench:${project.vaadin.testbench.version}")
 
             testSources.compileClasspath += [project.configurations[conf]]
@@ -292,7 +296,10 @@ class DependencyListener implements ProjectEvaluationListener {
         def testSources = project.sourceSets.test
 
         if (!project.configurations.hasProperty(conf)) {
-            project.configurations.create(conf)
+            project.configurations.create(conf).extendsFrom(
+                    project.configurations.compile,
+                    project.configurations.runtime
+            )
             project.dependencies.add(conf, "com.vaadin:vaadin-push:${version}")
 
             sources.compileClasspath += [project.configurations[conf]]
