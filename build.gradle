@@ -32,8 +32,16 @@ dependencies {
     deploy 'org.apache.maven.wagon:wagon-ftp:2.2'
 }
 
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+    include 'fi/**/*.groovy'
+    include 'fi/**/*.java'
+}
+
 artifacts {
     archives jar
+    archives sourcesJar
 }
 
 uploadArchives {
