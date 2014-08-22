@@ -29,17 +29,17 @@ import java.nio.file.StandardWatchEventKinds
 import java.nio.file.WatchEvent
 import java.nio.file.attribute.BasicFileAttributes
 
-public class ApplicationServer {
+class ApplicationServer {
 
     private Process process;
 
     private final project;
 
-    ApplicationServer(Project project) {
+    def ApplicationServer(Project project) {
         this.project = project;
     }
 
-    public start() {
+    def start() {
 
         if (process != null) {
             project.logger.error('Server is already running.')
@@ -112,17 +112,19 @@ public class ApplicationServer {
 
     }
 
-    public startAndBlock() {
+    def startAndBlock() {
         start()
         project.logger.lifecycle('Press [Ctrl+C] to terminate server...')
         process.waitFor()
         terminate()
     }
 
-    public terminate() {
-        process.waitForOrKill(100)
-        project.logger.lifecycle("Application server terminated.")
-        process = null
+    def terminate() {
+        if(process){
+            process.waitForOrKill(100)
+            project.logger.lifecycle("Application server terminated.")
+            process = null
+        }
     }
 
     def watchDirectoryForChanges() {
