@@ -19,6 +19,10 @@ import fi.jasoft.plugin.ApplicationServer
 import fi.jasoft.plugin.Util
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
+import org.gradle.plugins.ide.idea.model.IdeaProject
+import org.gradle.plugins.ide.idea.model.ProjectLibrary
+import org.gradle.tooling.GradleConnector
+import org.gradle.tooling.model.build.BuildEnvironment
 
 public class RunTask extends DefaultTask {
 
@@ -40,17 +44,6 @@ public class RunTask extends DefaultTask {
             Util.openBrowser(project, "http://localhost:${project.vaadin.serverPort}")
         }
 
-        if (project.vaadin.plugin.terminateOnEnter) {
-            server.start()
-            project.logger.lifecycle('Press [Enter] to terminate server...')
-            if (Util.readLine("") == null) {
-                project.logger.warn("Could not retrieve console. Use [CTRL+C] to terminate server.")
-                server.startAndBlock()
-            } else {
-                server.terminate()
-            }
-        } else {
-            server.startAndBlock()
-        }
+        server.startAndBlock()
     }
 }

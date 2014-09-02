@@ -36,7 +36,10 @@ class CreateProjectTask extends DefaultTask {
     @TaskAction
     public void run() {
 
-        applicationName = Util.readLine('\nApplication Name (MyApplication): ')
+        if(System.console()){
+            applicationName = Util.readLine('\nApplication Name (MyApplication): ')
+        }
+
         if (applicationName == null || applicationName == '') {
             applicationName = 'MyApplication'
         }
@@ -45,7 +48,9 @@ class CreateProjectTask extends DefaultTask {
             String widgetsetName = project.vaadin.widgetset.tokenize('.').last()
             applicationPackage = project.vaadin.widgetset[0..(-widgetsetName.size() - 2)]
         } else {
-            applicationPackage = Util.readLine("\nApplication Package (com.example.${applicationName.toLowerCase()}): ")
+            if(System.console()){
+                applicationPackage = Util.readLine("\nApplication Package (com.example.${applicationName.toLowerCase()}): ")
+            }
             if (applicationPackage == null || applicationPackage == '') {
                 applicationPackage = 'com.example.' + applicationName.toLowerCase()
             }

@@ -21,11 +21,6 @@ package fi.jasoft.plugin.configuration
 class VaadinPluginConfiguration {
 
     /**
-     * Should the vaadinRun task terminate on enter key (or when false terminate on Ctrl+C)
-     */
-    boolean terminateOnEnter = true
-
-    /**
      * Should all logs output by the task be redirected to the console (if false output is redirected to file)
      */
     boolean logToConsole = false
@@ -52,15 +47,6 @@ class VaadinPluginConfiguration {
      */
     void logToConsole(boolean logToConsole) {
         this.logToConsole = logToConsole
-    }
-
-    /**
-     * @see VaadinPluginConfiguration#terminateOnEnter
-     *
-     * @param terminateOnEnter
-     */
-    void terminateOnEnter(boolean terminateOnEnter) {
-        this.terminateOnEnter = terminateOnEnter
     }
 
     /**

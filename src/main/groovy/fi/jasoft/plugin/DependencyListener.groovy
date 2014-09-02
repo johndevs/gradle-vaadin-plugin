@@ -21,6 +21,9 @@ import org.gradle.api.ProjectEvaluationListener
 import org.gradle.api.ProjectState
 import org.gradle.api.file.FileTree
 import org.gradle.api.plugins.WarPluginConvention
+import org.gradle.plugins.ide.idea.model.ProjectLibrary
+import org.gradle.tooling.GradleConnector
+import org.gradle.tooling.model.idea.IdeaProject
 
 class DependencyListener implements ProjectEvaluationListener {
 
