@@ -53,6 +53,14 @@ class CreateThemeTask extends DefaultTask {
         substitutions['theme'] = substitutions['themeName'].toLowerCase()
         substitutions['themeImport'] = substitutions['theme'] + '.scss'
 
+        if(project.vaadin.version.startsWith('7.0') ||
+                project.vaadin.version.startsWith('7.1') ||
+                project.vaadin.version.startsWith('7.2')) {
+            substitutions['basetheme'] = 'reindeer'
+        } else {
+            substitutions['basetheme'] = 'valo'
+        }
+
         TemplateUtil.writeTemplate('styles.scss', themeDir, 'styles.scss', substitutions)
         TemplateUtil.writeTemplate('MyTheme.scss', themeDir, substitutions['themeImport'], substitutions)
 
