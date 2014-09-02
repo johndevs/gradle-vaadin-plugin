@@ -113,10 +113,12 @@ class ApplicationServer {
     }
 
     def startAndBlock() {
-        start()
-        project.logger.lifecycle('Press [Ctrl+C] to terminate server...')
-        process.waitFor()
-        terminate()
+        while(true) {
+            start()
+            project.logger.lifecycle('Press [Ctrl+C] to terminate server...')
+            process.waitFor()
+            terminate()
+        }
     }
 
     def terminate() {
@@ -165,9 +167,7 @@ class ApplicationServer {
         project.logger.info "Stopped watching directory"
 
         if(restart) {
-            terminate()
-            Thread.sleep(1000)
-            start()
+            process.waitForOrKill(1)
         }
     }
 }
