@@ -1,7 +1,7 @@
-@import "../reindeer/reindeer.scss";
+@import "../${basetheme}/${basetheme}.scss";
 
 @mixin ${theme} {
-	@include reindeer;
+	@include ${basetheme};
 
 	/* Add your theme selectors here */
 }
