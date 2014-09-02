@@ -19,10 +19,6 @@ import fi.jasoft.plugin.ApplicationServer
 import fi.jasoft.plugin.Util
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
-import org.gradle.plugins.ide.idea.model.IdeaProject
-import org.gradle.plugins.ide.idea.model.ProjectLibrary
-import org.gradle.tooling.GradleConnector
-import org.gradle.tooling.model.build.BuildEnvironment
 
 public class RunTask extends DefaultTask {
 
