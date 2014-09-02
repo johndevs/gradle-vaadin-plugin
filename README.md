@@ -157,7 +157,6 @@ vaadin.testbench.node.browsers = [
 ```
 
 ## Plugin configurations
-* ``vaadin.plugin.terminateOnEnter`` - Should the vaadinRun and devmode tasks be terminated on enter-key. Default true.
 * ``vaadin.plugin.logToConsole``- Should server logs be logged to the console or to a log file. Default is logging to file.
 * ``vaadin.plugin.openInBrowser`` - Should the application be opened in a browser tab after the application is launched. Default true.
 * ``vaadin.plugin.eclipseOutputDir`` - The directory where Eclipse will output its compiled classes. Default is project.sourceSets.main.output.classesDir.
