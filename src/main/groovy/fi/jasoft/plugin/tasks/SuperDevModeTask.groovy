@@ -28,6 +28,8 @@ class SuperDevModeTask extends DefaultTask {
 
     static final String NAME = 'vaadinSuperDevMode'
 
+    def Process codeserverProcess = null
+
     def SuperDevModeTask() {
         dependsOn(CompileWidgetsetTask.NAME)
         description = "Run Super Development Mode for easier client widget development."
@@ -46,31 +48,25 @@ class SuperDevModeTask extends DefaultTask {
             throw new GradleException("Property vaadin.widgetset not set.")
         }
 
-        ApplicationServer server = new ApplicationServer(project)
+        runCodeServer({
 
-        server.start()
+            ApplicationServer server = new ApplicationServer(project, ['superdevmode'])
 
-        if (project.vaadin.debug) {
-            Util.openBrowser(project, "http://localhost:${project.vaadin.serverPort}/?superdevmode&debug")
-        } else {
-            Util.openBrowser(project, "http://localhost:${project.vaadin.serverPort}/?superdevmode")
-        }
+            server.startAndBlock();
 
-        runCodeServer()
-
-        server.terminate()
+            codeserverProcess.waitForOrKill(1)
+        })
     }
 
-    def runCodeServer() {
-
+    def runCodeServer(Closure readyClosure) {
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
         File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
         File widgetsetsDir = new File(webAppDir.canonicalPath + '/VAADIN/widgetsets')
         widgetsetsDir.mkdirs()
-        String widgetset = project.vaadin.widgetset == null ? 'com.vaadin.terminal.gwt.DefaultWidgetSet' : project.vaadin.widgetset
 
         def jettyClasspath = project.configurations[DependencyListener.Configuration.JETTY8.caption()];
         def classpath = jettyClasspath + Util.getClassPath(project)
+        def widgetset = project.vaadin.widgetset
 
         if(project.vaadin.gwt.gwtSdkFirstInClasspath){
             FileCollection gwtCompilerClasspath = project.configurations[DependencyListener.Configuration.CLIENT.caption()];
@@ -86,13 +82,17 @@ class SuperDevModeTask extends DefaultTask {
             '-src', javaDir.canonicalPath,
             '-logLevel', project.vaadin.gwt.logLevel,
             '-noprecompile',
-            widgetset
+            project.vaadin.widgetset
         ]
 
-        def process = superdevmodeProcess.execute()
+        codeserverProcess = superdevmodeProcess.execute()
 
-        Util.logProcess(project, process, 'superdevmode.log')
+        Util.logProcess(project, codeserverProcess, 'superdevmode.log', { line ->
+            if(line.contains('The code server is ready.')){
+                readyClosure.call()
+            }
+        })
 
-        process.waitFor()
+        codeserverProcess.waitFor()
     }
 }

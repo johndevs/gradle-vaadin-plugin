@@ -116,10 +116,9 @@ class Util {
         return !project.vaadin.version.startsWith('7.0')
     }
 
-    public static void openBrowser(Project project, String url, int delay = 3000) {
+    public static void openBrowser(Project project, String url) {
         if (project.vaadin.plugin.openInBrowser && java.awt.Desktop.isDesktopSupported()) {
             Thread.startDaemon {
-                sleep delay
                 java.awt.Desktop.desktop.browse url.toURI()
             }
         }
@@ -197,10 +196,11 @@ class Util {
         project.plugins.findPlugin(fi.jasoft.plugin.GradleVaadinGroovyPlugin)
     }
 
-    def static logProcess(final Project project, final Process process, final String filename) {
+    def static logProcess(final Project project, final Process process, final String filename, Closure monitor={}) {
         if(project.vaadin.plugin.logToConsole){
             Thread.start 'Info logger', {
                 process.getInputStream().eachLine { output ->
+                    monitor.call(output)
                     if(output.contains("[WARN]")){
                         project.logger.warn(output.replaceAll("\\[WARN\\]",'').trim())
                     } else {
@@ -210,6 +210,7 @@ class Util {
             }
             Thread.start 'Error logger', {
                 process.getErrorStream().eachLine { String output ->
+                    monitor.call(output)
                     project.logger.error(output.replaceAll("\\[ERROR\\]",'').trim())
                 }
             }
@@ -221,6 +222,7 @@ class Util {
             Thread.start 'Info logger', {
                 logFile.withWriterAppend { out ->
                     process.getInputStream().eachLine { output ->
+                        monitor.call(output)
                         if(output.contains("[WARN]")){
                             out.println "[WARN] "+output.replaceAll("\\[WARN\\]",'').trim()
                         } else {
@@ -233,6 +235,7 @@ class Util {
             Thread.start 'Error logger', {
                 logFile.withWriterAppend { out ->
                     process.getErrorStream().eachLine { output ->
+                        monitor.call(output)
                         out.println "[ERROR] "+output.replaceAll("\\[ERROR\\]",'').trim()
                         out.flush()
                     }

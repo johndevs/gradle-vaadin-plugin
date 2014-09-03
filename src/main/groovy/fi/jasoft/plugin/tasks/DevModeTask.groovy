@@ -27,6 +27,8 @@ class DevModeTask extends DefaultTask {
 
     public static final String NAME = 'vaadinDevMode'
 
+    def Process devModeProcess
+
     public DevModeTask() {
         dependsOn('classes', UpdateWidgetsetTask.NAME)
         description = "Run Development Mode for easier debugging and development of client widgets."
@@ -40,28 +42,15 @@ class DevModeTask extends DefaultTask {
             return
         }
 
-        if (project.vaadin.devmode.noserver) {
-            runDevelopmentMode()
+        runDevelopmentMode()
+
+        if (!project.vaadin.devmode.noserver) {
+            new ApplicationServer(
+                    project, ["gwt.codesvr=${project.vaadin.devmode.bindAddress}:${project.vaadin.devmode.codeServerPort}"]
+            ).startAndBlock()
+            devModeProcess.waitForOrKill(1)
         } else {
-            ApplicationServer server = new ApplicationServer(project)
-
-            server.start()
-
-            if (project.vaadin.debug) {
-                Util.openBrowser(
-                        project,
-                        "http://localhost:${project.vaadin.serverPort}/?gwt.codesvr=${project.vaadin.devmode.bindAddress}:${project.vaadin.devmode.codeServerPort}&debug"
-                )
-            } else {
-                Util.openBrowser(
-                        project,
-                        "http://localhost:${project.vaadin.serverPort}/?gwt.codesvr=${project.vaadin.devmode.bindAddress}:${project.vaadin.devmode.codeServerPort}"
-                )
-            }
-
-            runDevelopmentMode()
-
-            server.terminate()
+            devModeProcess.waitFor()
         }
     }
 
@@ -91,10 +80,8 @@ class DevModeTask extends DefaultTask {
             '-bindAddress', project.vaadin.devmode.bindAddress
         ]
 
-        def process = devmodeProcess.execute()
+        devModeProcess = devmodeProcess.execute()
 
-        Util.logProcess(project, process, 'devmode.log')
-
-        process.waitFor()
+        Util.logProcess(project, devModeProcess, 'devmode.log')
     }
 }

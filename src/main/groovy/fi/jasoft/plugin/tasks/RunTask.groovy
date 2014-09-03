@@ -16,7 +16,6 @@
 package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.ApplicationServer
-import fi.jasoft.plugin.Util
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 
@@ -32,14 +31,6 @@ public class RunTask extends DefaultTask {
 
     @TaskAction
     public void run() {
-        ApplicationServer server = new ApplicationServer(project)
-
-        if (project.vaadin.debug) {
-            Util.openBrowser(project, "http://localhost:${project.vaadin.serverPort}?debug")
-        } else {
-            Util.openBrowser(project, "http://localhost:${project.vaadin.serverPort}")
-        }
-
-        server.startAndBlock()
+        new ApplicationServer(project).startAndBlock()
     }
 }

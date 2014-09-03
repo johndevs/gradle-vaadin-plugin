@@ -31,19 +31,22 @@ import java.nio.file.attribute.BasicFileAttributes
 
 class ApplicationServer {
 
-    private Process process;
+    def Process process;
 
-    private final project;
+    def final project;
 
-    def ApplicationServer(Project project) {
-        this.project = project;
+    def List browserParameters
+
+    def ApplicationServer(project, browserParameters = []) {
+        this.project = project
+        this.browserParameters = browserParameters
     }
 
-    def start() {
+    def boolean start() {
 
         if (process != null) {
             project.logger.error('Server is already running.')
-            return
+            return false
         }
 
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
@@ -92,31 +95,47 @@ class ApplicationServer {
         // Execute server
         process = appServerProcess.execute()
 
+        // Watch for changes in classes
         if(project.vaadin.debug && project.vaadin.plugin.jettyAutoRefresh) {
             Thread.start 'Directory Watcher', {
                 watchDirectoryForChanges()
             }
         }
 
-        Util.logProcess(project, process, 'jetty.log')
-
-        def resultStr = "Application running on http://0.0.0.0:${project.vaadin.serverPort} "
-        if (project.vaadin.jrebel.enabled) {
-            resultStr += "(debugger on ${project.vaadin.debugPort}, JRebel active)"
-        } else if (project.vaadin.debug) {
-            resultStr += "(debugger on ${project.vaadin.debugPort})"
-        } else {
-            resultStr += '(debugger off)'
+        // Build browser GET parameters
+        def paramString = ''
+        if (project.vaadin.debug) {
+            paramString += '?debug'
+            paramString += '&' + browserParameters.join('&')
+        } else if(!browserParameters.isEmpty()){
+            paramString += '?' + browserParameters.join('&')
         }
-        project.logger.lifecycle(resultStr)
 
+        // Capture log output
+        Util.logProcess(project, process, 'jetty.log', { line ->
+            if(line.contains('Server:main: Started')) {
+                def resultStr = "Application running on http://0.0.0.0:${project.vaadin.serverPort} "
+                if (project.vaadin.jrebel.enabled) {
+                    resultStr += "(debugger on ${project.vaadin.debugPort}, JRebel active)"
+                } else if (project.vaadin.debug) {
+                    resultStr += "(debugger on ${project.vaadin.debugPort})"
+                } else {
+                    resultStr += '(debugger off)'
+                }
+                project.logger.lifecycle(resultStr)
+                project.logger.lifecycle('Press [Ctrl+C] to terminate server...')
+
+                // Open browser
+                Util.openBrowser((Project)project, "http://localhost:${(Integer)project.vaadin.serverPort}/${paramString}")
+            }
+        })
     }
 
     def startAndBlock() {
         while(true) {
-            start()
-            project.logger.lifecycle('Press [Ctrl+C] to terminate server...')
+            if(!start()) break
             process.waitFor()
+            if(process.exitValue() != 0) break
             terminate()
         }
     }
