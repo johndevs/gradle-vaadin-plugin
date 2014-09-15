@@ -121,17 +121,10 @@ class DependencyListener implements ProjectEvaluationListener {
         // Add repositories
         Repositories.values().each { repository ->
             if (repositories.findByName(repository.caption()) == null) {
-                if(gradleMinorVersion < 9 && gradleMajorVersion == 1){
-                    repositories.mavenRepo(
-                            name: repository.caption(),
-                            url: repository.url()
-                    )
-                }  else {
-                    repositories.maven({
-                        name = repository.caption()
-                        url = repository.url()
-                    })
-                }
+                repositories.maven({
+                    name = repository.caption()
+                    url = repository.url()
+                })
             }
         }
 
