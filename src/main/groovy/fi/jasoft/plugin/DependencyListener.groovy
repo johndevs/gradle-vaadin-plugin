@@ -28,19 +28,21 @@ class DependencyListener implements ProjectEvaluationListener {
      * Added configurations to project
      */
     static enum Configuration {
-        SERVER('vaadin'),
-        CLIENT('vaadin-client'),
-        TESTBENCH('vaadin-testbench'),
-        @Deprecated JETTY8('jetty8'),
-        JETTY9('jetty9'),
-        PUSH('vaadin-push'),
-        JAVADOC('vaadin-javadoc');
+        SERVER('vaadin', 'Vaadin server side libraries'),
+        CLIENT('vaadin-client', 'Client side libraries used by Vaadin to compile the widgetset'),
+        TESTBENCH('vaadin-testbench', 'Testing libraries needed by Vaadin Testbench.'),
+        @Deprecated JETTY8('jetty8', 'Jetty 8 server used by the GWT CodeServer'),
+        JETTY9('jetty9', 'Jetty 9 server used by the vaadinRun task'),
+        PUSH('vaadin-push', 'Libraries used by vaadin push'),
+        JAVADOC('vaadin-javadoc', 'Classpath for compiling Javadoc for Vaadin projects');
 
-        final private String caption
+        def String caption
+        def String description;
 
-        public Configuration(String caption) { this.caption = caption }
-
-        public caption() { return caption }
+        public Configuration(String caption, String description) {
+            this.caption = caption
+            this.description = description
+        }
     }
 
     /**
@@ -146,57 +148,63 @@ class DependencyListener implements ProjectEvaluationListener {
     }
 
     private static void createJetty9Configuration(Project project) {
-        def conf = Configuration.JETTY9.caption()
+        def conf = Configuration.JETTY9
         def dependencies = project.dependencies
-        if (!project.configurations.hasProperty(conf)) {
-            project.configurations.create(conf).extendsFrom(project.configurations.runtime)
-            dependencies.add(conf, 'org.eclipse.jetty.aggregate:jetty-all:9.2.2.v20140723')
-            dependencies.add(conf, 'org.eclipse.jetty:jetty-annotations:9.2.2.v20140723')
-            dependencies.add(conf, 'org.eclipse.jetty:jetty-plus:9.2.2.v20140723')
-            dependencies.add(conf, 'org.eclipse.jetty:jetty-deploy:9.2.2.v20140723')
-            dependencies.add(conf, 'fi.jasoft.plugin:gradle-vaadin-plugin:' + GradleVaadinPlugin.getVersion())
-            dependencies.add(conf, 'org.ow2.asm:asm:5.0.2')
-            dependencies.add(conf, 'org.ow2.asm:asm-commons:5.0.2')
-            dependencies.add(conf, 'javax.servlet.jsp:jsp-api:2.2')
+        if (!project.configurations.hasProperty(conf.caption)) {
+            project.configurations.create(conf.caption).extendsFrom(
+                    project.configurations.runtime
+            ).setDescription(conf.description)
+            dependencies.add(conf.caption, 'org.eclipse.jetty.aggregate:jetty-all:9.2.2.v20140723')
+            dependencies.add(conf.caption, 'org.eclipse.jetty:jetty-annotations:9.2.2.v20140723')
+            dependencies.add(conf.caption, 'org.eclipse.jetty:jetty-plus:9.2.2.v20140723')
+            dependencies.add(conf.caption, 'org.eclipse.jetty:jetty-deploy:9.2.2.v20140723')
+            dependencies.add(conf.caption, 'fi.jasoft.plugin:gradle-vaadin-plugin:' + GradleVaadinPlugin.getVersion())
+            dependencies.add(conf.caption, 'org.ow2.asm:asm:5.0.2')
+            dependencies.add(conf.caption, 'org.ow2.asm:asm-commons:5.0.2')
+            dependencies.add(conf.caption, 'javax.servlet.jsp:jsp-api:2.2')
         }
     }
 
     @Deprecated
     def static createJetty8Configuration(Project project) {
-        def conf = Configuration.JETTY8.caption()
+        def conf = Configuration.JETTY8
         def dependencies = project.dependencies
-        if (!project.configurations.hasProperty(conf)) {
-            project.configurations.create(conf).extendsFrom(project.configurations.runtime)
-            dependencies.add(conf, 'org.eclipse.jetty.aggregate:jetty-all-server:8.1.15.v20140411')
-            dependencies.add(conf, 'fi.jasoft.plugin:gradle-vaadin-plugin:' + GradleVaadinPlugin.getVersion())
-            dependencies.add(conf, 'asm:asm-all:3.3.1')
-            dependencies.add(conf, 'javax.servlet.jsp:jsp-api:2.2')
+        if (!project.configurations.hasProperty(conf.caption)) {
+            project.configurations.create(conf.caption).extendsFrom(
+                    project.configurations.runtime
+            ).setDescription(conf.description)
+            dependencies.add(conf.caption, 'org.eclipse.jetty.aggregate:jetty-all-server:8.1.15.v20140411')
+            dependencies.add(conf.caption, 'fi.jasoft.plugin:gradle-vaadin-plugin:' + GradleVaadinPlugin.getVersion())
+            dependencies.add(conf.caption, 'asm:asm-all:3.3.1')
+            dependencies.add(conf.caption, 'javax.servlet.jsp:jsp-api:2.2')
         }
     }
 
     private static void createCommonVaadinConfiguration(Project project) {
         createGWTConfiguration(project)
 
-        def serverConf = Configuration.SERVER.caption()
-        def jetty8Conf = Configuration.JETTY9.caption()
+        def serverConf = Configuration.SERVER
+        def jettyConf = Configuration.JETTY9
 
-        if (!project.configurations.hasProperty(serverConf)) {
-            project.configurations.create(serverConf).extendsFrom(project.configurations.compile)
+        if (!project.configurations.hasProperty(serverConf.caption)) {
+            project.configurations.create(serverConf.caption).extendsFrom(
+                    project.configurations.compile
+            ).setDescription(serverConf.description)
 
             def sources = project.sourceSets.main
             def testSources = project.sourceSets.test
 
-            sources.compileClasspath += [project.configurations[serverConf]]
-            testSources.compileClasspath += [project.configurations[serverConf]]
-            testSources.runtimeClasspath += [project.configurations[serverConf]]
+            sources.compileClasspath += [project.configurations[serverConf.caption]]
+            testSources.compileClasspath += [project.configurations[serverConf.caption]]
+            testSources.runtimeClasspath += [project.configurations[serverConf.caption]]
 
             // For servlet 3 support
-            sources.compileClasspath += [project.configurations[jetty8Conf]]
-            testSources.compileClasspath += [project.configurations[jetty8Conf]]
-            testSources.runtimeClasspath += [project.configurations[jetty8Conf]]
+            sources.compileClasspath += [project.configurations[jettyConf.caption]]
+            testSources.compileClasspath += [project.configurations[jettyConf.caption]]
+            testSources.runtimeClasspath += [project.configurations[jettyConf.caption]]
 
             // Add server libs to war
-            project.war.classpath(project.configurations[serverConf])
+            project.war.classpath(project.configurations[serverConf.caption])
         }
     }
 
@@ -204,13 +212,13 @@ class DependencyListener implements ProjectEvaluationListener {
      * Creates the configuration for generating Javadoc
      */
     private static void createJavadocConfiguration(Project project, String version) {
-        def javadocConf = Configuration.JAVADOC.caption()
+        def javadocConf = Configuration.JAVADOC
         def dependencies = project.dependencies
-        if (!project.configurations.hasProperty(javadocConf)) {
-            project.configurations.create(javadocConf)
-            dependencies.add(javadocConf, 'javax.portlet:portlet-api:2.0')
-            dependencies.add(javadocConf, 'javax.servlet:javax.servlet-api:3.0.1')
-            dependencies.add(javadocConf, "com.vaadin:vaadin-push:${version}")
+        if (!project.configurations.hasProperty(javadocConf.caption)) {
+            project.configurations.create(javadocConf.caption).setDescription(javadocConf.description)
+            dependencies.add(javadocConf.caption, 'javax.portlet:portlet-api:2.0')
+            dependencies.add(javadocConf.caption, 'javax.servlet:javax.servlet-api:3.0.1')
+            dependencies.add(javadocConf.caption, "com.vaadin:vaadin-push:${version}")
         }
     }
 
@@ -219,8 +227,8 @@ class DependencyListener implements ProjectEvaluationListener {
         // Create common configuration for both Vaadin 6 and Vaadin 7
         createCommonVaadinConfiguration(project)
 
-        def serverConf = Configuration.SERVER.caption()
-        def clientConf = Configuration.CLIENT.caption()
+        def serverConf = Configuration.SERVER
+        def clientConf = Configuration.CLIENT
         def dependencies = project.dependencies
 
         // Theme compiler
@@ -228,30 +236,30 @@ class DependencyListener implements ProjectEvaluationListener {
             File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
             FileTree themes = project.fileTree(dir: webAppDir.canonicalPath + '/VAADIN/themes', include: '**/styles.scss')
             if (!themes.isEmpty()) {
-                dependencies.add(serverConf, "com.vaadin:vaadin-theme-compiler:${version}")
+                dependencies.add(serverConf.caption, "com.vaadin:vaadin-theme-compiler:${version}")
             }
         }
 
         // Client compiler or pre-compiled theme
         if (project.vaadin.widgetset == null) {
-            dependencies.add(serverConf, "com.vaadin:vaadin-client-compiled:${version}")
+            dependencies.add(serverConf.caption, "com.vaadin:vaadin-client-compiled:${version}")
         } else {
-            dependencies.add(clientConf, "com.vaadin:vaadin-client-compiler:${version}", {
+            dependencies.add(clientConf.caption, "com.vaadin:vaadin-client-compiler:${version}", {
 
                 // Project already has jetty, no need for it to be included again
                 exclude([group: 'org.mortbay.jetty'])  // pre 7.2.2
                 exclude([group: 'org.eclipse.jetty'])
             })
 
-            dependencies.add(clientConf, "com.vaadin:vaadin-client:${version}")
-            dependencies.add(clientConf, "javax.validation:validation-api:1.0.0.GA")
+            dependencies.add(clientConf.caption, "com.vaadin:vaadin-client:${version}")
+            dependencies.add(clientConf.caption, "javax.validation:validation-api:1.0.0.GA")
         }
 
         // Server
-        dependencies.add(serverConf, "com.vaadin:vaadin-server:${version}")
+        dependencies.add(serverConf.caption, "com.vaadin:vaadin-server:${version}")
 
         // Themes
-        dependencies.add(serverConf, "com.vaadin:vaadin-themes:${version}")
+        dependencies.add(serverConf.caption, "com.vaadin:vaadin-themes:${version}")
 
         // Optional push
         if (Util.isPushSupportedAndEnabled(project)) {
@@ -260,51 +268,53 @@ class DependencyListener implements ProjectEvaluationListener {
     }
 
     private static void createGWTConfiguration(Project project) {
-        def conf = Configuration.CLIENT.caption()
+        def conf = Configuration.CLIENT
         def sources = project.sourceSets.main
         def testSources = project.sourceSets.test
 
-        if (!project.configurations.hasProperty(conf)) {
-            project.configurations.create(conf).extendsFrom(project.configurations.compile)
+        if (!project.configurations.hasProperty(conf.caption)) {
+            project.configurations.create(conf.caption).extendsFrom(
+                    project.configurations.compile
+            ).setDescription(conf.description)
 
-            sources.compileClasspath += [project.configurations[conf]]
-            testSources.compileClasspath += [project.configurations[conf]]
-            testSources.runtimeClasspath += [project.configurations[conf]]
+            sources.compileClasspath += [project.configurations[conf.caption]]
+            testSources.compileClasspath += [project.configurations[conf.caption]]
+            testSources.runtimeClasspath += [project.configurations[conf.caption]]
         }
     }
 
     private static void createTestbenchConfiguration(Project project) {
-        def conf = Configuration.TESTBENCH.caption()
+        def conf = Configuration.TESTBENCH
         def testSources = project.sourceSets.test
 
-        if (!project.configurations.hasProperty(conf)) {
-            project.configurations.create(conf).extendsFrom(
+        if (!project.configurations.hasProperty(conf.caption)) {
+            project.configurations.create(conf.caption).extendsFrom(
                     project.configurations.compile,
                     project.configurations.runtime
 
-            )
-            project.dependencies.add(conf, "com.vaadin:vaadin-testbench:${project.vaadin.testbench.version}")
+            ).setDescription(conf.description)
+            project.dependencies.add(conf.caption, "com.vaadin:vaadin-testbench:${project.vaadin.testbench.version}")
 
-            testSources.compileClasspath += [project.configurations[conf]]
-            testSources.runtimeClasspath += [project.configurations[conf]]
+            testSources.compileClasspath += [project.configurations[conf.caption]]
+            testSources.runtimeClasspath += [project.configurations[conf.caption]]
         }
     }
 
     private static void createPushConfiguration(Project project, String version) {
-        def conf = Configuration.PUSH.caption()
+        def conf = Configuration.PUSH
         def sources = project.sourceSets.main
         def testSources = project.sourceSets.test
 
-        if (!project.configurations.hasProperty(conf)) {
-            project.configurations.create(conf).extendsFrom(
+        if (!project.configurations.hasProperty(conf.caption)) {
+            project.configurations.create(conf.caption).extendsFrom(
                     project.configurations.compile,
                     project.configurations.runtime
-            )
-            project.dependencies.add(conf, "com.vaadin:vaadin-push:${version}")
+            ).setDescription(conf.description)
+            project.dependencies.add(conf.caption, "com.vaadin:vaadin-push:${version}")
 
-            sources.compileClasspath += [project.configurations[conf]]
-            testSources.compileClasspath += [project.configurations[conf]]
-            testSources.runtimeClasspath += [project.configurations[conf]]
+            sources.compileClasspath += [project.configurations[conf.caption]]
+            testSources.compileClasspath += [project.configurations[conf.caption]]
+            testSources.runtimeClasspath += [project.configurations[conf.caption]]
         }
     }
 }
