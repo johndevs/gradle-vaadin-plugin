@@ -211,7 +211,7 @@ public class TaskListener implements TaskExecutionListener {
         }
 
         if (Util.isPushSupportedAndEnabled(project)) {
-            module.scopes.RUNTIME.plus += [conf[Configuration.JETTY9.caption]]
+            module.scopes.COMPILE.plus += [conf[Configuration.PUSH.caption]]
         }
     }
 

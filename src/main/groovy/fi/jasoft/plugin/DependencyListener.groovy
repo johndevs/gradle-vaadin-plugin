@@ -307,6 +307,7 @@ class DependencyListener implements ProjectEvaluationListener {
             sources.compileClasspath += [project.configurations[conf.caption]]
             testSources.compileClasspath += [project.configurations[conf.caption]]
             testSources.runtimeClasspath += [project.configurations[conf.caption]]
+            project.war.classpath(project.configurations[conf.caption])
         }
     }
 }
