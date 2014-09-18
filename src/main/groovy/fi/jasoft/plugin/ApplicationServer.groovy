@@ -110,17 +110,16 @@ class ApplicationServer {
         } else if(!browserParameters.isEmpty()){
             paramString += '?' + browserParameters.join('&')
         }
+        paramString = paramString.replaceAll('\\?$|&$', '')
 
         // Capture log output
         Util.logProcess(project, process, 'jetty.log', { line ->
             if(line.contains('Server:main: Started')) {
-                def resultStr = "Application running on http://0.0.0.0:${project.vaadin.serverPort} "
+                def resultStr = "Application running on http://localhost:${project.vaadin.serverPort} "
                 if (project.vaadin.jrebel.enabled) {
                     resultStr += "(debugger on ${project.vaadin.debugPort}, JRebel active)"
                 } else if (project.vaadin.debug) {
                     resultStr += "(debugger on ${project.vaadin.debugPort})"
-                } else {
-                    resultStr += '(debugger off)'
                 }
                 project.logger.lifecycle(resultStr)
                 project.logger.lifecycle('Press [Ctrl+C] to terminate server...')
