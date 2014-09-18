@@ -17,6 +17,7 @@ package fi.jasoft.plugin
 
 import fi.jasoft.plugin.DependencyListener.Configuration
 import fi.jasoft.plugin.tasks.CreateDirectoryZipTask
+import fi.jasoft.plugin.tasks.CreateWidgetsetGeneratorTask
 import fi.jasoft.plugin.testbench.TestbenchHub
 import fi.jasoft.plugin.testbench.TestbenchNode
 import groovy.xml.MarkupBuilder
@@ -235,7 +236,7 @@ public class TaskListener implements TaskExecutionListener {
             File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
             File f = project.file(javaDir.canonicalPath + '/' + pkg.replaceAll(/\./, '/') + '/' + filename)
             if (!f.exists()) {
-                project.tasks.createVaadinWidgetsetGenerator.run()
+                project.tasks[CreateWidgetsetGeneratorTask.NAME].run()
             }
         }
     }
