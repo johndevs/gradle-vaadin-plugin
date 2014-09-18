@@ -96,7 +96,11 @@ class CreateProjectTask extends DefaultTask {
         }
 
         if (Util.isAddonStylesSupported(project)) {
-            annotations.add("Theme(\"${applicationName}\")")
+            if(Util.isGroovyProject(project)){
+                annotations.add("Theme('${applicationName}')")
+            } else {
+                annotations.add("Theme(\"${applicationName}\")")
+            }
         }
 
         substitutions['annotations'] = annotations

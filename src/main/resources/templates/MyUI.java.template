@@ -3,11 +3,8 @@ package ${applicationPackage};
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Label;
-
-<% imports.each { pkg -> print "import $pkg;" } %>
-
-<% annotations.each { annotation -> print "@${annotation}" } %>
-public class ${applicationName}UI extends UI{
+<% imports.each { pkg -> println "import $pkg;" } %>
+<% annotations.each { annotation -> println "@${annotation}" } %>public class ${applicationName}UI extends UI{
 	
 	@Override
 	protected void init(VaadinRequest request){
