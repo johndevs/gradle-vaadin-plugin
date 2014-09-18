@@ -162,7 +162,7 @@ class UpdateWidgetsetTask extends DefaultTask {
         File f = new File(javaDir.canonicalPath + '/' + pkg.replaceAll(/\./, '/') + '/' + filename)
 
         if (f.exists() || project.vaadin.widgetsetGenerator != null) {
-            substitutions['widgetsetGenerator'] = pkg + filename.replaceAll('.java', '')
+            substitutions['widgetsetGenerator'] = "${pkg}.${filename.replaceAll('.java$', '')}"
         }
 
         //###################################################################
