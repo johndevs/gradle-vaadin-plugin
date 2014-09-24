@@ -131,7 +131,7 @@ class ApplicationServer {
                 project.logger.lifecycle('Press [Ctrl+C] to terminate server...')
 
                 // Open browser
-                if(project.vaadin.plugin.logToConsole && !restarting) {
+                if(!restarting) {
                     Util.openBrowser((Project)project, "http://localhost:${(Integer)project.vaadin.serverPort}/${paramString}")
                 }
             }
