@@ -42,7 +42,7 @@ class ApplicationServer {
         this.browserParameters = browserParameters
     }
 
-    def boolean start() {
+    def boolean start(restarting=false) {
 
         if (process != null) {
             project.logger.error('Server is already running.')
@@ -95,10 +95,16 @@ class ApplicationServer {
         // Execute server
         process = appServerProcess.execute()
 
+        if(!process.alive) {
+            project.logger.error("Could not start server,  server terminated with error code ${process.exitValue()}. Please look at jetty.log for reason.")
+            return
+        }
+
         // Watch for changes in classes
-        if(project.vaadin.debug && project.vaadin.plugin.jettyAutoRefresh) {
+        if(project.vaadin.plugin.jettyAutoRefresh) {
+            def self = this
             Thread.start 'Directory Watcher', {
-                watchDirectoryForChanges()
+                watchDirectoryForChanges(self)
             }
         }
 
@@ -125,29 +131,52 @@ class ApplicationServer {
                 project.logger.lifecycle('Press [Ctrl+C] to terminate server...')
 
                 // Open browser
-                Util.openBrowser((Project)project, "http://localhost:${(Integer)project.vaadin.serverPort}/${paramString}")
+                if(project.vaadin.plugin.logToConsole && !restarting) {
+                    Util.openBrowser((Project)project, "http://localhost:${(Integer)project.vaadin.serverPort}/${paramString}")
+                }
             }
         })
+
+        project.logger.info 'Server running'
     }
 
+    def restart = false
+
     def startAndBlock() {
-        while(true) {
-            if(!start()) break
+        while(true){
+            // Keep main loop running so task does not end
+
+            // Reset values
+            def restarting = restart
+            restart = false
+            process = null
+
+            // Start server
+            start(restarting)
+
+            // Wait until server process calls destroy()
             process.waitFor()
-            if(process.exitValue() != 0) break
-            terminate()
+
+            // In no restart is requested, terminate task
+            if(!restart) {
+                break;
+            }
         }
     }
 
     def terminate() {
         if(process){
-            process.waitForOrKill(100)
+            process.destroy()
             project.logger.lifecycle("Application server terminated.")
-            process = null
         }
     }
 
-    def watchDirectoryForChanges() {
+    def restart() {
+        restart = true
+        terminate()
+    }
+
+    def watchDirectoryForChanges(task) {
 
         File classesDir = null
         if (project.vaadin.plugin.eclipseOutputDir == null) {
@@ -185,7 +214,9 @@ class ApplicationServer {
         project.logger.info "Stopped watching directory"
 
         if(restart) {
-            process.waitForOrKill(1)
+            task.restart()
+        } else {
+            project.logger.info 'Stopped watching directory (no restart)'
         }
     }
 }
