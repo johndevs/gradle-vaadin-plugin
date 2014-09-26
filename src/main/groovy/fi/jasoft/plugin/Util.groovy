@@ -97,19 +97,27 @@ class Util {
         }
     }
 
-    public static boolean isPushSupportedAndEnabled(Project project) {
-        if (!project.vaadin.push) {
-            return false
-        }
-
+    /**
+     * Does the selected Vaadin version support push
+     *
+     * @param project
+     *      The project to check
+     * @return true if push is supported
+     */
+    def static isPushSupported(Project project) {
         String version = project.vaadin.version
-        if (version == '+') {
-            return true
-        }
-        if (version.startsWith('7') && !version.startsWith('7.0')) {
-            return true
-        }
-        return false
+        version == '+' || (version.startsWith('7') && !version.startsWith('7.0'))
+    }
+
+    /**
+     * Is push supported and enabled in the project
+     *
+     * @param project
+     *      The project to check
+     * @return  true if push is supported and enabled
+     */
+    def static isPushSupportedAndEnabled(Project project) {
+        isPushSupported(project) && project.vaadin.push
     }
 
     public static boolean isAddonStylesSupported(Project project) {

@@ -210,7 +210,9 @@ class DependencyListener implements ProjectEvaluationListener {
             project.configurations.create(javadocConf.caption).setDescription(javadocConf.description)
             dependencies.add(javadocConf.caption, 'javax.portlet:portlet-api:2.0')
             dependencies.add(javadocConf.caption, 'javax.servlet:javax.servlet-api:3.0.1')
-            dependencies.add(javadocConf.caption, "com.vaadin:vaadin-push:${version}")
+            if(Util.isPushSupported(project)){
+                dependencies.add(javadocConf.caption, "com.vaadin:vaadin-push:${version}")
+            }
         }
     }
 
