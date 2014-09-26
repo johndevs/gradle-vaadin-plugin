@@ -1,5 +1,15 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:0.5"
+    }
+}
+
+apply plugin: "com.jfrog.bintray"
 apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'idea'
@@ -52,29 +62,43 @@ artifacts {
     archives sourcesJar
 }
 
+bintray {
+    user = System.getProperty('PLUGIN_MAVEN_RELEASE_REPOSITORY_USER')
+    key = System.getProperty('PLUGIN_MAVEN_RELEASE_REPOSITORY_PASSWORD')
+
+    configurations = ['archives']
+
+    dryRun = false
+    publish = false
+    pkg {
+        repo = 'maven'
+        name = 'gradle-vaadin-plugin'
+        desc = 'Build Vaadin applications with Gradle!'
+        websiteUrl = 'https://github.com/johndevs/gradle-vaadin-plugin'
+        issueTrackerUrl = 'https://github.com/johndevs/gradle-vaadin-plugin/issues'
+        vcsUrl = 'https://github.com/johndevs/gradle-vaadin-plugin.git'
+        licenses = ['Apache-2.0']
+        labels = ['vaadin','gradle','plugin']
+        publicDownloadNumbers = true
+
+        version {
+            name = project.version
+            vcsTag = project.version
+            attributes = ['gradle-plugin': 'fi.jasoft.plugin.vaadin:gradle-vaadin-plugin:gradle-vaadin-plugin']
+        }
+    }
+}
 
 uploadArchives {
     repositories.mavenDeployer {
-        def releaseRepositoryUrl = System.getProperty('PLUGIN_MAVEN_RELEASE_REPOSITORY')
-        def releaseRepositoryUser = System.getProperty('PLUGIN_MAVEN_RELEASE_REPOSITORY_USER')
-        def releaseRepositoryPassword = System.getProperty('PLUGIN_MAVEN_RELEASE_REPOSITORY_PASSWORD')
-
         def snapshotRepositoryUrl = System.getProperty('PLUGIN_MAVEN_SNAPSHOT_REPOSITORY')
         def snapshotRepositoryUser = System.getProperty('PLUGIN_MAVEN_SNAPSHOT_REPOSITORY_USER')
         def snapshotRepositoryPassword = System.getProperty('PLUGIN_MAVEN_SNAPSHOT_REPOSITORY_PASSWORD')
 
         configuration = configurations.deploy
 
-        if(releaseRepositoryUrl){
-            repository( url: releaseRepositoryUrl) {
-                authentication(userName: releaseRepositoryUser, password: releaseRepositoryPassword)
-            }
-        }
-
-        if(snapshotRepositoryUrl){
-            snapshotRepository( url: snapshotRepositoryUrl ) {
-               authentication(userName: snapshotRepositoryUser, password: snapshotRepositoryPassword)
-            }
+        snapshotRepository( url: snapshotRepositoryUrl ) {
+           authentication(userName: snapshotRepositoryUser, password: snapshotRepositoryPassword)
         }
 
 	    pom.project {
