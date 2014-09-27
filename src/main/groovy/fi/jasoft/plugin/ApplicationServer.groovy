@@ -15,25 +15,18 @@
 */
 package fi.jasoft.plugin
 
+import fi.jasoft.plugin.tasks.CompileThemeTask
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.WarPluginConvention
 
-import java.nio.file.FileSystems
-import java.nio.file.FileVisitResult
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
-import java.nio.file.SimpleFileVisitor
-import java.nio.file.StandardWatchEventKinds
 import java.nio.file.WatchEvent
-import java.nio.file.attribute.BasicFileAttributes
 
 class ApplicationServer {
 
     def Process process;
 
-    def final project;
+    def final Project project;
 
     def List browserParameters
 
@@ -103,8 +96,15 @@ class ApplicationServer {
         // Watch for changes in classes
         if(project.vaadin.plugin.jettyAutoRefresh) {
             def self = this
-            Thread.start 'Directory Watcher', {
-                watchDirectoryForChanges(self)
+            Thread.start 'Class Directory Watcher', {
+                watchClassDirectoryForChanges(self)
+            }
+        }
+
+        // Watch for changes in theme
+        if(project.vaadin.plugin.themeAutoRecompile){
+            Thread.start 'Theme Directory Watcher', {
+                watchThemeDirectoryForChanges()
             }
         }
 
@@ -176,47 +176,30 @@ class ApplicationServer {
         terminate()
     }
 
-    def watchDirectoryForChanges(task) {
-
-        File classesDir = null
+    def watchClassDirectoryForChanges(final ApplicationServer server) {
+        def classesDir
         if (project.vaadin.plugin.eclipseOutputDir == null) {
             classesDir = project.sourceSets.main.output.classesDir
         } else {
             classesDir = project.file(project.vaadin.plugin.eclipseOutputDir)
         }
 
-        def classesPath = Paths.get(classesDir.canonicalPath)
-        def watchService = FileSystems.getDefault().newWatchService()
+        Util.watchDirectoryForChanges(project, classesDir as File, { event ->
+            server.restart()
+            true // Terminate watching
+        })
+    }
 
-        Files.walkFileTree classesPath, new SimpleFileVisitor<Path>() {
-
-            @Override
-            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs){
-                dir.register(watchService,
-                        StandardWatchEventKinds.ENTRY_CREATE,
-                        StandardWatchEventKinds.ENTRY_DELETE,
-                        StandardWatchEventKinds.ENTRY_MODIFY)
-                FileVisitResult.CONTINUE
-            }
-        }
-
-        project.logger.info "Watching directory $classesDir for changes..."
-
-        def restart = false
-        while(true) {
-            def key = watchService.take()
-            key.pollEvents().each { WatchEvent event ->
-                restart = true
-            }
-            if(!key.reset() || restart) break
-        }
-
-        project.logger.info "Stopped watching directory"
-
-        if(restart) {
-            task.restart()
-        } else {
-            project.logger.info 'Stopped watching directory (no restart)'
+    def watchThemeDirectoryForChanges() {
+        File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
+        File themesDir = new File(webAppDir.canonicalPath + '/VAADIN/themes')
+        if(themesDir.exists()) {
+            Util.watchDirectoryForChanges(project, themesDir, { WatchEvent event ->
+                if(event.context().toString().toLowerCase().endsWith(".scss")){
+                    CompileThemeTask.compile(project)
+                }
+                false // Do not terminate on completion
+            })
         }
     }
 }

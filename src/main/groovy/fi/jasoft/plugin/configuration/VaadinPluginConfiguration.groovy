@@ -40,4 +40,9 @@ class VaadinPluginConfiguration {
      * Should jetty restart when a class is changed in the build directory.
      */
     boolean jettyAutoRefresh = true
+
+    /**
+     * Should theme be recompiled when SCSS file is changes.
+     */
+    boolean themeAutoRecompile = true
 }

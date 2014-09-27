@@ -17,9 +17,20 @@ package fi.jasoft.plugin
 
 import groovy.io.FileType
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.plugins.WarPluginConvention
+
+import java.nio.file.FileSystems
+import java.nio.file.FileVisitResult
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+import java.nio.file.SimpleFileVisitor
+import java.nio.file.StandardWatchEventKinds
+import java.nio.file.WatchEvent
+import java.nio.file.attribute.BasicFileAttributes
 
 class Util {
 
@@ -250,5 +261,35 @@ class Util {
                 }
             }
         }
+    }
+
+    def static watchDirectoryForChanges(Project project, File dir, Closure closure) {
+        def path = Paths.get(dir.canonicalPath)
+        def watchService = FileSystems.getDefault().newWatchService()
+
+        Files.walkFileTree path, new SimpleFileVisitor<Path>() {
+
+            @Override
+            public FileVisitResult preVisitDirectory(Path p, BasicFileAttributes attrs){
+                p.register(watchService,
+                        StandardWatchEventKinds.ENTRY_CREATE,
+                        StandardWatchEventKinds.ENTRY_DELETE,
+                        StandardWatchEventKinds.ENTRY_MODIFY)
+                FileVisitResult.CONTINUE
+            }
+        }
+
+        project.logger.info "Watching directory $dir for changes..."
+
+        def stop = false
+        while(true) {
+            def key = watchService.take()
+            key.pollEvents().each { WatchEvent event ->
+                stop = closure.call(event)
+            }
+            if(!key.reset() || stop) break
+        }
+
+        project.logger.info "Stopped watching directory"
     }
 }

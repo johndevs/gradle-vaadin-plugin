@@ -16,6 +16,7 @@
 package fi.jasoft.plugin.tasks
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.Project
 import org.gradle.api.file.FileTree
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskAction
@@ -41,6 +42,10 @@ class CompileThemeTask extends DefaultTask {
 
     @TaskAction
     public void exec() {
+        compile(project)
+    }
+
+    def static compile(Project project) {
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
         FileTree themes = project.fileTree(dir: webAppDir.canonicalPath + '/VAADIN/themes', include: '**/styles.scss')
         themes.each { File theme ->
