@@ -89,7 +89,37 @@ bintray {
     }
 }
 
+task configurePluginPom << {
+    configure(install.repositories.mavenInstaller) {
+        pom.project {
+           licenses {
+               license {
+                 name 'The Apache Software License, Version 2.0'
+                 url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                 distribution 'repo'
+               }
+           }
+
+           developers {
+               developer {
+                   id 'johndevs'
+                   name 'John Ahlroos'
+               }
+           }
+
+           scm {
+               url 'https://github.com/johndevs/gradle-vaadin-plugin'
+               connection 'scm:git://github.com/johndevs/gradle-vaadin-plugin'
+               developerConnection 'scm:git@github.com:johndevs/gradle-vaadin-plugin'
+          }
+       }
+       pom.scopeMappings.mappings.remove(configurations.compile)
+   }
+}
+install.dependsOn configurePluginPom
+
 uploadArchives {
+    dependsOn configurePluginPom
     repositories.mavenDeployer {
         def snapshotRepositoryUrl = System.getProperty('PLUGIN_MAVEN_SNAPSHOT_REPOSITORY')
         def snapshotRepositoryUser = System.getProperty('PLUGIN_MAVEN_SNAPSHOT_REPOSITORY_USER')
@@ -100,36 +130,11 @@ uploadArchives {
         snapshotRepository( url: snapshotRepositoryUrl ) {
            authentication(userName: snapshotRepositoryUser, password: snapshotRepositoryPassword)
         }
-
-	    pom.project {
-	            licenses {
-	                license {
-	                    name 'The Apache Software License, Version 2.0'
-	                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-	                    distribution 'repo'
-	                }
-	            }
-
-	            developers {
-                    developer {
-                        id 'johndevs'
-                        name 'John Ahlroos'
-                    }
-                }
-
-                scm {
-                    url 'https://github.com/johndevs/gradle-vaadin-plugin'
-                    connection 'scm:git://github.com/johndevs/gradle-vaadin-plugin'
-                    developerConnection 'scm:git@github.com:johndevs/gradle-vaadin-plugin'
-                }
-	    }
-
-	    pom.scopeMappings.mappings.remove(configurations.compile)
     }
 }
 
 // Use wrapper
-task wrapper(type: Wrapper) { 
+task wrapper(type: Wrapper) {
 	gradleVersion = '2.0'
 }
 
