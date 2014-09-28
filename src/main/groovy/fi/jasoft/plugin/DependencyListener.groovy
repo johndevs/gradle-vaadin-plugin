@@ -51,7 +51,8 @@ class DependencyListener implements ProjectEvaluationListener {
     static enum Repositories {
         ADDONS('Vaadin addons', 'http://maven.vaadin.com/vaadin-addons'),
         SNAPSHOTS('Vaadin snapshots', 'http://oss.sonatype.org/content/repositories/vaadin-snapshots'),
-        JASOFT('Jasoft.fi Maven repository', 'http://mvn.jasoft.fi/maven2')
+        JASOFT('Jasoft.fi Maven repository', 'http://mvn.jasoft.fi/maven2'),
+        BINTRAY('Bintray.com Maven repository', 'http://dl.bintray.com/johndevs/maven')
 
         def String caption
         def String url
