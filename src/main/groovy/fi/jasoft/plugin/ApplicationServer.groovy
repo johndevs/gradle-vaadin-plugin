@@ -88,11 +88,6 @@ class ApplicationServer {
         // Execute server
         process = appServerProcess.execute()
 
-        if(!process.alive) {
-            project.logger.error("Could not start server,  server terminated with error code ${process.exitValue()}. Please look at jetty.log for reason.")
-            return
-        }
-
         // Watch for changes in classes
         if(project.vaadin.plugin.jettyAutoRefresh) {
             def self = this
