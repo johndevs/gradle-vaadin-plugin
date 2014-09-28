@@ -84,7 +84,7 @@ bintray {
         version {
             name = project.version
             vcsTag = project.version
-            attributes = ['gradle-plugin': 'fi.jasoft.plugin.vaadin:gradle-vaadin-plugin:gradle-vaadin-plugin']
+            attributes = ['gradle-plugin': 'fi.jasoft.plugin.vaadin:fi.jasoft.plugin:gradle-vaadin-plugin']
         }
     }
 }
