@@ -84,8 +84,8 @@ public class TaskListener implements TaskExecutionListener {
             War war = (War) task;
             war.exclude('VAADIN/gwt-unitCache/**')
 
-            // remove duplicates
-            war.classpath = war.classpath.files
+            // remove duplicates and providedCompile dependencies
+            war.classpath = war.classpath.files - project.configurations.providedCompile.files
         }
 
         if (task.getName() == 'test' && project.vaadin.testbench.enabled) {
