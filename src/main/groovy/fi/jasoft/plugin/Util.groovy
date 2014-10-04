@@ -285,7 +285,9 @@ class Util {
         while(true) {
             def key = watchService.take()
             key.pollEvents().each { WatchEvent event ->
-                stop = closure.call(event)
+                if (event.kind() != StandardWatchEventKinds.OVERFLOW) {
+                    stop = closure.call(key, event)
+                }
             }
             if(!key.reset() || stop) break
         }

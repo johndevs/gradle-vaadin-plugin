@@ -20,7 +20,9 @@ import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.WarPluginConvention
 
+import java.nio.file.Path
 import java.nio.file.WatchEvent
+import java.nio.file.WatchKey
 
 class ApplicationServer {
 
@@ -179,7 +181,20 @@ class ApplicationServer {
             classesDir = project.file(project.vaadin.plugin.eclipseOutputDir)
         }
 
-        Util.watchDirectoryForChanges(project, classesDir as File, { event ->
+        Util.watchDirectoryForChanges(project, (File) classesDir, { WatchKey key, WatchEvent event ->
+            Path basePath = (Path) key.watchable();
+            WatchEvent<Path> watchEventPath = (WatchEvent<Path>) event
+            Path path =  basePath.resolve(watchEventPath.context())
+            File file = path.toFile()
+
+            // Ignore client classes, as restarting server will not do you any good
+            def widgetsetPath = (project.vaadin.widgetset as String).tokenize('.')[0..-2].join('/')+'/client/'
+            if(file.absolutePath.contains(widgetsetPath)){
+                //TODO when file based widgetset recompiling is implmeneted we could recompile the widgetset here instead
+                project.logger.info("Ignored client side class change in ${file.absolutePath}")
+                return false
+            }
+
             server.restart()
             true // Terminate watching
         })
@@ -189,7 +204,7 @@ class ApplicationServer {
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
         File themesDir = new File(webAppDir.canonicalPath + '/VAADIN/themes')
         if(themesDir.exists()) {
-            Util.watchDirectoryForChanges(project, themesDir, { WatchEvent event ->
+            Util.watchDirectoryForChanges(project, themesDir, { WatchKey key, WatchEvent event ->
                 if(event.context().toString().toLowerCase().endsWith(".scss")){
                     CompileThemeTask.compile(project)
                 }
