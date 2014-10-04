@@ -105,10 +105,12 @@ class CompileWidgetsetTask extends DefaultTask {
         }
 
         if (project.vaadin.gwt.extraArgs) {
-            widgetsetCompileProcess += project.vaadin.gwt.extraArgs
+            widgetsetCompileProcess += project.vaadin.gwt.extraArgs as List
         }
 
         widgetsetCompileProcess += project.vaadin.widgetset
+
+        logger.info(widgetsetCompileProcess.join(' '))
 
         def Process process = widgetsetCompileProcess.execute()
 

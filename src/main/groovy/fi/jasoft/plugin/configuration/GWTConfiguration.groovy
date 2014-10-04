@@ -69,7 +69,7 @@ class GWTConfiguration {
     /**
      * Extra arguments passed to the compiler
      */
-    String extraArgs = null
+    String[] extraArgs = null
 
     /**
      * Source paths where the compiler will look for source files
