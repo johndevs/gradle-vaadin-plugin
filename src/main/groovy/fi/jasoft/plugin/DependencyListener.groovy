@@ -195,9 +195,6 @@ class DependencyListener implements ProjectEvaluationListener {
             sources.compileClasspath += [project.configurations[jettyConf.caption]]
             testSources.compileClasspath += [project.configurations[jettyConf.caption]]
             testSources.runtimeClasspath += [project.configurations[jettyConf.caption]]
-
-            // Add server libs to war
-            project.war.classpath(project.configurations[serverConf.caption])
         }
     }
 
@@ -310,7 +307,6 @@ class DependencyListener implements ProjectEvaluationListener {
             sources.compileClasspath += [project.configurations[conf.caption]]
             testSources.compileClasspath += [project.configurations[conf.caption]]
             testSources.runtimeClasspath += [project.configurations[conf.caption]]
-            project.war.classpath(project.configurations[conf.caption])
         }
     }
 }
