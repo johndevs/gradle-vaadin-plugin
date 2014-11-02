@@ -284,6 +284,10 @@ class Util {
         def stop = false
         while(true) {
             def key = watchService.take()
+
+            // Cancel out multiple same events by sleeping for a moment..
+            sleep(1000)
+
             key.pollEvents().each { WatchEvent event ->
                 if (event.kind() != StandardWatchEventKinds.OVERFLOW) {
                     stop = closure.call(key, event)
