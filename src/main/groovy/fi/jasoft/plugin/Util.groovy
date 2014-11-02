@@ -203,7 +203,7 @@ class Util {
                 def themeName = it.getName()
                 def fileNameRegExp = ~/$themeName\.s?css/
                 it.traverse(type: FileType.FILES, nameFilter : fileNameRegExp) {
-                    paths += ["/VAADIN/addons/$themeName/"+it.getName()]
+                    paths += ["VAADIN/addons/$themeName/"+it.getName()]
                 }
             }
         }
