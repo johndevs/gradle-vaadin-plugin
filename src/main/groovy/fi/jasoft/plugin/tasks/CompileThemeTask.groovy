@@ -15,6 +15,7 @@
 */
 package fi.jasoft.plugin.tasks
 
+import fi.jasoft.plugin.Util
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.FileTree
@@ -26,6 +27,8 @@ class CompileThemeTask extends DefaultTask {
     public static final String NAME = 'vaadinCompileThemes'
 
     public CompileThemeTask() {
+        dependsOn project.tasks.classes
+
         description = "Compiles a Vaadin SASS theme into CSS"
 
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
@@ -53,7 +56,7 @@ class CompileThemeTask extends DefaultTask {
             project.logger.lifecycle("Compiling " + theme.canonicalPath + "...")
             project.javaexec {
                 setMain('com.vaadin.sass.SassCompiler')
-                setClasspath(project.sourceSets.main.runtimeClasspath + project.sourceSets.main.compileClasspath)
+                setClasspath(Util.getClassPath(project))
                 setArgs([theme.canonicalPath, dir.canonicalPath + '/styles.css'])
             }
         }
