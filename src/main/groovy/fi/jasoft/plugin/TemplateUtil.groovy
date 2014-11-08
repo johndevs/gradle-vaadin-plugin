@@ -79,10 +79,10 @@ class TemplateUtil {
      *      The optional postfix (e.g. css)
      */
     static File[] getFilesFromPublicFolder(Project project, String postfix='*') {
-        (project.sourceSets.main.resources + Util.getMainSourceSet(project).srcDirTrees.collect {
-            project.fileTree(it.dir)
-        } as FileTree).matching {
-            include "**/*/public/**/*.$postfix"
-        }.files
+        Util.getMainSourceSet(project).srcDirTrees
+        .collect {project.fileTree(it.dir)}
+        .inject(project.sourceSets.main.resources){a, b -> a + b}
+        .matching {include "**/*/public/**/*.$postfix"}
+        .files
     }
 }

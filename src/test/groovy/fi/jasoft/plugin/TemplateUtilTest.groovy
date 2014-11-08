@@ -55,6 +55,17 @@ class TemplateUtilTest extends PluginTestBase {
         assertEquals 1, files.size()
         assertEquals 'This is a css file', files.find { it.name == 'file.css'}.text
     }
+    
+    @Test
+    void searchForFilesInMultipleSourceFolders() {
+        project.apply plugin: 'java'
+        project.sourceSets.main.java.srcDir "src/extra/java"
+        createFilesInPublicFolder(testDir.canonicalPath + '/src/main/resources/com/example/client/public' as File)
+        createFilesInPublicFolder(testDir.canonicalPath + '/src/extra/java/com/example/client/public' as File)
+    	
+        def files = TemplateUtil.getFilesFromPublicFolder(project)
+        assertEquals 6, files.size()
+    }
 
     @Test
     void searchForFilesInMainSourceSetPublicFolder() {
