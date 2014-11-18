@@ -189,9 +189,9 @@ class DependencyListener implements ProjectEvaluationListener {
        def org.gradle.api.artifacts.Configuration configuration
 
        if(extendsFrom){
-           configuration = project.configurations.create(conf.caption).setExtendsFrom(extendsFrom)
+           configuration = project.configurations.maybeCreate(conf.caption).setExtendsFrom(extendsFrom)
        } else {
-           configuration = project.configurations.create(conf.caption)
+           configuration = project.configurations.maybeCreate(conf.caption)
        }
 
        configuration.description = conf.description
@@ -214,7 +214,8 @@ class DependencyListener implements ProjectEvaluationListener {
     def static configureResolutionStrategy(Project project, org.gradle.api.artifacts.Configuration config) {
         config.resolutionStrategy.eachDependency { DependencyResolveDetails details ->
             if (details.requested.group == 'com.vaadin'  && details.requested.name.startsWith('vaadin-')
-                    && details.requested.name != 'vaadin-sass-compiler') {
+                    && details.requested.name != 'vaadin-sass-compiler'
+                    && details.requested.name != 'vaadin-client-compiler-deps') {
                 details.useVersion project.vaadin.version
             }
         }
