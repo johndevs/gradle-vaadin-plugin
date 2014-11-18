@@ -106,6 +106,11 @@ class DependencyListener implements ProjectEvaluationListener {
         if (project.vaadin.testbench.enabled) {
             createTestbenchConfiguration(project)
         }
+
+        // Assign resolution strategy so vaadin version is kept in sync
+        project.configurations.all { config ->
+            configureResolutionStrategy(project, config)
+        }
     }
 
     def static addRepositories(Project project) {
@@ -196,6 +201,23 @@ class DependencyListener implements ProjectEvaluationListener {
        }
 
        configuration
+    }
+
+    /**
+     * Configures the resolution strategy for a configuration. Ensures Vaadin version is the correct one.
+     *
+     * @param project
+     *      The project of the configuration
+     * @param configuration
+     *      The configuration
+     */
+    def static configureResolutionStrategy(Project project, org.gradle.api.artifacts.Configuration config) {
+        config.resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+            if (details.requested.group == 'com.vaadin'  && details.requested.name.startsWith('vaadin-')
+                    && details.requested.name != 'vaadin-sass-compiler') {
+                details.useVersion project.vaadin.version
+            }
+        }
     }
 
     @Deprecated
