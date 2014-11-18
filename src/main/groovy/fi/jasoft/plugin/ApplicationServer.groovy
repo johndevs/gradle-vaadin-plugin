@@ -23,6 +23,9 @@ import org.gradle.api.plugins.WarPluginConvention
 import java.nio.file.Path
 import java.nio.file.WatchEvent
 import java.nio.file.WatchKey
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledFuture
+import java.util.concurrent.TimeUnit
 
 class ApplicationServer {
 
@@ -205,11 +208,20 @@ class ApplicationServer {
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
         File themesDir = new File(webAppDir.canonicalPath + '/VAADIN/themes')
         if(themesDir.exists()) {
+            def executor = Executors.newSingleThreadScheduledExecutor()
+            ScheduledFuture currentTask
+
             Util.watchDirectoryForChanges(project, themesDir, { WatchKey key, WatchEvent event ->
                 if(event.context().toString().toLowerCase().endsWith(".scss")){
-                    CompileThemeTask.compile(project)
+                    if(currentTask){
+                        currentTask.cancel(true)
+                    }
+                    currentTask = executor.schedule({
+                        CompileThemeTask.compile(project)
+                    }, 1 , TimeUnit.SECONDS)
                 }
-                false // Do not terminate on completion
+
+                !themesDir.exists() // Terminate if theme directory no longer exists
             })
         }
     }

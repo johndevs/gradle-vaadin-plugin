@@ -53,12 +53,22 @@ class CompileThemeTask extends DefaultTask {
         FileTree themes = project.fileTree(dir: webAppDir.canonicalPath + '/VAADIN/themes', include: '**/styles.scss')
         themes.each { File theme ->
             File dir = new File(theme.parent)
-            project.logger.lifecycle("Compiling " + theme.canonicalPath + "...")
-            project.javaexec {
-                setMain('com.vaadin.sass.SassCompiler')
-                setClasspath(Util.getClassPath(project))
-                setArgs([theme.canonicalPath, dir.canonicalPath + '/styles.css'])
-            }
+            project.logger.info("Compiling " + theme.canonicalPath + "...")
+
+            def start = System.currentTimeMillis()
+
+            def compileProcess = ['java']
+            compileProcess += ['-cp',  Util.getClassPath(project).asPath]
+            compileProcess += 'com.vaadin.sass.SassCompiler'
+            compileProcess += [theme.canonicalPath, dir.canonicalPath + '/styles.css']
+
+            def Process process = compileProcess.execute()
+
+            Util.logProcess(project, process, 'theme-compile.log')
+
+            process.waitFor()
+
+            project.logger.info('Theme was compiled in '+ (System.currentTimeMillis()-start)/1000+' seconds')
         }
     }
 }
