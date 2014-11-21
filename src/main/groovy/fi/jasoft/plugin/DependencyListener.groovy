@@ -36,7 +36,8 @@ class DependencyListener implements ProjectEvaluationListener {
         @Deprecated JETTY8('jetty8', 'Jetty 8 server used by the GWT CodeServer'),
         JETTY9('jetty9', 'Jetty 9 server used by the vaadinRun task'),
         PUSH('vaadin-push', 'Libraries used by vaadin push'),
-        JAVADOC('vaadin-javadoc', 'Classpath for compiling Javadoc for Vaadin projects');
+        JAVADOC('vaadin-javadoc', 'Classpath for compiling Javadoc for Vaadin projects'),
+        GROOVY('vaadin-groovy', 'Groovy library for vaadin projects')
 
         def String caption
         def String description;

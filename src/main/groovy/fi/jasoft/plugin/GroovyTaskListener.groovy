@@ -2,8 +2,10 @@ package fi.jasoft.plugin
 
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.execution.TaskExecutionListener
 import org.gradle.api.tasks.TaskState
+import org.gradle.api.tasks.bundling.War
 
 /**
  * Created by john on 7/22/14.
@@ -30,6 +32,20 @@ class GroovyTaskListener implements TaskExecutionListener {
             if(task.getName() == 'ideaModule'){
                 configureIdeaModule(task)
             }
+
+            if (task.getName() == 'war') {
+                War war = (War) task;
+
+                // Add groovy libs to war
+                project.war.classpath += project.configurations[DependencyListener.Configuration.GROOVY.caption]
+
+                // Ensure no duplicates
+                project.war.classpath = war.classpath.files
+            }
+
+            if (task.getName() == 'eclipseClasspath') {
+                configureEclipsePlugin(task)
+            }
         }
     }
 
@@ -46,6 +62,14 @@ class GroovyTaskListener implements TaskExecutionListener {
         def conf = project.configurations
         def module = project.idea.module
 
-        module.scopes.COMPILE.plus += [conf['vaadin-groovy']]
+        module.scopes.COMPILE.plus += [conf[DependencyListener.Configuration.GROOVY.caption]]
+    }
+
+    def configureEclipsePlugin(Task task) {
+        def cp = project.eclipse.classpath
+        def conf = project.configurations
+
+        // Add dependencies to eclipse classpath
+        cp.plusConfigurations += [conf[DependencyListener.Configuration.GROOVY.caption]]
     }
 }

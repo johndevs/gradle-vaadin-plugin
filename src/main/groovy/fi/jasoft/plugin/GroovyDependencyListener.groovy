@@ -21,22 +21,15 @@ class GroovyDependencyListener implements ProjectEvaluationListener  {
             return
         }
 
-        def conf = 'vaadin-groovy'
-        def dependencies = project.dependencies
-        if (!project.configurations.hasProperty(conf)) {
-            project.configurations.create(conf)
-            dependencies.add(conf, 'org.codehaus.groovy:groovy-all:2.3.4')
-        }
+        def conf = DependencyListener.createConfiguration(project, DependencyListener.Configuration.GROOVY, [
+                'org.codehaus.groovy:groovy-all:2.3.4'
+        ], project.configurations.compile)
 
         def sources = project.sourceSets.main
+        sources.compileClasspath += [conf]
+
         def testSources = project.sourceSets.test
-
-        sources.compileClasspath += [project.configurations[conf]]
-        testSources.compileClasspath += [project.configurations[conf]]
-        testSources.runtimeClasspath += [project.configurations[conf]]
-
-        // Add groovy libs to war
-        project.war.classpath(project.configurations[conf])
-
+        testSources.compileClasspath += [conf]
+        testSources.runtimeClasspath += [conf]
     }
 }

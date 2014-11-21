@@ -167,6 +167,7 @@ class ApplicationServer {
     def terminate() {
         if(process){
             process.destroy()
+            process = null
             project.logger.lifecycle("Application server terminated.")
         }
     }
