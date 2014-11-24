@@ -29,9 +29,22 @@ class DevModeTask extends DefaultTask {
 
     def Process devModeProcess
 
+    def server
+
     public DevModeTask() {
         dependsOn('classes', UpdateWidgetsetTask.NAME)
         description = "Run Development Mode for easier debugging and development of client widgets."
+
+        addShutdownHook {
+            if(devModeProcess) {
+                devModeProcess.destroy()
+                devModeProcess = null
+            }
+            if(server) {
+                server.terminate()
+                server = null
+            }
+        }
     }
 
     @TaskAction
@@ -45,7 +58,7 @@ class DevModeTask extends DefaultTask {
         runDevelopmentMode()
 
         if (!project.vaadin.devmode.noserver) {
-            new ApplicationServer(
+            server = new ApplicationServer(
                     project, ["gwt.codesvr=${project.vaadin.devmode.bindAddress}:${project.vaadin.devmode.codeServerPort}"]
             ).startAndBlock()
             devModeProcess.waitForOrKill(1)

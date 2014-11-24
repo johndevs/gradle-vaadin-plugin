@@ -17,20 +17,27 @@ package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.ApplicationServer
 import org.gradle.api.DefaultTask
+import org.gradle.api.invocation.Gradle
 import org.gradle.api.tasks.TaskAction
 
 public class RunTask extends DefaultTask {
 
     public static final String NAME = 'vaadinRun'
 
+    def server = new ApplicationServer(project)
+
     public RunTask() {
         dependsOn(CompileWidgetsetTask.NAME)
         dependsOn(CompileThemeTask.NAME)
         description = 'Runs the Vaadin application on an embedded Jetty ApplicationServer'
+
+        addShutdownHook {
+            server.terminate()
+        }
     }
 
     @TaskAction
     public void run() {
-        new ApplicationServer(project).startAndBlock()
+        server.startAndBlock()
     }
 }

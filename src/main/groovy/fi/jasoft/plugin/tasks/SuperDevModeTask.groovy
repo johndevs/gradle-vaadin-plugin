@@ -30,9 +30,24 @@ class SuperDevModeTask extends DefaultTask {
 
     def Process codeserverProcess = null
 
+    def server = null
+
     def SuperDevModeTask() {
         dependsOn(CompileWidgetsetTask.NAME)
         description = "Run Super Development Mode for easier client widget development."
+
+
+        addShutdownHook {
+           if(codeserverProcess){
+               codeserverProcess.destroy()
+               codeserverProcess = null
+           }
+
+            if(server) {
+                server.terminate()
+                server = null
+            }
+        }
     }
 
     @TaskAction
@@ -50,7 +65,7 @@ class SuperDevModeTask extends DefaultTask {
 
         runCodeServer({
 
-            ApplicationServer server = new ApplicationServer(project, ['superdevmode'])
+            server = new ApplicationServer(project, ['superdevmode'])
 
             server.startAndBlock();
 

@@ -168,6 +168,7 @@ class ApplicationServer {
         if(process){
             process.destroy()
             process = null
+            restart = false
             project.logger.lifecycle("Application server terminated.")
         }
     }
