@@ -28,35 +28,7 @@ class CompileWidgetsetTask extends DefaultTask {
 
     public CompileWidgetsetTask() {
         dependsOn('classes', UpdateWidgetsetTask.NAME)
-
         description = "Compiles Vaadin Addons and components into Javascript."
-
-        File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-
-        File targetDir = new File(webAppDir.canonicalPath + '/VAADIN/widgetsets')
-        getOutputs().dir(targetDir)
-
-        File unitCacheDir = new File(webAppDir.canonicalPath + '/VAADIN/gwt-unitCache')
-        getOutputs().dir(unitCacheDir)
-
-        /* Monitor changes in dependencies since upgrading a
-        * dependency should also trigger a recompile of the widgetset
-        */
-        getInputs().files(project.configurations.compile)
-
-        // Monitor changes in client side classes and resources
-        project.sourceSets.main.java.srcDirs.each {
-            getInputs().files(project.fileTree(it.absolutePath).include('**/*/client/**/*.java'))
-            getInputs().files(project.fileTree(it.absolutePath).include('**/*/shared/**/*.java'))
-            getInputs().files(project.fileTree(it.absolutePath).include('**/*/public/**/*.*'))
-            getInputs().files(project.fileTree(it.absolutePath).include('**/*/*.gwt.xml'))
-        }
-
-        //Monitor changes in resources
-        project.sourceSets.main.resources.srcDirs.each {
-            getInputs().files(project.fileTree(it.absolutePath).include('**/*/public/**/*.*'))
-            getInputs().files(project.fileTree(it.absolutePath).include('**/*/*.gwt.xml'))
-        }
     }
 
     @TaskAction
@@ -121,5 +93,4 @@ class CompileWidgetsetTask extends DefaultTask {
          */
         new File(targetDir.canonicalPath + "/WEB-INF").deleteDir()
     }
-
 }
