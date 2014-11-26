@@ -185,12 +185,12 @@ class DependencyListener implements ProjectEvaluationListener {
     def static org.gradle.api.artifacts.Configuration createConfiguration(Project project,
                                        Configuration conf,
                                        List<String> dependencies,
-                                       Iterable extendsFrom=null) {
+                                       Iterable<org.gradle.api.artifacts.Configuration> extendsFrom=null) {
 
        def org.gradle.api.artifacts.Configuration configuration
 
        if(extendsFrom){
-           configuration = project.configurations.maybeCreate(conf.caption).setExtendsFrom(extendsFrom)
+           configuration = project.configurations.maybeCreate(conf.caption).setExtendsFrom(extendsFrom as Set)
        } else {
            configuration = project.configurations.maybeCreate(conf.caption)
        }

@@ -1,12 +1,3 @@
-package fi.jasoft.plugin
-
-import fi.jasoft.plugin.configuration.VaadinPluginExtension
-
-import org.gradle.api.plugins.WarPlugin
-import org.junit.Test
-
-import static org.junit.Assert.assertTrue
-
 /*
 * Copyright 2014 John Ahlroos
 *
@@ -22,6 +13,15 @@ import static org.junit.Assert.assertTrue
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
+package fi.jasoft.plugin
+
+import fi.jasoft.plugin.configuration.VaadinPluginExtension
+
+import org.gradle.api.plugins.WarPlugin
+import org.junit.Test
+
+import static org.junit.Assert.assertTrue
+
 class PluginConfigurationTest extends PluginTestBase{
 
     @Test
