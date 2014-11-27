@@ -26,12 +26,17 @@ or to use a specific version of the plugin
     apply from: 'http://plugins.jasoft.fi/vaadin-groovy.plugin?version=x.x.x'
 
 ## With new Gradle plugin mechanism (Gradle 2.1+)
+(Note that using this method only works for Java projects.)
 
     plugins {
         id "fi.jasoft.plugin.vaadin" version "0.9.2"
     }
 
 ## Snapshot builds
+
+    apply from: 'http://plugins.jasoft.fi/vaadin.plugin?version=0.9-SNAPSHOT'
+    
+or
 
     apply from: 'http://plugins.jasoft.fi/vaadin-groovy.plugin?version=0.9-SNAPSHOT'
 
