@@ -23,7 +23,7 @@ class GroovyDependencyListener implements ProjectEvaluationListener  {
 
         def conf = DependencyListener.createConfiguration(project, DependencyListener.Configuration.GROOVY, [
                 'org.codehaus.groovy:groovy-all:2.3.4'
-        ], project.configurations.compile)
+        ], [project.configurations.compile])
 
         def sources = project.sourceSets.main
         sources.compileClasspath += [conf]
