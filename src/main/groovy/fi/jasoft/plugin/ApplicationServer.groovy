@@ -102,7 +102,7 @@ class ApplicationServer {
         }
 
         // Watch for changes in theme
-        if(project.vaadin.plugin.themeAutoRecompile){
+        if(firstStart && project.vaadin.plugin.themeAutoRecompile){
             Thread.start 'Theme Directory Watcher', {
                 watchThemeDirectoryForChanges()
             }
@@ -200,8 +200,7 @@ class ApplicationServer {
                 // Force restart of server
                 server.terminate()
             }
-            project
-            true // Terminate watching
+            false
         })
     }
 
@@ -218,7 +217,7 @@ class ApplicationServer {
                         currentTask.cancel(true)
                     }
                     currentTask = executor.schedule({
-                        CompileThemeTask.compile(project)
+                        CompileThemeTask.compile(project, true)
                     }, 1 , TimeUnit.SECONDS)
                 }
 

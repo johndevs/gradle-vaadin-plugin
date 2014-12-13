@@ -48,12 +48,17 @@ class CompileThemeTask extends DefaultTask {
         compile(project)
     }
 
-    def static compile(Project project) {
+    def static compile(Project project, boolean isRecompile=false) {
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
         FileTree themes = project.fileTree(dir: webAppDir.canonicalPath + '/VAADIN/themes', include: '**/styles.scss')
         themes.each { File theme ->
             File dir = new File(theme.parent)
-            project.logger.info("Compiling " + theme.canonicalPath + "...")
+
+            if(isRecompile){
+                project.logger.lifecycle("Recompiling " + theme.canonicalPath + "...")
+            } else {
+                project.logger.info("Compiling " + theme.canonicalPath + "...")
+            }
 
             def start = System.currentTimeMillis()
 
@@ -68,7 +73,11 @@ class CompileThemeTask extends DefaultTask {
 
             process.waitFor()
 
-            project.logger.info('Theme was compiled in '+ (System.currentTimeMillis()-start)/1000+' seconds')
+            if(isRecompile){
+                project.logger.lifecycle('Theme was recompiled in '+ (System.currentTimeMillis()-start)/1000+' seconds')
+            } else {
+                project.logger.info('Theme was compiled in '+ (System.currentTimeMillis()-start)/1000+' seconds')
+            }
         }
     }
 }
