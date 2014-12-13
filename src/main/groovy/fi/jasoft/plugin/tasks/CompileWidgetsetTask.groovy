@@ -45,12 +45,7 @@ class CompileWidgetsetTask extends DefaultTask {
         // Ensure unit cache dir is present so the compiler does not complain
         new File(webAppDir.canonicalPath + '/VAADIN/gwt-unitCache').mkdirs()
 
-        FileCollection classpath = Util.getClassPath(project)
-
-        if(project.vaadin.gwt.gwtSdkFirstInClasspath){
-            FileCollection gwtCompilerClasspath = project.configurations[DependencyListener.Configuration.CLIENT.caption];
-            classpath = gwtCompilerClasspath + classpath.minus(gwtCompilerClasspath);
-        }
+        FileCollection classpath = Util.getClientCompilerClassPath(project)
 
         def widgetsetCompileProcess = ['java']
 

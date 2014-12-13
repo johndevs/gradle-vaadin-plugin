@@ -55,28 +55,51 @@ class Util {
         return null;
     }
 
-    public static FileCollection getClassPath(Project project) {
-        FileCollection classpath =
-            project.configurations.providedCompile +
-                    project.configurations.compile +
-                    project.sourceSets.main.runtimeClasspath +
-                    project.sourceSets.main.compileClasspath
+    public static FileCollection getCompileClassPath(Project project) {
+        project.sourceSets.main.compileClasspath
+    }
 
-        Util.getMainSourceSet(project).srcDirs.each {
-            classpath += [project.files(it)]
+    /**
+     * Returns the classpath used for embedded Jetty
+     *
+     * @param project
+     *      The project
+     *
+     * @return
+     */
+    static FileCollection getJettyClassPath(Project project) {
+        FileCollection collection = project.configurations[DependencyListener.Configuration.JETTY9.caption]
+        collection += project.sourceSets.main.runtimeClasspath
+        collection += getCompileClassPath(project)
+        collection
+    }
+
+    /**
+     * Gets the classpath used for compiling client side code
+     *
+     * @param project
+     *      The project to compile
+     * @return
+     *      The classpath for the GWT compiler
+     */
+    static FileCollection getClientCompilerClassPath(Project project) {
+        FileCollection collection = project.sourceSets.main.runtimeClasspath
+        collection += project.sourceSets.main.compileClasspath
+
+        getMainSourceSet(project).srcDirs.each {
+            collection += project.files(it)
         }
 
-        if(Util.isGroovyProject(project)){
-            // Groovy projects might still have java files (client side code)
-            project.sourceSets.main.java.srcDirs.each {
-                classpath += [project.files(it)]
-            }
+        project.sourceSets.main.java.srcDirs.each { File dir ->
+            collection += project.files(dir)
         }
 
-        project.sourceSets.main.resources.srcDirs.each {
-            classpath += [project.files(it)]
+        if(project.vaadin.gwt.gwtSdkFirstInClasspath){
+            FileCollection gwtCompilerClasspath = project.configurations[DependencyListener.Configuration.CLIENT.caption];
+            collection = gwtCompilerClasspath + collection.minus(gwtCompilerClasspath);
         }
-        return classpath
+
+        collection
     }
 
     /**
@@ -84,24 +107,35 @@ class Util {
      *
      * @param project
      *      The project to get the source set from
-     *
+     * @param forceDefaultJavaSourceset
+     *      Should the Java source set be preferred
      * @return
      *      The source set
      */
-    static SourceDirectorySet getMainSourceSet(project, forceDefaultJavaSourceset=false) {
+    static SourceDirectorySet getMainSourceSet(Project project, forceDefaultJavaSourceset=false) {
         if(project.vaadin.mainSourceSet) {
             project.vaadin.mainSourceSet
-        } else if(Util.isGroovyProject(project) && !forceDefaultJavaSourceset) {
+        } else if(isGroovyProject(project) && !forceDefaultJavaSourceset) {
             project.sourceSets.main.groovy
         } else {
             project.sourceSets.main.java
         }
     }
 
-    static SourceDirectorySet getMainTestSourceSet(project, forceDefaultJavaSourceset=false) {
+    /**
+     * Returns the sources set where project test sources files are located
+     *
+     * @param project
+     *      The project
+     * @param forceDefaultJavaSourceset
+     *      Should the Java source set be preferred
+     * @return
+     *      The source set
+     */
+    static SourceDirectorySet getMainTestSourceSet(Project project, forceDefaultJavaSourceset=false) {
         if(project.vaadin.mainTestSourceSet) {
             project.vaadin.mainTestSourceSet
-        } else if(Util.isGroovyProject(project) && !forceDefaultJavaSourceset) {
+        } else if(isGroovyProject(project) && !forceDefaultJavaSourceset) {
             project.sourceSets.test.groovy
         } else {
             project.sourceSets.test.java

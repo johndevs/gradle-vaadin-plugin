@@ -80,14 +80,7 @@ class SuperDevModeTask extends DefaultTask {
         widgetsetsDir.mkdirs()
 
         def jettyClasspath = project.configurations[DependencyListener.Configuration.JETTY8.caption];
-        def classpath = jettyClasspath + Util.getClassPath(project)
-        def widgetset = project.vaadin.widgetset
-
-        if(project.vaadin.gwt.gwtSdkFirstInClasspath){
-            FileCollection gwtCompilerClasspath = project.configurations[DependencyListener.Configuration.CLIENT.caption];
-            classpath = jettyClasspath + gwtCompilerClasspath + classpath.minus(gwtCompilerClasspath+jettyClasspath);
-        }
-
+        def classpath = jettyClasspath + Util.getClientCompilerClassPath(project)
         def superdevmodeProcess = ['java',
             '-cp', classpath.getAsPath(),
             'com.google.gwt.dev.codeserver.CodeServer',

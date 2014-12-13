@@ -70,12 +70,7 @@ class DevModeTask extends DefaultTask {
     protected void runDevelopmentMode() {
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
 
-        def classpath = Util.getClassPath(project)
-
-        if(project.vaadin.gwt.gwtSdkFirstInClasspath){
-            FileCollection gwtCompilerClasspath = project.configurations[DependencyListener.Configuration.CLIENT.caption];
-            classpath = gwtCompilerClasspath + classpath.minus(gwtCompilerClasspath);
-        }
+        def classpath = Util.getClientCompilerClassPath(project)
 
         def devmodeProcess = ['java',
             '-cp', classpath.getAsPath(),

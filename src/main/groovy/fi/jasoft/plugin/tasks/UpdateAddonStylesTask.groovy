@@ -43,7 +43,7 @@ class UpdateAddonStylesTask extends DefaultTask {
             return;
         }
 
-        def cp = Util.getClassPath(project)
+        def cp = Util.getCompileClassPath(project)
 
         themesDir.eachDir {
             project.logger.info("Updating ${it.canonicalPath}/addons.scss")

@@ -58,7 +58,7 @@ class CompileThemeTask extends DefaultTask {
             def start = System.currentTimeMillis()
 
             def compileProcess = ['java']
-            compileProcess += ['-cp',  Util.getClassPath(project).asPath]
+            compileProcess += ['-cp',  Util.getCompileClassPath(project).asPath]
             compileProcess += 'com.vaadin.sass.SassCompiler'
             compileProcess += [theme.canonicalPath, dir.canonicalPath + '/styles.css']
 
