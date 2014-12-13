@@ -40,7 +40,7 @@ class ApplicationServer {
         this.browserParameters = browserParameters
     }
 
-    def boolean start(restarting=false) {
+    def boolean start(firstStart=false) {
 
         if (process != null) {
             project.logger.error('Server is already running.')
@@ -131,7 +131,7 @@ class ApplicationServer {
                 project.logger.lifecycle('Press [Ctrl+C] to terminate server...')
 
                 // Open browser
-                if(!restarting) {
+                if(firstStart) {
                     Util.openBrowser((Project)project, "http://localhost:${(Integer)project.vaadin.serverPort}/${paramString}")
                 }
             }
@@ -140,26 +140,26 @@ class ApplicationServer {
         project.logger.info 'Server running'
     }
 
-    def restart = false
-
     def startAndBlock() {
+        def firstStart = true
+
         while(true){
-            // Keep main loop running so task does not end
+            // Keep main loop running so task does not end. Task
+            // shutdownhook will terminate server
 
             // Reset values
-            def restarting = restart
-            restart = false
             process = null
 
             // Start server
-            start(restarting)
+            start(firstStart)
+            firstStart = false
 
             // Wait until server process calls destroy()
             process.waitFor()
 
-            // In no restart is requested, terminate task
-            if(!restart) {
-                break;
+            if(!project.vaadin.plugin.jettyAutoRefresh){
+                // Auto-refresh turned off
+                break
             }
         }
     }
@@ -168,14 +168,8 @@ class ApplicationServer {
         if(process){
             process.destroy()
             process = null
-            restart = false
             project.logger.lifecycle("Application server terminated.")
         }
-    }
-
-    def restart() {
-        restart = true
-        terminate()
     }
 
     def watchClassDirectoryForChanges(final ApplicationServer server) {
@@ -201,7 +195,12 @@ class ApplicationServer {
                     return false
                 }
             }
-            server.restart()
+
+            if(project.vaadin.plugin.jettyAutoRefresh){
+                // Force restart of server
+                server.terminate()
+            }
+            project
             true // Terminate watching
         })
     }
