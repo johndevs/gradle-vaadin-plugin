@@ -237,6 +237,10 @@ public class TaskListener implements TaskExecutionListener {
         if (Util.isPushSupportedAndEnabled(project)) {
             cp.plusConfigurations += [conf[Configuration.PUSH.caption]]
         }
+
+        // Configure natures
+        def natures = project.eclipse.project.natures
+        natures.add(0, 'org.springsource.ide.eclipse.gradle.core.nature' )
     }
 
     private void configureIdeaModule(Task task) {
