@@ -90,6 +90,16 @@ class ApplicationServer {
         File classesDir = project.file("build/classes")
         appServerProcess.add(classesDir.canonicalPath + '/')
 
+        if(project.logger.debugEnabled){
+            appServerProcess.add('DEBUG')
+        } else if(project.logger.infoEnabled){
+            appServerProcess.add('INFO')
+        } else if(project.logger.warnEnabled){
+            appServerProcess.add('WARN')
+        } else{
+            appServerProcess.add('OFF')
+        }
+
         // Execute server
         process = appServerProcess.execute()
 

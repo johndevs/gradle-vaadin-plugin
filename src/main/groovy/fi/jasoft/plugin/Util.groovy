@@ -252,19 +252,28 @@ class Util {
     def static logProcess(final Project project, final Process process, final String filename, Closure monitor={}) {
         if(project.vaadin.plugin.logToConsole){
             Thread.start 'Info logger', {
-                process.getInputStream().eachLine { output ->
-                    monitor.call(output)
-                    if(output.contains("[WARN]")){
-                        project.logger.warn(output.replaceAll("\\[WARN\\]",'').trim())
-                    } else {
-                        project.logger.info(output.trim())
+                try {
+                    process.inputStream.eachLine { output ->
+                        monitor.call(output)
+                        if (output.contains("[WARN]")) {
+                            project.logger.warn(output.replaceAll("\\[WARN\\]", '').trim())
+                        } else {
+                            project.logger.info(output.trim())
+                        }
                     }
+                } catch(IOException e){
+                    // Stream might be closed
                 }
             }
+
             Thread.start 'Error logger', {
-                process.getErrorStream().eachLine { String output ->
-                    monitor.call(output)
-                    project.logger.error(output.replaceAll("\\[ERROR\\]",'').trim())
+                try {
+                    process.errorStream.eachLine { String output ->
+                        monitor.call(output)
+                        project.logger.error(output.replaceAll("\\[ERROR\\]", '').trim())
+                    }
+                } catch(IOException e){
+                    // Stream might be closed
                 }
             }
         } else {
@@ -274,23 +283,31 @@ class Util {
             final File logFile = new File(logDir.canonicalPath + '/' + filename)
             Thread.start 'Info logger', {
                 logFile.withWriterAppend { out ->
-                    process.getInputStream().eachLine { output ->
-                        monitor.call(output)
-                        if(output.contains("[WARN]")){
-                            out.println "[WARN] "+output.replaceAll("\\[WARN\\]",'').trim()
-                        } else {
-                            out.println "[INFO] "+output.trim()
+                    try {
+                        process.inputStream.eachLine { output ->
+                            monitor.call(output)
+                            if (output.contains("[WARN]")) {
+                                out.println "[WARN] " + output.replaceAll("\\[WARN\\]", '').trim()
+                            } else {
+                                out.println "[INFO] " + output.trim()
+                            }
+                            out.flush()
                         }
-                        out.flush()
+                    } catch (IOException e) {
+                        // Stream might be closed
                     }
                 }
             }
             Thread.start 'Error logger', {
                 logFile.withWriterAppend { out ->
-                    process.getErrorStream().eachLine { output ->
-                        monitor.call(output)
-                        out.println "[ERROR] "+output.replaceAll("\\[ERROR\\]",'').trim()
-                        out.flush()
+                    try {
+                        process.errorStream.eachLine { output ->
+                            monitor.call(output)
+                            out.println "[ERROR] "+output.replaceAll("\\[ERROR\\]",'').trim()
+                            out.flush()
+                        }
+                    } catch (IOException e) {
+                        // Stream might be closed
                     }
                 }
             }

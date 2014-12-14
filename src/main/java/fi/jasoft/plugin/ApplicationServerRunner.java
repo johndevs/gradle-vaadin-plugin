@@ -30,19 +30,19 @@ import java.util.List;
 
 public class ApplicationServerRunner {
 
-    // Usage: 'ApplicationServerRunner [port] [webbappdir] [classesdir]'
+    // Usage: 'ApplicationServerRunner [port] [webbappdir] [classesdir] [LogLevel]'
     public static void main(String[] args) throws Exception {
         int port = Integer.parseInt(args[0]);
         String webAppDir = args[1];
         String classesDir = args[2];
+        String logLevel = args[3];
 
         List<String> resources = new ArrayList<>();
         if(new File(webAppDir).exists()){
             resources.add(webAppDir);
         }
 
-        // For debugging
-        //System.setProperty("org.eclipse.jetty.LEVEL", "DEBUG");
+        System.setProperty("org.eclipse.jetty.LEVEL", logLevel);
 
         Server server = new Server(port);
     
