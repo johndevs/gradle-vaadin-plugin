@@ -92,12 +92,8 @@ class ApplicationServer {
 
         if(project.logger.debugEnabled){
             appServerProcess.add('DEBUG')
-        } else if(project.logger.infoEnabled){
+        } else {
             appServerProcess.add('INFO')
-        } else if(project.logger.warnEnabled){
-            appServerProcess.add('WARN')
-        } else{
-            appServerProcess.add('OFF')
         }
 
         // Execute server
