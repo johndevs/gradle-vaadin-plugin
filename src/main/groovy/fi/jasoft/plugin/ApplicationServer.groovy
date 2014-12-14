@@ -127,23 +127,22 @@ class ApplicationServer {
         // Capture log output
         Util.logProcess(project, process, 'jetty.log', { line ->
             if(line.contains('Server:main: Started')) {
-                def resultStr = "Application running on http://localhost:${project.vaadin.serverPort} "
-                if (project.vaadin.jrebel.enabled) {
-                    resultStr += "(debugger on ${project.vaadin.debugPort}, JRebel active)"
-                } else if (project.vaadin.debug) {
-                    resultStr += "(debugger on ${project.vaadin.debugPort})"
-                }
-                project.logger.lifecycle(resultStr)
-                project.logger.lifecycle('Press [Ctrl+C] to terminate server...')
-
-                // Open browser
                 if(firstStart) {
+                    def resultStr = "Application running on http://localhost:${project.vaadin.serverPort} "
+                    if (project.vaadin.jrebel.enabled) {
+                        resultStr += "(debugger on ${project.vaadin.debugPort}, JRebel active)"
+                    } else if (project.vaadin.debug) {
+                        resultStr += "(debugger on ${project.vaadin.debugPort})"
+                    }
+                    project.logger.lifecycle(resultStr)
+                    project.logger.lifecycle('Press [Ctrl+C] to terminate server...')
+
                     Util.openBrowser((Project)project, "http://localhost:${(Integer)project.vaadin.serverPort}/${paramString}")
+                } else {
+                    project.logger.lifecycle("Server reload complete.")
                 }
             }
         })
-
-        project.logger.info 'Server running'
     }
 
     def startAndBlock() {
@@ -153,8 +152,10 @@ class ApplicationServer {
             // Keep main loop running so task does not end. Task
             // shutdownhook will terminate server
 
-            // Reset values
-            process = null
+            if(process != null){
+                // Process has not been terminated
+                project.logger.warn("Server process was not terminated cleanly before re-loading")
+            }
 
             // Start server
             start(firstStart)
@@ -174,7 +175,7 @@ class ApplicationServer {
         if(process){
             process.destroy()
             process = null
-            project.logger.lifecycle("Application server terminated.")
+            project.logger.info("Application server terminated.")
         }
     }
 
