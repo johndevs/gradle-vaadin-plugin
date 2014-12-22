@@ -216,7 +216,8 @@ class DependencyListener implements ProjectEvaluationListener {
         config.resolutionStrategy.eachDependency { DependencyResolveDetails details ->
             if (details.requested.group == 'com.vaadin'  && details.requested.name.startsWith('vaadin-')
                     && details.requested.name != 'vaadin-sass-compiler'
-                    && details.requested.name != 'vaadin-client-compiler-deps') {
+                    && details.requested.name != 'vaadin-client-compiler-deps'
+                    && !details.requested.name.startsWith('vaadin-testbench')) {
                 details.useVersion project.vaadin.version
             }
         }
@@ -314,8 +315,9 @@ class DependencyListener implements ProjectEvaluationListener {
     }
 
     private static void createTestbenchConfiguration(Project project) {
-        def conf = createConfiguration(project, Configuration.TESTBENCH, [],
-                [project.configurations.compile, project.configurations.runtime])
+        def conf = createConfiguration(project, Configuration.TESTBENCH, [
+           "com.vaadin:vaadin-testbench:${project.vaadin.testbench.version}"
+        ], [project.configurations.testCompile])
 
         def testSources = project.sourceSets.test
         testSources.compileClasspath += [conf]
