@@ -349,4 +349,13 @@ class Util {
 
         project.logger.info "Stopped watching directory"
     }
+
+    def static File getThemesDirectory(Project project) {
+        if(project.vaadin.plugin.themesDirectory){
+            project.file(project.vaadin.plugin.themesDirectory)
+        } else {
+            File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
+            project.file(webAppDir.canonicalPath + '/VAADIN/themes')
+        }
+    }
 }

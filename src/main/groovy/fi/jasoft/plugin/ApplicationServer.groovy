@@ -212,8 +212,7 @@ class ApplicationServer {
     }
 
     def watchThemeDirectoryForChanges() {
-        File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-        File themesDir = new File(webAppDir.canonicalPath + '/VAADIN/themes')
+        File themesDir = Util.getThemesDirectory(project)
         if(themesDir.exists()) {
             def executor = Executors.newSingleThreadScheduledExecutor()
             ScheduledFuture currentTask

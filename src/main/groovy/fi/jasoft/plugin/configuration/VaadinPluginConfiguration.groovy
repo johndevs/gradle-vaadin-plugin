@@ -45,4 +45,9 @@ class VaadinPluginConfiguration {
      * Should theme be recompiled when SCSS file is changes.
      */
     boolean themeAutoRecompile = true
+
+    /**
+     * Custom directory where themes can be found
+     */
+    String themesDirectory = null
 }

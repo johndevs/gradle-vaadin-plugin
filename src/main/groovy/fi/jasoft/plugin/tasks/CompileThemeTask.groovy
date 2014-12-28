@@ -19,28 +19,29 @@ import fi.jasoft.plugin.Util
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.FileTree
-import org.gradle.api.plugins.WarPluginConvention
+import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
 
 class CompileThemeTask extends DefaultTask {
 
     public static final String NAME = 'vaadinCompileThemes'
 
+    @InputDirectory
+    def themesDirectory = Util.getThemesDirectory(project)
+
+    @InputFiles
+    def scssFiles = project.fileTree(dir: themesDirectory, include: '**/*.scss').collect()
+
+    @OutputFiles
+    def cssFiles =  project.fileTree(dir: themesDirectory, include: '**/styles.scss').collect { File theme ->
+        new File(new File(theme.parent).canonicalPath + '/styles.css')
+    }
+
     public CompileThemeTask() {
         dependsOn project.tasks.classes
-
         description = "Compiles a Vaadin SASS theme into CSS"
-
-        File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-
-        getInputs().files(project.fileTree(dir: webAppDir.canonicalPath + '/VAADIN/themes', include: '**/*.scss'))
-
-        FileTree themes = project.fileTree(dir: webAppDir.canonicalPath + '/VAADIN/themes', include: '**/styles.scss')
-        themes.each { File theme ->
-            File dir = new File(theme.parent)
-            File css = new File(dir.canonicalPath + '/styles.css')
-            getOutputs().files(css)
-        }
     }
 
     @TaskAction
@@ -49,8 +50,14 @@ class CompileThemeTask extends DefaultTask {
     }
 
     def static compile(Project project, boolean isRecompile=false) {
-        File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-        FileTree themes = project.fileTree(dir: webAppDir.canonicalPath + '/VAADIN/themes', include: '**/styles.scss')
+        File themesDir = Util.getThemesDirectory(project)
+
+        project.logger.info("Compiling themes found in "+themesDir)
+
+        FileTree themes = project.fileTree(dir: themesDir, include: '**/styles.scss')
+
+        project.logger.info("Found ${themes.files.size() } themes.")
+
         themes.each { File theme ->
             File dir = new File(theme.parent)
 
