@@ -43,9 +43,7 @@ class CreateThemeTask extends DefaultTask {
     }
 
     public void createTheme(String themeName) {
-
-        File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-        File themeDir = new File(webAppDir.canonicalPath + '/VAADIN/themes/' + themeName)
+        File themeDir = project.file(Util.getThemesDirectory(project).canonicalPath + "/${themeName}")
         themeDir.mkdirs()
 
         def substitutions = [:]

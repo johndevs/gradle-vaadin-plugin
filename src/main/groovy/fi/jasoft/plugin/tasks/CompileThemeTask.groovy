@@ -28,20 +28,18 @@ class CompileThemeTask extends DefaultTask {
 
     public static final String NAME = 'vaadinCompileThemes'
 
-    @InputDirectory
-    def themesDirectory = Util.getThemesDirectory(project)
-
-    @InputFiles
-    def scssFiles = project.fileTree(dir: themesDirectory, include: '**/*.scss').collect()
-
-    @OutputFiles
-    def cssFiles =  project.fileTree(dir: themesDirectory, include: '**/styles.scss').collect { File theme ->
-        new File(new File(theme.parent).canonicalPath + '/styles.css')
-    }
-
     public CompileThemeTask() {
         dependsOn project.tasks.classes
         description = "Compiles a Vaadin SASS theme into CSS"
+
+        project.afterEvaluate {
+            def themesDirectory = Util.getThemesDirectory(project)
+            inputs.dir themesDirectory
+            inputs.files(project.fileTree(dir: themesDirectory, include: '**/*.scss').collect())
+            outputs.files(project.fileTree(dir: themesDirectory, include: '**/styles.scss').collect {
+                File theme -> new File(new File(theme.parent).canonicalPath + '/styles.css')
+            })
+        }
     }
 
     @TaskAction
