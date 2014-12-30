@@ -213,12 +213,19 @@ class DependencyListener implements ProjectEvaluationListener {
      *      The configuration
      */
     def static configureResolutionStrategy(Project project, org.gradle.api.artifacts.Configuration config) {
+        def blacklist = [
+                'vaadin-sass-compiler',
+                'vaadin-client-compiler-deps',
+                'vaadin-cdi'
+        ]
+
         config.resolutionStrategy.eachDependency { DependencyResolveDetails details ->
-            if (details.requested.group == 'com.vaadin'  && details.requested.name.startsWith('vaadin-')
-                    && details.requested.name != 'vaadin-sass-compiler'
-                    && details.requested.name != 'vaadin-client-compiler-deps'
-                    && !details.requested.name.startsWith('vaadin-testbench')) {
-                details.useVersion project.vaadin.version
+            def group = details.requested.group
+            def name = details.requested.name
+            if(group == 'com.vaadin' && name.startsWith('vaadin-')) {
+                if (!(name in blacklist) && !name.startsWith('vaadin-testbench')) {
+                    details.useVersion project.vaadin.version
+                }
             }
         }
     }
