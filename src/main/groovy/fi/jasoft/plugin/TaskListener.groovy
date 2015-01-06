@@ -29,6 +29,9 @@ import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskState
 import org.gradle.api.tasks.bundling.War
 
+import java.util.jar.Attributes
+import java.util.jar.Manifest
+
 public class TaskListener implements TaskExecutionListener {
 
     private TestbenchHub testbenchHub
@@ -252,9 +255,8 @@ public class TaskListener implements TaskExecutionListener {
         module.name = project.name
 
         module.inheritOutputDirs = false
-        module.outputDir = project.file('build/classes/main')
-        module.testOutputDir = project.file('build/classes/test')
-
+        module.outputDir = project.sourceSets.main.output.classesDir
+        module.testOutputDir = project.sourceSets.test.output.classesDir
 
         // Download sources and javadoc
         module.downloadJavadoc = true
@@ -364,6 +366,14 @@ public class TaskListener implements TaskExecutionListener {
 
     private void configureAddonZipMetadata(Task task) {
 
+        def attributes = [
+                'Vaadin-License-Title': project.vaadin.addon.license,
+                'Implementation-Title': project.vaadin.addon.title,
+                'Implementation-Version': project.version != null ? project.version : '',
+                'Implementation-Vendor': project.vaadin.addon.author,
+                'Vaadin-Addon': "libs/${project.jar.archiveName}"
+        ] as HashMap<String, String>
+
         // Create metadata file
         def buildDir = project.file('build/tmp/zip')
         buildDir.mkdirs()
@@ -371,17 +381,9 @@ public class TaskListener implements TaskExecutionListener {
         def meta = project.file(buildDir.absolutePath + '/META-INF')
         meta.mkdirs()
 
-        def manifest = project.file(meta.absolutePath + '/MANIFEST.MF')
-        manifest.createNewFile()
-
-        manifest << """
-            Vaadin-Package-Version: 1
-            Vaadin-License-Title: ${project.vaadin.addon.license}
-            Implementation-Title: ${project.vaadin.addon.title}
-            Implementation-Version: ${project.version != null ? project.version : ''}
-            Implementation-Vendor: ${project.vaadin.addon.author}
-            Vaadin-Addon: libs/${project.jar.archiveName}
-        """.stripIndent().trim()
+        def manifestFile = project.file(meta.absolutePath + '/MANIFEST.MF')
+        manifestFile.createNewFile()
+        manifestFile << attributes.collect { key, value -> "$key: $value" }.join("\n")
     }
 
     private void configureJRebel(Task task) {

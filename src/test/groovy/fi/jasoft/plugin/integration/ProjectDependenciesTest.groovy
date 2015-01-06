@@ -3,6 +3,7 @@ package fi.jasoft.plugin.integration
 import fi.jasoft.plugin.DependencyListener
 import fi.jasoft.plugin.GradleVaadinPlugin
 import fi.jasoft.plugin.configuration.VaadinPluginExtension
+import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ArtifactRepositoryContainer
 import org.gradle.api.artifacts.Configuration
