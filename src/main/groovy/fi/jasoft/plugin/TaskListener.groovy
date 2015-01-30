@@ -16,6 +16,7 @@
 package fi.jasoft.plugin
 
 import fi.jasoft.plugin.DependencyListener.Configuration
+import fi.jasoft.plugin.tasks.BuildClassPathJar
 import fi.jasoft.plugin.tasks.CompileWidgetsetTask
 import fi.jasoft.plugin.tasks.CreateDirectoryZipTask
 import fi.jasoft.plugin.tasks.CreateWidgetsetGeneratorTask
@@ -28,9 +29,6 @@ import org.gradle.api.execution.TaskExecutionListener
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskState
 import org.gradle.api.tasks.bundling.War
-
-import java.util.jar.Attributes
-import java.util.jar.Manifest
 
 public class TaskListener implements TaskExecutionListener {
 
@@ -170,6 +168,12 @@ public class TaskListener implements TaskExecutionListener {
                 task.inputs.files(project.fileTree(it.absolutePath).include('**/*/*.gwt.xml'))
             }
 
+            // Add classpath jar
+            if(project.vaadin.plugin.useClassPathJar) {
+                BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
+                task.inputs.file(pathJarTask.archivePath)
+            }
+
             File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
 
             // Widgetset output directory
@@ -179,6 +183,18 @@ public class TaskListener implements TaskExecutionListener {
             // Unit cache output directory
             File unitCacheDir = new File(webAppDir.canonicalPath + '/VAADIN/gwt-unitCache')
             task.outputs.dir(unitCacheDir)
+        }
+
+        if(task.getName() == BuildClassPathJar.NAME) {
+            def files = Util.getCompileClassPath(project).filter { File file ->
+                file.isFile() && file.name.endsWith('.jar')
+            }
+
+            task.inputs.files(files)
+
+            task.manifest.attributes('Class-Path': files.collect { File file ->
+                file.toURI().toString()
+            }.join(' '))
         }
     }
 

@@ -15,9 +15,9 @@
 */
 package fi.jasoft.plugin
 
+import fi.jasoft.plugin.tasks.BuildClassPathJar
 import groovy.io.FileType
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.plugins.WarPluginConvention
@@ -68,9 +68,18 @@ class Util {
      * @return
      */
     static FileCollection getJettyClassPath(Project project) {
-        FileCollection collection = project.configurations[DependencyListener.Configuration.JETTY9.caption]
+        FileCollection collection
+
+        if(project.vaadin.plugin.useClassPathJar){
+            BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
+            collection = project.files(pathJarTask.archivePath)
+        } else {
+            collection = project.configurations[DependencyListener.Configuration.JETTY9.caption]
+            collection += getCompileClassPath(project)
+        }
+
         collection += project.sourceSets.main.runtimeClasspath
-        collection += getCompileClassPath(project)
+
         collection
     }
 

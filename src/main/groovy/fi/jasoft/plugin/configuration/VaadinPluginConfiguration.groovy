@@ -15,6 +15,8 @@
 */
 package fi.jasoft.plugin.configuration
 
+import org.apache.tools.ant.taskdefs.condition.Os
+
 /**
  * General configuration options for the plugin itself
  */
@@ -50,4 +52,11 @@ class VaadinPluginConfiguration {
      * Custom directory where themes can be found
      */
     String themesDirectory = null
+
+    /*
+    * Should a classpath Jar be used to shorten the classpath.
+    *
+    * FIXME make default on windows once confirmed working
+    */
+    boolean useClassPathJar = false //Os.isFamily(Os.FAMILY_WINDOWS)
 }

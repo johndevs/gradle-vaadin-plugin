@@ -95,6 +95,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
         project.tasks.create(name: BuildSourcesJarTask.NAME, type: BuildSourcesJarTask, group: 'Vaadin Utility')
         project.tasks.create(name: BuildJavadocJarTask.NAME, type: BuildJavadocJarTask, group: 'Vaadin Utility')
+        project.tasks.create(name: BuildClassPathJar.NAME, type: BuildClassPathJar, group: 'Vaadin Utility')
 
         project.tasks.create(name: CreateTestbenchTestTask.NAME, type: CreateTestbenchTestTask, group: 'Vaadin Testbench')
 

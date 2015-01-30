@@ -15,19 +15,21 @@
 */
 package fi.jasoft.plugin.tasks
 
-import fi.jasoft.plugin.DependencyListener
 import fi.jasoft.plugin.Util
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskAction
 
+import java.util.jar.Attributes
+import java.util.jar.JarFile
+
 class CompileWidgetsetTask extends DefaultTask {
 
     public static final NAME = 'vaadinCompileWidgetset'
 
     public CompileWidgetsetTask() {
-        dependsOn('classes', UpdateWidgetsetTask.NAME)
+        dependsOn('classes', UpdateWidgetsetTask.NAME, BuildClassPathJar.NAME)
         description = "Compiles Vaadin Addons and components into Javascript."
     }
 
@@ -45,7 +47,32 @@ class CompileWidgetsetTask extends DefaultTask {
         // Ensure unit cache dir is present so the compiler does not complain
         new File(webAppDir.canonicalPath + '/VAADIN/gwt-unitCache').mkdirs()
 
-        FileCollection classpath = Util.getClientCompilerClassPath(project)
+        FileCollection classpath
+
+        if(project.vaadin.plugin.useClassPathJar){
+            // Add dependencies using the classpath jar
+            BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
+            classpath = project.files(pathJarTask.archivePath)
+
+            classpath += Util.getClientCompilerClassPath(project).filter { File file ->
+                if(file.name.endsWith('.jar')){
+                    // Add GWT compiler + deps
+                    if(file.name.startsWith('vaadin-client') ||
+                            file.name.startsWith('vaadin-shared') ||
+                            file.name.startsWith('validation-api')){
+                        return true
+                    }
+
+                    // Addons with client side widgetset
+                    JarFile jar = new JarFile(file.absolutePath)
+                    Attributes attributes = jar.manifest.mainAttributes
+                    return attributes.getValue('Vaadin-Widgetsets')
+                }
+                true
+            }
+        } else {
+            classpath = Util.getClientCompilerClassPath(project)
+        }
 
         def widgetsetCompileProcess = ['java']
 

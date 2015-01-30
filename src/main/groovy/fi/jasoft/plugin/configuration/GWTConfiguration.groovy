@@ -15,6 +15,8 @@
 */
 package fi.jasoft.plugin.configuration
 
+import org.apache.tools.ant.taskdefs.condition.Os
+
 /**
  * Configuration options for the GWT compiler
  */
