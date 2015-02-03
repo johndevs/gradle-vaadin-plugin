@@ -194,6 +194,16 @@ class Util {
         if (version.startsWith('7') && !version.startsWith('7.0')) {
             return true
         }
+        false
+    }
+
+    static boolean isOperaUserAgentSupported(Project project) {
+        String version = project.vaadin.version
+        if(version.startsWith('7.0') || version.startsWith('7.1') ||
+                version.startsWith('7.2') || version.startsWith('7.3')){
+            return true
+        }
+        false
     }
 
     public static boolean isServlet3Project(Project project) {

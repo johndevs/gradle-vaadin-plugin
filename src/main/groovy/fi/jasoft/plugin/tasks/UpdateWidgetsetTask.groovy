@@ -124,8 +124,11 @@ class UpdateWidgetsetTask extends DefaultTask {
 
         def properties = [:]
 
-        def ua = 'ie8,ie9,gecko1_8,safari,opera'
+        def ua = 'ie8,ie9,gecko1_8,safari'
         if (project.vaadin.gwt.userAgent == null) {
+            if (Util.isOperaUserAgentSupported(project)) {
+                ua += ',opera'
+            }
             if (Util.isIE10UserAgentSupported(project)) {
                 ua += ',ie10'
             }
