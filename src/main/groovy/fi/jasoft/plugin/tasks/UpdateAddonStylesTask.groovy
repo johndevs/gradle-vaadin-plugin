@@ -48,15 +48,13 @@ class UpdateAddonStylesTask extends DefaultTask {
         themesDir.eachDir {
             project.logger.info("Updating ${it.canonicalPath}/addons.scss")
 
-            def importer = ['java']
-            importer.add('-cp')
-            importer.add(cp.getAsPath())
-            importer.add('com.vaadin.server.themeutils.SASSAddonImportFileCreator')
-            importer.add(it.canonicalPath)
+            def execResult = project.javaexec {
+                classpath cp
+                main = 'com.vaadin.server.themeutils.SASSAddonImportFileCreator'
+                args it.canonicalPath
+            }
 
-            importer = importer.execute()
-
-            if (importer.waitFor() != 0) {
+            if (execResult.exitValue != 0) {
                 project.logger.error("Failed to update ${it.canonicalPath}/addons.scss")
             }
         }
