@@ -33,6 +33,11 @@ class VaadinPluginExtension {
      */
     String widgetsetGenerator = null
 
+    /*
+     * Use the widgetset CDN located at cdn.virit.in
+     */
+    boolean widgetsetCDN = false
+
     /**
      * The vaadin version to use. By default latest Vaadin 7 version.
      */

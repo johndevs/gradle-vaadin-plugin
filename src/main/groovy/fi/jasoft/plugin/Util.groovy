@@ -377,4 +377,14 @@ class Util {
             project.file(webAppDir.canonicalPath + '/VAADIN/themes')
         }
     }
+
+    def static String getResolvedVaadinVersion(Project project) {
+        def version = project.vaadin.version
+        project.configurations[DependencyListener.Configuration.SERVER.caption].resolvedConfiguration.firstLevelModuleDependencies.each{ dependency ->
+            if(dependency.moduleName == 'vaadin-server'){
+               version = dependency.moduleVersion
+           }
+        }
+        version
+    }
 }

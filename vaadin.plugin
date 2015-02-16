@@ -8,6 +8,8 @@
  */ 
 buildscript {
     repositories {
+        mavenCentral()
+
         def gradleVersion = project.getGradle().getGradleVersion().split("\\.")
         def gradleMajorVersion = Integer.parseInt(gradleVersion[0])
         def gradleMinorVersion =  Integer.parseInt(gradleVersion[1])
@@ -28,6 +30,7 @@ buildscript {
         }
     }
    dependencies {
+        classpath group: 'org.codehaus.groovy.modules.http-builder', name: 'http-builder', version: '0.7.1'
         classpath group: 'fi.jasoft.plugin', name: 'gradle-vaadin-plugin', version: '+'
     }
 }
