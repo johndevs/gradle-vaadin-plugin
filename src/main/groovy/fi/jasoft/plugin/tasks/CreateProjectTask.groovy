@@ -132,7 +132,11 @@ class CreateProjectTask extends DefaultTask {
         def initParams = ['ui': "$applicationPackage.${applicationName}UI"]
 
         if (project.vaadin.widgetset != null) {
-            initParams.put('widgetset', project.vaadin.widgetset.replaceAll("[^a-zA-Z0-9]+",""))
+            if(project.vaadin.widgetsetCDN){
+                initParams.put('widgetset', project.vaadin.widgetset.replaceAll("[^a-zA-Z0-9]+",""))
+            } else {
+                initParams.put('widgetset', project.vaadin.widgetset)
+            }
         }
 
         substitutions['initParams'] = initParams
