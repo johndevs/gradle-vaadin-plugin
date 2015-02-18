@@ -33,11 +33,14 @@ class CompileWidgetsetTask extends DefaultTask {
 
     static final WIDGETSET_CDN_URL = 'http://cdn.virit.in'
 
+    /**
+     * HTTP POST request sent to CDN for requesting a widgetset.
+     */
     private def queryWidgetsetRequest = { version, style ->
         [
             path: '/api/compiler/compile',
             query: [
-                    'compile.async' : false
+                    'compile.async' : true
             ],
             body: [
                     vaadinVersion: version,
@@ -49,6 +52,9 @@ class CompileWidgetsetTask extends DefaultTask {
         ]
     }
 
+    /**
+     * HTTP POST request sent to CDN for downloading a widgetset.
+     */
     private def downloadWidgetsetRequest = { version, style ->
         [
             path: '/api/compiler/download',
@@ -62,58 +68,94 @@ class CompileWidgetsetTask extends DefaultTask {
         ]
     }
 
+    /**
+     * Called by the downloadWidgetsetRequest once the response with the zipped contents arrive
+     */
+    private def writeWidgetsetToFileSystem = { request, zipStream ->
+        def widgetsetName = project.vaadin.widgetset.replaceAll("[^a-zA-Z0-9]+","")
+
+        if(widgetsetName != project.vaadin.widgetset){
+            logger.warn("Widgetset name cannot contain special characters when using CDN. Illegal characters removed, please update your @Widgetset annotation or web.xml accordingly.")
+        }
+
+        def widgetsetDirectory = new File(Util.getWidgetsetDirectory(project).absolutePath, widgetsetName)
+        widgetsetDirectory.mkdirs()
+
+        def generatedWidgetSetName = request.headers.wsId as String
+        def ze
+        while ((ze = zipStream.nextEntry) != null) {
+            def fileName = ze.name as String
+
+            // Replace the generated widgetset filename with the real one
+            final File outfile = new File(widgetsetDirectory.absolutePath,
+                    fileName.replace(generatedWidgetSetName, widgetsetName));
+
+            // Create directories and file
+            outfile.parentFile.mkdirs();
+            outfile.createNewFile();
+
+            // Create file byte by byte
+            FileOutputStream fout = new FileOutputStream(outfile);
+            for (int c = zipStream.read(); c != -1; c = zipStream.read()) {
+                fout.write(c);
+            }
+            zipStream.closeEntry();
+            fout.close();
+
+            // Replace all mentions of generated widgetset name with real one inside the files as well
+            def contents = outfile.text
+            outfile.text = contents.replaceAll(generatedWidgetSetName, widgetsetName)
+        }
+        zipStream.close();
+    }
+
     public CompileWidgetsetTask() {
         dependsOn('classes', UpdateWidgetsetTask.NAME, BuildClassPathJar.NAME)
         description = "Compiles Vaadin Addons and components into Javascript."
     }
 
+    private File
+
     @TaskAction
     public void run() {
-        File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-        File targetDir = new File(webAppDir.canonicalPath + '/VAADIN/widgetsets')
-        targetDir.mkdirs()
+
+        // Ensure widgetset directory exists
+        Util.getWidgetsetDirectory(project).mkdirs()
 
         if (project.vaadin.widgetset == null) {
-            if(project.vaadin.widgetsetCDN) {
-                /*
-               Query for a widgetset
-                */
-                while(true){
-                    def info = queryRemoteWidgetset()
-                    println info
+            // Use default widgetset
+            return
+        } else if(project.vaadin.widgetsetCDN) {
+            // Use widgetset CDN to retrieve widgetset
 
-                    def status = info.status as String
-                    def name = info.widgetSetName as String
-                    switch(status){
-                        case 'NOT_FOUND':
-                        case 'UNKNOWN':
-                        case 'ERROR':
-                            logger.error(info)
-                            didWork = false
-                            return
-                        case 'QUEUED':
-                        case 'COMPILING':
-                        case 'COMPILED':
-                            logger.info("Widgetset is compiling with status $status. Waiting 10 seconds and quering again.")
-                            sleep(10000)
-                            break;
-                        case 'AVAILABLE':
-                            logger.info('Widgetset is available, downloading...')
-                            downloadWidgetset(new File(targetDir, name))
-                            return
-                    }
+            while(true){
+                def info = queryRemoteWidgetset()
+                def status = info.status as String
+                switch(status){
+                    case 'NOT_FOUND':
+                    case 'UNKNOWN':
+                    case 'ERROR':
+                        logger.error(info)
+                        didWork = false
+                        return
+                    case 'QUEUED':
+                    case 'COMPILING':
+                    case 'COMPILED':
+                        logger.info("Widgetset is compiling with status $status. Waiting 10 seconds and quering again.")
+                        sleep(10000)
+                        break;
+                    case 'AVAILABLE':
+                        logger.info('Widgetset is available, downloading...')
+                        downloadWidgetset()
+                        return
                 }
             }
-
-            // Use default widgetset
             return
         }
 
-        // Ensure unit cache dir is present so the compiler does not complain
-        new File(webAppDir.canonicalPath + '/VAADIN/gwt-unitCache').mkdirs()
+        // Compile widgetset locally
 
         FileCollection classpath
-
         if(project.vaadin.plugin.useClassPathJar){
             // Add dependencies using the classpath jar
             BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
@@ -151,7 +193,7 @@ class CompileWidgetsetTask extends DefaultTask {
 
         widgetsetCompileProcess += ['-style', project.vaadin.gwt.style]
         widgetsetCompileProcess += ['-optimize', project.vaadin.gwt.optimize]
-        widgetsetCompileProcess += ['-war', targetDir.canonicalPath]
+        widgetsetCompileProcess += ['-war', Util.getWidgetsetDirectory(project).canonicalPath]
         widgetsetCompileProcess += ['-logLevel', project.vaadin.gwt.logLevel]
         widgetsetCompileProcess += ['-localWorkers', project.vaadin.gwt.localWorkers]
 
@@ -174,11 +216,6 @@ class CompileWidgetsetTask extends DefaultTask {
         Util.logProcess(project, process, 'widgetset-compile.log')
 
         process.waitFor()
-
-        /*
-         * Compiler generates an extra WEB-INF folder into the widgetsets folder. Remove it.
-         */
-        new File(targetDir.canonicalPath + "/WEB-INF").deleteDir()
     }
 
     /**
@@ -203,38 +240,17 @@ class CompileWidgetsetTask extends DefaultTask {
      * @return
      *      Returns a stream with the widgetset files
      */
-    private ZipInputStream downloadWidgetset(File targetDir) {
-        logger.info("Saving widgetset to "+targetDir.absolutePath)
-
+    private ZipInputStream downloadWidgetset() {
         def client = new RESTClient(WIDGETSET_CDN_URL)
-        client.headers['User-Agent'] = 'VWSCDN-1.3.1-SNAPSHOT ( / / ; / ; )'
+        client.headers['User-Agent'] = 'VWSCDN-1.3.0 ( / / ; / ; )'
         client.headers['Accept'] = 'application/x-zip'
         client.parser.'application/x-zip' = { response ->
             new ZipInputStream(response.entity.content)
         }
 
-        def response = client.post(downloadWidgetsetRequest(
+        client.post(downloadWidgetsetRequest(
             Util.getResolvedVaadinVersion(project),
             project.vaadin.gwt.style
-        ))
-
-        def writeToFilestem = { ZipInputStream zipInputStream ->
-            def ze
-            while ((ze = zipInputStream.nextEntry) != null) {
-                final File outfile = new File(targetDir.absolutePath, ze.getName());
-                outfile.getParentFile().mkdirs();
-                outfile.createNewFile();
-
-                FileOutputStream fout = new FileOutputStream(outfile);
-                for (int c = zipInputStream.read(); c != -1; c = zipInputStream.
-                        read()) {
-                    fout.write(c);
-                }
-                zipInputStream.closeEntry();
-                fout.close();
-            }
-            zipInputStream.close();
-        }
-        writeToFilestem(new ZipInputStream(response.data))
+        ), writeWidgetsetToFileSystem)
     }
 }

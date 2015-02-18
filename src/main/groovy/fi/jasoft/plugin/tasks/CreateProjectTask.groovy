@@ -44,8 +44,9 @@ class CreateProjectTask extends DefaultTask {
             applicationName = 'MyApplication'
         }
 
-        if (project.vaadin.widgetset != null) {
+        if (project.vaadin.widgetset != null && project.vaadin.widgetset.contains('.')) {
             String widgetsetName = project.vaadin.widgetset.tokenize('.').last()
+
             applicationPackage = project.vaadin.widgetset[0..(-widgetsetName.size() - 2)]
         } else {
             if(System.console()){
@@ -131,7 +132,7 @@ class CreateProjectTask extends DefaultTask {
         def initParams = ['ui': "$applicationPackage.${applicationName}UI"]
 
         if (project.vaadin.widgetset != null) {
-            initParams.put('widgetset', String.valueOf(project.vaadin.widgetset))
+            initParams.put('widgetset', project.vaadin.widgetset.replaceAll("[^a-zA-Z0-9]+",""))
         }
 
         substitutions['initParams'] = initParams

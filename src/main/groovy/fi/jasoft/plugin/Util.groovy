@@ -369,6 +369,15 @@ class Util {
         project.logger.info "Stopped watching directory"
     }
 
+    /**
+     * Returns the themes directory
+     *
+     * @param project
+     *      The project to get the themes directory for
+     *
+     * @return
+     *      The themes directory
+     */
     def static File getThemesDirectory(Project project) {
         if(project.vaadin.plugin.themesDirectory){
             project.file(project.vaadin.plugin.themesDirectory)
@@ -378,6 +387,31 @@ class Util {
         }
     }
 
+    /**
+     * Returns the widgetset directory
+     *
+     * @param project
+     *      The project to get the directory for
+     * @return
+     *      The widgetset directory
+     */
+    def static File getWidgetsetDirectory(Project project) {
+        File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
+        project.file(webAppDir.canonicalPath +'/VAADIN/widgetsets')
+    }
+
+    /**
+     * Returns the resolved Vaadin version.
+     *
+     * For example, if the version has been defined as 7.x and the real latest Vaadin 7
+     * version that is releases is 7.3.10 then this method will return 7.3.10.     *
+     *
+     * @param project
+     *      The project to get the Vadin version for
+     *
+     * @return
+     *      The resolved Vaadin version
+     */
     def static String getResolvedVaadinVersion(Project project) {
         def version = project.vaadin.version
         project.configurations[DependencyListener.Configuration.SERVER.caption].resolvedConfiguration.firstLevelModuleDependencies.each{ dependency ->
