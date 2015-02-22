@@ -18,6 +18,9 @@ package fi.jasoft.plugin
 import fi.jasoft.plugin.tasks.BuildClassPathJar
 import groovy.io.FileType
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.Dependency
+import org.gradle.api.artifacts.DependencyResolveDetails
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.plugins.WarPluginConvention
@@ -31,6 +34,9 @@ import java.nio.file.SimpleFileVisitor
 import java.nio.file.StandardWatchEventKinds
 import java.nio.file.WatchEvent
 import java.nio.file.attribute.BasicFileAttributes
+import java.util.jar.Attributes
+import java.util.jar.JarInputStream
+import java.util.jar.Manifest
 
 class Util {
 
@@ -420,5 +426,38 @@ class Util {
            }
         }
         version
+    }
+
+    /**
+     * Returns all addon jars in the proejct
+     *
+     * @param project
+     *      The project to look in
+     * @return
+     */
+    def static Set findAddonsInProject(Project project) {
+        def addons = []
+        def widgetsetAttribute = new Attributes.Name('Vaadin-Widgetsets')
+        project.configurations.all.each { Configuration conf ->
+            conf.allDependencies.each {Dependency dependency ->
+                conf.files(dependency).each { File file ->
+                    file.withInputStream { InputStream stream->
+                        def jarStream = new JarInputStream(stream)
+                        def mf = jarStream.getManifest()
+                        def attributes = mf?.mainAttributes
+                        if(attributes?.getValue(widgetsetAttribute)){
+                            if(!dependency.name.startsWith('vaadin-client')){
+                                addons << [
+                                        groupId:dependency.group,
+                                        artifactId: dependency.name,
+                                        version: dependency.version
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        addons
     }
 }

@@ -45,7 +45,7 @@ class CompileWidgetsetTask extends DefaultTask {
             body: [
                     vaadinVersion: version,
                     eager: [],
-                    addons: [],
+                    addons: Util.findAddonsInProject(project),
                     compileStyle: style
             ],
             requestContentType : ContentType.JSON
@@ -61,7 +61,7 @@ class CompileWidgetsetTask extends DefaultTask {
             body: [
                     vaadinVersion: version,
                     eager: [],
-                    addons: [],
+                    addons: Util.findAddonsInProject(project),
                     compileStyle: style
             ],
             requestContentType : ContentType.JSON
@@ -128,6 +128,7 @@ class CompileWidgetsetTask extends DefaultTask {
         } else if(project.vaadin.widgetsetCDN) {
             // Use widgetset CDN to retrieve widgetset
 
+            // Queary for widgetset with addons
             while(true){
                 def info = queryRemoteWidgetset()
                 def status = info.status as String
