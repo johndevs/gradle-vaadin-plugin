@@ -45,13 +45,13 @@ class UpdateAddonStylesTask extends DefaultTask {
 
         def cp = Util.getCompileClassPath(project)
 
-        themesDir.eachDir {
-            project.logger.info("Updating ${it.canonicalPath}/addons.scss")
+        themesDir.eachDir { dir ->
+            project.logger.info("Updating ${dir.canonicalPath}/addons.scss")
 
             def execResult = project.javaexec {
                 classpath cp
                 main = 'com.vaadin.server.themeutils.SASSAddonImportFileCreator'
-                args it.canonicalPath
+                args dir.canonicalPath
             }
 
             if (execResult.exitValue != 0) {
