@@ -147,55 +147,6 @@ public class TaskListener implements TaskExecutionListener {
         if (task.getName() == CreateDirectoryZipTask.NAME) {
             configureAddonZipMetadata(task)
         }
-
-        if(task.getName() == CompileWidgetsetTask.NAME) {
-            /* Monitor changes in dependencies since upgrading a
-             * dependency should also trigger a recompile of the widgetset
-             */
-            task.inputs.files(project.configurations.compile)
-
-            // Monitor changes in client side classes and resources
-            project.sourceSets.main.java.srcDirs.each {
-                task.inputs.files(project.fileTree(it.absolutePath).include('**/*/client/**/*.java'))
-                task.inputs.files(project.fileTree(it.absolutePath).include('**/*/shared/**/*.java'))
-                task.inputs.files(project.fileTree(it.absolutePath).include('**/*/public/**/*.*'))
-                task.inputs.files(project.fileTree(it.absolutePath).include('**/*/*.gwt.xml'))
-            }
-
-            //Monitor changes in resources
-            project.sourceSets.main.resources.srcDirs.each {
-                task.inputs.files(project.fileTree(it.absolutePath).include('**/*/public/**/*.*'))
-                task.inputs.files(project.fileTree(it.absolutePath).include('**/*/*.gwt.xml'))
-            }
-
-            // Add classpath jar
-            if(project.vaadin.plugin.useClassPathJar) {
-                BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
-                task.inputs.file(pathJarTask.archivePath)
-            }
-
-            File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-
-            // Widgetset output directory
-            File targetDir = new File(webAppDir.canonicalPath + '/VAADIN/widgetsets')
-            task.outputs.dir(targetDir)
-
-            // Unit cache output directory
-            File unitCacheDir = new File(webAppDir.canonicalPath + '/VAADIN/gwt-unitCache')
-            task.outputs.dir(unitCacheDir)
-        }
-
-        if(task.getName() == BuildClassPathJar.NAME) {
-            def files = Util.getCompileClassPath(project).filter { File file ->
-                file.isFile() && file.name.endsWith('.jar')
-            }
-
-            task.inputs.files(files)
-
-            task.manifest.attributes('Class-Path': files.collect { File file ->
-                file.toURI().toString()
-            }.join(' '))
-        }
     }
 
     public void afterExecute(Task task, TaskState state) {
