@@ -17,9 +17,11 @@ package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.Util
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.TaskExecutionException
 
 import java.util.jar.Attributes
 import java.util.jar.JarFile
@@ -143,14 +145,25 @@ class CompileWidgetsetTask extends DefaultTask {
         widgetsetCompileProcess += project.vaadin.widgetset
 
         def Process process = widgetsetCompileProcess.execute()
+        def failed = false
+        Util.logProcess(project, process, 'widgetset-compile.log', { String output ->
+            // Monitor log for errors
+            if(output.trim().startsWith('[ERROR]')){
+                failed = true
+            }
+        })
 
-        Util.logProcess(project, process, 'widgetset-compile.log')
-
+        // Block
         process.waitFor()
 
         /*
          * Compiler generates an extra WEB-INF folder into the widgetsets folder. Remove it.
          */
         new File(targetDir.canonicalPath + "/WEB-INF").deleteDir()
+
+        if(failed) {
+            // Terminate build
+            throw new GradleException('Widgetset failed to compile. See error log above.')
+        }
     }
 }
