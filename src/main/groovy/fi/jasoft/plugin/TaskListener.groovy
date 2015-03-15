@@ -319,16 +319,26 @@ public class TaskListener implements TaskExecutionListener {
         }
 
         // Add metadata to jar manifest
-        task.manifest.attributes(
-                'Vaadin-Package-Version': 1,
-                'Vaadin-Widgetsets': widgetset,
-                'Vaadin-Stylesheets': styles.join(','),
-                'Vaadin-License-Title': project.vaadin.addon.license,
-                'Implementation-Title': project.vaadin.addon.title,
-                'Implementation-Version': project.version,
-                'Implementation-Vendor': project.vaadin.addon.author,
-                'Built-By': "Gradle Vaadin Plugin ${GradleVaadinPlugin.PLUGIN_VERSION}"
-        )
+        def attributes = [:]
+        attributes['Vaadin-Package-Version'] = 1
+        attributes['Implementation-Version'] = project.version
+        attributes['Built-By'] = "Gradle Vaadin Plugin ${GradleVaadinPlugin.PLUGIN_VERSION}"
+        if(widgetset){
+            attributes['Vaadin-Widgetsets'] = widgetset
+        }
+        if(styles){
+           attributes['Vaadin-Stylesheets'] = styles.join(',')
+        }
+        if(project.vaadin.addon.license){
+            attributes['Vaadin-License-Title'] = project.vaadin.addon.license
+        }
+        if(project.vaadin.addon.title){
+            attributes['Implementation-Title'] = project.vaadin.addon.title
+        }
+        if(project.vaadin.addon.author){
+            attributes['Implementation-Vendor'] = project.vaadin.addon.author
+        }
+        task.manifest.attributes(attributes)
     }
 
     private void configureAddonZipMetadata(Task task) {
