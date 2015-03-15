@@ -29,6 +29,11 @@ import org.gradle.api.execution.TaskExecutionListener
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskState
 import org.gradle.api.tasks.bundling.War
+import org.gradle.plugins.ide.eclipse.EclipseWtpPlugin
+import org.gradle.plugins.ide.eclipse.model.EclipseWtp
+import org.gradle.plugins.ide.eclipse.model.EclipseWtpFacet
+import org.gradle.plugins.ide.eclipse.model.Facet
+import org.gradle.plugins.ide.eclipse.model.WtpFacet
 
 public class TaskListener implements TaskExecutionListener {
 
@@ -249,10 +254,14 @@ public class TaskListener implements TaskExecutionListener {
     }
 
     private void configureEclipseWtpPluginFacet(Task task) {
-        def wtp = project.eclipse.wtp
-        wtp.facet.facet(name: 'com.vaadin.integration.eclipse.core', version: '7.0')
-        wtp.facet.facet(name: 'jst.web', version: '3.0')
-        wtp.facet.facet(name: 'java', version: project.sourceCompatibility)
+        def wtp = project.eclipse.wtp as EclipseWtp
+        def facet = wtp.facet
+
+        facet.facets = []
+        facet.facet(name: 'jst.web', version: '3.0')
+        facet.facet(name: 'jst.java', version: project.sourceCompatibility)
+        facet.facet(name: 'com.vaadin.integration.eclipse.core', version: '7.0')
+        facet.facet(name: 'java', version: project.sourceCompatibility)
     }
 
     private void ensureWidgetsetGeneratorExists(Task task) {
