@@ -216,7 +216,9 @@ class DependencyListener implements ProjectEvaluationListener {
         def blacklist = [
                 'vaadin-sass-compiler',
                 'vaadin-client-compiler-deps',
-                'vaadin-cdi'
+                'vaadin-cdi',
+                'vaadin-spring',
+                'vaadin-spring-boot'
         ]
 
         config.resolutionStrategy.eachDependency { DependencyResolveDetails details ->
