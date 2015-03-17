@@ -148,6 +148,8 @@ class ProjectDependenciesTest {
                 compile 'com.vaadin:vaadin-sass-compiler:+'
                 compile 'com.vaadin:vaadin-client-compiler-deps:+'
                 compile 'com.vaadin:vaadin-cdi:+'
+                compile 'com.vaadin:vaadin-spring:+'
+                compile 'com.vaadin:vaadin-spring-boot:+'
             }
 
             evaluate()
