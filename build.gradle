@@ -222,6 +222,9 @@ jar {
 }
 
 test {
+    //Integration tests depend on jar artifact
+    dependsOn 'jar'
+
     testLogging {
         exceptionFormat "full"
     }
