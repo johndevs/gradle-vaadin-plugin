@@ -124,11 +124,16 @@ uploadArchives {
         def snapshotRepositoryUrl = System.getProperty('PLUGIN_MAVEN_SNAPSHOT_REPOSITORY')
         def snapshotRepositoryUser = System.getProperty('PLUGIN_MAVEN_SNAPSHOT_REPOSITORY_USER')
         def snapshotRepositoryPassword = System.getProperty('PLUGIN_MAVEN_SNAPSHOT_REPOSITORY_PASSWORD')
+        def snapshotRepositoryPrivateKey = System.getProperty('PLUGIN_MAVEN_SNAPSHOT_REPOSITORY_KEY')
 
         configuration = configurations.deploy
 
         snapshotRepository( url: snapshotRepositoryUrl ) {
-           authentication(userName: snapshotRepositoryUser, password: snapshotRepositoryPassword)
+           authentication(
+                   userName: snapshotRepositoryUser,
+                   password: snapshotRepositoryPassword,
+                   privateKey: snapshotRepositoryPrivateKey
+           )
         }
     }
 }
