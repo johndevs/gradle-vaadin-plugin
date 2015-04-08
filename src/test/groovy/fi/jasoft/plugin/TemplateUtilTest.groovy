@@ -7,7 +7,7 @@ import org.junit.Test
 import static junit.framework.Assert.assertEquals
 
 /*
-* Copyright 2014 John Ahlroos
+* Copyright 2015 John Ahlroos
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
