@@ -117,7 +117,7 @@ class CompileWidgetsetTask extends DefaultTask {
         def widgetsetCompileProcess = ['java']
 
         if (project.vaadin.gwt.jvmArgs) {
-            widgetsetCompileProcess += project.vaadin.gwt.jvmArgs
+            widgetsetCompileProcess += project.vaadin.gwt.jvmArgs as List
         }
 
         widgetsetCompileProcess += ['-cp',  classpath.getAsPath()]
