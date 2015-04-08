@@ -18,6 +18,7 @@ package fi.jasoft.plugin.tasks
 import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskAction
 
@@ -47,32 +48,37 @@ class UpdateWidgetsetTask extends DefaultTask {
             return false;
         }
 
-        // Check source dir if widgetset is present there
-        File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
-        File widgetsetFile = new File(javaDir.canonicalPath + '/' + project.vaadin.widgetset.replaceAll(/\./, '/') + ".gwt.xml")
+        File widgetsetFile
 
-        if (widgetsetFile.exists()) {
-            updateWidgetset(widgetsetFile, project);
-            return false;
+        // Check source dir if widgetset is present there
+        if(!Util.getMainSourceSet(project).srcDirs.isEmpty()){
+            File javaDir = Util.getMainSourceSet(project).srcDirs.first()
+            widgetsetFile = new File(javaDir.canonicalPath + '/' + project.vaadin.widgetset.replaceAll(/\./, '/') + ".gwt.xml")
+            if (widgetsetFile.exists()) {
+                updateWidgetset(widgetsetFile, project);
+                return false;
+            }
         }
 
         // Check resource dir if widgetset is present there
-        File resourceDir = project.sourceSets.main.resources.srcDirs.iterator().next()
-        widgetsetFile = new File(resourceDir.canonicalPath + '/' + project.vaadin.widgetset.replaceAll(/\./, '/') + ".gwt.xml")
-
-        if (widgetsetFile.exists()) {
-            updateWidgetset(widgetsetFile, project);
-            return false;
+        if(!project.sourceSets.main.resources.srcDirs.isEmpty()){
+            File resourceDir = project.sourceSets.main.resources.srcDirs.first()
+            widgetsetFile = new File(resourceDir.canonicalPath + '/' + project.vaadin.widgetset.replaceAll(/\./, '/') + ".gwt.xml")
+            if (widgetsetFile.exists()) {
+                updateWidgetset(widgetsetFile, project);
+                return false;
+            }
         }
 
-        // No widgetset detected, create one
-        new File(widgetsetFile.parent).mkdirs()
-
-        widgetsetFile.createNewFile()
-
-        updateWidgetset(widgetsetFile, project);
-
-        return true;
+        if(widgetsetFile){
+            // No widgetset detected, create one
+            new File(widgetsetFile.parent).mkdirs()
+            widgetsetFile.createNewFile()
+            updateWidgetset(widgetsetFile, project);
+            return true;
+        } else {
+            throw new GradleException("No source or resource directory present. Cannot generate widgeset file.")
+        }
     }
 
     private static void updateWidgetset(File widgetsetFile, Project project) {
@@ -161,7 +167,11 @@ class UpdateWidgetsetTask extends DefaultTask {
             filename = name + ".java"
         }
 
-        File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
+        if(Util.getMainSourceSet(project).srcDirs.isEmpty()){
+            throw new GradleException('No source sets was found.')
+        }
+
+        File javaDir = Util.getMainSourceSet(project).srcDirs.first()
         File f = new File(javaDir.canonicalPath + '/' + pkg.replaceAll(/\./, '/') + '/' + filename)
 
         if (f.exists() || project.vaadin.widgetsetGenerator != null) {
