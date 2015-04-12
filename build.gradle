@@ -194,11 +194,6 @@ compileTestGroovy {
     classpath += files(sourceSets.ast.output.classesDir)
 }
 
-
-test {
-    classpath += files(sourceSets.ast.output.classesDir)
-}
-
 processResources {
 
     // Create pom.xml for Vaadin directory
@@ -227,10 +222,18 @@ jar {
 }
 
 test {
-    //Integration tests depend on jar artifact
-    dependsOn 'jar'
-
+    classpath += files(sourceSets.ast.output.classesDir)
     testLogging {
         exceptionFormat "full"
     }
+    exclude '**/integration/**'
+}
+
+task integrationTest(type:Test) {
+    dependsOn 'jar'
+    classpath += files(sourceSets.ast.output.classesDir)
+    testLogging {
+        exceptionFormat "full"
+    }
+    include '**/integration/**'
 }
