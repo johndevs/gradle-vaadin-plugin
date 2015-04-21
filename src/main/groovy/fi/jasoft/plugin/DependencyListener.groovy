@@ -158,7 +158,7 @@ class DependencyListener implements ProjectEvaluationListener {
                 'org.ow2.asm:asm:5.0.2',
                 'org.ow2.asm:asm-commons:5.0.2',
                 'javax.servlet.jsp:jsp-api:2.2'
-        ], [ project.configurations.runtime ])
+        ])
 
         def sources = project.sourceSets.main
         sources.compileClasspath += [conf]
