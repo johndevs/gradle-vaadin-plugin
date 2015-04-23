@@ -96,7 +96,7 @@ class SuperDevModeTask extends DefaultTask {
         codeserverProcess = superdevmodeProcess.execute()
 
         Util.logProcess(project, codeserverProcess, 'superdevmode.log', { line ->
-            if(line.contains('The code server is ready.')){
+            if(line.contains('The code server is ready')){
                 readyClosure.call()
             }
         })

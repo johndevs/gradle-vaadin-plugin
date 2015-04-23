@@ -155,8 +155,8 @@ class DependencyListener implements ProjectEvaluationListener {
                 'org.eclipse.jetty:jetty-plus:9.2.2.v20140723',
                 'org.eclipse.jetty:jetty-deploy:9.2.2.v20140723',
                 'fi.jasoft.plugin:gradle-vaadin-plugin:' + GradleVaadinPlugin.getVersion(),
-                'org.ow2.asm:asm:5.0.2',
-                'org.ow2.asm:asm-commons:5.0.2',
+                'org.ow2.asm:asm:5.0.3',
+                'org.ow2.asm:asm-commons:5.0.3',
                 'javax.servlet.jsp:jsp-api:2.2'
         ])
 
@@ -237,7 +237,8 @@ class DependencyListener implements ProjectEvaluationListener {
         createConfiguration(project, Configuration.JETTY8, [
                 'org.eclipse.jetty.aggregate:jetty-all-server:8.1.15.v20140411',
                 'fi.jasoft.plugin:gradle-vaadin-plugin:' + GradleVaadinPlugin.getVersion(),
-                'asm:asm-all:3.3.1',
+                'org.ow2.asm:asm:5.0.3',
+                'org.ow2.asm:asm-commons:5.0.3',
                 'javax.servlet.jsp:jsp-api:2.2'
         ], [ project.configurations.runtime ])
     }
