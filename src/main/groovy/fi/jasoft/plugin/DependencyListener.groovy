@@ -218,7 +218,8 @@ class DependencyListener implements ProjectEvaluationListener {
                 'vaadin-client-compiler-deps',
                 'vaadin-cdi',
                 'vaadin-spring',
-                'vaadin-spring-boot'
+                'vaadin-spring-boot',
+                'vaadin-spring-boot-starter'
         ]
 
         config.resolutionStrategy.eachDependency { DependencyResolveDetails details ->
