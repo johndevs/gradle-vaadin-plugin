@@ -40,4 +40,9 @@ class DevelopmentModeConfiguration {
      * To what port should development mode bind itself to.
      */
     int codeServerPort = 9997
+
+    /**
+     * Extra arguments passed to the code server
+     */
+    String[] extraArgs = null
 }

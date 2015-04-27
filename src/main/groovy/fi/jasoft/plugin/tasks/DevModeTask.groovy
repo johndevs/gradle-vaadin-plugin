@@ -72,21 +72,24 @@ class DevModeTask extends DefaultTask {
 
         def classpath = Util.getClientCompilerClassPath(project)
 
-        def devmodeProcess = ['java',
-            '-cp', classpath.getAsPath(),
-            'com.google.gwt.dev.DevMode',
-            project.vaadin.widgetset,
-            '-noserver',
-            '-war', webAppDir.canonicalPath + '/VAADIN/widgetsets',
-            '-gen', 'build/devmode/gen',
-            '-startupUrl', "http://localhost:${project.vaadin.serverPort}",
-            '-logLevel', project.vaadin.gwt.logLevel,
-            '-deploy', 'build/devmode/deploy',
-            '-workDir', 'build/devmode/',
-            '-logdir', 'build/devmode/logs',
-            '-codeServerPort', project.vaadin.devmode.codeServerPort,
-            '-bindAddress', project.vaadin.devmode.bindAddress
-        ]
+        def devmodeProcess = ['java']
+        devmodeProcess += ['-cp', classpath.getAsPath()]
+        devmodeProcess += 'com.google.gwt.dev.DevMode'
+        devmodeProcess += project.vaadin.widgetset
+        devmodeProcess += '-noserver'
+        devmodeProcess += ['-war', webAppDir.canonicalPath + '/VAADIN/widgetsets']
+        devmodeProcess += ['-gen', 'build/devmode/gen']
+        devmodeProcess += ['-startupUrl', "http://localhost:${project.vaadin.serverPort}"]
+        devmodeProcess += ['-logLevel', project.vaadin.gwt.logLevel]
+        devmodeProcess += ['-deploy', 'build/devmode/deploy']
+        devmodeProcess += ['-workDir', 'build/devmode/']
+        devmodeProcess += ['-logdir', 'build/devmode/logs']
+        devmodeProcess += ['-codeServerPort', project.vaadin.devmode.codeServerPort]
+        devmodeProcess += ['-bindAddress', project.vaadin.devmode.bindAddress]
+
+        if (project.vaadin.devmode.extraArgs) {
+            devmodeProcess += project.vaadin.devmode.extraArgs as List
+        }
 
         devModeProcess = devmodeProcess.execute()
 
