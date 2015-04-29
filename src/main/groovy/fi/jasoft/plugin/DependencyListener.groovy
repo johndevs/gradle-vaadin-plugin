@@ -115,11 +115,6 @@ class DependencyListener implements ProjectEvaluationListener {
     }
 
     def static addRepositories(Project project) {
-
-        def gradleVersion = project.getGradle().getGradleVersion().split("\\.")
-        def gradleMajorVersion = Integer.parseInt(gradleVersion[0])
-        def gradleMinorVersion =  Integer.parseInt(gradleVersion[1])
-
         def repositories = project.repositories
 
         // Ensure maven central and maven local are included
