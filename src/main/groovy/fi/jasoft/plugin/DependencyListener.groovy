@@ -132,7 +132,8 @@ class DependencyListener implements ProjectEvaluationListener {
         }
 
         // Add plugin development repository if specified
-        if (new File(GradleVaadinPlugin.getDebugDir()).exists()
+        if (GradleVaadinPlugin.getDebugDir() != null 
+            && new File(GradleVaadinPlugin.getDebugDir()).exists()
                 && repositories.findByName('Gradle Vaadin plugin development repository') == null) {
 
             if (GradleVaadinPlugin.isFirstPlugin()) {
@@ -214,7 +215,8 @@ class DependencyListener implements ProjectEvaluationListener {
                 'vaadin-cdi',
                 'vaadin-spring',
                 'vaadin-spring-boot',
-                'vaadin-spring-boot-starter'
+                'vaadin-spring-boot-starter',
+                'vaadin-shared-deps'
         ]
 
         config.resolutionStrategy.eachDependency { DependencyResolveDetails details ->
