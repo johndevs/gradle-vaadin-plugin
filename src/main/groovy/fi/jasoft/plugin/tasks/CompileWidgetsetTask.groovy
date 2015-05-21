@@ -105,6 +105,11 @@ class CompileWidgetsetTask extends DefaultTask {
 
                     // Addons with client side widgetset
                     JarFile jar = new JarFile(file.absolutePath)
+
+                    if(!jar.manifest) {
+                        return false
+                    }
+
                     Attributes attributes = jar.manifest.mainAttributes
                     return attributes.getValue('Vaadin-Widgetsets')
                 }
