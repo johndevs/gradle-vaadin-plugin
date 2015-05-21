@@ -32,7 +32,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
     static {
         PLUGIN_PROPERTIES = new Properties()
-        PLUGIN_PROPERTIES.load(GradleVaadinPlugin.class.getResourceAsStream('/plugin.properties'))
+        PLUGIN_PROPERTIES.load(GradleVaadinPlugin.class.getResourceAsStream('/vaadin_plugin.properties'))
         PLUGIN_VERSION = PLUGIN_PROPERTIES.getProperty('version')
         PLUGIN_DEBUG_DIR = PLUGIN_PROPERTIES.getProperty("debugdir")
     }
