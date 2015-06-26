@@ -103,8 +103,6 @@ class VaadinPluginExtension {
      */
     final AddonConfiguration addon = new AddonConfiguration()
 
-
-
     /**
      * Configuration options for GWT
      */
