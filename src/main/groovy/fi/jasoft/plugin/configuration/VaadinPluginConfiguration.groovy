@@ -54,9 +54,7 @@ class VaadinPluginConfiguration {
     String themesDirectory = null
 
     /*
-    * Should a classpath Jar be used to shorten the classpath.
-    *
-    * FIXME make default on windows once confirmed working
-    */
-    boolean useClassPathJar = false //Os.isFamily(Os.FAMILY_WINDOWS)
+     * Should a classpath Jar be used to shorten the classpath.
+     */
+    boolean useClassPathJar = Os.isFamily(Os.FAMILY_WINDOWS)
 }
