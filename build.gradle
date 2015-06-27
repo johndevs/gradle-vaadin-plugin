@@ -40,7 +40,7 @@ dependencies {
     compile 'org.eclipse.jetty:jetty-deploy:9.2.2.v20140723'
     compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
 
-    deploy 'org.apache.maven.wagon:wagon-ftp:2.2'
+    deploy 'org.apache.maven.wagon:wagon-ssh:2.2'
 }
 
 sourceSets {
@@ -125,11 +125,16 @@ uploadArchives {
         def snapshotRepositoryUrl = System.getProperty('PLUGIN_MAVEN_SNAPSHOT_REPOSITORY')
         def snapshotRepositoryUser = System.getProperty('PLUGIN_MAVEN_SNAPSHOT_REPOSITORY_USER')
         def snapshotRepositoryPassword = System.getProperty('PLUGIN_MAVEN_SNAPSHOT_REPOSITORY_PASSWORD')
+        def snapshotRepositoryPrivateKey = System.getProperty('PLUGIN_MAVEN_SNAPSHOT_REPOSITORY_KEY')
 
         configuration = configurations.deploy
 
         snapshotRepository( url: snapshotRepositoryUrl ) {
-           authentication(userName: snapshotRepositoryUser, password: snapshotRepositoryPassword)
+           authentication(
+                   userName: snapshotRepositoryUser,
+                   password: snapshotRepositoryPassword,
+                   privateKey: snapshotRepositoryPrivateKey
+           )
         }
     }
 }
@@ -190,11 +195,6 @@ compileTestGroovy {
     classpath += files(sourceSets.ast.output.classesDir)
 }
 
-
-test {
-    classpath += files(sourceSets.ast.output.classesDir)
-}
-
 processResources {
 
     // Create pom.xml for Vaadin directory
@@ -223,7 +223,18 @@ jar {
 }
 
 test {
+    classpath += files(sourceSets.ast.output.classesDir)
     testLogging {
         exceptionFormat "full"
     }
+    exclude '**/integration/**'
+}
+
+task integrationTest(type:Test) {
+    dependsOn 'jar'
+    classpath += files(sourceSets.ast.output.classesDir)
+    testLogging {
+        exceptionFormat "full"
+    }
+    include '**/integration/**'
 }

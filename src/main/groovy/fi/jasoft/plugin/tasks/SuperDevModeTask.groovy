@@ -1,5 +1,5 @@
 /*
-* Copyright 2014 John Ahlroos
+* Copyright 2015 John Ahlroos
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -81,22 +81,27 @@ class SuperDevModeTask extends DefaultTask {
 
         def jettyClasspath = project.configurations[DependencyListener.Configuration.JETTY8.caption];
         def classpath = jettyClasspath + Util.getClientCompilerClassPath(project)
-        def superdevmodeProcess = ['java',
-            '-cp', classpath.getAsPath(),
-            'com.google.gwt.dev.codeserver.CodeServer',
-            '-bindAddress', project.vaadin.devmode.bindAddress,
-            '-port', 9876,
-            '-workDir', widgetsetsDir.canonicalPath,
-            '-src', javaDir.canonicalPath,
-            '-logLevel', project.vaadin.gwt.logLevel,
-            '-noprecompile',
-            project.vaadin.widgetset
-        ]
+
+        def superdevmodeProcess = ['java']
+        superdevmodeProcess += ['-cp', classpath.getAsPath()]
+        superdevmodeProcess += 'com.google.gwt.dev.codeserver.CodeServer'
+        superdevmodeProcess += ['-bindAddress', project.vaadin.devmode.bindAddress]
+        superdevmodeProcess += ['-port', 9876]
+        superdevmodeProcess += ['-workDir', widgetsetsDir.canonicalPath]
+        superdevmodeProcess += ['-src', javaDir.canonicalPath]
+        superdevmodeProcess += ['-logLevel', project.vaadin.gwt.logLevel]
+        superdevmodeProcess += ['-noprecompile']
+
+        if (project.vaadin.devmode.extraArgs) {
+            superdevmodeProcess += project.vaadin.devmode.extraArgs as List
+        }
+
+        superdevmodeProcess += project.vaadin.widgetset
 
         codeserverProcess = superdevmodeProcess.execute()
 
         Util.logProcess(project, codeserverProcess, 'superdevmode.log', { line ->
-            if(line.contains('The code server is ready.')){
+            if(line.contains('The code server is ready')){
                 readyClosure.call()
             }
         })

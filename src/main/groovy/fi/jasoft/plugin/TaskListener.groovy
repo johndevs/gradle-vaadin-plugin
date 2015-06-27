@@ -1,5 +1,5 @@
 /*
-* Copyright 2014 John Ahlroos
+* Copyright 2015 John Ahlroos
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -29,6 +29,11 @@ import org.gradle.api.execution.TaskExecutionListener
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskState
 import org.gradle.api.tasks.bundling.War
+import org.gradle.plugins.ide.eclipse.EclipseWtpPlugin
+import org.gradle.plugins.ide.eclipse.model.EclipseWtp
+import org.gradle.plugins.ide.eclipse.model.EclipseWtpFacet
+import org.gradle.plugins.ide.eclipse.model.Facet
+import org.gradle.plugins.ide.eclipse.model.WtpFacet
 
 public class TaskListener implements TaskExecutionListener {
 
@@ -147,55 +152,6 @@ public class TaskListener implements TaskExecutionListener {
         if (task.getName() == CreateDirectoryZipTask.NAME) {
             configureAddonZipMetadata(task)
         }
-
-        if(task.getName() == CompileWidgetsetTask.NAME) {
-            /* Monitor changes in dependencies since upgrading a
-             * dependency should also trigger a recompile of the widgetset
-             */
-            task.inputs.files(project.configurations.compile)
-
-            // Monitor changes in client side classes and resources
-            project.sourceSets.main.java.srcDirs.each {
-                task.inputs.files(project.fileTree(it.absolutePath).include('**/*/client/**/*.java'))
-                task.inputs.files(project.fileTree(it.absolutePath).include('**/*/shared/**/*.java'))
-                task.inputs.files(project.fileTree(it.absolutePath).include('**/*/public/**/*.*'))
-                task.inputs.files(project.fileTree(it.absolutePath).include('**/*/*.gwt.xml'))
-            }
-
-            //Monitor changes in resources
-            project.sourceSets.main.resources.srcDirs.each {
-                task.inputs.files(project.fileTree(it.absolutePath).include('**/*/public/**/*.*'))
-                task.inputs.files(project.fileTree(it.absolutePath).include('**/*/*.gwt.xml'))
-            }
-
-            // Add classpath jar
-            if(project.vaadin.plugin.useClassPathJar) {
-                BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
-                task.inputs.file(pathJarTask.archivePath)
-            }
-
-            File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-
-            // Widgetset output directory
-            File targetDir = new File(webAppDir.canonicalPath + '/VAADIN/widgetsets')
-            task.outputs.dir(targetDir)
-
-            // Unit cache output directory
-            File unitCacheDir = new File(webAppDir.canonicalPath + '/VAADIN/gwt-unitCache')
-            task.outputs.dir(unitCacheDir)
-        }
-
-        if(task.getName() == BuildClassPathJar.NAME) {
-            def files = Util.getCompileClassPath(project).filter { File file ->
-                file.isFile() && file.name.endsWith('.jar')
-            }
-
-            task.inputs.files(files)
-
-            task.manifest.attributes('Class-Path': files.collect { File file ->
-                file.toURI().toString()
-            }.join(' '))
-        }
     }
 
     public void afterExecute(Task task, TaskState state) {
@@ -298,10 +254,14 @@ public class TaskListener implements TaskExecutionListener {
     }
 
     private void configureEclipseWtpPluginFacet(Task task) {
-        def wtp = project.eclipse.wtp
-        wtp.facet.facet(name: 'com.vaadin.integration.eclipse.core', version: '7.0')
-        wtp.facet.facet(name: 'jst.web', version: '3.0')
-        wtp.facet.facet(name: 'java', version: project.sourceCompatibility)
+        def wtp = project.eclipse.wtp as EclipseWtp
+        def facet = wtp.facet
+
+        facet.facets = []
+        facet.facet(name: 'jst.web', version: '3.0')
+        facet.facet(name: 'jst.java', version: project.sourceCompatibility)
+        facet.facet(name: 'com.vaadin.integration.eclipse.core', version: '7.0')
+        facet.facet(name: 'java', version: project.sourceCompatibility)
     }
 
     private void ensureWidgetsetGeneratorExists(Task task) {
@@ -368,16 +328,26 @@ public class TaskListener implements TaskExecutionListener {
         }
 
         // Add metadata to jar manifest
-        task.manifest.attributes(
-                'Vaadin-Package-Version': 1,
-                'Vaadin-Widgetsets': widgetset,
-                'Vaadin-Stylesheets': styles.join(','),
-                'Vaadin-License-Title': project.vaadin.addon.license,
-                'Implementation-Title': project.vaadin.addon.title,
-                'Implementation-Version': project.version,
-                'Implementation-Vendor': project.vaadin.addon.author,
-                'Built-By': "Gradle Vaadin Plugin ${GradleVaadinPlugin.PLUGIN_VERSION}"
-        )
+        def attributes = [:]
+        attributes['Vaadin-Package-Version'] = 1
+        attributes['Implementation-Version'] = project.version
+        attributes['Built-By'] = "Gradle Vaadin Plugin ${GradleVaadinPlugin.PLUGIN_VERSION}"
+        if(widgetset){
+            attributes['Vaadin-Widgetsets'] = widgetset
+        }
+        if(styles){
+           attributes['Vaadin-Stylesheets'] = styles.join(',')
+        }
+        if(project.vaadin.addon.license){
+            attributes['Vaadin-License-Title'] = project.vaadin.addon.license
+        }
+        if(project.vaadin.addon.title){
+            attributes['Implementation-Title'] = project.vaadin.addon.title
+        }
+        if(project.vaadin.addon.author){
+            attributes['Implementation-Vendor'] = project.vaadin.addon.author
+        }
+        task.manifest.attributes(attributes)
     }
 
     private void configureAddonZipMetadata(Task task) {

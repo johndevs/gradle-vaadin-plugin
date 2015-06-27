@@ -10,14 +10,11 @@ buildscript {
     repositories {
         mavenCentral()
 
-        def gradleVersion = project.getGradle().getGradleVersion().split("\\.")
-        def gradleMajorVersion = Integer.parseInt(gradleVersion[0])
-        def gradleMinorVersion =  Integer.parseInt(gradleVersion[1])
+        def version = VersionNumber.parse(project.gradle.gradleVersion)
+        def repositoryName = 'Bintray Repository'
+        def repositoryUrl = 'http://dl.bintray.com/johndevs/maven'
 
-        def repositoryName = 'Jasoft.fi Maven Repository'
-        def repositoryUrl = 'http://mvn.jasoft.fi/maven2'
-
-        if(gradleMinorVersion < 9 && gradleMajorVersion == 1){
+        if(version.minor < 9 && version.major == 1){
             mavenRepo(
                 name: repositoryName,
                 url: repositoryUrl

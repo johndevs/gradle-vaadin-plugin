@@ -1,5 +1,6 @@
 package fi.jasoft.plugin.tasks
 
+import fi.jasoft.plugin.Util
 import org.gradle.api.tasks.bundling.Jar
 
 /**
@@ -16,6 +17,18 @@ class BuildClassPathJar extends Jar {
 
         onlyIf {
             project.vaadin.plugin.useClassPathJar
+        }
+
+        project.afterEvaluate{
+            def files = Util.getCompileClassPath(project).filter { File file ->
+                file.isFile() && file.name.endsWith('.jar')
+            }
+
+            inputs.files(files)
+
+            manifest.attributes('Class-Path': files.collect { File file ->
+                file.toURI().toString()
+            }.join(' '))
         }
     }
 }

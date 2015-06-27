@@ -1,5 +1,5 @@
 /*
-* Copyright 2014 John Ahlroos
+* Copyright 2015 John Ahlroos
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -19,9 +19,11 @@ import fi.jasoft.plugin.Util
 import groovyx.net.http.ContentType
 import groovyx.net.http.RESTClient
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.TaskExecutionException
 
 import java.util.jar.Attributes
 import java.util.jar.JarFile
@@ -112,6 +114,44 @@ class CompileWidgetsetTask extends DefaultTask {
     public CompileWidgetsetTask() {
         dependsOn('classes', UpdateWidgetsetTask.NAME, BuildClassPathJar.NAME)
         description = "Compiles Vaadin Addons and components into Javascript."
+
+        project.afterEvaluate {
+
+            /* Monitor changes in dependencies since upgrading a
+            * dependency should also trigger a recompile of the widgetset
+            */
+            inputs.files(project.configurations.compile)
+
+            // Monitor changes in client side classes and resources
+            project.sourceSets.main.java.srcDirs.each {
+                inputs.files(project.fileTree(it.absolutePath).include('**/*/client/**/*.java'))
+                inputs.files(project.fileTree(it.absolutePath).include('**/*/shared/**/*.java'))
+                inputs.files(project.fileTree(it.absolutePath).include('**/*/public/**/*.*'))
+                inputs.files(project.fileTree(it.absolutePath).include('**/*/*.gwt.xml'))
+            }
+
+            //Monitor changes in resources
+            project.sourceSets.main.resources.srcDirs.each {
+                inputs.files(project.fileTree(it.absolutePath).include('**/*/public/**/*.*'))
+                inputs.files(project.fileTree(it.absolutePath).include('**/*/*.gwt.xml'))
+            }
+
+            // Add classpath jar
+            if(project.vaadin.plugin.useClassPathJar) {
+                BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
+                inputs.file(pathJarTask.archivePath)
+            }
+
+            def webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
+
+            // Widgetset output directory
+            def targetDir = new File(webAppDir.canonicalPath, 'VAADIN/widgetsets')
+            outputs.dir(targetDir)
+
+            // Unit cache output directory
+            def unitCacheDir = new File(webAppDir.canonicalPath, 'VAADIN/gwt-unitCache')
+            outputs.dir(unitCacheDir)
+        }
     }
 
     private File
@@ -185,7 +225,7 @@ class CompileWidgetsetTask extends DefaultTask {
         def widgetsetCompileProcess = ['java']
 
         if (project.vaadin.gwt.jvmArgs) {
-            widgetsetCompileProcess += project.vaadin.gwt.jvmArgs
+            widgetsetCompileProcess += project.vaadin.gwt.jvmArgs as List
         }
 
         widgetsetCompileProcess += ['-cp',  classpath.getAsPath()]
@@ -213,10 +253,26 @@ class CompileWidgetsetTask extends DefaultTask {
         widgetsetCompileProcess += project.vaadin.widgetset
 
         def Process process = widgetsetCompileProcess.execute()
+        def failed = false
+        Util.logProcess(project, process, 'widgetset-compile.log', { String output ->
+            // Monitor log for errors
+            if(output.trim().startsWith('[ERROR]')){
+                failed = true
+            }
+        })
 
-        Util.logProcess(project, process, 'widgetset-compile.log')
-
+        // Block
         process.waitFor()
+
+        /*
+         * Compiler generates an extra WEB-INF folder into the widgetsets folder. Remove it.
+         */
+        new File(targetDir.canonicalPath + "/WEB-INF").deleteDir()
+
+        if(failed) {
+            // Terminate build
+            throw new GradleException('Widgetset failed to compile. See error log above.')
+        }
     }
 
     /**

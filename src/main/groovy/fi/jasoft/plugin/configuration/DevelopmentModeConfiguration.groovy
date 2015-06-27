@@ -1,5 +1,5 @@
 /*
-* Copyright 2014 John Ahlroos
+* Copyright 2015 John Ahlroos
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -40,4 +40,9 @@ class DevelopmentModeConfiguration {
      * To what port should development mode bind itself to.
      */
     int codeServerPort = 9997
+
+    /**
+     * Extra arguments passed to the code server
+     */
+    String[] extraArgs = null
 }

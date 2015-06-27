@@ -179,3 +179,4 @@ vaadin.testbench.node.browsers = [
 * ``vaadin.plugin.jettyAutoRefresh`` - Should jetty automatically restart when a class is changed while jetty is running.
 * ``vaadin.plugin.themeAutoRecompile`` - Should the SASS theme be recompiled on change while the vaadinRun task is executed.
 * ``vaadin.plugin.themesDirectory`` - Root directory for themes. By default *src/main/webapp/VAADIN/themes*
+* ``vaadin.plugin.useClassPathJar`` - Use a single jar to define the classpath (if the classpath is too long)

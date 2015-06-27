@@ -1,5 +1,5 @@
 /*
-* Copyright 2014 John Ahlroos
+* Copyright 2015 John Ahlroos
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -115,11 +115,6 @@ class DependencyListener implements ProjectEvaluationListener {
     }
 
     def static addRepositories(Project project) {
-
-        def gradleVersion = project.getGradle().getGradleVersion().split("\\.")
-        def gradleMajorVersion = Integer.parseInt(gradleVersion[0])
-        def gradleMinorVersion =  Integer.parseInt(gradleVersion[1])
-
         def repositories = project.repositories
 
         // Ensure maven central and maven local are included
@@ -155,10 +150,10 @@ class DependencyListener implements ProjectEvaluationListener {
                 'org.eclipse.jetty:jetty-plus:9.2.2.v20140723',
                 'org.eclipse.jetty:jetty-deploy:9.2.2.v20140723',
                 'fi.jasoft.plugin:gradle-vaadin-plugin:' + GradleVaadinPlugin.getVersion(),
-                'org.ow2.asm:asm:5.0.2',
-                'org.ow2.asm:asm-commons:5.0.2',
+                'org.ow2.asm:asm:5.0.3',
+                'org.ow2.asm:asm-commons:5.0.3',
                 'javax.servlet.jsp:jsp-api:2.2'
-        ], [ project.configurations.runtime ])
+        ])
 
         def sources = project.sourceSets.main
         sources.compileClasspath += [conf]
@@ -216,7 +211,10 @@ class DependencyListener implements ProjectEvaluationListener {
         def blacklist = [
                 'vaadin-sass-compiler',
                 'vaadin-client-compiler-deps',
-                'vaadin-cdi'
+                'vaadin-cdi',
+                'vaadin-spring',
+                'vaadin-spring-boot',
+                'vaadin-spring-boot-starter'
         ]
 
         config.resolutionStrategy.eachDependency { DependencyResolveDetails details ->
@@ -235,7 +233,8 @@ class DependencyListener implements ProjectEvaluationListener {
         createConfiguration(project, Configuration.JETTY8, [
                 'org.eclipse.jetty.aggregate:jetty-all-server:8.1.15.v20140411',
                 'fi.jasoft.plugin:gradle-vaadin-plugin:' + GradleVaadinPlugin.getVersion(),
-                'asm:asm-all:3.3.1',
+                'org.ow2.asm:asm:5.0.3',
+                'org.ow2.asm:asm-commons:5.0.3',
                 'javax.servlet.jsp:jsp-api:2.2'
         ], [ project.configurations.runtime ])
     }
