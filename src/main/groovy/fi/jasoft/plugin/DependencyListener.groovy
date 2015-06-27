@@ -144,11 +144,14 @@ class DependencyListener implements ProjectEvaluationListener {
     }
 
     def static createJetty9Configuration(Project project) {
+        def jettyVersion = '9.3.0.v20150612'
+
         def conf = createConfiguration(project, Configuration.JETTY9, [
-                'org.eclipse.jetty.aggregate:jetty-all:9.2.2.v20140723',
-                'org.eclipse.jetty:jetty-annotations:9.2.2.v20140723',
-                'org.eclipse.jetty:jetty-plus:9.2.2.v20140723',
-                'org.eclipse.jetty:jetty-deploy:9.2.2.v20140723',
+                "org.eclipse.jetty.aggregate:jetty-all:$jettyVersion",
+                "org.eclipse.jetty:jetty-annotations:$jettyVersion",
+                "org.eclipse.jetty:jetty-plus:$jettyVersion",
+                "org.eclipse.jetty:jetty-deploy:$jettyVersion",
+                'org.slf4j:slf4j-simple:1.7.12',
                 'fi.jasoft.plugin:gradle-vaadin-plugin:' + GradleVaadinPlugin.getVersion(),
                 'org.ow2.asm:asm:5.0.3',
                 'org.ow2.asm:asm-commons:5.0.3',

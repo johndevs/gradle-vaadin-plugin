@@ -126,7 +126,7 @@ class ApplicationServer {
 
         // Capture log output
         Util.logProcess(project, process, 'jetty.log', { line ->
-            if(line.contains('Server:main: Started')) {
+            if(line.contains('org.eclipse.jetty.server.Server - Started')) {
                 if(firstStart) {
                     def resultStr = "Application running on http://localhost:${project.vaadin.serverPort} "
                     if (project.vaadin.jrebel.enabled) {
