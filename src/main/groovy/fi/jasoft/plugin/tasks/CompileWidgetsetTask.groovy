@@ -142,15 +142,11 @@ class CompileWidgetsetTask extends DefaultTask {
                 inputs.file(pathJarTask.archivePath)
             }
 
-            def webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-
             // Widgetset output directory
-            def targetDir = new File(webAppDir.canonicalPath, 'VAADIN/widgetsets')
-            outputs.dir(targetDir)
+            outputs.dir(Util.getWidgetsetDirectory(project))
 
             // Unit cache output directory
-            def unitCacheDir = new File(webAppDir.canonicalPath, 'VAADIN/gwt-unitCache')
-            outputs.dir(unitCacheDir)
+            outputs.dir(Util.getWidgetsetCacheDirectory(project))
         }
     }
 
@@ -267,7 +263,7 @@ class CompileWidgetsetTask extends DefaultTask {
         /*
          * Compiler generates an extra WEB-INF folder into the widgetsets folder. Remove it.
          */
-        new File(targetDir.canonicalPath + "/WEB-INF").deleteDir()
+        new File(Util.getWidgetsetDirectory(project), 'WEB-INF').deleteDir()
 
         if(failed) {
             // Terminate build
