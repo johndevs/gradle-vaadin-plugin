@@ -16,6 +16,7 @@
 package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.Util
+import fi.jasoft.plugin.configuration.VaadinPluginExtension
 import groovyx.net.http.ContentType
 import groovyx.net.http.RESTClient
 import org.gradle.api.DefaultTask
@@ -150,50 +151,67 @@ class CompileWidgetsetTask extends DefaultTask {
         }
     }
 
-    private File
-
     @TaskAction
     public void run() {
+        def vaadin = project.vaadin as VaadinPluginExtension
+        if(vaadin.widgetset){
+            if(vaadin.widgetsetCDN){
+                compileRemotely()
+            } else {
+                compileLocally()
+            }
+        }
+    }
 
-        // Ensure widgetset directory exists
-        Util.getWidgetsetDirectory(project).mkdirs()
+    private void compileRemotely() {
+        def vaadin = project.vaadin as VaadinPluginExtension
+        if(vaadin.widgetset ==~ /[A-Za-z0-9]+/){
 
-        if (project.vaadin.widgetset == null) {
-            // Use default widgetset
-            return
-        } else if(project.vaadin.widgetsetCDN) {
-            // Use widgetset CDN to retrieve widgetset
+            // Ensure widgetset directory exists
+            Util.getWidgetsetDirectory(project).mkdirs()
 
-            // Queary for widgetset with addons
+            def timeout = 60000 * 3 // 3 minutes
+
             while(true){
-                def info = queryRemoteWidgetset()
-                def status = info.status as String
+                def widgetsetInfo = queryRemoteWidgetset()
+                logger.info(widgetsetInfo.toString())
+                def status = widgetsetInfo.status as String
                 switch(status){
                     case 'NOT_FOUND':
                     case 'UNKNOWN':
                     case 'ERROR':
-                        logger.error(info)
-                        didWork = false
-                        return
+                        throw new GradleException("Failed to compile widgetset with CDN with the status $status")
                     case 'QUEUED':
                     case 'COMPILING':
                     case 'COMPILED':
-                        logger.info("Widgetset is compiling with status $status. Waiting 10 seconds and quering again.")
-                        sleep(10000)
-                        break;
+                        logger.info("Widgetset is compiling with status $status. Waiting 10 seconds and querying again.")
+                        if(timeout > 0){
+                            sleep(10000)
+                            timeout -= 10000
+                        } else {
+                            throw new GradleException('Waiting for widgetset to compile timed out. Please try again at a later time.')
+                        }
+                        break
                     case 'AVAILABLE':
                         logger.info('Widgetset is available, downloading...')
                         downloadWidgetset()
                         return
                 }
             }
-            return
+        } else {
+            throw new GradleException('Widgetset name can only contain alphanumeric characters (A-Z,a-z,0-9) when using CDN.')
         }
+    }
 
-        // Compile widgetset locally
+    private void compileLocally() {
+        def vaadin = project.vaadin as VaadinPluginExtension
+        def gwt = vaadin.gwt
+
+        // Ensure widgetset directory exists
+        Util.getWidgetsetDirectory(project).mkdirs()
 
         FileCollection classpath
-        if(project.vaadin.plugin.useClassPathJar){
+        if(vaadin.plugin.useClassPathJar){
             // Add dependencies using the classpath jar
             BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
             classpath = project.files(pathJarTask.archivePath)
@@ -220,33 +238,33 @@ class CompileWidgetsetTask extends DefaultTask {
 
         def widgetsetCompileProcess = ['java']
 
-        if (project.vaadin.gwt.jvmArgs) {
-            widgetsetCompileProcess += project.vaadin.gwt.jvmArgs as List
+        if (gwt.jvmArgs) {
+            widgetsetCompileProcess += gwt.jvmArgs as List
         }
 
         widgetsetCompileProcess += ['-cp',  classpath.getAsPath()]
 
         widgetsetCompileProcess += 'com.google.gwt.dev.Compiler'
 
-        widgetsetCompileProcess += ['-style', project.vaadin.gwt.style]
-        widgetsetCompileProcess += ['-optimize', project.vaadin.gwt.optimize]
+        widgetsetCompileProcess += ['-style', gwt.style]
+        widgetsetCompileProcess += ['-optimize', gwt.optimize]
         widgetsetCompileProcess += ['-war', Util.getWidgetsetDirectory(project).canonicalPath]
-        widgetsetCompileProcess += ['-logLevel', project.vaadin.gwt.logLevel]
-        widgetsetCompileProcess += ['-localWorkers', project.vaadin.gwt.localWorkers]
+        widgetsetCompileProcess += ['-logLevel', gwt.logLevel]
+        widgetsetCompileProcess += ['-localWorkers', gwt.localWorkers]
 
-        if (project.vaadin.gwt.draftCompile) {
+        if (gwt.draftCompile) {
             widgetsetCompileProcess += '-draftCompile'
         }
 
-        if (project.vaadin.gwt.strict) {
+        if (gwt.strict) {
             widgetsetCompileProcess += '-strict'
         }
 
-        if (project.vaadin.gwt.extraArgs) {
-            widgetsetCompileProcess += project.vaadin.gwt.extraArgs as List
+        if (gwt.extraArgs) {
+            widgetsetCompileProcess += gwt.extraArgs as List
         }
 
-        widgetsetCompileProcess += project.vaadin.widgetset
+        widgetsetCompileProcess += vaadin.widgetset
 
         def Process process = widgetsetCompileProcess.execute()
         def failed = false
@@ -280,10 +298,13 @@ class CompileWidgetsetTask extends DefaultTask {
     private queryRemoteWidgetset(){
         logger.info("Querying widgetset for Vaadin "+Util.getResolvedVaadinVersion(project))
         def client = new RESTClient(WIDGETSET_CDN_URL)
-        def response = client.post(queryWidgetsetRequest(
-                Util.getResolvedVaadinVersion(project),
-                project.vaadin.gwt.style
-        ))
+
+        def request = queryWidgetsetRequest(Util.getResolvedVaadinVersion(project), project.vaadin.gwt.style)
+        logger.info(request.toString())
+
+        def response = client.post(request)
+        logger.info(response.toString())
+
         response.data
     }
 
