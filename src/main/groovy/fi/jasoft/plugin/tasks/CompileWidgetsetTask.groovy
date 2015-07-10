@@ -61,7 +61,7 @@ class CompileWidgetsetTask extends DefaultTask {
                 inputs.file(pathJarTask.archivePath)
             }
 
-            def webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
+            def webAppDir = project.vaadin.gwt.outputDirectory ?: project.convention.getPlugin(WarPluginConvention).webAppDir
 
             // Widgetset output directory
             def targetDir = new File(webAppDir.canonicalPath, 'VAADIN/widgetsets')
@@ -79,7 +79,7 @@ class CompileWidgetsetTask extends DefaultTask {
             return;
         }
 
-        File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
+        File webAppDir = project.vaadin.gwt.outputDirectory ?: project.convention.getPlugin(WarPluginConvention).webAppDir
 
         File targetDir = new File(webAppDir.canonicalPath + '/VAADIN/widgetsets')
         targetDir.mkdirs()
