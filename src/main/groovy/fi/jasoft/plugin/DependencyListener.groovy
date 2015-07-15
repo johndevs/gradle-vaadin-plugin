@@ -83,7 +83,7 @@ class DependencyListener implements ProjectEvaluationListener {
             return
         }
 
-        String version = project.vaadin.version
+        String version = Util.getVaadinVersion(project)
 
         if(version !=null && version.startsWith("6")){
             project.logger.error("Plugin no longer supports Vaadin 6, to use Vaadin 6 apply an older version of the plugin.")
@@ -227,7 +227,9 @@ class DependencyListener implements ProjectEvaluationListener {
                 String group = dependency.group
                 String name = dependency.name
                 if("$group:$name".toString() in whitelist){
-                    details.useVersion project.vaadin.version
+                    if(project.vaadin.version){
+                        details.useVersion Util.getVaadinVersion(project)
+                    }
                 }
             }
         })

@@ -21,6 +21,7 @@ import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.plugins.WarPluginConvention
+import org.gradle.util.VersionNumber
 
 import java.nio.file.FileSystems
 import java.nio.file.FileVisitResult
@@ -159,7 +160,7 @@ class Util {
      * @return true if push is supported
      */
     def static isPushSupported(Project project) {
-        String version = project.vaadin.version
+        String version = Util.getVaadinVersion(project)
         version == '+' || (version.startsWith('7') && !version.startsWith('7.0'))
     }
 
@@ -175,7 +176,8 @@ class Util {
     }
 
     public static boolean isAddonStylesSupported(Project project) {
-        return !project.vaadin.version.startsWith('7.0')
+        VersionNumber version = VersionNumber.parse(getVaadinVersion(project))
+        return version.minor > 0
     }
 
     public static void openBrowser(Project project, String url) {
@@ -186,34 +188,25 @@ class Util {
         }
     }
 
-    public static boolean isIE10UserAgentSupported(Project project) {
-        String version = project.vaadin.version
-        if (version == '+') {
+    static boolean isIE10UserAgentSupported(Project project) {
+        if (getVaadinVersion(project) == '+') {
             return true
         }
-        if (version.startsWith('7') && !version.startsWith('7.0')) {
-            return true
-        }
-        false
+        VersionNumber version = VersionNumber.parse(getVaadinVersion(project))
+        version.minor > 0
     }
 
     static boolean isOperaUserAgentSupported(Project project) {
-        String version = project.vaadin.version
-        if(version.startsWith('7.0') || version.startsWith('7.1') ||
-                version.startsWith('7.2') || version.startsWith('7.3')){
-            return true
-        }
-        false
+        VersionNumber version = VersionNumber.parse(getVaadinVersion(project))
+        version.minor < 4
     }
 
     public static boolean isServlet3Project(Project project) {
-        String version = project.vaadin.version
-        if (version == '+') {
+        if (getVaadinVersion(project) == '+') {
             return true
         }
-        if (version.startsWith('7') && !version.startsWith('7.0')) {
-            return true
-        }
+        VersionNumber version = VersionNumber.parse(getVaadinVersion(project))
+        version.minor > 0
     }
 
     public static boolean isRootProject(Project project) {
@@ -236,13 +229,8 @@ class Util {
     }
 
     public static boolean isSassCompilerSupported(Project project) {
-
-        // Sass compiler is supported 7.2+
-        String version = project.vaadin.version
-        if(version.startsWith("6") || version.startsWith("7.0") || version.startsWith("7.1") ){
-            return false
-        }
-        return true
+        VersionNumber version = VersionNumber.parse(getVaadinVersion(project))
+        version.minor > 1
     }
 
     public static List findAddonSassStylesInProject(Project project) {
@@ -392,5 +380,17 @@ class Util {
             File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
             project.file(webAppDir.canonicalPath + '/VAADIN/themes')
         }
+    }
+
+    /**
+     * Returns the defined Vaadin version or if no version is defined then it returns the default vaadin version.
+     *
+     * @param project
+     *      The project to get the version for
+     * @return
+     *      version as a string
+     */
+    def static String getVaadinVersion(Project project) {
+        project.vaadin.version ?: '7.3.+'
     }
 }

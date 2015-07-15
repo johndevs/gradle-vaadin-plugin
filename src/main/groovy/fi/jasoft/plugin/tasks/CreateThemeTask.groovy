@@ -20,6 +20,7 @@ import fi.jasoft.plugin.Util
 import org.gradle.api.DefaultTask
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskAction
+import org.gradle.util.VersionNumber
 
 class CreateThemeTask extends DefaultTask {
 
@@ -51,13 +52,8 @@ class CreateThemeTask extends DefaultTask {
         substitutions['theme'] = substitutions['themeName'].toLowerCase()
         substitutions['themeImport'] = substitutions['theme'] + '.scss'
 
-        if(project.vaadin.version.startsWith('7.0') ||
-                project.vaadin.version.startsWith('7.1') ||
-                project.vaadin.version.startsWith('7.2')) {
-            substitutions['basetheme'] = 'reindeer'
-        } else {
-            substitutions['basetheme'] = 'valo'
-        }
+        VersionNumber version = VersionNumber.parse(Util.getVaadinVersion(project))
+        substitutions['basetheme'] = version.minor < 3 ? 'reindeer' : 'valo'
 
         TemplateUtil.writeTemplate('styles.scss', themeDir, 'styles.scss', substitutions)
         TemplateUtil.writeTemplate('MyTheme.scss', themeDir, substitutions['themeImport'], substitutions)
