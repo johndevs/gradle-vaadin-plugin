@@ -92,4 +92,6 @@ class GWTConfiguration {
      * Should GWT be placed first in the classpath when compiling the widgetset.
      */
     boolean gwtSdkFirstInClasspath = false
+
+    File outputDirectory = null
 }
