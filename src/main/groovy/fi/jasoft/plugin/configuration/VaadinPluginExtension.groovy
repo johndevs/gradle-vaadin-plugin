@@ -16,6 +16,7 @@
 package fi.jasoft.plugin.configuration
 
 import org.gradle.api.file.SourceDirectorySet
+import org.gradle.api.internal.tasks.options.Option
 
 /**
  * Plugin configuration extension
