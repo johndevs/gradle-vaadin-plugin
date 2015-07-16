@@ -17,17 +17,24 @@ package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
+import org.apache.commons.lang.StringUtils
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
+import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
 
 class CreateProjectTask extends DefaultTask {
 
     public static final NAME = 'vaadinCreateProject'
 
-    private String applicationName
+    @Option(option = 'name', description = 'Application name')
+    def String applicationName
 
-    private String applicationPackage
+    @Option(option = 'package', description = 'Application UI package')
+    def String applicationPackage
+
+    @Option(option = 'widgetset', description = 'Widgetset name')
+    def String widgetsetFQN
 
     public CreateProjectTask() {
         description = "Creates a new Vaadin Project."
@@ -36,35 +43,35 @@ class CreateProjectTask extends DefaultTask {
     @TaskAction
     public void run() {
 
-        if(System.console()){
-            applicationName = Util.readLine('\nApplication Name (MyApplication): ')
+        if(!applicationName){
+            applicationName = System.console() ? Util.readLine('\nApplication Name (MyApplication): ') : 'MyApplication'
         }
 
-        if (applicationName == null || applicationName == '') {
-            applicationName = 'MyApplication'
-        }
-
-        if (project.vaadin.widgetset != null && project.vaadin.widgetset.contains('.')) {
-            String widgetsetName = project.vaadin.widgetset.tokenize('.').last()
-
-            applicationPackage = project.vaadin.widgetset[0..(-widgetsetName.size() - 2)]
-        } else {
-            if(System.console()){
-                applicationPackage = Util.readLine("\nApplication Package (com.example.${applicationName.toLowerCase()}): ")
-            }
-            if (applicationPackage == null || applicationPackage == '') {
-                applicationPackage = 'com.example.' + applicationName.toLowerCase()
+        if(!applicationPackage){
+            if(widgetsetFQN?.contains('.')){
+                String widgetsetName = widgetsetFQN.tokenize('.').last()
+                applicationPackage = widgetsetFQN[0..(-widgetsetName.size() - 2)]
+            } else if (project.vaadin.widgetset?.contains('.')) {
+                String widgetsetName = project.vaadin.widgetset.tokenize('.').last()
+                applicationPackage = project.vaadin.widgetset[0..(-widgetsetName.size() - 2)]
+            } else {
+                applicationPackage = System.console() ? Util.readLine("\nApplication Package (com.example.${applicationName.toLowerCase()}): ") : 'com.example.' + applicationName.toLowerCase()
             }
         }
 
         createUIClass(project)
+
         createServletClass(project)
 
         if (Util.isAddonStylesSupported(project)) {
             project.tasks[CreateThemeTask.NAME].createTheme(applicationName)
         }
 
-        project.tasks[UpdateWidgetsetTask.NAME].run()
+        if(widgetsetFQN){
+            UpdateWidgetsetTask.ensureWidgetPresent(project, widgetsetFQN)
+        } else {
+            project.tasks[UpdateWidgetsetTask.NAME].run()
+        }
     }
 
     private void createUIClass(Project project) {

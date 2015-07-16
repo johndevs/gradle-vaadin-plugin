@@ -518,7 +518,7 @@ class Util {
      * @return
      *      The themes directory
      */
-    def static File getThemesDirectory(Project project) {
+    static File getThemesDirectory(Project project) {
         if(project.vaadin.plugin.themesDirectory){
             project.file(project.vaadin.plugin.themesDirectory)
         } else {
@@ -528,7 +528,6 @@ class Util {
     }
 
     /**
-<<<<<<< HEAD
      * Returns the widgetset directory
      *
      * @param project
@@ -537,7 +536,7 @@ class Util {
      *      The widgetset directory
      */
     static File getWidgetsetDirectory(Project project) {
-        File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
+        File webAppDir = project.vaadin.gwt.outputDirectory ?: project.convention.getPlugin(WarPluginConvention).webAppDir
         project.file(webAppDir.canonicalPath +'/VAADIN/widgetsets')
     }
 
