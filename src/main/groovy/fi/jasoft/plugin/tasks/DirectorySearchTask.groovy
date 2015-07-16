@@ -2,6 +2,7 @@ package fi.jasoft.plugin.tasks
 
 import groovy.json.JsonSlurper
 import org.gradle.api.DefaultTask
+import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
 
 import java.text.SimpleDateFormat
@@ -32,6 +33,15 @@ class DirectorySearchTask extends DefaultTask {
 
     private final int maxCacheAge = TimeUnit.MILLISECONDS.convert(1, TimeUnit.HOURS)
 
+    @Option(option = 'search', description ='String to search for in addons')
+    def String searchPattern
+
+    @Option(option = 'sort', description = 'Sort criteria (options: name,description,date,rating)')
+    def String sortOption
+
+    @Option(option = 'verbose', description = 'Should verbose descriptions be shown')
+    def Boolean verbose
+
     DirectorySearchTask() {
         description = "Lists addons in the Vaadin Directory"
     }
@@ -53,9 +63,9 @@ class DirectorySearchTask extends DefaultTask {
         }
 
         def args = project.getProperties()
-        def search = args.get('search', null)
-        def sort = args.get('sort', null)
-        def verbose = Boolean.parseBoolean(args.get('verbose', 'false'))
+        String search = searchPattern ?: args.get('search', null)
+        String sort = sortOption ?: args.get('sort', null)
+        Boolean verbose = verbose ?: Boolean.parseBoolean(args.get('verbose', 'false'))
         listAddons(search, sort, verbose)
     }
 
