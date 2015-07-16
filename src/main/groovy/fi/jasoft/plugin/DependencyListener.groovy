@@ -15,6 +15,7 @@
 */
 package fi.jasoft.plugin
 
+import org.gradle.api.Action
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project
 import org.gradle.api.ProjectEvaluationListener
@@ -23,6 +24,7 @@ import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.artifacts.DependencyResolveDetails
 import org.gradle.api.file.FileTree
 import org.gradle.api.plugins.WarPluginConvention
+import org.gradle.util.VersionNumber
 
 class DependencyListener implements ProjectEvaluationListener {
 
@@ -81,7 +83,7 @@ class DependencyListener implements ProjectEvaluationListener {
             return
         }
 
-        String version = project.vaadin.version
+        String version = Util.getVaadinVersion(project)
 
         if(version !=null && version.startsWith("6")){
             project.logger.error("Plugin no longer supports Vaadin 6, to use Vaadin 6 apply an older version of the plugin.")
@@ -211,24 +213,29 @@ class DependencyListener implements ProjectEvaluationListener {
      *      The configuration
      */
     def static configureResolutionStrategy(Project project, org.gradle.api.artifacts.Configuration config) {
-        def blacklist = [
-                'vaadin-sass-compiler',
-                'vaadin-client-compiler-deps',
-                'vaadin-cdi',
-                'vaadin-spring',
-                'vaadin-spring-boot',
-                'vaadin-spring-boot-starter'
+        final List whitelist = [
+                'com.vaadin:vaadin-client',
+                'com.vaadin:vaadin-client-compiled',
+                'com.vaadin:vaadin-client-compiler',
+                'com.vaadin:vaadin-server',
+                'com.vaadin:vaadin-shared',
+                'com.vaadin:vaadin-themes',
+                'com.vaadin:vaadin-push'
         ]
 
-        config.resolutionStrategy.eachDependency { DependencyResolveDetails details ->
-            def group = details.requested.group
-            def name = details.requested.name
-            if(group == 'com.vaadin' && name.startsWith('vaadin-')) {
-                if (!(name in blacklist) && !name.startsWith('vaadin-testbench')) {
-                    details.useVersion project.vaadin.version
+        config.resolutionStrategy.eachDependency(new Action<DependencyResolveDetails>() {
+            @Override
+            void execute(DependencyResolveDetails details) {
+                def dependency = details.requested
+                String group = dependency.group
+                String name = dependency.name
+                if("$group:$name".toString() in whitelist){
+                    if(project.vaadin.version){
+                        details.useVersion Util.getVaadinVersion(project)
+                    }
                 }
             }
-        }
+        })
     }
 
     @Deprecated

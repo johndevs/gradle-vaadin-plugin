@@ -16,6 +16,7 @@
 package fi.jasoft.plugin.configuration
 
 import org.gradle.api.file.SourceDirectorySet
+import org.gradle.api.internal.tasks.options.Option
 
 /**
  * Plugin configuration extension
@@ -41,7 +42,7 @@ class VaadinPluginExtension {
     /**
      * The vaadin version to use. By default latest Vaadin 7 version.
      */
-    String version = "7.3.+"
+    String version = null
 
     /**
      * Should application be run in debug mode. When running in production set this to true

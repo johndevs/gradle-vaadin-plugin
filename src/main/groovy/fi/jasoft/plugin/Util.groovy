@@ -24,6 +24,7 @@ import org.gradle.api.artifacts.DependencyResolveDetails
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.plugins.WarPluginConvention
+import org.gradle.util.VersionNumber
 
 import java.nio.file.FileSystems
 import java.nio.file.FileVisitResult
@@ -198,7 +199,7 @@ class Util {
      * @return true if push is supported
      */
     static isPushSupported(Project project) {
-        String version = project.vaadin.version
+        String version = Util.getVaadinVersion(project)
         version == '+' || (version.startsWith('7') && !version.startsWith('7.0'))
     }
 
@@ -222,7 +223,8 @@ class Util {
      *      <code>true</code> if addon styles are supported
      */
     static boolean isAddonStylesSupported(Project project) {
-        return !project.vaadin.version.startsWith('7.0')
+        VersionNumber version = VersionNumber.parse(getVaadinVersion(project))
+        version.minor > 0
     }
 
     /**
@@ -251,14 +253,11 @@ class Util {
      *      <code>true</code> if the IE10 user agent is supported
      */
     static boolean isIE10UserAgentSupported(Project project) {
-        String version = project.vaadin.version
-        if (version == '+') {
+        if (getVaadinVersion(project) == '+') {
             return true
         }
-        if (version.startsWith('7') && !version.startsWith('7.0')) {
-            return true
-        }
-        false
+        VersionNumber version = VersionNumber.parse(getVaadinVersion(project))
+        version.minor > 0
     }
 
     /**
@@ -271,12 +270,8 @@ class Util {
      *      <code>true</code> if the Opera user agent is supported
      */
     static boolean isOperaUserAgentSupported(Project project) {
-        String version = project.vaadin.version
-        if(version.startsWith('7.0') || version.startsWith('7.1') ||
-                version.startsWith('7.2') || version.startsWith('7.3')){
-            return true
-        }
-        false
+        VersionNumber version = VersionNumber.parse(getVaadinVersion(project))
+        version.minor < 4
     }
 
     /**
@@ -288,14 +283,11 @@ class Util {
      *      <code>true</code> if Servlet 3 is supported
      */
     static boolean isServlet3Project(Project project) {
-        String version = project.vaadin.version
-        if (version == '+') {
+        if (getVaadinVersion(project) == '+') {
             return true
         }
-        if (version.startsWith('7') && !version.startsWith('7.0')) {
-            return true
-        }
-        false
+        VersionNumber version = VersionNumber.parse(getVaadinVersion(project))
+        version.minor > 0
     }
 
     /**
@@ -334,13 +326,8 @@ class Util {
      *      <code>true</code> if SCSS compiling is supported
      */
     static boolean isSassCompilerSupported(Project project) {
-
-        // Sass compiler is supported 7.2+
-        String version = project.vaadin.version
-        if(version.startsWith("7.0") || version.startsWith("7.1") ){
-            return false
-        }
-        true
+        VersionNumber version = VersionNumber.parse(getVaadinVersion(project))
+        version.minor > 1
     }
 
     /**
@@ -541,6 +528,7 @@ class Util {
     }
 
     /**
+<<<<<<< HEAD
      * Returns the widgetset directory
      *
      * @param project
@@ -599,16 +587,16 @@ class Util {
         def addons = []
         def widgetsetAttribute = new Attributes.Name('Vaadin-Widgetsets')
         project.configurations.all.each { Configuration conf ->
-            conf.allDependencies.each {Dependency dependency ->
+            conf.allDependencies.each { Dependency dependency ->
                 conf.files(dependency).each { File file ->
-                    file.withInputStream { InputStream stream->
+                    file.withInputStream { InputStream stream ->
                         def jarStream = new JarInputStream(stream)
                         def mf = jarStream.getManifest()
                         def attributes = mf?.mainAttributes
-                        if(attributes?.getValue(widgetsetAttribute)){
-                            if(!dependency.name.startsWith('vaadin-client')){
+                        if (attributes?.getValue(widgetsetAttribute)) {
+                            if (!dependency.name.startsWith('vaadin-client')) {
                                 addons << [
-                                        groupId:dependency.group,
+                                        groupId: dependency.group,
                                         artifactId: dependency.name,
                                         version: dependency.version
                                 ]
@@ -619,5 +607,17 @@ class Util {
             }
         }
         addons
+    }
+
+    /**
+     * Returns the defined Vaadin version or if no version is defined then it returns the default vaadin version.
+     *
+     * @param project
+     *      The project to get the version for
+     * @return
+     *      version as a string
+     */
+    static String getVaadinVersion(Project project) {
+        project.vaadin.version ?: '7.3.+'
     }
 }
