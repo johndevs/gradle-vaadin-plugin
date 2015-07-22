@@ -29,16 +29,16 @@ or to use a specific version of the plugin
 (Note that using this method only works for Java projects.)
 
     plugins {
-        id "fi.jasoft.plugin.vaadin" version "0.9.2"
+        id "fi.jasoft.plugin.vaadin" version "0.9.8"
     }
 
 ## Snapshot builds
 
-    apply from: 'http://plugins.jasoft.fi/vaadin.plugin?version=0.9-SNAPSHOT'
+    apply from: 'http://plugins.jasoft.fi/vaadin.plugin?version=0.10-SNAPSHOT'
     
 or
 
-    apply from: 'http://plugins.jasoft.fi/vaadin-groovy.plugin?version=0.9-SNAPSHOT'
+    apply from: 'http://plugins.jasoft.fi/vaadin-groovy.plugin?version=0.10-SNAPSHOT'
 
 ## Manually applying the plugin
 
@@ -65,12 +65,13 @@ apply plugin: fi.jasoft.plugin.GradleVaadinPlugin
 
 # Versions
 
-|       | Gradle | Vaadin | Java | Jetty | Servlet | Major features    |
-|-------|--------|--------|------|-------|---------|-------------------|
-| 0.6.x |   1.x  |   6,7  |  6,7 |  8.1  | 2.5,3.0 | Servlet 3 support |
-| 0.7.x |   1.x  |   6,7  |  6,7 |  8.1  | 2.5,3.0 | Testbench 3, Directory addon zip, Directory Browser, Source & Javadoc jars | 
-| 0.8.x |   1.x  |    7   |   7  |  8.1  | 3.0 | Idea support, Addon SCSS themes, GWT first in classpath  | 
-| 0.9.x |   2.x  |    7   |  7,8 |  9.2  | 3.0 | Groovy support, Jetty 9, Jetty autorestart |
+|        | Gradle | Vaadin | Java | Jetty | Servlet | Major features    |
+|--------|--------|--------|------|-------|---------|-------------------|
+| 0.6.x  |   1.x  |   6,7  |  6,7 |  8.1  | 2.5,3.0 | Servlet 3 support |
+| 0.7.x  |   1.x  |   6,7  |  6,7 |  8.1  | 2.5,3.0 | Testbench 3, Directory addon zip, Directory Browser, Source & Javadoc jars | 
+| 0.8.x  |   1.x  |    7   |   7  |  8.1  | 3.0 | Idea support, Addon SCSS themes, GWT first in classpath  | 
+| 0.9.x  |   2.x  |    7   |  7,8 |  9.2  | 3.0 | Groovy support, Jetty 9, Jetty autorestart |
+| 0.10.x |   2.x  |    7   |  7,8 |  9.3  | 3.0 | Widgetset CDN support, Classpath JAR on Win as default | 
 
 
 # Plugin tasks
@@ -105,6 +106,7 @@ For a better example of an actual working build.gradle using these options see h
 ## Vaadin Project configurations
 * ``vaadin.version`` - Vaadin version (Vaadin 6 and 7 supported). Defaults to latest Vaadin 7
 * ``vaadin.widgetset`` - The fully qualified name of the widgetset (eg. com.example.helloworld.MyWidgetset)
+* ``vaadin.widgetsetCDN`` - Should the widgetset CDN (virit.in) be used. Default off.
 * ``vaadin.widgetsetGenerator`` - The fully qualified name of the widgetset generator.
 * ``vaadin.debugPort`` - On what port should the debugger listen. Default is 8000
 * ``vaadin.manageWidgetset`` - Should the plugin manage the widgetset for you. Default is true.
