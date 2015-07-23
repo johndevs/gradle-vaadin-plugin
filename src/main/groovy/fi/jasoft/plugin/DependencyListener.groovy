@@ -134,15 +134,12 @@ class DependencyListener implements ProjectEvaluationListener {
         }
 
         // Add plugin development repository if specified
-        if (GradleVaadinPlugin.getDebugDir() != null 
-            && new File(GradleVaadinPlugin.getDebugDir()).exists()
-                && repositories.findByName('Gradle Vaadin plugin development repository') == null) {
-
-            if (GradleVaadinPlugin.isFirstPlugin()) {
-                project.logger.lifecycle("Using development libs found at " + GradleVaadinPlugin.getDebugDir())
+        if((GradleVaadinPlugin.debugDir as File)?.exists()
+                && !repositories.findByName('Gradle Vaadin plugin development repository')) {
+            if (GradleVaadinPlugin.firstPlugin) {
+                project.logger.lifecycle("Using development libs found at " + GradleVaadinPlugin.debugDir)
             }
-
-            repositories.flatDir(name: 'Gradle Vaadin plugin development repository', dirs: GradleVaadinPlugin.getDebugDir())
+            repositories.flatDir(name: 'Gradle Vaadin plugin development repository', dirs: GradleVaadinPlugin.debugDir)
         }
     }
 
