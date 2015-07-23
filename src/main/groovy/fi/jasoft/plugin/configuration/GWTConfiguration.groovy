@@ -93,5 +93,8 @@ class GWTConfiguration {
      */
     boolean gwtSdkFirstInClasspath = false
 
+    /**
+     * (Optional) root directory, for generated files; default is the web-app dir from the WAR plugin
+     */
     File outputDirectory = null
 }
