@@ -1,80 +1,53 @@
 package fi.jasoft.plugin.integration
 
-import fi.jasoft.plugin.GradleVaadinPlugin
-import fi.jasoft.plugin.TaskListener
 import fi.jasoft.plugin.tasks.CreateDirectoryZipTask
-import org.gradle.api.JavaVersion
-import org.gradle.api.Project
-import org.gradle.api.internal.changedetection.rules.TaskStateChanges
-import org.gradle.api.internal.tasks.TaskStateInternal
-import org.gradle.plugins.ide.eclipse.EclipseWtpPlugin
-import org.gradle.plugins.ide.eclipse.model.EclipseWtp
-import org.gradle.plugins.ide.eclipse.model.EclipseWtpFacet
-import org.gradle.testfixtures.ProjectBuilder
-import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.TemporaryFolder
 
-import java.util.jar.Manifest
-
-import static fi.jasoft.plugin.DependencyListener.Configuration.*
-import static junit.framework.Assert.assertEquals
-import static junit.framework.Assert.assertNull
-import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertTrue
 
 /**
  * Created by john on 1/6/15.
  */
-class TaskConfigurationsTest {
-
-    @Rule
-    public final TemporaryFolder projectDir = new TemporaryFolder()
-
-    def Project project
-
-    @Before void setup(){
-        projectDir.create()
-
-        project = ProjectBuilder.builder().withProjectDir(projectDir.root).build().with { project ->
-            apply plugin: GradleVaadinPlugin
-            apply plugin: 'eclipse-wtp'
-            apply plugin: 'idea'
-            evaluate()
-            project
-        }
-    }
-
-    def runTask(String task) {
-        def listener = new TaskListener(project)
-        listener.beforeExecute(project.tasks[task])
-        listener.afterExecute(project.tasks[task], new TaskStateInternal())
-    }
+class TaskConfigurationsTest implements IntegrationTest {
 
     @Test void 'Eclipse default configuration'() {
 
-        runTask('eclipseClasspath')
+        buildFile << """
+            import static fi.jasoft.plugin.DependencyListener.Configuration.*
 
-        def classpath = project.eclipse.classpath
+            apply plugin: 'eclipse-wtp'
 
-        assertTrue classpath.downloadSources
+            task verifyEclipseClassPath(dependsOn: 'eclipseClasspath') << {
+                def classpath = project.eclipse.classpath
+                println 'Download sources ' +  classpath.downloadSources
+                println 'Eclipse output dir ' + project.vaadin.plugin.eclipseOutputDir
+                println 'Classes dir is default output dir ' + (classpath.defaultOutputDir == project.sourceSets.main.output.classesDir)
 
-        assertNull project.vaadin.plugin.eclipseOutputDir
-        assertEquals(classpath.defaultOutputDir, project.sourceSets.main.output.classesDir)
+                def confs = project.configurations
+                println 'Server in classpath ' + (confs.getByName(SERVER.caption) in classpath.plusConfigurations)
+                println 'Client in classpath ' + (confs.getByName(CLIENT.caption) in classpath.plusConfigurations)
+                println 'Jetty9 in classpath ' + (confs.getByName(JETTY9.caption) in classpath.plusConfigurations)
 
-        def confs = project.configurations
-        assertTrue confs.getByName(SERVER.caption) in classpath.plusConfigurations
-        assertTrue confs.getByName(CLIENT.caption) in classpath.plusConfigurations
-        assertTrue confs.getByName(JETTY9.caption) in classpath.plusConfigurations
+                def natures = project.eclipse.project.natures
+                println 'Springsource nature ' + ('org.springsource.ide.eclipse.gradle.core.nature' in natures)
+            }
+        """.stripIndent()
 
-        def natures = project.eclipse.project.natures
-        assertTrue 'org.springsource.ide.eclipse.gradle.core.nature' in natures
+        def result = getResultWithArguments('verifyEclipseClassPath').standardOutput
+
+        assertTrue result, result.contains( 'Download sources true')
+        assertTrue result, result.contains( 'Eclipse output dir null')
+        assertTrue result, result.contains( 'Classes dir is default output dir true')
+
+        assertTrue result, result.contains( 'Server in classpath true')
+        assertTrue result, result.contains( 'Client in classpath true')
+        assertTrue result, result.contains( 'Jetty9 in classpath true')
+
+        assertTrue result, result.contains( 'Springsource nature true')
     }
 
     @Test void 'Eclipse configuration with custom output dir'() {
-        project = ProjectBuilder.builder().build().with { project ->
-            apply plugin: GradleVaadinPlugin
+        buildFile << """
             apply plugin: 'eclipse-wtp'
 
             vaadin {
@@ -83,19 +56,22 @@ class TaskConfigurationsTest {
                 }
             }
 
-            evaluate()
-            project
-        }
+            task verifyOutputDir(dependsOn:'eclipseClasspath') << {
+                println project.eclipse.classpath.defaultOutputDir
+                println project.file('custom/dir')
+                println 'Default output dir is set to eclipseOutputDir ' + (project.eclipse.classpath.defaultOutputDir == project.file('custom/dir'))
+            }
+        """.stripIndent()
 
-        runTask('eclipseClasspath')
-
-        def classpath = project.eclipse.classpath
-        assertEquals(classpath.defaultOutputDir, project.file('custom/dir'))
+        def result = getResultWithArguments('verifyOutputDir').standardOutput
+        assertTrue result, result.contains('Default output dir is set to eclipseOutputDir true')
     }
 
     @Test void 'Eclipse configuration with Testbench enabled'() {
-        project = ProjectBuilder.builder().build().with { project ->
-            apply plugin: GradleVaadinPlugin
+
+        buildFile << """
+            import static fi.jasoft.plugin.DependencyListener.Configuration.*
+
             apply plugin: 'eclipse-wtp'
 
             vaadin {
@@ -104,124 +80,170 @@ class TaskConfigurationsTest {
                 }
             }
 
-            evaluate()
-            project
-        }
+            task verifyTestbenchDependency(dependsOn: 'eclipseClasspath') << {
+                def confs = project.configurations
+                def classpath = project.eclipse.classpath
+                println 'Testbench on classpath ' + (confs.getByName(TESTBENCH.caption) in classpath.plusConfigurations)
+            }
 
-        runTask('eclipseClasspath')
+        """.stripIndent()
 
-        def classpath = project.eclipse.classpath
-        def confs = project.configurations
-        assertTrue confs.getByName(TESTBENCH.caption) in classpath.plusConfigurations
+        def result = getResultWithArguments('verifyTestbenchDependency').standardOutput
+        assertTrue result.contains('Testbench on classpath true')
     }
 
-    @Test void 'Eclipse WTP default configuration'() {
+    @Test void 'Eclipse WTP component configuration'() {
 
-        runTask('eclipseWtpComponent')
+        buildFile << """
+            import static fi.jasoft.plugin.DependencyListener.Configuration.*
 
-        def confs = project.configurations
-        def server = confs.getByName(SERVER.caption)
+            apply plugin: 'eclipse-wtp'
 
-        def EclipseWtp wtp = project.eclipse.wtp
-        assertTrue server in wtp.component.plusConfigurations
+            task verifyWTP(dependsOn: eclipseWtpComponent) << {
+                def confs = project.configurations
+                println 'Server in components ' + (confs.getByName(SERVER.caption) in project.eclipse.wtp.component.plusConfigurations)
+            }
 
-        runTask('eclipseWtpFacet')
+        """.stripIndent()
 
-        def facets = wtp.facet.facets
-        def JavaVersion javaVersion = project.sourceCompatibility
-        assertEquals '7.0', facets.find { it.name=='com.vaadin.integration.eclipse.core'}.version
-        assertEquals '3.0', facets.find { it.name=='jst.web'}.version
-        assertEquals javaVersion.toString(), facets.find { it.name=='java'}.version
+        def result = getResultWithArguments('verifyWTP').standardOutput
+        assertTrue result, result.contains('Server in components true')
+    }
+
+    @Test void 'Eclipse WTP facet configuration'() {
+
+        buildFile << """
+            apply plugin: 'eclipse-wtp'
+
+            task verifyWTP(dependsOn: eclipseWtpFacet) << {
+                def facets = project.eclipse.wtp.facet.facets
+                def JavaVersion javaVersion = project.sourceCompatibility
+                println 'Vaadin Facet version ' + (facets.find { it.name=='com.vaadin.integration.eclipse.core'}.version)
+                println 'jst.web Facet version ' + (facets.find { it.name=='jst.web'}.version)
+                println 'Java Facet version equals sourceCompatibility ' + (javaVersion.toString() == facets.find { it.name=='java'}.version)
+            }
+
+        """.stripIndent()
+
+        def result = getResultWithArguments('verifyWTP').standardOutput
+        assertTrue result, result.contains('Vaadin Facet version 7.0')
+        assertTrue result, result.contains('jst.web Facet version 3.0')
+        assertTrue result, result.contains('Java Facet version equals sourceCompatibility true')
     }
 
     @Test void 'IDEA default configuration'() {
 
-        runTask('ideaModule')
+        buildFile << """
+            import static fi.jasoft.plugin.DependencyListener.Configuration.*
 
-        def conf = project.configurations
-        def module = project.idea.module
+            apply plugin: 'idea'
 
-        assertEquals project.name, module.name
-        //assertTrue module.inheritOutputDirs as Boolean
-        assertEquals project.sourceSets.main.output.classesDir, module.outputDir
-        assertEquals project.sourceSets.test.output.classesDir, module.testOutputDir
+            task verifyIdeaModule(dependsOn: 'ideaModule') << {
 
-        assertTrue module.downloadJavadoc
-        assertTrue module.downloadSources
+                def module = project.idea.module
+                println 'Module and Project name is equal ' + (project.name == module.name)
+                println 'Output dir is classes dir ' + (project.sourceSets.main.output.classesDir == module.outputDir)
+                println 'Test output dir is classes dir ' + (project.sourceSets.test.output.classesDir == module.testOutputDir)
 
-        def scopes = module.scopes
-        assertTrue conf.getByName(SERVER.caption) in scopes.COMPILE.plus
-        assertTrue conf.getByName(CLIENT.caption) in scopes.COMPILE.plus
-        assertTrue conf.getByName(JETTY9.caption) in scopes.PROVIDED.plus
+                println 'Download Javadoc ' + module.downloadJavadoc
+                println 'Download Sources ' + module.downloadSources
+
+                def conf = project.configurations
+                def scopes = module.scopes
+                println 'Server configuration included ' + (conf.getByName(SERVER.caption) in scopes.COMPILE.plus)
+                println 'Client configuration included ' + (conf.getByName(CLIENT.caption) in scopes.COMPILE.plus)
+                println 'Jetty9 configuration included ' + (conf.getByName(JETTY9.caption) in scopes.PROVIDED.plus)
+
+            }
+        """.stripIndent()
+
+        def result = getResultWithArguments('verifyIdeaModule').standardOutput
+        assertTrue result, result.contains('Module and Project name is equal true')
+        assertTrue result, result.contains('Output dir is classes dir true')
+        assertTrue result, result.contains('Test output dir is classes dir true')
+
+        assertTrue result, result.contains('Download Javadoc true')
+        assertTrue result, result.contains('Download Sources true')
+
+        assertTrue result, result.contains('Server configuration included true')
+        assertTrue result, result.contains('Client configuration included true')
+        assertTrue result, result.contains('Jetty9 configuration included true')
     }
 
     @Test void 'IDEA configuration with Testbench'() {
-        project = ProjectBuilder.builder().build().with { project ->
-            apply plugin: GradleVaadinPlugin
-            apply plugin: 'idea'
 
-            vaadin {
+        buildFile << """
+             import static fi.jasoft.plugin.DependencyListener.Configuration.*
+
+             apply plugin: 'idea'
+
+             vaadin {
                 testbench {
                     enabled true
                 }
-            }
+             }
 
-            evaluate()
-            project
-        }
+             task verifyTestBench(dependsOn: 'ideaModule') << {
+                def conf = project.configurations
+                def module = project.idea.module
+                def scopes = module.scopes
+                println 'Test configuration has testbench ' + (conf.getByName(TESTBENCH.caption) in scopes.TEST.plus)
+             }
+        """.stripIndent()
 
-        runTask('ideaModule')
+        def result = getResultWithArguments('verifyTestBench').standardOutput
 
-        def conf = project.configurations
-        def module = project.idea.module
-        def scopes = module.scopes
-        assertTrue conf.getByName(TESTBENCH.caption) in scopes.TEST.plus
+        assertTrue result, result.contains('Test configuration has testbench true')
     }
 
     @Test void 'IDEA configuration with push'() {
-        project = ProjectBuilder.builder().build().with { project ->
-            apply plugin: GradleVaadinPlugin
+
+        buildFile << """
+            import static fi.jasoft.plugin.DependencyListener.Configuration.*
+
             apply plugin: 'idea'
 
             vaadin {
                 push true
             }
 
-            evaluate()
-            project
-        }
+            task verifyPush(dependsOn: 'ideaModule') << {
+                def conf = project.configurations
+                def module = project.idea.module
+                def scopes = module.scopes
+                println 'Compile configuration has push ' + (conf.getByName(PUSH.caption) in scopes.COMPILE.plus)
+            }
 
-        runTask('ideaModule')
+        """.stripIndent()
 
-        def conf = project.configurations
-        def module = project.idea.module
-        def scopes = module.scopes
-        assertTrue conf.getByName(PUSH.caption) in scopes.COMPILE.plus
+        def result = getResultWithArguments('verifyPush').standardOutput
+
+        assertTrue result, result.contains('Compile configuration has push true')
     }
 
     @Test void 'Update widgetset generator before compile'() {
-        project = ProjectBuilder.builder().withProjectDir(projectDir.root).build().with { project ->
-            apply plugin: GradleVaadinPlugin
 
-            vaadin {
+        buildFile << """
+             vaadin {
                 widgetset 'com.example.Widgetset'
                 widgetsetGenerator 'com.example.WidgetsetGenerator'
-            }
+             }
 
-            evaluate()
-            project
-        }
+             task verifyWidgetsetGenerator(dependsOn:compileJava) << {
+                def generatorFile = file('src/main/java/com/example/WidgetsetGenerator.java')
+                println generatorFile
+                println 'Generator File was created ' + generatorFile.exists()
+             }
+        """.stripIndent()
 
-        runTask('compileJava')
+        def result = getResultWithArguments('verifyWidgetsetGenerator').standardOutput
 
-        def generatorFile = new File(projectDir.root.canonicalPath + '/src/main/java/com/example/WidgetsetGenerator.java')
-        assertTrue generatorFile.exists()
+        assertTrue result, result.contains('Generator File was created true')
     }
 
-    @Test void 'Addon Metadata'() {
-        project = ProjectBuilder.builder().withProjectDir(projectDir.root).build().with { project ->
-            apply plugin: GradleVaadinPlugin
+    @Test void 'Addon Jar Metadata'() {
 
+        buildFile << """
             version '1.2.3'
 
             vaadin {
@@ -233,34 +255,59 @@ class TaskConfigurationsTest {
                 }
             }
 
-            evaluate()
-            project
-        }
+            task verifyAddonJarManifest(dependsOn: 'jar') << {
+                def attributes = project.tasks.jar.manifest.attributes
+                println 'Vaadin-Widgetsets ' + attributes['Vaadin-Widgetsets']
+                println 'Implementation-Title ' + attributes['Implementation-Title']
+                println 'Implementation-Version ' + attributes['Implementation-Version']
+                println 'Implementation-Vendor ' + attributes['Implementation-Vendor']
+                println 'Vaadin-License-Title ' + attributes['Vaadin-License-Title']
+                println 'Vaadin-Package-Version ' + attributes['Vaadin-Package-Version']
+            }
+        """.stripIndent()
 
-        runTask('jar')
+        def result = getResultWithArguments('verifyAddonJarManifest').standardOutput
+        assertTrue result, result.contains('Vaadin-Widgetsets com.example.Widgetset')
+        assertTrue result, result.contains('Implementation-Title test-addon')
+        assertTrue result, result.contains('Implementation-Version 1.2.3')
+        assertTrue result, result.contains('Implementation-Vendor test-author')
+        assertTrue result, result.contains('Vaadin-License-Title my-license')
+        assertTrue result, result.contains('Vaadin-Package-Version 1')
+    }
 
-        def attributes = project.tasks.jar.manifest.attributes
-        assertEquals 'com.example.Widgetset', attributes['Vaadin-Widgetsets']
-        assertEquals 'test-addon', attributes['Implementation-Title']
-        assertEquals project.version, attributes['Implementation-Version']
-        assertEquals 'test-author', attributes['Implementation-Vendor']
-        assertEquals 'my-license', attributes['Vaadin-License-Title']
-        assertEquals 1, attributes['Vaadin-Package-Version']
+    @Test void 'Addon Zip Metadata'() {
+        buildFile << """
+            version '1.2.3'
 
-        runTask(CreateDirectoryZipTask.NAME)
+            vaadin {
+                widgetset 'com.example.Widgetset'
+                addon {
+                    title 'test-addon'
+                    license 'my-license'
+                    author 'test-author'
+                }
+            }
 
-        def manifestFile = project.file('build/tmp/zip/META-INF/MANIFEST.MF')
-        assertTrue manifestFile.exists()
+            task verifyAddonZipManifest(dependsOn: '${CreateDirectoryZipTask.NAME}') << {
+                def manifestFile = project.file('build/tmp/zip/META-INF/MANIFEST.MF')
+                println 'Zip manifest exists ' + manifestFile.exists()
 
-        def manifest = new Manifest()
-        manifest.read(new ByteArrayInputStream(manifestFile.text.bytes))
+                def manifest = new java.util.jar.Manifest()
+                manifest.read(new ByteArrayInputStream(manifestFile.text.bytes))
 
-        attributes = manifest.mainAttributes
+                def attributes = manifest.mainAttributes
+                attributes.entrySet().each { entry ->
+                    println entry.key.toString() + ' ' + entry.value.toString()
+                }
+            }
+        """.stripIndent()
 
-        assertEquals 'test-addon', attributes.getValue('Implementation-Title')
-        assertEquals 'my-license', attributes.getValue('Vaadin-License-Title')
-        assertEquals project.version, attributes.getValue('Implementation-Version')
-        assertEquals 'test-author', attributes.getValue('Implementation-Vendor')
-        //assertEquals "libs/${project.jar.archiveName}", attributes.getValue('Vaadin-Addon')
+        def result = getResultWithArguments('verifyAddonZipManifest').standardOutput
+        assertTrue result, result.contains('Zip manifest exists true')
+        assertTrue result, result.contains('Implementation-Title test-addon')
+        assertTrue result, result.contains('Implementation-Version 1.2.3')
+        assertTrue result, result.contains('Implementation-Vendor test-author')
+        assertTrue result, result.contains('Vaadin-License-Title my-license')
+
     }
 }

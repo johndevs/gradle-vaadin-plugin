@@ -1,9 +1,6 @@
 package fi.jasoft.plugin
 
-import org.gradle.mvn3.org.apache.maven.project.ProjectBuildingHelper
-import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Test
-
 import static junit.framework.Assert.assertEquals
 
 /*

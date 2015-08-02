@@ -41,6 +41,9 @@ dependencies {
     compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
 
     deploy 'org.apache.maven.wagon:wagon-ssh:2.2'
+
+    testCompile gradleTestKit()
+    testCompile 'junit:junit:4.12'
 }
 
 sourceSets {
@@ -141,7 +144,7 @@ uploadArchives {
 
 // Use wrapper
 task wrapper(type: Wrapper) {
-	gradleVersion = '2.5'
+	gradleVersion = '2.6-rc-1'
 }
 
 // Create pom.xml for Vaadin Directory
