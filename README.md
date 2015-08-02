@@ -34,11 +34,11 @@ or to use a specific version of the plugin
 
 ## Snapshot builds
 
-    apply from: 'http://plugins.jasoft.fi/vaadin.plugin?version=0.10-SNAPSHOT'
+    apply from: 'http://plugins.jasoft.fi/vaadin.plugin?version=0.11-SNAPSHOT'
     
 or
 
-    apply from: 'http://plugins.jasoft.fi/vaadin-groovy.plugin?version=0.10-SNAPSHOT'
+    apply from: 'http://plugins.jasoft.fi/vaadin-groovy.plugin?version=0.11-SNAPSHOT'
 
 ## Manually applying the plugin
 
