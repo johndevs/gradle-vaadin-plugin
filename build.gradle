@@ -233,11 +233,11 @@ test {
     exclude '**/integration/**'
 }
 
-task integrationTest(type:Test) {
-    dependsOn 'jar'
+task integrationTest(type:Test, dependsOn:['test','jar']) {
     classpath += files(sourceSets.ast.output.classesDir)
     testLogging {
         exceptionFormat "full"
     }
     include '**/integration/**'
 }
+check.dependsOn 'integrationTest'
