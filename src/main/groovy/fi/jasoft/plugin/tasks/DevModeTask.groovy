@@ -16,10 +16,8 @@
 package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.ApplicationServer
-import fi.jasoft.plugin.DependencyListener
 import fi.jasoft.plugin.Util
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskAction
 

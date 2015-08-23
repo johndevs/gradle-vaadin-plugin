@@ -15,9 +15,6 @@
 */
 package fi.jasoft.plugin
 
-import fi.jasoft.plugin.DependencyListener.Configuration
-import fi.jasoft.plugin.tasks.BuildClassPathJar
-import fi.jasoft.plugin.tasks.CompileWidgetsetTask
 import fi.jasoft.plugin.tasks.CreateDirectoryZipTask
 import fi.jasoft.plugin.tasks.CreateWidgetsetGeneratorTask
 import fi.jasoft.plugin.testbench.TestbenchHub
@@ -26,14 +23,9 @@ import groovy.xml.MarkupBuilder
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.execution.TaskExecutionListener
-import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskState
 import org.gradle.api.tasks.bundling.War
-import org.gradle.plugins.ide.eclipse.EclipseWtpPlugin
 import org.gradle.plugins.ide.eclipse.model.EclipseWtp
-import org.gradle.plugins.ide.eclipse.model.EclipseWtpFacet
-import org.gradle.plugins.ide.eclipse.model.Facet
-import org.gradle.plugins.ide.eclipse.model.WtpFacet
 
 public class TaskListener implements TaskExecutionListener {
 
@@ -101,11 +93,11 @@ public class TaskListener implements TaskExecutionListener {
                 )
 
                 // remove duplicates and providedCompile dependencies
-                war.classpath += project.configurations[Configuration.SERVER.caption]
+                war.classpath += project.configurations['vaadin-server']
 
                 // Include push dependencies if enabled
                 if(Util.isPushSupportedAndEnabled(project)) {
-                    war.classpath += project.configurations[Configuration.PUSH.caption]
+                    war.classpath += project.configurations['vaadin-push']
                 }
 
                 // Remove providedCompile dependencies
@@ -139,11 +131,11 @@ public class TaskListener implements TaskExecutionListener {
 
         if (task.getName() == 'javadoc') {
             task.source = Util.getMainSourceSet(project)
-            if (project.configurations.findByName(Configuration.JAVADOC.caption) != null) {
-                task.classpath += [project.configurations[Configuration.JAVADOC.caption]]
+            if (project.configurations.findByName('vaadin-javadoc') != null) {
+                task.classpath += [project.configurations['vaadin-javadoc']]
             }
-            if (project.configurations.findByName(Configuration.SERVER.caption) != null) {
-                task.classpath += [project.configurations[Configuration.SERVER.caption]]
+            if (project.configurations.findByName('vaadin-server') != null) {
+                task.classpath += [project.configurations['vaadin-server']]
             }
             task.failOnError = false
             task.options.addStringOption("sourcepath", "")
@@ -201,16 +193,16 @@ public class TaskListener implements TaskExecutionListener {
         }
 
         // Add dependencies to eclipse classpath
-        cp.plusConfigurations += [conf[Configuration.SERVER.caption]]
-        cp.plusConfigurations += [conf[Configuration.CLIENT.caption]]
-        cp.plusConfigurations += [conf[Configuration.JETTY9.caption]]
+        cp.plusConfigurations += [conf['vaadin-server']]
+        cp.plusConfigurations += [conf['vaadin-client']]
+        //cp.plusConfigurations += [conf['vaadin-jetty9']]
 
         if (project.vaadin.testbench.enabled) {
-            cp.plusConfigurations += [conf[Configuration.TESTBENCH.caption]]
+            cp.plusConfigurations += [conf['vaadin-testbench']]
         }
 
         if (Util.isPushSupportedAndEnabled(project)) {
-            cp.plusConfigurations += [conf[Configuration.PUSH.caption]]
+            cp.plusConfigurations += [conf['vaadin-push']]
         }
 
         // Configure natures
@@ -235,22 +227,22 @@ public class TaskListener implements TaskExecutionListener {
         module.downloadSources = true
 
         // Add configurations to classpath
-        module.scopes.COMPILE.plus += [conf[Configuration.SERVER.caption]]
-        module.scopes.COMPILE.plus += [conf[Configuration.CLIENT.caption]]
-        module.scopes.PROVIDED.plus += [conf[Configuration.JETTY9.caption]]
+        module.scopes.COMPILE.plus += [conf['vaadin-server']]
+        module.scopes.COMPILE.plus += [conf['vaadin-client']]
+        //module.scopes.PROVIDED.plus += [conf['vaadin-jetty9']]
 
         if (project.vaadin.testbench.enabled) {
-            module.scopes.TEST.plus += [conf[Configuration.TESTBENCH.caption]]
+            module.scopes.TEST.plus += [conf['vaadin-testbench']]
         }
 
         if (Util.isPushSupportedAndEnabled(project)) {
-            module.scopes.COMPILE.plus += [conf[Configuration.PUSH.caption]]
+            module.scopes.COMPILE.plus += [conf['vaadin-push']]
         }
     }
 
     private void configureEclipseWtpPluginComponent(Task task) {
         def wtp = project.eclipse.wtp
-        wtp.component.plusConfigurations += [project.configurations[Configuration.SERVER.caption]]
+        wtp.component.plusConfigurations += [project.configurations['vaadin-server']]
     }
 
     private void configureEclipseWtpPluginFacet(Task task) {

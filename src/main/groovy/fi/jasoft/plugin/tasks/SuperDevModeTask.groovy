@@ -16,11 +16,9 @@
 package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.ApplicationServer
-import fi.jasoft.plugin.DependencyListener
 import fi.jasoft.plugin.Util
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
-import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskAction
 
@@ -79,8 +77,8 @@ class SuperDevModeTask extends DefaultTask {
         File widgetsetsDir = new File(webAppDir.canonicalPath + '/VAADIN/widgetsets')
         widgetsetsDir.mkdirs()
 
-        def jettyClasspath = project.configurations[DependencyListener.Configuration.JETTY8.caption];
-        def classpath = jettyClasspath + Util.getClientCompilerClassPath(project)
+        def SDMClassPath = project.configurations['vaadin-superdevmode'];
+        def classpath = SDMClassPath + Util.getClientCompilerClassPath(project)
 
         def superdevmodeProcess = ['java']
         superdevmodeProcess += ['-cp', classpath.getAsPath()]

@@ -114,7 +114,7 @@ class Util {
             BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
             collection = project.files(pathJarTask.archivePath)
         } else {
-            collection = project.configurations[DependencyListener.Configuration.JETTY9.caption]
+            collection = project.configurations['vaadin-jetty9']
             collection += getCompileClassPath(project)
         }
 
@@ -144,7 +144,7 @@ class Util {
         }
 
         if(project.vaadin.gwt.gwtSdkFirstInClasspath){
-            FileCollection gwtCompilerClasspath = project.configurations[DependencyListener.Configuration.CLIENT.caption];
+            FileCollection gwtCompilerClasspath = project.configurations['vaadin-client'];
             collection = gwtCompilerClasspath + collection.minus(gwtCompilerClasspath);
         }
 
@@ -566,7 +566,7 @@ class Util {
      */
     static String getResolvedVaadinVersion(Project project) {
         def version = project.vaadin.version
-        project.configurations[DependencyListener.Configuration.SERVER.caption].resolvedConfiguration.firstLevelModuleDependencies.each{ dependency ->
+        project.configurations['vaadin-server'].resolvedConfiguration.firstLevelModuleDependencies.each{ dependency ->
             if(dependency.moduleName == 'vaadin-server'){
                version = dependency.moduleVersion
            }
