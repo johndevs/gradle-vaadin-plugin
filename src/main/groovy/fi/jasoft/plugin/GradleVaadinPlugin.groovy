@@ -99,31 +99,10 @@ class GradleVaadinPlugin implements Plugin<Project> {
         applyDependencies(project)
 
         // Tasks
-        def tasks = project.tasks
-        tasks.create(name: CreateProjectTask.NAME, type: CreateProjectTask, group: 'Vaadin')
-        tasks.create(name: CreateComponentTask.NAME, type: CreateComponentTask, group: 'Vaadin')
-        tasks.create(name: CreateCompositeTask.NAME, type: CreateCompositeTask, group: 'Vaadin')
-        tasks.create(name: CreateThemeTask.NAME, type: CreateThemeTask, group: 'Vaadin')
-        tasks.create(name: CreateWidgetsetGeneratorTask.NAME, type: CreateWidgetsetGeneratorTask, group: 'Vaadin')
-
-        tasks.create(name: CompileWidgetsetTask.NAME, type: CompileWidgetsetTask, group: 'Vaadin')
-        tasks.create(name: DevModeTask.NAME, type: DevModeTask, group: 'Vaadin')
-        tasks.create(name: SuperDevModeTask.NAME, type: SuperDevModeTask, group: 'Vaadin')
-        tasks.create(name: CompileThemeTask.NAME, type: CompileThemeTask, group: 'Vaadin')
-        tasks.create(name: RunTask.NAME, type: RunTask, group: 'Vaadin')
-        tasks.create(name: UpdateWidgetsetTask.NAME, type: UpdateWidgetsetTask, group: 'Vaadin')
-
-        tasks.create(name: UpdateAddonStylesTask.NAME, type: UpdateAddonStylesTask, group: 'Vaadin')
-        tasks.create(name: CreateAddonThemeTask.NAME, type: CreateAddonThemeTask, group: 'Vaadin')
-
-        tasks.create(name: BuildSourcesJarTask.NAME, type: BuildSourcesJarTask, group: 'Vaadin Utility')
-        tasks.create(name: BuildJavadocJarTask.NAME, type: BuildJavadocJarTask, group: 'Vaadin Utility')
-        tasks.create(name: BuildClassPathJar.NAME, type: BuildClassPathJar, group: 'Vaadin Utility')
-
-        tasks.create(name: CreateTestbenchTestTask.NAME, type: CreateTestbenchTestTask, group: 'Vaadin Testbench')
-
-        tasks.create(name: DirectorySearchTask.NAME, type: DirectorySearchTask, group: 'Vaadin Directory')
-        tasks.create(name: CreateDirectoryZipTask.NAME, type: CreateDirectoryZipTask, group: 'Vaadin Directory')
+        applyVaadinTasks(project)
+        applyVaadinUtilityTasks(project)
+        applyVaadinTestbenchTasks(project)
+        applyVaadinDirectoryTasks(project)
 
         // Add debug information to all compilation results
         tasks.compileJava.options.debugOptions.debugLevel = 'source,lines,vars'
@@ -380,4 +359,40 @@ class GradleVaadinPlugin implements Plugin<Project> {
         })
     }
 
+    static void applyVaadinTasks(Project project){
+        def tasks = project.tasks
+        tasks.create(name: CreateProjectTask.NAME, type: CreateProjectTask, group: 'Vaadin')
+        tasks.create(name: CreateComponentTask.NAME, type: CreateComponentTask, group: 'Vaadin')
+        tasks.create(name: CreateCompositeTask.NAME, type: CreateCompositeTask, group: 'Vaadin')
+        tasks.create(name: CreateThemeTask.NAME, type: CreateThemeTask, group: 'Vaadin')
+        tasks.create(name: CreateWidgetsetGeneratorTask.NAME, type: CreateWidgetsetGeneratorTask, group: 'Vaadin')
+
+        tasks.create(name: CompileWidgetsetTask.NAME, type: CompileWidgetsetTask, group: 'Vaadin')
+        tasks.create(name: DevModeTask.NAME, type: DevModeTask, group: 'Vaadin')
+        tasks.create(name: SuperDevModeTask.NAME, type: SuperDevModeTask, group: 'Vaadin')
+        tasks.create(name: CompileThemeTask.NAME, type: CompileThemeTask, group: 'Vaadin')
+        tasks.create(name: RunTask.NAME, type: RunTask, group: 'Vaadin')
+        tasks.create(name: UpdateWidgetsetTask.NAME, type: UpdateWidgetsetTask, group: 'Vaadin')
+
+        tasks.create(name: UpdateAddonStylesTask.NAME, type: UpdateAddonStylesTask, group: 'Vaadin')
+        tasks.create(name: CreateAddonThemeTask.NAME, type: CreateAddonThemeTask, group: 'Vaadin')
+    }
+
+    static void applyVaadinUtilityTasks(Project project) {
+        def tasks = project.tasks
+        tasks.create(name: BuildSourcesJarTask.NAME, type: BuildSourcesJarTask, group: 'Vaadin Utility')
+        tasks.create(name: BuildJavadocJarTask.NAME, type: BuildJavadocJarTask, group: 'Vaadin Utility')
+        tasks.create(name: BuildClassPathJar.NAME, type: BuildClassPathJar, group: 'Vaadin Utility')
+    }
+
+    static void applyVaadinTestbenchTasks(Project project) {
+        def tasks = project.tasks
+        tasks.create(name: CreateTestbenchTestTask.NAME, type: CreateTestbenchTestTask, group: 'Vaadin Testbench')
+    }
+
+    static void applyVaadinDirectoryTasks(Project project) {
+        def tasks = project.tasks
+        tasks.create(name: DirectorySearchTask.NAME, type: DirectorySearchTask, group: 'Vaadin Directory')
+        tasks.create(name: CreateDirectoryZipTask.NAME, type: CreateDirectoryZipTask, group: 'Vaadin Directory')
+    }
 }
