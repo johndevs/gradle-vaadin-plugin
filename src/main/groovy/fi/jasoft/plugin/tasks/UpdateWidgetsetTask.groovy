@@ -30,6 +30,12 @@ class UpdateWidgetsetTask extends DefaultTask {
 
     public static final String NAME = 'vaadinUpdateWidgetset'
 
+    private static final String PUBLIC_FOLDER = 'public'
+
+    private static final String CSS_FILE_POSTFIX = 'css'
+
+    private static final String SCSS_FILE_POSTFIX = 'scss'
+
     public UpdateWidgetsetTask() {
         description = "Updates the widgetset xml file"
     }
@@ -181,7 +187,7 @@ class UpdateWidgetsetTask extends DefaultTask {
 
         def linkers = [:]
 
-        File[] clientSCSS = TemplateUtil.getFilesFromPublicFolder(project, 'scss')
+        File[] clientSCSS = TemplateUtil.getFilesFromPublicFolder(project, SCSS_FILE_POSTFIX)
         if (clientSCSS.length > 0) {
             linkers.put('scssintegration', 'com.vaadin.sass.linker.SassLinker')
         }
@@ -195,40 +201,28 @@ class UpdateWidgetsetTask extends DefaultTask {
         clientSCSS.each {
 
             // Get the relative path to the public folder
-            String path = it.parent.substring(it.parent.lastIndexOf('public') + 'public'.length())
-            if (path.startsWith('/')) {
+            def path = it.parent.substring(it.parent.lastIndexOf(PUBLIC_FOLDER) + PUBLIC_FOLDER.length())
+            if (path.startsWith(File.separator)) {
                 path = path.substring(1);
             }
 
             // Convert file name from scss -> css
-            filename = it.name.substring(0, it.name.length() - 4) + 'css'
-
-            // Recreate relative path to scss file
-            path = path + '/' + filename
-            if (path.startsWith('/')) {
-                path = path.substring(1);
-            }
-
-            stylesheets.add(path)
+            def cssFile = it.name.substring(0, it.name.length() - SCSS_FILE_POSTFIX.length()) + CSS_FILE_POSTFIX
+            stylesheets.add(path ? path + File.separator + cssFile : cssFile)
         }
 
         // Retrive CSS files
-        File[] clientCSS = TemplateUtil.getFilesFromPublicFolder(project, 'css')
+        File[] clientCSS = TemplateUtil.getFilesFromPublicFolder(project, CSS_FILE_POSTFIX)
         clientCSS.each {
 
             // Get the relative path to the public folder
-            String path = it.parent.substring(it.parent.lastIndexOf('public') + 'public'.length())
-            if (path.startsWith('/')) {
+            def path = it.parent.substring(it.parent.lastIndexOf(PUBLIC_FOLDER) + PUBLIC_FOLDER.length())
+            if (path.startsWith(File.separator)) {
                 path = path.substring(1);
             }
 
-            // Recreate relative path to css file
-            path = path + '/' + it.name
-            if (path.startsWith('/')) {
-                path = path.substring(1);
-            }
-
-            stylesheets.add(path)
+            def scssFile = it.name
+            stylesheets.add(path ? path + File.separator + scssFile : scssFile)
         }
 
         substitutions['stylesheets'] = stylesheets
