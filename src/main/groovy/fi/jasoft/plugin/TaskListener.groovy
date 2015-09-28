@@ -100,8 +100,11 @@ public class TaskListener implements TaskExecutionListener {
                         project.sourceSets.main.output.resourcesDir
                 )
 
-                // remove duplicates and providedCompile dependencies
+                // Include compile time dependencies (server inherits compile)
                 war.classpath += project.configurations[Configuration.SERVER.caption]
+
+                // Include runtime dependencies
+                war.classpath += project.configurations.runtime
 
                 // Include push dependencies if enabled
                 if(Util.isPushSupportedAndEnabled(project)) {
