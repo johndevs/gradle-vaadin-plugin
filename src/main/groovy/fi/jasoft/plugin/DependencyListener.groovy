@@ -232,6 +232,13 @@ class DependencyListener implements ProjectEvaluationListener {
                         details.useVersion Util.getVaadinVersion(project)
                     }
                 }
+
+                if(config.name == Configuration.CLIENT.caption) {
+                    if(group == 'javax.validation' && name == 'validation-api'){
+                        // GWT only supports this version, do not upgrade it
+                        details.useVersion '1.0.0.GA'
+                    }
+                }
             }
         })
     }
