@@ -111,8 +111,9 @@ public class TaskListener implements TaskExecutionListener {
                     war.classpath += project.configurations[Configuration.PUSH.caption]
                 }
 
-                // Remove providedCompile dependencies
+                // Remove provided dependencies
                 war.classpath -= project.configurations.providedCompile
+                war.classpath -= project.configurations.providedRuntime
 
                 // Ensure no duplicates
                 war.classpath = war.classpath.files
