@@ -15,6 +15,7 @@
 */
 package fi.jasoft.plugin
 
+import fi.jasoft.plugin.configuration.VaadinPluginExtension
 import fi.jasoft.plugin.tasks.BuildClassPathJar
 import groovy.io.FileType
 import org.gradle.api.Project
@@ -96,6 +97,27 @@ class Util {
      */
     static FileCollection getCompileClassPath(Project project) {
         project.sourceSets.main.compileClasspath
+    }
+
+    /**
+     * Get the compile time classpath of the project or the classpath jar if enabled
+     *
+     * @param project
+     *      the project to get the classpath for
+     * @return
+     *      the classpath as a collection of files
+     */
+    static FileCollection getCompileClassPathOrJar(Project project) {
+        def vaadin = project.vaadin as VaadinPluginExtension
+        FileCollection classpath
+        if(vaadin.plugin.useClassPathJar) {
+            // Add dependencies using the classpath jar
+            BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
+            classpath = project.files(pathJarTask.archivePath)
+        } else {
+            classpath = getCompileClassPath(project)
+        }
+        classpath
     }
 
     /**

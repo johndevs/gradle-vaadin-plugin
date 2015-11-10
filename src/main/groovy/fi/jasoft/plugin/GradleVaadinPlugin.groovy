@@ -115,9 +115,6 @@ class GradleVaadinPlugin implements Plugin<Project> {
         // Ensure widgetset is up-2-date
         project.processResources.dependsOn(UpdateWidgetsetTask.NAME)
 
-        // Ensure addon themes are up2date
-        project.processResources.dependsOn(UpdateAddonStylesTask.NAME)
-
         // Cleanup plugin outputs
         project.clean.dependsOn(project.tasks['clean' + CompileWidgetsetTask.NAME.capitalize()])
         project.clean.dependsOn(project.tasks['clean' + RunTask.NAME.capitalize()])
