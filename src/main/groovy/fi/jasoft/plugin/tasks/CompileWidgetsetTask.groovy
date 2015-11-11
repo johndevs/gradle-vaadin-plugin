@@ -234,6 +234,11 @@ class CompileWidgetsetTask extends DefaultTask {
                 }
                 true
             }
+
+            // Ensure gwt sdk libs are in the correct order
+            if(project.vaadin.gwt.gwtSdkFirstInClasspath){
+                classpath = Util.moveGwtSdkFirstInClasspath(project, classpath)
+            }
         }
 
         def widgetsetCompileProcess = ['java']

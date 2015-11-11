@@ -166,11 +166,24 @@ class Util {
         }
 
         if(project.vaadin.gwt.gwtSdkFirstInClasspath){
-            FileCollection gwtCompilerClasspath = project.configurations[DependencyListener.Configuration.CLIENT.caption];
-            collection = gwtCompilerClasspath + collection.minus(gwtCompilerClasspath);
+            moveGwtSdkFirstInClasspath(project, collection)
         }
+    }
 
-        collection
+    /**
+     * Moves the GWT SDK libs first in the classpath to ensure the GWT compiler
+     * gets the correct versions of its dependencies.
+     *
+     * @param project
+     *      the project
+     * @param collection
+     *      the collection with the classpath files
+     * @return
+     *      a new collection with the GWT SDK libs listed first
+     */
+    static FileCollection moveGwtSdkFirstInClasspath(Project project , FileCollection collection){
+        FileCollection gwtCompilerClasspath = project.configurations[DependencyListener.Configuration.CLIENT.caption];
+        return gwtCompilerClasspath + collection.minus(gwtCompilerClasspath);
     }
 
     /**
