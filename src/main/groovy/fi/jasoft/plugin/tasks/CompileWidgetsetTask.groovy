@@ -210,12 +210,9 @@ class CompileWidgetsetTask extends DefaultTask {
         // Ensure widgetset directory exists
         Util.getWidgetsetDirectory(project).mkdirs()
 
-        FileCollection classpath
+        FileCollection classpath =Util.getCompileClassPathOrJar(project)
         if(vaadin.plugin.useClassPathJar){
-            // Add dependencies using the classpath jar
-            BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
-            classpath = project.files(pathJarTask.archivePath)
-
+            // Add client dependencies missing from the classpath jar
             classpath += Util.getClientCompilerClassPath(project).filter { File file ->
                 if(file.name.endsWith('.jar')){
                     // Add GWT compiler + deps
@@ -237,8 +234,11 @@ class CompileWidgetsetTask extends DefaultTask {
                 }
                 true
             }
-        } else {
-            classpath = Util.getClientCompilerClassPath(project)
+
+            // Ensure gwt sdk libs are in the correct order
+            if(project.vaadin.gwt.gwtSdkFirstInClasspath){
+                classpath = Util.moveGwtSdkFirstInClasspath(project, classpath)
+            }
         }
 
         def widgetsetCompileProcess = ['java']
@@ -247,7 +247,7 @@ class CompileWidgetsetTask extends DefaultTask {
             widgetsetCompileProcess += gwt.jvmArgs as List
         }
 
-        widgetsetCompileProcess += ['-cp',  classpath.getAsPath()]
+        widgetsetCompileProcess += ['-cp',  classpath.asPath]
 
         widgetsetCompileProcess += 'com.google.gwt.dev.Compiler'
 

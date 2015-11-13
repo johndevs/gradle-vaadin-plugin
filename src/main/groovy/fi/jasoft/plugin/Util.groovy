@@ -15,6 +15,7 @@
 */
 package fi.jasoft.plugin
 
+import fi.jasoft.plugin.configuration.VaadinPluginExtension
 import fi.jasoft.plugin.tasks.BuildClassPathJar
 import groovy.io.FileType
 import org.gradle.api.Project
@@ -99,6 +100,27 @@ class Util {
     }
 
     /**
+     * Get the compile time classpath of the project or the classpath jar if enabled
+     *
+     * @param project
+     *      the project to get the classpath for
+     * @return
+     *      the classpath as a collection of files
+     */
+    static FileCollection getCompileClassPathOrJar(Project project) {
+        def vaadin = project.vaadin as VaadinPluginExtension
+        FileCollection classpath
+        if(vaadin.plugin.useClassPathJar) {
+            // Add dependencies using the classpath jar
+            BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
+            classpath = project.files(pathJarTask.archivePath)
+        } else {
+            classpath = getCompileClassPath(project)
+        }
+        classpath
+    }
+
+    /**
      * Returns the classpath used for embedded Jetty
      *
      * @param project
@@ -144,11 +166,24 @@ class Util {
         }
 
         if(project.vaadin.gwt.gwtSdkFirstInClasspath){
-            FileCollection gwtCompilerClasspath = project.configurations['vaadin-client'];
-            collection = gwtCompilerClasspath + collection.minus(gwtCompilerClasspath);
+            moveGwtSdkFirstInClasspath(project, collection)
         }
+    }
 
-        collection
+    /**
+     * Moves the GWT SDK libs first in the classpath to ensure the GWT compiler
+     * gets the correct versions of its dependencies.
+     *
+     * @param project
+     *      the project
+     * @param collection
+     *      the collection with the classpath files
+     * @return
+     *      a new collection with the GWT SDK libs listed first
+     */
+    static FileCollection moveGwtSdkFirstInClasspath(Project project , FileCollection collection){
+        FileCollection gwtCompilerClasspath = project.configurations['vaadin-client'];
+        return gwtCompilerClasspath + collection.minus(gwtCompilerClasspath);
     }
 
     /**

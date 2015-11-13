@@ -29,7 +29,7 @@ class CompileThemeTask extends DefaultTask {
     public static final String NAME = 'vaadinCompileThemes'
 
     public CompileThemeTask() {
-        dependsOn project.tasks.classes
+        dependsOn('classes', BuildClassPathJar.NAME, UpdateAddonStylesTask.NAME)
         description = "Compiles a Vaadin SASS theme into CSS"
 
         project.afterEvaluate {
@@ -39,6 +39,12 @@ class CompileThemeTask extends DefaultTask {
             outputs.files(project.fileTree(dir: themesDirectory, include: '**/styles.scss').collect {
                 File theme -> new File(new File(theme.parent).canonicalPath + '/styles.css')
             })
+
+            // Add classpath jar
+            if(project.vaadin.plugin.useClassPathJar) {
+                BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
+                inputs.file(pathJarTask.archivePath)
+            }
         }
     }
 
@@ -68,7 +74,7 @@ class CompileThemeTask extends DefaultTask {
             def start = System.currentTimeMillis()
 
             def compileProcess = ['java']
-            compileProcess += ['-cp',  Util.getCompileClassPath(project).asPath]
+            compileProcess += ['-cp',  Util.getCompileClassPathOrJar(project).asPath]
             compileProcess += 'com.vaadin.sass.SassCompiler'
             compileProcess += [theme.canonicalPath, dir.canonicalPath + '/styles.css']
 

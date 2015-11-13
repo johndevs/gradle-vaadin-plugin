@@ -95,13 +95,17 @@ public class TaskListener implements TaskExecutionListener {
                 // remove duplicates and providedCompile dependencies
                 war.classpath += project.configurations['vaadin-server']
 
+                // Include runtime dependencies
+                war.classpath += project.configurations.runtime
+
                 // Include push dependencies if enabled
                 if(Util.isPushSupportedAndEnabled(project)) {
                     war.classpath += project.configurations['vaadin-push']
                 }
 
-                // Remove providedCompile dependencies
+                // Remove provided dependencies
                 war.classpath -= project.configurations.providedCompile
+                war.classpath -= project.configurations.providedRuntime
 
                 // Ensure no duplicates
                 war.classpath = war.classpath.files

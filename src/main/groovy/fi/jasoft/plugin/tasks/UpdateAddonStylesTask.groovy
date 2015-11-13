@@ -16,7 +16,9 @@
 package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.Util
+import fi.jasoft.plugin.configuration.VaadinPluginExtension
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskAction
 
@@ -26,31 +28,46 @@ class UpdateAddonStylesTask extends DefaultTask {
     public static final String NAME = 'vaadinUpdateAddonStyles'
 
     UpdateAddonStylesTask() {
+        dependsOn('classes', BuildClassPathJar.NAME)
         description = 'Updates the addons.scss file with addon styles.'
+
+        project.afterEvaluate {
+
+            // Themes dirs
+            themeDir?.eachDir {
+                inputs.dir it.canonicalPath
+                outputs.file "${it.canonicalPath}/addons.scss"
+            }
+
+            // Add classpath jar
+            if(project.vaadin.plugin.useClassPathJar) {
+                BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
+                inputs.file(pathJarTask.archivePath)
+            }
+        }
+    }
+
+    def getThemeDir(){
+        File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
+        File themesDir = new File(webAppDir.canonicalPath + '/VAADIN/themes')
+        if (!themesDir.exists()) {
+            return null;
+        }
+        themesDir
     }
 
     @TaskAction
     public void run() {
-
         if (!Util.isAddonStylesSupported(project)) {
             return
         }
 
-        File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-
-        File themesDir = new File(webAppDir.canonicalPath + '/VAADIN/themes')
-        if (!themesDir.exists()) {
-            return;
-        }
-
-        def cp = Util.getCompileClassPath(project)
-
-        themesDir.eachDir {
+        themeDir?.eachDir {
             project.logger.info("Updating ${it.canonicalPath}/addons.scss")
 
             def importer = ['java']
             importer.add('-cp')
-            importer.add(cp.getAsPath())
+            importer.add(Util.getCompileClassPathOrJar(project).asPath)
             importer.add('com.vaadin.server.themeutils.SASSAddonImportFileCreator')
             importer.add(it.canonicalPath)
 
