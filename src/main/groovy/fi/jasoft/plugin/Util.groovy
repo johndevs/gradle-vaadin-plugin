@@ -166,8 +166,10 @@ class Util {
         }
 
         if(project.vaadin.gwt.gwtSdkFirstInClasspath){
-            moveGwtSdkFirstInClasspath(project, collection)
+            collection = moveGwtSdkFirstInClasspath(project, collection)
         }
+
+        collection
     }
 
     /**
