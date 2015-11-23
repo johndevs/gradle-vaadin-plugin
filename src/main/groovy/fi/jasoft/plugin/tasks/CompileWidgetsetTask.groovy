@@ -210,7 +210,7 @@ class CompileWidgetsetTask extends DefaultTask {
         // Ensure widgetset directory exists
         Util.getWidgetsetDirectory(project).mkdirs()
 
-        FileCollection classpath =Util.getCompileClassPathOrJar(project)
+        FileCollection classpath = Util.getCompileClassPathOrJar(project)
         if(vaadin.plugin.useClassPathJar){
             // Add client dependencies missing from the classpath jar
             classpath += Util.getClientCompilerClassPath(project).filter { File file ->
@@ -239,6 +239,8 @@ class CompileWidgetsetTask extends DefaultTask {
             if(project.vaadin.gwt.gwtSdkFirstInClasspath){
                 classpath = Util.moveGwtSdkFirstInClasspath(project, classpath)
             }
+        } else {
+            classpath = Util.getClientCompilerClassPath(project)
         }
 
         def widgetsetCompileProcess = ['java']
