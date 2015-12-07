@@ -144,10 +144,10 @@ public class TaskListener implements TaskExecutionListener {
         if (task.getName() == 'javadoc') {
             task.source = Util.getMainSourceSet(project)
             if (project.configurations.findByName(Configuration.JAVADOC.caption) != null) {
-                task.classpath += [project.configurations[Configuration.JAVADOC.caption]]
+                task.classpath = task.classpath.plus(project.configurations[Configuration.JAVADOC.caption])
             }
             if (project.configurations.findByName(Configuration.SERVER.caption) != null) {
-                task.classpath += [project.configurations[Configuration.SERVER.caption]]
+                task.classpath = task.classpath.plus(project.configurations[Configuration.SERVER.caption])
             }
             task.failOnError = false
             task.options.addStringOption("sourcepath", "")

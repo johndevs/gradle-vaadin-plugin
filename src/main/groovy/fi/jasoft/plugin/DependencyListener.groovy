@@ -22,6 +22,7 @@ import org.gradle.api.ProjectEvaluationListener
 import org.gradle.api.ProjectState
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.artifacts.DependencyResolveDetails
+import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTree
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.util.VersionNumber
@@ -160,11 +161,11 @@ class DependencyListener implements ProjectEvaluationListener {
         ])
 
         def sources = project.sourceSets.main
-        sources.compileClasspath += [conf]
+        sources.compileClasspath = sources.compileClasspath.plus(conf)
 
         def testSources = project.sourceSets.test
-        testSources.compileClasspath += [conf]
-        testSources.runtimeClasspath += [conf]
+        testSources.compileClasspath = testSources.compileClasspath.plus(conf)
+        testSources.runtimeClasspath = testSources.runtimeClasspath.plus(conf)
     }
 
     /**
@@ -259,11 +260,11 @@ class DependencyListener implements ProjectEvaluationListener {
         def conf = createConfiguration(project, Configuration.SERVER, [], [ project.configurations.compile])
 
         def sources = project.sourceSets.main
-        sources.compileClasspath += [conf]
+        sources.compileClasspath = sources.compileClasspath.plus(conf)
 
         def testSources = project.sourceSets.test
-        testSources.compileClasspath += [conf]
-        testSources.runtimeClasspath += [conf]
+        testSources.compileClasspath = testSources.compileClasspath.plus(conf)
+        testSources.runtimeClasspath = testSources.runtimeClasspath.plus(conf)
     }
 
     /**
@@ -329,11 +330,11 @@ class DependencyListener implements ProjectEvaluationListener {
         def conf = createConfiguration(project, Configuration.CLIENT, [], [project.configurations.compile])
 
         def sources = project.sourceSets.main
-        sources.compileClasspath += [conf]
+        sources.compileClasspath = sources.compileClasspath.plus(conf)
 
         def testSources = project.sourceSets.test
-        testSources.compileClasspath += [conf]
-        testSources.runtimeClasspath += [conf]
+        testSources.compileClasspath = testSources.compileClasspath.plus(conf)
+        testSources.runtimeClasspath = testSources.runtimeClasspath.plus(conf)
     }
 
     private static void createTestbenchConfiguration(Project project) {
@@ -342,8 +343,8 @@ class DependencyListener implements ProjectEvaluationListener {
         ], [project.configurations.testCompile])
 
         def testSources = project.sourceSets.test
-        testSources.compileClasspath += [conf]
-        testSources.runtimeClasspath += [conf]
+        testSources.compileClasspath = testSources.compileClasspath.plus(conf)
+        testSources.runtimeClasspath = testSources.runtimeClasspath.plus(conf)
     }
 
     private static void createPushConfiguration(Project project, String version) {
@@ -352,10 +353,10 @@ class DependencyListener implements ProjectEvaluationListener {
         ], [project.configurations.compile, project.configurations.runtime])
 
         def sources = project.sourceSets.main
-        sources.compileClasspath += [conf]
+        sources.compileClasspath = sources.compileClasspath.plus(conf)
 
         def testSources = project.sourceSets.test
-        testSources.compileClasspath += [conf]
-        testSources.runtimeClasspath += [conf]
+        testSources.compileClasspath = testSources.compileClasspath.plus(conf)
+        testSources.runtimeClasspath = testSources.runtimeClasspath.plus(conf)
     }
 }
