@@ -199,7 +199,7 @@ public class TaskListener implements TaskExecutionListener {
         // Add dependencies to eclipse classpath
         cp.plusConfigurations += [conf['vaadin-server']]
         cp.plusConfigurations += [conf['vaadin-client']]
-        //cp.plusConfigurations += [conf['vaadin-jetty9']]
+        cp.plusConfigurations += [conf['vaadin-jetty9']]
 
         if (project.vaadin.testbench.enabled) {
             cp.plusConfigurations += [conf['vaadin-testbench']]
@@ -233,7 +233,7 @@ public class TaskListener implements TaskExecutionListener {
         // Add configurations to classpath
         module.scopes.COMPILE.plus += [conf['vaadin-server']]
         module.scopes.COMPILE.plus += [conf['vaadin-client']]
-        //module.scopes.PROVIDED.plus += [conf['vaadin-jetty9']]
+        module.scopes.PROVIDED.plus += [conf['vaadin-jetty9']]
 
         if (project.vaadin.testbench.enabled) {
             module.scopes.TEST.plus += [conf['vaadin-testbench']]

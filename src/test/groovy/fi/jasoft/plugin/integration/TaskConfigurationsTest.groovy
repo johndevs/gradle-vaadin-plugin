@@ -13,8 +13,6 @@ class TaskConfigurationsTest implements IntegrationTest {
     @Test void 'Eclipse default configuration'() {
 
         buildFile << """
-            import static fi.jasoft.plugin.DependencyListener.Configuration.*
-
             apply plugin: 'eclipse-wtp'
 
             task verifyEclipseClassPath(dependsOn: 'eclipseClasspath') << {
@@ -24,9 +22,9 @@ class TaskConfigurationsTest implements IntegrationTest {
                 println 'Classes dir is default output dir ' + (classpath.defaultOutputDir == project.sourceSets.main.output.classesDir)
 
                 def confs = project.configurations
-                println 'Server in classpath ' + (confs.getByName(SERVER.caption) in classpath.plusConfigurations)
-                println 'Client in classpath ' + (confs.getByName(CLIENT.caption) in classpath.plusConfigurations)
-                println 'Jetty9 in classpath ' + (confs.getByName(JETTY9.caption) in classpath.plusConfigurations)
+                println 'Server in classpath ' + (confs.getByName('vaadin-server') in classpath.plusConfigurations)
+                println 'Client in classpath ' + (confs.getByName('vaadin-client') in classpath.plusConfigurations)
+                println 'Jetty9 in classpath ' + (confs.getByName('vaadin-jetty9') in classpath.plusConfigurations)
 
                 def natures = project.eclipse.project.natures
                 println 'Springsource nature ' + ('org.springsource.ide.eclipse.gradle.core.nature' in natures)
@@ -70,8 +68,6 @@ class TaskConfigurationsTest implements IntegrationTest {
     @Test void 'Eclipse configuration with Testbench enabled'() {
 
         buildFile << """
-            import static fi.jasoft.plugin.DependencyListener.Configuration.*
-
             apply plugin: 'eclipse-wtp'
 
             vaadin {
@@ -83,7 +79,7 @@ class TaskConfigurationsTest implements IntegrationTest {
             task verifyTestbenchDependency(dependsOn: 'eclipseClasspath') << {
                 def confs = project.configurations
                 def classpath = project.eclipse.classpath
-                println 'Testbench on classpath ' + (confs.getByName(TESTBENCH.caption) in classpath.plusConfigurations)
+                println 'Testbench on classpath ' + (confs.getByName('vaadin-testbench') in classpath.plusConfigurations)
             }
 
         """.stripIndent()
@@ -95,13 +91,11 @@ class TaskConfigurationsTest implements IntegrationTest {
     @Test void 'Eclipse WTP component configuration'() {
 
         buildFile << """
-            import static fi.jasoft.plugin.DependencyListener.Configuration.*
-
             apply plugin: 'eclipse-wtp'
 
             task verifyWTP(dependsOn: eclipseWtpComponent) << {
                 def confs = project.configurations
-                println 'Server in components ' + (confs.getByName(SERVER.caption) in project.eclipse.wtp.component.plusConfigurations)
+                println 'Server in components ' + (confs.getByName('vaadin-server') in project.eclipse.wtp.component.plusConfigurations)
             }
 
         """.stripIndent()
@@ -134,8 +128,6 @@ class TaskConfigurationsTest implements IntegrationTest {
     @Test void 'IDEA default configuration'() {
 
         buildFile << """
-            import static fi.jasoft.plugin.DependencyListener.Configuration.*
-
             apply plugin: 'idea'
 
             task verifyIdeaModule(dependsOn: 'ideaModule') << {
@@ -150,9 +142,9 @@ class TaskConfigurationsTest implements IntegrationTest {
 
                 def conf = project.configurations
                 def scopes = module.scopes
-                println 'Server configuration included ' + (conf.getByName(SERVER.caption) in scopes.COMPILE.plus)
-                println 'Client configuration included ' + (conf.getByName(CLIENT.caption) in scopes.COMPILE.plus)
-                println 'Jetty9 configuration included ' + (conf.getByName(JETTY9.caption) in scopes.PROVIDED.plus)
+                println 'Server configuration included ' + (conf.getByName('vaadin-server') in scopes.COMPILE.plus)
+                println 'Client configuration included ' + (conf.getByName('vaadin-client') in scopes.COMPILE.plus)
+                println 'Jetty9 configuration included ' + (conf.getByName('vaadin-jetty9') in scopes.PROVIDED.plus)
 
             }
         """.stripIndent()
@@ -173,8 +165,6 @@ class TaskConfigurationsTest implements IntegrationTest {
     @Test void 'IDEA configuration with Testbench'() {
 
         buildFile << """
-             import static fi.jasoft.plugin.DependencyListener.Configuration.*
-
              apply plugin: 'idea'
 
              vaadin {
@@ -187,7 +177,7 @@ class TaskConfigurationsTest implements IntegrationTest {
                 def conf = project.configurations
                 def module = project.idea.module
                 def scopes = module.scopes
-                println 'Test configuration has testbench ' + (conf.getByName(TESTBENCH.caption) in scopes.TEST.plus)
+                println 'Test configuration has testbench ' + (conf.getByName('vaadin-testbench') in scopes.TEST.plus)
              }
         """.stripIndent()
 
@@ -199,8 +189,6 @@ class TaskConfigurationsTest implements IntegrationTest {
     @Test void 'IDEA configuration with push'() {
 
         buildFile << """
-            import static fi.jasoft.plugin.DependencyListener.Configuration.*
-
             apply plugin: 'idea'
 
             vaadin {
@@ -211,7 +199,7 @@ class TaskConfigurationsTest implements IntegrationTest {
                 def conf = project.configurations
                 def module = project.idea.module
                 def scopes = module.scopes
-                println 'Compile configuration has push ' + (conf.getByName(PUSH.caption) in scopes.COMPILE.plus)
+                println 'Compile configuration has push ' + (conf.getByName('vaadin-push') in scopes.COMPILE.plus)
             }
 
         """.stripIndent()

@@ -30,18 +30,16 @@ class ProjectDependenciesTest implements IntegrationTest {
     @Test void 'Project has Vaadin configurations'() {
 
         buildFile << """
-            import static fi.jasoft.plugin.DependencyListener.Configuration.*
-
             task testConfigurations << {
                 def confs = project.configurations
 
-                println 'Server configuration ' + confs.hasProperty(SERVER.caption)
-                println 'Client configuration ' + confs.hasProperty(CLIENT.caption)
-                println 'Javadoc configuration ' + confs.hasProperty(JAVADOC.caption)
+                println 'Server configuration ' + confs.hasProperty('vaadin-server')
+                println 'Client configuration ' + confs.hasProperty('vaadin-client')
+                println 'Javadoc configuration ' + confs.hasProperty('vaadin-javadoc')
 
-                println 'Testbench configuration ' + confs.hasProperty(TESTBENCH.caption)
-                println 'Push configuration ' + confs.hasProperty(PUSH.caption)
-                println 'Groovy configuration ' + confs.hasProperty(GROOVY.caption)
+                println 'Testbench configuration ' + !confs.getByName('vaadin-testbench').dependencies.empty
+                println 'Push configuration ' + !confs.getByName('vaadin-push').dependencies.empty
+                println 'Groovy configuration ' + confs.hasProperty('vaadin-groovy')
             }
         """.stripIndent()
 
@@ -58,11 +56,17 @@ class ProjectDependenciesTest implements IntegrationTest {
     @Test void 'Project has Vaadin repositories'() {
 
         buildFile << """
-            import fi.jasoft.plugin.DependencyListener
             task testRepositories << {
-                DependencyListener.Repositories.each {
-                    if(!project.repositories.hasProperty(it.caption)){
-                        println 'Repository missing '+it.caption
+                def repositories = [
+                    'Vaadin addons',
+                    'Vaadin snapshots',
+                    'Jasoft.fi Maven repository',
+                    'Bintray.com Maven repository'
+                ]
+
+                repositories.each {
+                    if(!project.repositories.hasProperty(it)){
+                        println 'Repository missing '+it
                     }
                 }
             }
@@ -75,50 +79,44 @@ class ProjectDependenciesTest implements IntegrationTest {
     @Test void 'Project has Jetty dependency'() {
 
         buildFile << """
-            import static fi.jasoft.plugin.DependencyListener.Configuration.*
             task hasJettyConfiguration << {
                 def confs = project.configurations
-                println 'Jetty 9 '+ confs.hasProperty(JETTY9.caption)
-                println 'Jetty 8 '+ confs.hasProperty(JETTY8.caption)
+                println 'Jetty 9 '+ confs.hasProperty('vaadin-jetty9')
             }
         """.stripIndent()
 
         def result = getResultWithArguments('hasJettyConfiguration').standardOutput
         assertTrue result, result.contains( 'Jetty 9 true')
-        assertTrue result, result.contains( 'Jetty 8 false')
     }
 
     @Test void 'Project has pre-compiled widgetset'() {
 
         buildFile << """
-            import static fi.jasoft.plugin.DependencyListener.Configuration.*
             task hasWidgetset << {
                 def confs = project.configurations
-                def server = confs.getByName(SERVER.caption)
-                println 'Has client dependency ' + !confs.getByName(CLIENT.caption).dependencies.empty
-                println 'Has client-compiled dependency ' + !server.dependencies.findAll {it.name == 'vaadin-client-compiled'}.empty
+                def client = confs.getByName('vaadin-client')
+                println 'Has client dependency ' + !client.dependencies.empty
+                println 'Has client-compiled dependency ' + !client.dependencies.findAll {it.name == 'vaadin-client-compiled'}.empty
             }
          """.stripIndent()
 
         def result = getResultWithArguments('hasWidgetset').standardOutput
-        assertTrue result, result.contains( 'Has client dependency false')
+        assertTrue result, result.contains( 'Has client dependency true')
         assertTrue result, result.contains( 'Has client-compiled dependency true')
     }
 
     @Test void 'Client dependencies added when widgetset present'() {
 
         buildFile << """
-            import static fi.jasoft.plugin.DependencyListener.Configuration.*
-
             vaadin {
                 widgetset 'com.example.TestWidgetset'
             }
 
             task testClientDependencies << {
                 def confs = project.configurations
-                def server = confs.getByName(SERVER.caption)
-                println 'Has client dependency ' + !confs.getByName(CLIENT.caption).dependencies.empty
-                println 'Has client-compiled dependency ' +  !server.dependencies.findAll {it.name == 'vaadin-client-compiled'}.empty
+                def client = confs.getByName('vaadin-server')
+                println 'Has client dependency ' + !client.dependencies.empty
+                println 'Has client-compiled dependency ' +  !client.dependencies.findAll {it.name == 'vaadin-client-compiled'}.empty
             }
         """.stripIndent()
 
@@ -130,21 +128,19 @@ class ProjectDependenciesTest implements IntegrationTest {
     @Test void 'Vaadin version is resolved'() {
 
         buildFile << """
-            import static fi.jasoft.plugin.DependencyListener.Configuration.*
-
             vaadin {
                 version '7.3.0'
                 widgetset 'com.example.TestWidgetset'
             }
 
             task verifyVaadinVersion << {
-                def server = project.configurations.getByName(SERVER.caption)
+                def server = project.configurations.getByName('vaadin-server')
                 server.dependencies.each {
                     if(it.group.equals('com.vaadin')){
                         println 'Vaadin Server ' + it.version
                     }
                 }
-                def client = project.configurations.getByName(CLIENT.caption)
+                def client = project.configurations.getByName('vaadin-client')
                 client.dependencies.each {
                     if(it.group.equals('com.vaadin')){
                         println 'Vaadin Client ' + it.version
@@ -161,8 +157,6 @@ class ProjectDependenciesTest implements IntegrationTest {
     @Test void 'Project has Testbench dependencies'() {
 
         buildFile << """
-            import static fi.jasoft.plugin.DependencyListener.Configuration.*
-
             vaadin {
                 testbench {
                     enabled true
@@ -171,9 +165,9 @@ class ProjectDependenciesTest implements IntegrationTest {
 
             task verifyTestbenchPresent << {
                 def confs = project.configurations
-                println 'Testbench configuration ' + confs.hasProperty(TESTBENCH.caption)
+                println 'Testbench configuration ' + confs.hasProperty('vaadin-testbench')
 
-                def testbench = confs.getByName(TESTBENCH.caption)
+                def testbench = confs.getByName('vaadin-testbench')
                 println 'Testbench artifacts ' + !testbench.empty
             }
         """.stripIndent()

@@ -37,7 +37,7 @@ class GroovyTaskListener implements TaskExecutionListener {
                 War war = (War) task;
 
                 // Add groovy libs to war
-                project.war.classpath += project.configurations[DependencyListener.Configuration.GROOVY.caption]
+                project.war.classpath += project.configurations['vaadin-groovy']
 
                 // Ensure no duplicates
                 project.war.classpath = war.classpath.files
@@ -62,7 +62,7 @@ class GroovyTaskListener implements TaskExecutionListener {
         def conf = project.configurations
         def module = project.idea.module
 
-        module.scopes.COMPILE.plus += [conf[DependencyListener.Configuration.GROOVY.caption]]
+        module.scopes.COMPILE.plus += [conf['vaadin-groovy']]
     }
 
     def configureEclipsePlugin(Task task) {
@@ -70,6 +70,6 @@ class GroovyTaskListener implements TaskExecutionListener {
         def conf = project.configurations
 
         // Add dependencies to eclipse classpath
-        cp.plusConfigurations += [conf[DependencyListener.Configuration.GROOVY.caption]]
+        cp.plusConfigurations += [conf['vaadin-groovy']]
     }
 }

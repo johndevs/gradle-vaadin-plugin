@@ -19,10 +19,21 @@ class GradleVaadinGroovyPlugin extends GradleVaadinPlugin {
         project.extensions.create('vaadin-groovy', VaadinPluginGroovyExtension)
 
         // Dependencies
-        project.gradle.addProjectEvaluationListener(new GroovyDependencyListener())
         project.gradle.taskGraph.addTaskExecutionListener(new GroovyTaskListener(project))
+
+        def configurations = project.configurations
+        def projectDependencies = project.dependencies
+        configurations.create('vaadin-groovy', { conf ->
+            conf.description = 'Libraries needed to use Groovy with Vaadin'
+            conf.defaultDependencies { dependencies ->
+                def groovy = projectDependencies.create('org.codehaus.groovy:groovy-all:2.3.4')
+                dependencies.add(groovy)
+            }
+        })
 
         // Plugins
         project.plugins.apply(GroovyPlugin)
+
+
     }
 }
