@@ -105,6 +105,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
         applyVaadinDirectoryTasks(project)
 
         // Add debug information to all compilation results
+        def tasks = project.tasks
         tasks.compileJava.options.debugOptions.debugLevel = 'source,lines,vars'
 
         // Add sources to test classpath
