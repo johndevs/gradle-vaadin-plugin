@@ -109,7 +109,8 @@ class GradleVaadinPlugin implements Plugin<Project> {
         tasks.compileJava.options.debugOptions.debugLevel = 'source,lines,vars'
 
         // Add sources to test classpath
-        project.sourceSets.test.runtimeClasspath += [project.files(project.sourceSets.main.java.srcDirs)]
+        project.sourceSets.test.runtimeClasspath =
+                project.sourceSets.test.runtimeClasspath.plus(project.files(project.sourceSets.main.java.srcDirs))
 
         // War project should build the widgetset and themes
         def war = project.war

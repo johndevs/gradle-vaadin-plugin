@@ -135,11 +135,12 @@ public class TaskListener implements TaskExecutionListener {
 
         if (task.getName() == 'javadoc') {
             task.source = Util.getMainSourceSet(project)
+
             if (project.configurations.findByName('vaadin-javadoc') != null) {
-                task.classpath += [project.configurations['vaadin-javadoc']]
+                task.classpath = task.classpath.plus(project.configurations['vaadin-javadoc'])
             }
             if (project.configurations.findByName('vaadin-server') != null) {
-                task.classpath += [project.configurations['vaadin-server']]
+                task.classpath = task.classpath.plus(project.configurations['vaadin-server'])
             }
             task.failOnError = false
             task.options.addStringOption("sourcepath", "")
