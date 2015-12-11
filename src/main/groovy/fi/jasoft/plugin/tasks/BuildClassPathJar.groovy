@@ -20,9 +20,12 @@ class BuildClassPathJar extends Jar {
         }
 
         project.afterEvaluate{
-            def files = Util.getCompileClassPath(project).filter { File file ->
-                file.isFile() && file.name.endsWith('.jar')
-            }
+
+            def files = project.configurations['vaadin-payara']
+                    .plus(Util.getCompileClassPath(project))
+                    .filter { File file ->
+                        file.isFile() && file.name.endsWith('.jar')
+                    }
 
             inputs.files(files)
 

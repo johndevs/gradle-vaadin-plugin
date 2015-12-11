@@ -145,6 +145,22 @@ class Util {
         collection
     }
 
+    static FileCollection getPayaraClassPath(Project project) {
+        FileCollection collection
+
+        if(project.vaadin.plugin.useClassPathJar){
+            BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
+            collection = project.files(pathJarTask.archivePath)
+        } else {
+            collection = project.configurations['vaadin-payara']
+            collection += getCompileClassPath(project)
+        }
+
+        collection += project.sourceSets.main.runtimeClasspath
+
+        collection
+    }
+
     /**
      * Gets the classpath used for compiling client side code
      *
@@ -422,81 +438,118 @@ class Util {
      */
     static void logProcess(final Project project, final Process process, final String filename, Closure monitor={}) {
         if(project.vaadin.plugin.logToConsole){
-            Thread.start 'Info logger', {
+            logProcessToConsole(project,process,monitor)
+        } else {
+            logProcessToFile(project, process, filename, monitor)
+        }
+    }
+
+    /**
+     * Logs a process to a file
+     *
+     * @param project
+     *      the project
+     * @param process
+     *      the process
+     * @param filename
+     *      thefilename where to output the logs
+     * @param monitor
+     *      the monitor for monitoring log output
+     */
+    static void logProcessToFile(final Project project, final Process process, final String filename,
+                                 Closure monitor={}) {
+        project.logger.info("Logging to file")
+
+        File logDir = project.file('build/logs/')
+        logDir.mkdirs()
+
+        final File logFile = new File(logDir.canonicalPath + '/' + filename)
+
+        Thread.start 'Info logger', {
+            logFile.withWriterAppend { out ->
                 try {
                     def errorOccurred = false
+
                     process.inputStream.eachLine { output ->
                         monitor.call(output)
                         if (output.contains("[WARN]")) {
-                            project.logger.warn(output.replaceAll("\\[WARN\\]", '').trim())
+                            out.println "[WARN] " + output.replaceAll("\\[WARN\\]", '').trim()
                         } else if(output.contains('[ERROR]')){
                             errorOccurred = true
+                            out.println "[ERROR] "+output.replaceAll("\\[ERROR\\]",'').trim()
                         } else {
-                            project.logger.info(output.trim())
+                            out.println "[INFO] " + output.trim()
                         }
+                        out.flush()
                         if(errorOccurred){
                             // An error has occurred, dump everything to console
                             project.logger.error(output.replaceAll("\\[ERROR\\]",'').trim())
                         }
                     }
-                } catch(IOException e){
+                } catch (IOException e) {
                     // Stream might be closed
                 }
             }
+        }
 
-            Thread.start 'Error logger', {
+        Thread.start 'Error logger', {
+            logFile.withWriterAppend { out ->
                 try {
-                    process.errorStream.eachLine { String output ->
+                    process.errorStream.eachLine { output ->
                         monitor.call(output)
-                        project.logger.error(output.replaceAll("\\[ERROR\\]", '').trim())
+                        out.println "[ERROR] "+output.replaceAll("\\[ERROR\\]",'').trim()
+                        out.flush()
                     }
-                } catch(IOException e){
+                } catch (IOException e) {
                     // Stream might be closed
                 }
             }
-        } else {
-            File logDir = project.file('build/logs/')
-            logDir.mkdirs()
+        }
+    }
 
-            final File logFile = new File(logDir.canonicalPath + '/' + filename)
-            Thread.start 'Info logger', {
-                logFile.withWriterAppend { out ->
-                    try {
-                        def errorOccurred = false
-                        process.inputStream.eachLine { output ->
-                            monitor.call(output)
-                            if (output.contains("[WARN]")) {
-                                out.println "[WARN] " + output.replaceAll("\\[WARN\\]", '').trim()
-                            } else if(output.contains('[ERROR]')){
-                                errorOccurred = true
-                                out.println "[ERROR] "+output.replaceAll("\\[ERROR\\]",'').trim()
-                            } else {
-                                out.println "[INFO] " + output.trim()
-                            }
-                            out.flush()
-                            if(errorOccurred){
-                                // An error has occurred, dump everything to console
-                                project.logger.error(output.replaceAll("\\[ERROR\\]",'').trim())
-                            }
-                        }
-                    } catch (IOException e) {
-                        // Stream might be closed
+    /**
+     * Logs process output to the console
+     *
+     * @param project
+     *      the project
+     * @param process
+     *      the process to log output from
+     * @param monitor
+     *      the monitor to monitory output with
+     */
+    static void logProcessToConsole(final Project project, final Process process, Closure monitor={}) {
+        project.logger.info("Logging to console")
+
+        Thread.start 'Info logger', {
+            try {
+                def errorOccurred = false
+                process.inputStream.eachLine { output ->
+                    monitor.call(output)
+                    if (output.contains("[WARN]")) {
+                        project.logger.warn(output.replaceAll("\\[WARN\\]", '').trim())
+                    } else if(output.contains('[ERROR]')){
+                        errorOccurred = true
+                    } else {
+                        project.logger.info(output.trim())
+                    }
+                    if(errorOccurred){
+                        // An error has occurred, dump everything to console
+                        project.logger.error(output.replaceAll("\\[ERROR\\]",'').trim())
                     }
                 }
+            } catch(IOException e){
+                // Stream might be closed
             }
-            Thread.start 'Error logger', {
-                logFile.withWriterAppend { out ->
-                    try {
-                        process.errorStream.eachLine { output ->
-                            monitor.call(output)
-                            project.logger.error(output.replaceAll("\\[ERROR\\]",'').trim())
-                            out.println "[ERROR] "+output.replaceAll("\\[ERROR\\]",'').trim()
-                            out.flush()
-                        }
-                    } catch (IOException e) {
-                        // Stream might be closed
-                    }
+        }
+
+        Thread.start 'Error logger', {
+            try {
+                process.errorStream.eachLine { String output ->
+                    monitor.call(output)
+                    project.logger.error(output.replaceAll("\\[ERROR\\]", '').trim())
                 }
+            } catch(IOException e){
+                // Stream might be closed
             }
         }
     }
@@ -537,7 +590,7 @@ class Util {
             sleep(1000)
 
             key.pollEvents().each { WatchEvent event ->
-                if (event.kind() != StandardWatchEventKinds.OVERFLOW) {
+                if (!stop && event.kind() != StandardWatchEventKinds.OVERFLOW) {
                     stop = closure.call(key, event)
                 }
             }
@@ -655,5 +708,47 @@ class Util {
      */
     static String getVaadinVersion(Project project) {
         project.vaadin.version ?: '7.5.+'
+    }
+
+    /**
+     * Returns the classpath of the WAR used by the vaadinRun task
+     *
+     * @param project
+     *      the project to use
+     * @return
+     *      classpath of WAR
+     */
+    static FileCollection getWarClasspath(Project project) {
+
+        // Include project classes and resources
+        FileCollection classpath = project.files(
+                project.sourceSets.main.output.classesDir,
+                project.sourceSets.main.output.resourcesDir
+        )
+
+        // Include server dependencies
+        classpath += project.configurations['vaadin-server']
+
+        // Include client if no widgetset to provide pre-compiled widgetset
+        if(!project.vaadin.widgetset){
+            classpath += project.configurations['vaadin-client']
+        }
+
+        // Include runtime dependencies
+        classpath += project.configurations.runtime
+
+        // Include push dependencies if enabled
+        if(isPushSupportedAndEnabled(project)) {
+            classpath += project.configurations['vaadin-push']
+        }
+
+        // Remove provided dependencies
+        classpath -= project.configurations.providedCompile
+        classpath -= project.configurations.providedRuntime
+
+        // Ensure no duplicates
+        classpath = project.files(classpath.files)
+
+        classpath
     }
 }

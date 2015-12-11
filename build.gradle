@@ -39,6 +39,7 @@ dependencies {
     compile 'org.eclipse.jetty:jetty-plus:9.2.2.v20140723'
     compile 'org.eclipse.jetty:jetty-deploy:9.2.2.v20140723'
     compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
+    compile 'fish.payara.extras:payara-embedded-web:4.1.152.1'
 
     deploy 'org.apache.maven.wagon:wagon-ssh:2.2'
 

@@ -15,6 +15,7 @@
 */
 package fi.jasoft.plugin
 
+import fi.jasoft.plugin.tasks.BuildClassPathJar
 import fi.jasoft.plugin.tasks.CompileThemeTask
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
@@ -48,7 +49,6 @@ class ApplicationServer {
         }
 
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-        FileCollection cp = Util.getJettyClassPath(project)
 
         def appServerProcess = ['java']
 
@@ -73,8 +73,18 @@ class ApplicationServer {
             appServerProcess.add('-ea')
         }
 
+        FileCollection cp
+        if(project.vaadin.plugin.useClassPathJar){
+            BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
+            cp = project.files(pathJarTask.archivePath)
+        } else {
+            cp = project.configurations['vaadin-payara']
+                    .plus(Util.getWarClasspath(project))
+                    .filter { it.file && it.canonicalFile.name.endsWith('.jar')}
+        }
+
         appServerProcess.add('-cp')
-        appServerProcess.add(cp.getAsPath())
+        appServerProcess.add(cp.asPath)
 
         if (project.vaadin.jvmArgs != null) {
             appServerProcess.addAll(project.vaadin.jvmArgs)
@@ -87,7 +97,7 @@ class ApplicationServer {
 
         appServerProcess.add(webAppDir.canonicalPath + '/')
 
-        File classesDir = project.file("build/classes")
+        File classesDir = project.sourceSets.main.output.classesDir
         appServerProcess.add(classesDir.canonicalPath + '/')
 
         if(project.logger.debugEnabled){
@@ -96,6 +106,17 @@ class ApplicationServer {
             appServerProcess.add('INFO')
         }
 
+        appServerProcess.add(project.name);
+
+        def payaraDir = new File(project.buildDir.absolutePath, 'payara')
+        payaraDir.mkdirs()
+        appServerProcess.add(payaraDir.absolutePath)
+
+        def payaraClasspath = new File(payaraDir, 'classpath.txt')
+        payaraClasspath.text = Util.getWarClasspath(project)
+                .filter { it.file && it.canonicalFile.name.endsWith('.jar')}
+                .join(";")
+
         // Execute server
         process = appServerProcess.execute()
 
@@ -103,7 +124,7 @@ class ApplicationServer {
         if(project.vaadin.plugin.jettyAutoRefresh) {
             def self = this
             Thread.start 'Class Directory Watcher', {
-                watchClassDirectoryForChanges(self)
+                ApplicationServer.watchClassDirectoryForChanges(self)
             }
         }
 
@@ -125,8 +146,8 @@ class ApplicationServer {
         paramString = paramString.replaceAll('\\?$|&$', '')
 
         // Capture log output
-        Util.logProcess(project, process, 'jetty.log', { line ->
-            if(line.contains('org.eclipse.jetty.server.Server - Started')) {
+        Util.logProcess(project, process, 'payara.log', { line ->
+            if(line.contains('was successfully deployed')) {
                 if(firstStart) {
                     def resultStr = "Application running on http://localhost:${project.vaadin.serverPort} "
                     if (project.vaadin.jrebel.enabled) {
@@ -179,7 +200,8 @@ class ApplicationServer {
         }
     }
 
-    def watchClassDirectoryForChanges(final ApplicationServer server) {
+    static watchClassDirectoryForChanges(final ApplicationServer server) {
+        def project = server.project
         def classesDir
         if (project.vaadin.plugin.eclipseOutputDir == null) {
             classesDir = project.sourceSets.main.output.classesDir
@@ -203,8 +225,9 @@ class ApplicationServer {
                 }
             }
 
-            if(project.vaadin.plugin.jettyAutoRefresh){
+            if(project.vaadin.plugin.jettyAutoRefresh && server.process){
                 // Force restart of server
+                project.logger.lifecycle("Reloading server...")
                 server.terminate()
             }
             false

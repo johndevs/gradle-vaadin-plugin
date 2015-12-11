@@ -15,63 +15,64 @@
 */
 package fi.jasoft.plugin;
 
-import org.eclipse.jetty.annotations.AnnotationConfiguration;
-import org.eclipse.jetty.jmx.MBeanContainer;
-import org.eclipse.jetty.plus.webapp.EnvConfiguration;
-import org.eclipse.jetty.plus.webapp.PlusConfiguration;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.util.resource.ResourceCollection;
-import org.eclipse.jetty.webapp.*;
+import org.glassfish.embeddable.*;
+import org.glassfish.embeddable.archive.ScatteredArchive;
 
 import java.io.File;
-import java.lang.management.ManagementFactory;
-import java.util.ArrayList;
-import java.util.List;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ApplicationServerRunner {
 
-    // Usage: 'ApplicationServerRunner [port] [webbappdir] [classesdir] [LogLevel]'
+    // Usage: 'ApplicationServerRunner [port] [webbappdir] [classesdir] [LogLevel] [name] [workdir]'
     public static void main(String[] args) throws Exception {
         int port = Integer.parseInt(args[0]);
         String webAppDir = args[1];
         String classesDir = args[2];
-        String logLevel = args[3];
+        Level logLevel = Level.parse(args[3]);
+        String name = args[4];
+        String workdir = args[5];
 
-        List<String> resources = new ArrayList<>();
-        if(new File(webAppDir).exists()){
-            resources.add(webAppDir);
+        String[] dependencies = new String(Files.readAllBytes(Paths.get(workdir + "/classpath.txt")), StandardCharsets.UTF_8).split(";");
+
+        Logger.getLogger("").getHandlers()[0].setLevel(logLevel);
+        Logger.getLogger("javax.enterprise.system.tools.deployment").setLevel(logLevel);
+        Logger.getLogger("javax.enterprise.system").setLevel(logLevel);
+
+        try {
+
+            BootstrapProperties bootstrap = new BootstrapProperties();
+            GlassFishRuntime runtime = GlassFishRuntime.bootstrap(bootstrap, ApplicationServerRunner.class.getClass().getClassLoader());
+            GlassFishProperties glassfishProperties = new GlassFishProperties();
+            glassfishProperties.setPort("http-listener", port);
+            GlassFish glassfish = runtime.newGlassFish(glassfishProperties);
+            glassfish.start();
+
+            Deployer deployer = glassfish.getDeployer();
+            ScatteredArchive archive = new ScatteredArchive(
+                    name,
+                    ScatteredArchive.Type.WAR,
+                    new File(webAppDir));
+            archive.addClassPath(new File(classesDir));
+
+            for(String dependency : dependencies){
+                archive.addClassPath(new File(dependency));
+            }
+
+            String tmp = System.getProperty("java.io.tmpdir");
+            System.setProperty("java.io.tmpdir", workdir);
+            URI archiveURI = archive.toURI();
+            System.setProperty("java.io.tmpdir", tmp);
+
+            deployer.deploy(archiveURI, "--contextroot=");
+        } catch (Exception ex){
+            Logger.getLogger(ApplicationServerRunner.class.getName()).log(Level.SEVERE,
+                    null, ex);
         }
 
-        System.setProperty("org.eclipse.jetty.LEVEL", logLevel);
-
-        Server server = new Server(port);
-    
-        // Setup JMX
-        MBeanContainer mbContainer = new MBeanContainer(ManagementFactory.getPlatformMBeanServer());
-        server.addBean(mbContainer);
-
-        // Static file handler
-        WebAppContext handler = new WebAppContext();
-        server.setHandler(handler);
-
-        handler.setContextPath("/");
-        handler.setBaseResource(new ResourceCollection(resources.toArray(new String[resources.size()])));
-        handler.setParentLoaderPriority(true);
-        handler.setExtraClasspath(classesDir);
-        handler.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern", ".*/build/classes/.*");
-        handler.setConfigurations(new Configuration[]{
-                new WebXmlConfiguration(),
-                new WebInfConfiguration(),
-                new PlusConfiguration(),
-                new MetaInfConfiguration(),
-                new FragmentConfiguration(),
-                new EnvConfiguration(),
-                new AnnotationConfiguration(),
-                new JettyWebXmlConfiguration()
-        });
-        handler.setClassLoader(new WebAppClassLoader(ApplicationServerRunner.class.getClassLoader(), handler));
-
-        server.start();
-        server.join();
     }
 }

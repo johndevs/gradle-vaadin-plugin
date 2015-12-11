@@ -155,6 +155,8 @@ class GradleVaadinPlugin implements Plugin<Project> {
                    conf.name.startsWith('vaadin-')
                 })
             }
+
+
         }
     }
 
@@ -307,6 +309,17 @@ class GradleVaadinPlugin implements Plugin<Project> {
             }
         })
 
+        configurations.create('vaadin-payara', { conf ->
+            conf.description = 'Libraries for running the embedded Payara server'
+            conf.defaultDependencies { dependencies ->
+                def payaraWebProfile = projectDependencies.create('fish.payara.extras:payara-embedded-web:4.1.152.1')
+                dependencies.add(payaraWebProfile)
+
+                def plugin = projectDependencies.create("fi.jasoft.plugin:gradle-vaadin-plugin:${GradleVaadinPlugin.version}")
+                dependencies.add(plugin)
+            }
+        })
+
         configurations.create('vaadin-push', { conf ->
             conf.description = 'Libraries needed for using Vaadin Push features.'
             conf.defaultDependencies { dependencies ->
@@ -356,7 +369,54 @@ class GradleVaadinPlugin implements Plugin<Project> {
                 }
             }
         })
+
+        // Ensure vaadin version is correct across configurations
+        project.configurations.all { config ->
+            configureResolutionStrategy(project, config)
+        }
     }
+
+    /**
+     * Configures the resolution strategy for a configuration. Ensures Vaadin version is the correct one.
+     *
+     * @param project
+     *      The project of the configuration
+     * @param configuration
+     *      The configuration
+     */
+    static void configureResolutionStrategy(Project project, Configuration config) {
+        config.resolutionStrategy.eachDependency(new Action<DependencyResolveDetails>() {
+
+            @Override
+            void execute(DependencyResolveDetails details) {
+                def whitelist = [
+                        'com.vaadin:vaadin-client',
+                        'com.vaadin:vaadin-client-compiled',
+                        'com.vaadin:vaadin-client-compiler',
+                        'com.vaadin:vaadin-server',
+                        'com.vaadin:vaadin-shared',
+                        'com.vaadin:vaadin-themes',
+                        'com.vaadin:vaadin-push'
+                ]
+
+                def dependency = details.requested
+                String group = dependency.group
+                String name = dependency.name
+
+                if("$group:$name".toString() in whitelist){
+                    details.useVersion Util.getVaadinVersion(project)
+                }
+
+                if(config.name == 'vaadin-client') {
+                    if(group == 'javax.validation' && name == 'validation-api'){
+                        // GWT only supports this version, do not upgrade it
+                        details.useVersion '1.0.0.GA'
+                    }
+                }
+            }
+        })
+    }
+
 
     static void applyVaadinTasks(Project project){
         def tasks = project.tasks

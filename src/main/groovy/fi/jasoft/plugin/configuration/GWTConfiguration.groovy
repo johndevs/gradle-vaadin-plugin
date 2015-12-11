@@ -91,7 +91,7 @@ class GWTConfiguration {
     /**
      * Should GWT be placed first in the classpath when compiling the widgetset.
      */
-    boolean gwtSdkFirstInClasspath = false
+    boolean gwtSdkFirstInClasspath = true
 
     /**
      * (Optional) root directory, for generated files; default is the web-app dir from the WAR plugin
