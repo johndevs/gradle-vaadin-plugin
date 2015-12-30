@@ -121,47 +121,6 @@ class Util {
     }
 
     /**
-     * Returns the classpath used for embedded Jetty
-     *
-     * @param project
-     *      the project to get the classpath for
-     *
-     * @return
-     *      the classpath as a collection of files
-     */
-    static FileCollection getJettyClassPath(Project project) {
-        FileCollection collection
-
-        if(project.vaadin.plugin.useClassPathJar){
-            BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
-            collection = project.files(pathJarTask.archivePath)
-        } else {
-            collection = project.configurations['vaadin-jetty9']
-            collection += getCompileClassPath(project)
-        }
-
-        collection += project.sourceSets.main.runtimeClasspath
-
-        collection
-    }
-
-    static FileCollection getPayaraClassPath(Project project) {
-        FileCollection collection
-
-        if(project.vaadin.plugin.useClassPathJar){
-            BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
-            collection = project.files(pathJarTask.archivePath)
-        } else {
-            collection = project.configurations['vaadin-payara']
-            collection += getCompileClassPath(project)
-        }
-
-        collection += project.sourceSets.main.runtimeClasspath
-
-        collection
-    }
-
-    /**
      * Gets the classpath used for compiling client side code
      *
      * @param project

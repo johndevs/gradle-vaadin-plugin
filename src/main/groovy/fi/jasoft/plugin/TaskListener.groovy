@@ -19,15 +19,15 @@ import fi.jasoft.plugin.tasks.CreateDirectoryZipTask
 import fi.jasoft.plugin.tasks.CreateWidgetsetGeneratorTask
 import fi.jasoft.plugin.testbench.TestbenchHub
 import fi.jasoft.plugin.testbench.TestbenchNode
+import groovy.transform.PackageScope
 import groovy.xml.MarkupBuilder
-import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.execution.TaskExecutionListener
 import org.gradle.api.tasks.TaskState
 import org.gradle.api.tasks.bundling.War
 import org.gradle.plugins.ide.eclipse.model.EclipseWtp
 
-public class TaskListener implements TaskExecutionListener {
+class TaskListener implements TaskExecutionListener {
 
     private TestbenchHub testbenchHub
 
@@ -35,133 +35,67 @@ public class TaskListener implements TaskExecutionListener {
 
     ApplicationServer testbenchAppServer
 
-    private final Project project
-
-    public TaskListener(Project project) {
-        this.project = project
-    }
-
     public void beforeExecute(Task task) {
-
-        if (project != task.getProject() || !project.hasProperty('vaadin')) {
+        if (!task.project.hasProperty('vaadin')) {
             return
         }
 
-        /*
-         * Dependency related configurations
-         */
-        if (project.vaadin.manageDependencies) {
-
-            if (task.getName() == 'eclipseClasspath') {
+        switch (task.name) {
+            case 'eclipseClasspath':
                 configureEclipsePlugin(task)
-            }
-
-            if (task.getName() == 'eclipseWtpComponent') {
+                break
+            case 'ideaModule':
+                configureIdeaModule(task)
+                break
+            case 'eclipseWtpFacet':
+                configureEclipseWtpPluginFacet(task)
+                break
+            case 'eclipseWtpComponent':
                 configureEclipseWtpPluginComponent(task)
-            }
-
-            if(task.getName() == 'ideaModule'){
-               configureIdeaModule(task)
-            }
-        }
-
-        if (task.getName() == 'eclipseWtpFacet') {
-            configureEclipseWtpPluginFacet(task)
-        }
-
-        if (task.getName() == 'compileJava') {
-            ensureWidgetsetGeneratorExists(task)
-        }
-
-        if (task.getName() == 'jar') {
-            configureAddonMetadata(task)
-        }
-
-        if (task.getName() == 'war') {
-            configureJRebel(task)
-
-            // Exclude unit cache
-            War war = (War) task;
-            war.exclude('VAADIN/gwt-unitCache/**')
-
-            if (project.vaadin.manageDependencies) {
-                war.classpath = Util.getWarClasspath(project).files
-            }
-        }
-
-        if (task.getName() == 'test' && project.vaadin.testbench.enabled) {
-
-            if (project.vaadin.testbench.hub.enabled) {
-                testbenchHub = new TestbenchHub(project)
-                testbenchHub.start()
-            }
-
-            if (project.vaadin.testbench.node.enabled) {
-                testbenchNode = new TestbenchNode(project)
-                testbenchNode.start()
-            }
-
-            if (project.vaadin.testbench.runApplication) {
-                testbenchAppServer = new ApplicationServer(project)
-                testbenchAppServer.start()
-
-                // Ensure everything is up and running before continuing with the tests
-                sleep(5000)
-            }
-        }
-
-        if (task.getName() == 'javadoc') {
-            task.source = Util.getMainSourceSet(project)
-
-            if (project.configurations.findByName('vaadin-javadoc') != null) {
-                task.classpath = task.classpath.plus(project.configurations['vaadin-javadoc'])
-            }
-            if (project.configurations.findByName('vaadin-server') != null) {
-                task.classpath = task.classpath.plus(project.configurations['vaadin-server'])
-            }
-            task.failOnError = false
-            task.options.addStringOption("sourcepath", "")
-        }
-
-        if (task.getName() == CreateDirectoryZipTask.NAME) {
-            configureAddonZipMetadata(task)
+                break
+            case 'compileJava':
+                ensureWidgetsetGeneratorExists(task)
+                break
+            case 'jar':
+                configureAddonMetadata(task)
+                break
+            case 'war':
+                configureJRebel(task)
+                configureWAR(task)
+                break
+            case 'test':
+                configureTest(task, this)
+                break
+            case 'javadoc':
+                configureJavadoc(task)
+                break
+            case CreateDirectoryZipTask.NAME:
+                configureAddonZipMetadata(task)
+                break
         }
     }
 
     public void afterExecute(Task task, TaskState state) {
-
-        if (project != task.getProject() || !project.hasProperty('vaadin')) {
+        if (!task.project.hasProperty('vaadin')) {
             return
         }
 
-        if (task.getName() == 'test' && project.vaadin.testbench.enabled) {
-
-            if (testbenchAppServer != null) {
-                testbenchAppServer.terminate()
-                testbenchAppServer = null
-            }
-
-            if (testbenchNode != null) {
-                testbenchNode.terminate()
-                testbenchNode = null
-            }
-
-            if (testbenchHub != null) {
-                testbenchHub.terminate()
-                testbenchHub = null
-            }
+        if (task.name == 'test') {
+            terminateTestbench(this)
         }
 
         // Notify users that sources are not present in the jar
-        if (task.getName() == 'jar' && !state.getSkipped()) {
+        if (task.name == 'jar' && !state.getSkipped()) {
             task.getLogger().warn("Please note that the jar archive will NOT by default include the source files.\n" +
                     "You can add them to the jar by adding jar{ from sourceSets.main.allJava } to build.gradle.")
         }
     }
 
-    private void configureEclipsePlugin(Task task) {
-        def cp = project.eclipse.classpath
+    @PackageScope
+    static configureEclipsePlugin(Task task) {
+        def project = task.project
         def conf = project.configurations
+        def cp = project.eclipse.classpath
 
         // Always download sources
         cp.downloadSources = true
@@ -175,16 +109,15 @@ public class TaskListener implements TaskExecutionListener {
         }
 
         // Add dependencies to eclipse classpath
-        cp.plusConfigurations += [conf['vaadin-server']]
-        cp.plusConfigurations += [conf['vaadin-client']]
-        cp.plusConfigurations += [conf['vaadin-jetty9']]
+        cp.plusConfigurations += [conf[GradleVaadinPlugin.CONFIGURATION_SERVER]]
+        cp.plusConfigurations += [conf[GradleVaadinPlugin.CONFIGURATION_CLIENT]]
 
         if (project.vaadin.testbench.enabled) {
-            cp.plusConfigurations += [conf['vaadin-testbench']]
+            cp.plusConfigurations += [conf[GradleVaadinPlugin.CONFIGURATION_TESTBENCH]]
         }
 
         if (Util.isPushSupportedAndEnabled(project)) {
-            cp.plusConfigurations += [conf['vaadin-push']]
+            cp.plusConfigurations += [conf[GradleVaadinPlugin.CONFIGURATION_PUSH]]
         }
 
         // Configure natures
@@ -192,8 +125,9 @@ public class TaskListener implements TaskExecutionListener {
         natures.add(0, 'org.springsource.ide.eclipse.gradle.core.nature' )
     }
 
-    private void configureIdeaModule(Task task) {
-
+    @PackageScope
+    static configureIdeaModule(Task task) {
+        def project = task.project
         def conf = project.configurations
         def module = project.idea.module
 
@@ -209,50 +143,55 @@ public class TaskListener implements TaskExecutionListener {
         module.downloadSources = true
 
         // Add configurations to classpath
-        module.scopes.COMPILE.plus += [conf['vaadin-server']]
-        module.scopes.COMPILE.plus += [conf['vaadin-client']]
-        module.scopes.PROVIDED.plus += [conf['vaadin-jetty9']]
+        module.scopes.COMPILE.plus += [conf[GradleVaadinPlugin.CONFIGURATION_SERVER]]
+        module.scopes.COMPILE.plus += [conf[GradleVaadinPlugin.CONFIGURATION_CLIENT]]
 
         if (project.vaadin.testbench.enabled) {
-            module.scopes.TEST.plus += [conf['vaadin-testbench']]
+            module.scopes.TEST.plus += [conf[GradleVaadinPlugin.CONFIGURATION_TESTBENCH]]
         }
 
         if (Util.isPushSupportedAndEnabled(project)) {
-            module.scopes.COMPILE.plus += [conf['vaadin-push']]
+            module.scopes.COMPILE.plus += [conf[GradleVaadinPlugin.CONFIGURATION_PUSH]]
         }
     }
 
-    private void configureEclipseWtpPluginComponent(Task task) {
+    @PackageScope
+    static configureEclipseWtpPluginComponent(Task task) {
+        def project = task.project
         def wtp = project.eclipse.wtp
-        wtp.component.plusConfigurations += [project.configurations['vaadin-server']]
+        wtp.component.plusConfigurations += [project.configurations[GradleVaadinPlugin.CONFIGURATION_SERVER]]
     }
 
-    private void configureEclipseWtpPluginFacet(Task task) {
-        def wtp = project.eclipse.wtp as EclipseWtp
+    @PackageScope
+    static configureEclipseWtpPluginFacet(Task task) {
+        def wtp = task.project.eclipse.wtp as EclipseWtp
         def facet = wtp.facet
 
         facet.facets = []
         facet.facet(name: 'jst.web', version: '3.0')
-        facet.facet(name: 'jst.java', version: project.sourceCompatibility)
+        facet.facet(name: 'jst.java', version: task.project.sourceCompatibility)
         facet.facet(name: 'com.vaadin.integration.eclipse.core', version: '7.0')
-        facet.facet(name: 'java', version: project.sourceCompatibility)
+        facet.facet(name: 'java', version: task.project.sourceCompatibility)
     }
 
-    private void ensureWidgetsetGeneratorExists(Task task) {
-        def generator = project.vaadin.widgetsetGenerator
+    @PackageScope
+    static ensureWidgetsetGeneratorExists(Task task) {
+        def generator = task.project.vaadin.widgetsetGenerator
         if (generator != null) {
             String name = generator.tokenize('.').last()
             String pkg = generator.replaceAll('.' + name, '')
             String filename = name + ".java"
-            File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
-            File f = project.file(javaDir.canonicalPath + '/' + pkg.replaceAll(/\./, '/') + '/' + filename)
+            File javaDir = Util.getMainSourceSet(task.project).srcDirs.iterator().next()
+            File f = task.project.file(javaDir.canonicalPath + '/' + pkg.replaceAll(/\./, '/') + '/' + filename)
             if (!f.exists()) {
-                project.tasks[CreateWidgetsetGeneratorTask.NAME].run()
+                task.project.tasks[CreateWidgetsetGeneratorTask.NAME].run()
             }
         }
     }
 
-    private File getManifest() {
+    @PackageScope
+    static File getManifest(Task task) {
+        def project = task.project
         def sources = Util.getMainSourceSet(project).srcDirs.asList() + project.sourceSets.main.resources.srcDirs.asList()
         File manifest = null
         sources.each {
@@ -265,16 +204,18 @@ public class TaskListener implements TaskExecutionListener {
         return manifest
     }
 
-    private void configureAddonMetadata(Task task) {
+    @PackageScope
+    static configureAddonMetadata(Task task) {
+        def project = task.project
 
         // Resolve widgetset
         def widgetset = project.vaadin.widgetset
         if (widgetset == null) {
-            widgetset = 'com.vaadin.DefaultWidgetSet'
+            widgetset = GradleVaadinPlugin.DEFAULT_WIDGETSET
         }
 
         // Scan for existing manifest in source folder and reuse if possible
-        File manifest = getManifest()
+        File manifest = getManifest(task)
         if (manifest != null) {
             project.logger.warn("Manifest found in project, possibly overwriting existing values.")
             task.manifest.from(manifest)
@@ -324,8 +265,9 @@ public class TaskListener implements TaskExecutionListener {
         task.manifest.attributes(attributes)
     }
 
-    private void configureAddonZipMetadata(Task task) {
-
+    @PackageScope
+    static configureAddonZipMetadata(Task task) {
+        def project = task.project
         def attributes = [
                 'Vaadin-License-Title': project.vaadin.addon.license,
                 'Implementation-Title': project.vaadin.addon.title,
@@ -346,7 +288,9 @@ public class TaskListener implements TaskExecutionListener {
         manifestFile << attributes.collect { key, value -> "$key: $value" }.join("\n")
     }
 
-    private void configureJRebel(Task task) {
+    @PackageScope
+    static configureJRebel(Task task) {
+        def project = task.project
         if (project.vaadin.jrebel.enabled) {
 
             def classes = project.sourceSets.main.output.classesDir
@@ -371,4 +315,71 @@ public class TaskListener implements TaskExecutionListener {
             }
         }
     }
+
+    @PackageScope
+    static configureWAR(Task task){
+        assert task instanceof War
+        War war = (War) task;
+        war.exclude('VAADIN/gwt-unitCache/**')
+        if (task.project.vaadin.manageDependencies) {
+            war.classpath = Util.getWarClasspath(task.project).files
+        }
+    }
+
+    @PackageScope
+    static configureTest(Task task, TaskListener listener){
+        def project = task.project
+        if(project.vaadin.testbench.enabled){
+            if (project.vaadin.testbench.hub.enabled) {
+                listener.testbenchHub = new TestbenchHub(project)
+                listener.testbenchHub.start()
+            }
+
+            if (project.vaadin.testbench.node.enabled) {
+                listener.testbenchNode = new TestbenchNode(project)
+                listener.testbenchNode.start()
+            }
+
+            if (project.vaadin.testbench.runApplication) {
+                listener.testbenchAppServer = new ApplicationServer(project)
+                listener.testbenchAppServer.start()
+
+                // Ensure everything is up and running before continuing with the tests
+                sleep(5000)
+            }
+        }
+    }
+
+    @PackageScope
+    static terminateTestbench(TaskListener listener) {
+        if (listener.testbenchAppServer) {
+            listener.testbenchAppServer.terminate()
+            listener.testbenchAppServer = null
+        }
+
+        if (listener.testbenchNode) {
+            listener.testbenchNode.terminate()
+            listener.testbenchNode = null
+        }
+
+        if (listener.testbenchHub) {
+            listener.testbenchHub.terminate()
+            listener.testbenchHub = null
+        }
+    }
+
+    @PackageScope
+    static configureJavadoc(Task task){
+        def project = task.project
+        task.source = Util.getMainSourceSet(project)
+        if (project.configurations.findByName(GradleVaadinPlugin.CONFIGURATION_JAVADOC)) {
+            task.classpath = task.classpath.plus(project.configurations[GradleVaadinPlugin.CONFIGURATION_JAVADOC])
+        }
+        if (project.configurations.findByName(GradleVaadinPlugin.CONFIGURATION_SERVER)) {
+            task.classpath = task.classpath.plus(project.configurations[GradleVaadinPlugin.CONFIGURATION_SERVER])
+        }
+        task.failOnError = false
+        task.options.addStringOption("sourcepath", "")
+    }
+
 }

@@ -24,7 +24,6 @@ class TaskConfigurationsTest implements IntegrationTest {
                 def confs = project.configurations
                 println 'Server in classpath ' + (confs.getByName('vaadin-server') in classpath.plusConfigurations)
                 println 'Client in classpath ' + (confs.getByName('vaadin-client') in classpath.plusConfigurations)
-                println 'Jetty9 in classpath ' + (confs.getByName('vaadin-jetty9') in classpath.plusConfigurations)
 
                 def natures = project.eclipse.project.natures
                 println 'Springsource nature ' + ('org.springsource.ide.eclipse.gradle.core.nature' in natures)
@@ -39,7 +38,6 @@ class TaskConfigurationsTest implements IntegrationTest {
 
         assertTrue result, result.contains( 'Server in classpath true')
         assertTrue result, result.contains( 'Client in classpath true')
-        assertTrue result, result.contains( 'Jetty9 in classpath true')
 
         assertTrue result, result.contains( 'Springsource nature true')
     }
@@ -144,7 +142,6 @@ class TaskConfigurationsTest implements IntegrationTest {
                 def scopes = module.scopes
                 println 'Server configuration included ' + (conf.getByName('vaadin-server') in scopes.COMPILE.plus)
                 println 'Client configuration included ' + (conf.getByName('vaadin-client') in scopes.COMPILE.plus)
-                println 'Jetty9 configuration included ' + (conf.getByName('vaadin-jetty9') in scopes.PROVIDED.plus)
 
             }
         """.stripIndent()
@@ -159,7 +156,6 @@ class TaskConfigurationsTest implements IntegrationTest {
 
         assertTrue result, result.contains('Server configuration included true')
         assertTrue result, result.contains('Client configuration included true')
-        assertTrue result, result.contains('Jetty9 configuration included true')
     }
 
     @Test void 'IDEA configuration with Testbench'() {

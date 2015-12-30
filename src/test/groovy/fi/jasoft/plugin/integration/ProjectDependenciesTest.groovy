@@ -76,19 +76,6 @@ class ProjectDependenciesTest implements IntegrationTest {
         assertFalse result, result.contains( 'Repository missing')
     }
 
-    @Test void 'Project has Jetty dependency'() {
-
-        buildFile << """
-            task hasJettyConfiguration << {
-                def confs = project.configurations
-                println 'Jetty 9 '+ confs.hasProperty('vaadin-jetty9')
-            }
-        """.stripIndent()
-
-        def result = getResultWithArguments('hasJettyConfiguration').standardOutput
-        assertTrue result, result.contains( 'Jetty 9 true')
-    }
-
     @Test void 'Project has pre-compiled widgetset'() {
 
         buildFile << """
