@@ -198,7 +198,7 @@ class Util {
      * @return
      *      The source set
      */
-    static SourceDirectorySet getMainSourceSet(Project project, forceDefaultJavaSourceset=false) {
+    static SourceDirectorySet getMainSourceSet(Project project, boolean forceDefaultJavaSourceset=false) {
         if(project.vaadin.mainSourceSet) {
             project.vaadin.mainSourceSet
         } else if(isGroovyProject(project) && !forceDefaultJavaSourceset) {
