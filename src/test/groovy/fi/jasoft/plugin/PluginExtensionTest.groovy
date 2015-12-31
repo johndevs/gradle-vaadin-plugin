@@ -110,7 +110,7 @@ class PluginExtensionTest extends PluginTestBase {
         VaadinPluginExtension vaadin = project.extensions.vaadin
         assert vaadin.devmode instanceof DevelopmentModeConfiguration
         assert vaadin.devmode.noserver == false
-        assert vaadin.devmode.superDevMode == false
+        assert vaadin.devmode.superDevMode == true
         assert vaadin.devmode.bindAddress == '127.0.0.1'
         assert vaadin.devmode.codeServerPort == 9997
     }
