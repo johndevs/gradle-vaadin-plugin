@@ -50,12 +50,6 @@ class SuperDevModeTask extends DefaultTask {
 
     @TaskAction
     def run() {
-
-        if (!project.vaadin.devmode.superDevMode) {
-            logger.error 'SuperDevMode is a experimental feature and is not enabled for project by default. To enable it set vaadin.devmode.superDevMode to true'
-            throw new GradleException("Property vaadin.devmode.superDevMode not set.")
-        }
-
         if(!project.vaadin.widgetset) {
             logger.error 'No widgetset defined (can be set with vaadin.widgetset in build.gradle)'
             throw new GradleException("Property vaadin.widgetset not set.")

@@ -322,22 +322,21 @@ class GradleVaadinPlugin implements Plugin<Project> {
         configurations.create(CONFIGURATION_SUPERDEVMODE, { conf ->
             conf.description = 'Libraries needed by Vaadin Superdevmode.'
             conf.defaultDependencies { dependencies ->
-                if(project.vaadin.devmode.superDevMode){
-                    def jettyAll = projectDependencies.create( 'org.eclipse.jetty.aggregate:jetty-all-server:8.1.15.v20140411')
-                    dependencies.add(jettyAll)
 
-                    def plugin = projectDependencies.create("fi.jasoft.plugin:gradle-vaadin-plugin:${GradleVaadinPlugin.version}")
-                    dependencies.add(plugin)
+                def jettyAll = projectDependencies.create( 'org.eclipse.jetty.aggregate:jetty-all-server:8.1.15.v20140411')
+                dependencies.add(jettyAll)
 
-                    def asm = projectDependencies.create('org.ow2.asm:asm:5.0.3')
-                    dependencies.add(asm)
+                def plugin = projectDependencies.create("fi.jasoft.plugin:gradle-vaadin-plugin:${GradleVaadinPlugin.version}")
+                dependencies.add(plugin)
 
-                    def asmCommons = projectDependencies.create('org.ow2.asm:asm-commons:5.0.3')
-                    dependencies.add(asmCommons)
+                def asm = projectDependencies.create('org.ow2.asm:asm:5.0.3')
+                dependencies.add(asm)
 
-                    def jsp = projectDependencies.create('javax.servlet.jsp:jsp-api:2.2')
-                    dependencies.add(jsp)
-                }
+                def asmCommons = projectDependencies.create('org.ow2.asm:asm-commons:5.0.3')
+                dependencies.add(asmCommons)
+
+                def jsp = projectDependencies.create('javax.servlet.jsp:jsp-api:2.2')
+                dependencies.add(jsp)
             }
         })
 

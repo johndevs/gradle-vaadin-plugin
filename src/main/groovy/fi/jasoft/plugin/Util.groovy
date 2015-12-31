@@ -159,7 +159,7 @@ class Util {
      *      a new collection with the GWT SDK libs listed first
      */
     static FileCollection moveGwtSdkFirstInClasspath(Project project , FileCollection collection){
-        FileCollection gwtCompilerClasspath = project.configurations['vaadin-client'];
+        FileCollection gwtCompilerClasspath = project.configurations[GradleVaadinPlugin.CONFIGURATION_CLIENT];
         return gwtCompilerClasspath + collection.minus(gwtCompilerClasspath);
     }
 

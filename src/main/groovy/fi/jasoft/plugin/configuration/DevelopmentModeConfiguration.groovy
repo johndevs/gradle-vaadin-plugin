@@ -15,6 +15,8 @@
 */
 package fi.jasoft.plugin.configuration
 
+import fi.jasoft.plugin.MessageLogger
+
 /**
  * Configuration for Development Mode
  */
@@ -22,14 +24,29 @@ package fi.jasoft.plugin.configuration
 class DevelopmentModeConfiguration {
 
     /**
-     * Should the internal Jetty server be used.
+     * Should the internal server be used.
      */
     boolean noserver = false
 
     /**
      * Should super devmode be available
+     *
+     * @deprecated
      */
-    boolean superDevMode = false
+    @Deprecated
+    void setSuperDevMode(boolean sdm){
+        isSuperDevMode()
+    }
+    @Deprecated
+    void superDevMode(boolean sdm){
+       isSuperDevMode()
+    }
+    @Deprecated
+    boolean isSuperDevMode(){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.devmode.superDevMode',
+                'This property will always be true.')
+        true
+    }
 
     /**
      * To what host or ip should development mode bind itself to. By default localhost.

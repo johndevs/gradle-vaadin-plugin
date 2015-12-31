@@ -124,9 +124,7 @@ class UpdateWidgetsetTask extends DefaultTask {
         //###################################################################
 
         def configurationProperties = [:]
-        if (project.vaadin.devmode.superDevMode) {
-            configurationProperties['devModeRedirectEnabled'] = true
-        }
+        configurationProperties['devModeRedirectEnabled'] = true
 
         substitutions['configurationProperties'] = configurationProperties
 
