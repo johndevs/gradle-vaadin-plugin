@@ -615,7 +615,7 @@ class Util {
      */
     static String getResolvedVaadinVersion(Project project) {
         def version = project.vaadin.version
-        project.configurations['vaadin-server'].resolvedConfiguration.firstLevelModuleDependencies.each{ dependency ->
+        project.configurations[GradleVaadinPlugin.CONFIGURATION_SERVER].resolvedConfiguration.firstLevelModuleDependencies.each{ dependency ->
             if(dependency.moduleName == 'vaadin-server'){
                version = dependency.moduleVersion
            }
@@ -666,7 +666,7 @@ class Util {
      *      version as a string
      */
     static String getVaadinVersion(Project project) {
-        project.vaadin.version ?: '7.5.+'
+        project.vaadin.version ?: '7.6.+'
     }
 
     /**
@@ -686,11 +686,11 @@ class Util {
         )
 
         // Include server dependencies
-        classpath += project.configurations['vaadin-server']
+        classpath += project.configurations[GradleVaadinPlugin.CONFIGURATION_SERVER]
 
         // Include client if no widgetset to provide pre-compiled widgetset
         if(!project.vaadin.widgetset){
-            classpath += project.configurations['vaadin-client']
+            classpath += project.configurations[GradleVaadinPlugin.CONFIGURATION_CLIENT]
         }
 
         // Include runtime dependencies
@@ -698,7 +698,7 @@ class Util {
 
         // Include push dependencies if enabled
         if(isPushSupportedAndEnabled(project)) {
-            classpath += project.configurations['vaadin-push']
+            classpath += project.configurations[GradleVaadinPlugin.CONFIGURATION_PUSH]
         }
 
         // Remove provided dependencies
