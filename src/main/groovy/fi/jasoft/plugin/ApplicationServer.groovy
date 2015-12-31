@@ -121,7 +121,7 @@ class ApplicationServer {
         process = appServerProcess.execute()
 
         // Watch for changes in classes
-        if(project.vaadin.plugin.jettyAutoRefresh) {
+        if(project.vaadin.plugin.serverRestart) {
             def self = this
             Thread.start 'Class Directory Watcher', {
                 ApplicationServer.watchClassDirectoryForChanges(self)
@@ -185,7 +185,7 @@ class ApplicationServer {
             // Wait until server process calls destroy()
             process.waitFor()
 
-            if(!project.vaadin.plugin.jettyAutoRefresh){
+            if(!project.vaadin.plugin.serverRestart){
                 // Auto-refresh turned off
                 break
             }
@@ -225,7 +225,7 @@ class ApplicationServer {
                 }
             }
 
-            if(project.vaadin.plugin.jettyAutoRefresh && server.process){
+            if(project.vaadin.plugin.serverRestart && server.process){
                 // Force restart of server
                 project.logger.lifecycle("Reloading server...")
                 server.terminate()

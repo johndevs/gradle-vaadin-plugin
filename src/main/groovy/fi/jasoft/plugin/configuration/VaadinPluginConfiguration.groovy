@@ -15,6 +15,7 @@
 */
 package fi.jasoft.plugin.configuration
 
+import fi.jasoft.plugin.MessageLogger
 import org.apache.tools.ant.taskdefs.condition.Os
 
 /**
@@ -40,8 +41,30 @@ class VaadinPluginConfiguration {
 
     /**
      * Should jetty restart when a class is changed in the build directory.
+     *
+     * @deprecated
      */
-    boolean jettyAutoRefresh = true
+    @Deprecated
+    void jettyAutoRefresh(boolean refresh){
+        isJettyAutoRefresh()
+        serverRestart = refresh
+    }
+    @Deprecated
+    void setJettyAutoRefresh(boolean refresh){
+        isJettyAutoRefresh()
+        serverRestart = refresh
+    }
+    @Deprecated
+    boolean isJettyAutoRefresh(){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.plugin.jettyAutoRefresh',
+                'This property has been replaced by vaadin.plugin.serverRestart.')
+        serverRestart
+    }
+
+    /**
+     * Should the server restart after every change.
+     */
+    boolean serverRestart = true
 
     /**
      * Should theme be recompiled when SCSS file is changes.
