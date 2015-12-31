@@ -16,6 +16,6 @@ class PluginRestrictionsTest implements IntegrationTest {
             }
         """.stripMargin()
 
-        assertTrue failedResult.standardError.contains('Plugin no longer supports Vaadin 6')
+        assertTrue runFailureExpected().contains('Plugin no longer supports Vaadin 6')
     }
 }

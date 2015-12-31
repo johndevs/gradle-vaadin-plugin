@@ -21,7 +21,7 @@ class ProjectDependenciesTest implements IntegrationTest {
             }
         """.stripIndent()
 
-        def result = getResultWithArguments('testProperties').standardOutput
+        def result = runWithArguments('testProperties')
         assertTrue result, result.contains( 'Has Vaadin property true')
         assertTrue result, result.contains( 'Has Vaadin extension true')
         assertTrue result, result.contains( 'Has Vaadin type true')
@@ -43,7 +43,7 @@ class ProjectDependenciesTest implements IntegrationTest {
             }
         """.stripIndent()
 
-        def result = getResultWithArguments('testConfigurations').standardOutput
+        def result = runWithArguments('testConfigurations')
         assertTrue result, result.contains( 'Server configuration true')
         assertTrue result, result.contains( 'Client configuration true')
         assertTrue result, result.contains( 'Javadoc configuration true')
@@ -72,7 +72,7 @@ class ProjectDependenciesTest implements IntegrationTest {
             }
         """.stripIndent()
 
-        def result = getResultWithArguments('testRepositories').standardOutput
+        def result = runWithArguments('testRepositories')
         assertFalse result, result.contains( 'Repository missing')
     }
 
@@ -87,7 +87,7 @@ class ProjectDependenciesTest implements IntegrationTest {
             }
          """.stripIndent()
 
-        def result = getResultWithArguments('hasWidgetset').standardOutput
+        def result = runWithArguments('hasWidgetset')
         assertTrue result, result.contains( 'Has client dependency true')
         assertTrue result, result.contains( 'Has client-compiled dependency true')
     }
@@ -107,7 +107,7 @@ class ProjectDependenciesTest implements IntegrationTest {
             }
         """.stripIndent()
 
-        def result = getResultWithArguments('testClientDependencies').standardOutput
+        def result = runWithArguments('testClientDependencies')
         assertTrue result, result.contains( 'Has client dependency true')
         assertTrue result, result.contains( 'Has client-compiled dependency false')
     }
@@ -136,7 +136,7 @@ class ProjectDependenciesTest implements IntegrationTest {
             }
         """.stripIndent()
 
-        def result = getResultWithArguments('verifyVaadinVersion').standardOutput
+        def result = runWithArguments('verifyVaadinVersion')
         assertTrue result, result.contains( 'Vaadin Server 7.3.0')
         assertTrue result, result.contains( 'Vaadin Client 7.3.0')
     }
@@ -159,7 +159,7 @@ class ProjectDependenciesTest implements IntegrationTest {
             }
         """.stripIndent()
 
-        def result = getResultWithArguments('verifyTestbenchPresent').standardOutput
+        def result = runWithArguments('verifyTestbenchPresent')
         assertTrue result, result.contains( 'Testbench configuration true')
         assertTrue result, result.contains( 'Testbench artifacts true')
     }
@@ -185,7 +185,7 @@ class ProjectDependenciesTest implements IntegrationTest {
 
         """.stripIndent()
 
-        def result = getResultWithArguments('evaluateVersionBlacklist').standardOutput
+        def result = runWithArguments('evaluateVersionBlacklist')
         assertFalse result, result.contains( 'Version blacklist failed for')
     }
 
@@ -203,7 +203,7 @@ class ProjectDependenciesTest implements IntegrationTest {
             }
         """.stripIndent()
 
-        def result = getResultWithArguments('testMavenCentralLocal').standardOutput
+        def result = runWithArguments('testMavenCentralLocal')
         assertTrue result, result.contains( 'Has Maven Central')
         assertTrue result, result.contains( 'Has Maven Local')
     }

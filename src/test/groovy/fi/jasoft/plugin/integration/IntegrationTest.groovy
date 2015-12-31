@@ -38,11 +38,11 @@ trait IntegrationTest {
         """
     }
 
-    BuildResult getResultWithArguments(String... args) {
-        GradleRunner.create().withProjectDir(projectDir.root).withArguments(args).build()
+    String runWithArguments(String... args) {
+        GradleRunner.create().withProjectDir(projectDir.root).withArguments(args).build().output
     }
 
-    BuildResult getFailedResult() {
-        GradleRunner.create().withProjectDir(projectDir.root).buildAndFail()
+    String runFailureExpected() {
+        GradleRunner.create().withProjectDir(projectDir.root).buildAndFail().output
     }
 }

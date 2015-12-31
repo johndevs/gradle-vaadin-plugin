@@ -30,7 +30,7 @@ class TaskConfigurationsTest implements IntegrationTest {
             }
         """.stripIndent()
 
-        def result = getResultWithArguments('verifyEclipseClassPath').standardOutput
+        def result = runWithArguments('verifyEclipseClassPath')
 
         assertTrue result, result.contains( 'Download sources true')
         assertTrue result, result.contains( 'Eclipse output dir null')
@@ -38,7 +38,7 @@ class TaskConfigurationsTest implements IntegrationTest {
 
         assertTrue result, result.contains( 'Server in classpath true')
         assertTrue result, result.contains( 'Client in classpath true')
-
+      
         assertTrue result, result.contains( 'Springsource nature true')
     }
 
@@ -59,7 +59,7 @@ class TaskConfigurationsTest implements IntegrationTest {
             }
         """.stripIndent()
 
-        def result = getResultWithArguments('verifyOutputDir').standardOutput
+        def result = runWithArguments('verifyOutputDir')
         assertTrue result, result.contains('Default output dir is set to eclipseOutputDir true')
     }
 
@@ -82,7 +82,7 @@ class TaskConfigurationsTest implements IntegrationTest {
 
         """.stripIndent()
 
-        def result = getResultWithArguments('verifyTestbenchDependency').standardOutput
+        def result = runWithArguments('verifyTestbenchDependency')
         assertTrue result.contains('Testbench on classpath true')
     }
 
@@ -98,7 +98,7 @@ class TaskConfigurationsTest implements IntegrationTest {
 
         """.stripIndent()
 
-        def result = getResultWithArguments('verifyWTP').standardOutput
+        def result = runWithArguments('verifyWTP')
         assertTrue result, result.contains('Server in components true')
     }
 
@@ -117,7 +117,7 @@ class TaskConfigurationsTest implements IntegrationTest {
 
         """.stripIndent()
 
-        def result = getResultWithArguments('verifyWTP').standardOutput
+        def result = runWithArguments('verifyWTP')
         assertTrue result, result.contains('Vaadin Facet version 7.0')
         assertTrue result, result.contains('jst.web Facet version 3.0')
         assertTrue result, result.contains('Java Facet version equals sourceCompatibility true')
@@ -142,11 +142,10 @@ class TaskConfigurationsTest implements IntegrationTest {
                 def scopes = module.scopes
                 println 'Server configuration included ' + (conf.getByName('vaadin-server') in scopes.COMPILE.plus)
                 println 'Client configuration included ' + (conf.getByName('vaadin-client') in scopes.COMPILE.plus)
-
             }
         """.stripIndent()
 
-        def result = getResultWithArguments('verifyIdeaModule').standardOutput
+        def result = runWithArguments('verifyIdeaModule')
         assertTrue result, result.contains('Module and Project name is equal true')
         assertTrue result, result.contains('Output dir is classes dir true')
         assertTrue result, result.contains('Test output dir is classes dir true')
@@ -177,7 +176,7 @@ class TaskConfigurationsTest implements IntegrationTest {
              }
         """.stripIndent()
 
-        def result = getResultWithArguments('verifyTestBench').standardOutput
+        def result = runWithArguments('verifyTestBench')
 
         assertTrue result, result.contains('Test configuration has testbench true')
     }
@@ -200,7 +199,7 @@ class TaskConfigurationsTest implements IntegrationTest {
 
         """.stripIndent()
 
-        def result = getResultWithArguments('verifyPush').standardOutput
+        def result = runWithArguments('verifyPush')
 
         assertTrue result, result.contains('Compile configuration has push true')
     }
@@ -220,7 +219,7 @@ class TaskConfigurationsTest implements IntegrationTest {
              }
         """.stripIndent()
 
-        def result = getResultWithArguments('verifyWidgetsetGenerator').standardOutput
+        def result = runWithArguments('verifyWidgetsetGenerator')
 
         assertTrue result, result.contains('Generator File was created true')
     }
@@ -250,7 +249,7 @@ class TaskConfigurationsTest implements IntegrationTest {
             }
         """.stripIndent()
 
-        def result = getResultWithArguments('verifyAddonJarManifest').standardOutput
+        def result = runWithArguments('verifyAddonJarManifest')
         assertTrue result, result.contains('Vaadin-Widgetsets com.example.Widgetset')
         assertTrue result, result.contains('Implementation-Title test-addon')
         assertTrue result, result.contains('Implementation-Version 1.2.3')
@@ -286,7 +285,7 @@ class TaskConfigurationsTest implements IntegrationTest {
             }
         """.stripIndent()
 
-        def result = getResultWithArguments('verifyAddonZipManifest').standardOutput
+        def result = runWithArguments('verifyAddonZipManifest')
         assertTrue result, result.contains('Zip manifest exists true')
         assertTrue result, result.contains('Implementation-Title test-addon')
         assertTrue result, result.contains('Implementation-Version 1.2.3')
