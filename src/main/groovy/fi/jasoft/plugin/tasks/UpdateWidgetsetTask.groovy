@@ -132,7 +132,7 @@ class UpdateWidgetsetTask extends DefaultTask {
                     Manifest mf = jarStream.getManifest();
                     if (mf != null) {
                         Attributes attributes = mf.getMainAttributes()
-                        if (attributes != null) {   
+                        if (attributes != null) {
                             String widgetsets = attributes.getValue('Vaadin-Widgetsets')
                             if (widgetsets != null) {
                                 for (String widgetset : widgetsets.split(",")) {
