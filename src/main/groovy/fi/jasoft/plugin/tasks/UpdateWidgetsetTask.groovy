@@ -17,11 +17,21 @@ package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
+import org.apache.commons.io.FileUtils
+import org.apache.commons.io.FilenameUtils
+import org.apache.commons.lang.StringUtils
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.Dependency
+import org.gradle.api.artifacts.ExternalModuleDependency
+import org.gradle.api.artifacts.ProjectDependency
+import org.gradle.api.file.FileTree
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.util.PatternFilterable
 
+import java.nio.file.Paths
 import java.util.jar.Attributes
 import java.util.jar.JarInputStream
 import java.util.jar.Manifest
@@ -91,18 +101,46 @@ class UpdateWidgetsetTask extends DefaultTask {
         def inherits = ['com.vaadin.DefaultWidgetSet']
 
         // Scan classpath for Vaadin addons and inherit their widgetsets
-        project.configurations.compile.each {
-            JarInputStream jarStream = new JarInputStream(it.newDataInputStream());
-            Manifest mf = jarStream.getManifest();
-            if (mf != null) {
-                Attributes attributes = mf.getMainAttributes()
-                if (attributes != null) {
-                    String widgetsets = attributes.getValue('Vaadin-Widgetsets')
-                    if (widgetsets != null) {
-                        for (String widgetset : widgetsets.split(",")) {
-                            if (widgetset != 'com.vaadin.terminal.gwt.DefaultWidgetSet'
-                                    && widgetset != 'com.vaadin.DefaultWidgetSet') {
-                                inherits.push(widgetset)
+        Configuration compileConf =  project.configurations.compile
+        compileConf.allDependencies.each { Dependency dependency ->
+            if(dependency instanceof ProjectDependency){
+                def depProject = dependency.dependencyProject
+                if(depProject.hasProperty('vaadin')){
+                    // A vaadin submodule
+
+                    // Scan in source folder
+                    Util.getMainSourceSet(depProject).srcDirs.each { File srcDir ->
+                        depProject.fileTree(srcDir.absolutePath).include('**/*/*.gwt.xml').each { File file ->
+                            def path = file.absolutePath.substring(srcDir.absolutePath.size()+1)
+                            def widgetset = StringUtils.removeEnd(path, ".gwt.xml").replaceAll(File.separator, '.')
+                            inherits.push(widgetset)
+                        }
+                    }
+
+                    // Scan in resource folders
+                    depProject.sourceSets.main.resources.srcDirs.each { File srcDir ->
+                        depProject.fileTree(srcDir.absolutePath).include('**/*/*.gwt.xml').each { File file ->
+                            def path = file.absolutePath.substring(srcDir.absolutePath.size()+1)
+                            def widgetset = StringUtils.removeEnd(path, ".gwt.xml").replaceAll(File.separator, '.')
+                            inherits.push(widgetset)
+                        }
+                    }
+                }
+            } else {
+                compileConf.files(dependency).each {
+                    JarInputStream jarStream = new JarInputStream(it.newDataInputStream());
+                    Manifest mf = jarStream.getManifest();
+                    if (mf != null) {
+                        Attributes attributes = mf.getMainAttributes()
+                        if (attributes != null) {
+                            String widgetsets = attributes.getValue('Vaadin-Widgetsets')
+                            if (widgetsets != null) {
+                                for (String widgetset : widgetsets.split(",")) {
+                                    if (widgetset != 'com.vaadin.terminal.gwt.DefaultWidgetSet'
+                                            && widgetset != 'com.vaadin.DefaultWidgetSet') {
+                                        inherits.push(widgetset)
+                                    }
+                                }
                             }
                         }
                     }

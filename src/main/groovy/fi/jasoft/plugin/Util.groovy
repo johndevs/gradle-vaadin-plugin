@@ -22,6 +22,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.DependencyResolveDetails
+import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.plugins.WarPluginConvention
@@ -173,7 +174,7 @@ class Util {
      * @return
      *      The source set
      */
-    static SourceDirectorySet getMainSourceSet(Project project, forceDefaultJavaSourceset=false) {
+    static SourceDirectorySet getMainSourceSet(Project project, boolean forceDefaultJavaSourceset=false) {
         if(project.vaadin.mainSourceSet) {
             project.vaadin.mainSourceSet
         } else if(isGroovyProject(project) && !forceDefaultJavaSourceset) {
@@ -636,18 +637,20 @@ class Util {
         def widgetsetAttribute = new Attributes.Name('Vaadin-Widgetsets')
         project.configurations.all.each { Configuration conf ->
             conf.allDependencies.each { Dependency dependency ->
-                conf.files(dependency).each { File file ->
-                    file.withInputStream { InputStream stream ->
-                        def jarStream = new JarInputStream(stream)
-                        def mf = jarStream.getManifest()
-                        def attributes = mf?.mainAttributes
-                        if (attributes?.getValue(widgetsetAttribute)) {
-                            if (!dependency.name.startsWith('vaadin-client')) {
-                                addons << [
-                                        groupId: dependency.group,
-                                        artifactId: dependency.name,
-                                        version: dependency.version
-                                ]
+                if(!(dependency instanceof ProjectDependency)){
+                    conf.files(dependency).each { File file ->
+                        file.withInputStream { InputStream stream ->
+                            def jarStream = new JarInputStream(stream)
+                            def mf = jarStream.getManifest()
+                            def attributes = mf?.mainAttributes
+                            if (attributes?.getValue(widgetsetAttribute)) {
+                                if (!dependency.name.startsWith('vaadin-client')) {
+                                    addons << [
+                                            groupId: dependency.group,
+                                            artifactId: dependency.name,
+                                            version: dependency.version
+                                    ]
+                                }
                             }
                         }
                     }
