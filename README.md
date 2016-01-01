@@ -65,14 +65,16 @@ apply plugin: fi.jasoft.plugin.GradleVaadinPlugin
 
 # Versions
 
-|        | Gradle | Vaadin | Java | Jetty | Servlet | Major features    |
-|--------|--------|--------|------|-------|---------|-------------------|
-| 0.6.x  |   1.x  |   6,7  |  6,7 |  8.1  | 2.5,3.0 | Servlet 3 support |
-| 0.7.x  |   1.x  |   6,7  |  6,7 |  8.1  | 2.5,3.0 | Testbench 3, Directory addon zip, Directory Browser, Source & Javadoc jars | 
-| 0.8.x  |   1.x  |    7   |   7  |  8.1  | 3.0 | Idea support, Addon SCSS themes, GWT first in classpath  | 
-| 0.9.x  |   2.x  |    7   |  7,8 |  9.2  | 3.0 | Groovy support, Jetty 9, Jetty autorestart |
-| 0.10.x |   2.x  |    7   |  7,8 |  9.3  | 3.0 | Widgetset CDN support, Classpath JAR on Win as default | 
+|        | Gradle | Vaadin | Java | Jetty | Payara |Servlet | Major features    |
+|--------|--------|--------|------|-------|--------|---------|-------------------|
+| 0.6.x  |   1.x  |   6,7  |  6,7 |  8.1  |        | 2.5,3.0 | Servlet 3 support |
+| 0.7.x  |   1.x  |   6,7  |  6,7 |  8.1  |        | 2.5,3.0 | Testbench 3, Directory addon zip, Directory Browser, Source & Javadoc jars | 
+| 0.8.x  |   1.x  |    7   |   7  |  8.1  |        | 3.0 | Idea support, Addon SCSS themes, GWT first in classpath  | 
+| 0.9.x  |   2.x  |    7   |  7,8 |  9.2  |        | 3.0 | Groovy support, Jetty 9, Jetty autorestart |
+| 0.10.x |   2.x  |    7   |  7,8 |  9.3  |        | 3.0 | Widgetset CDN support, Classpath JAR on Win as default | 
+| 0.11.x |   3.x  |    7   |  7,8 |   -*  |  4.1   | 3.0 | Payara as web server, dependencies as defaultDependencies, Support for parallel execution of tasks |
 
+\* Jetty was replaced by Payara for the vaadinRun task.
 
 # Plugin tasks
 The following tasks are available in the plugin
@@ -143,7 +145,7 @@ gwt.jvmArgs = ['-Xmx500M', '-XX:MaxPermSize=256M']
 
 ## Vaadin Devmode configurations
 * ``vaadin.devmode.noserver`` - Do not run the embedded Jetty server when running devmode. Default is false.
-* ``vaadin.devmode.superDevMode`` - Add support for super devmode. Default is false.
+* ~~``vaadin.devmode.superDevMode`` - Add support for super devmode. Default is false.~~
 * ``vaadin.devmode.bindAddress`` - The address the DevMode server should be bound to. Default is 127.0.0.1.
 * ``vaadin.devmode.codeServerPort`` - The port the DevMode server should be bound to. Default is 9997.
 
@@ -179,7 +181,8 @@ vaadin.testbench.node.browsers = [
 * ``vaadin.plugin.logToConsole``- Should server logs be logged to the console or to a log file. Default is logging to file.
 * ``vaadin.plugin.openInBrowser`` - Should the application be opened in a browser tab after the application is launched. Default true.
 * ``vaadin.plugin.eclipseOutputDir`` - The directory where Eclipse will output its compiled classes. Default is project.sourceSets.main.output.classesDir.
-* ``vaadin.plugin.jettyAutoRefresh`` - Should jetty automatically restart when a class is changed while jetty is running.
+* ~~``vaadin.plugin.jettyAutoRefresh`` - Should jetty automatically restart when a class is changed while jetty is running.~~
+* ``vaadin.plugin.serverRestart`` - Should the server automatically restart when a class is changed.
 * ``vaadin.plugin.themeAutoRecompile`` - Should the SASS theme be recompiled on change while the vaadinRun task is executed.
 * ``vaadin.plugin.themesDirectory`` - Root directory for themes. By default *src/main/webapp/VAADIN/themes*
 * ``vaadin.plugin.useClassPathJar`` - Use a single jar to define the classpath (if the classpath is too long)
