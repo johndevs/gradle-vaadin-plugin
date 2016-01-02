@@ -72,9 +72,9 @@ apply plugin: fi.jasoft.plugin.GradleVaadinPlugin
 | 0.8.x  |   1.x  |    7   |   7  |  8.1  |        | 3.0 | Idea support, Addon SCSS themes, GWT first in classpath  | 
 | 0.9.x  |   2.x  |    7   |  7,8 |  9.2  |        | 3.0 | Groovy support, Jetty 9, Jetty autorestart |
 | 0.10.x |   2.x  |    7   |  7,8 |  9.3  |        | 3.0 | Widgetset CDN support, Classpath JAR on Win as default | 
-| 0.11.x |   3.x  |    7   |  7,8 |   -*  |  4.1   | 3.0 | Payara as web server, dependencies as defaultDependencies, Support for parallel execution of tasks |
+| 0.11.x |   3.x  |    7   |  7,8 |  9.3  |  4.1*  | 3.0 | Payara as web server, dependencies as defaultDependencies, Support for parallel execution of tasks |
 
-\* Jetty was replaced by Payara for the vaadinRun task.
+\* Payara becomes the default server for vaadinRun.
 
 # Plugin tasks
 The following tasks are available in the plugin
@@ -186,3 +186,4 @@ vaadin.testbench.node.browsers = [
 * ``vaadin.plugin.themeAutoRecompile`` - Should the SASS theme be recompiled on change while the vaadinRun task is executed.
 * ``vaadin.plugin.themesDirectory`` - Root directory for themes. By default *src/main/webapp/VAADIN/themes*
 * ``vaadin.plugin.useClassPathJar`` - Use a single jar to define the classpath (if the classpath is too long)
+* ``vaadin.plugin.server`` - Which server the vaadinRun task uses. Can be either *payara* or *jetty*. Payara is used by default.
