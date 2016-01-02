@@ -15,7 +15,7 @@
 */
 package fi.jasoft.plugin.tasks
 
-import fi.jasoft.plugin.ApplicationServer
+import fi.jasoft.plugin.servers.ApplicationServer
 import fi.jasoft.plugin.Util
 import org.gradle.api.DefaultTask
 import org.gradle.api.plugins.WarPluginConvention
@@ -56,7 +56,7 @@ class DevModeTask extends DefaultTask {
         runDevelopmentMode()
 
         if (!project.vaadin.devmode.noserver) {
-            server = new ApplicationServer(
+            server = ApplicationServer.create(
                     project, ["gwt.codesvr=${project.vaadin.devmode.bindAddress}:${project.vaadin.devmode.codeServerPort}"]
             ).startAndBlock()
             devModeProcess.waitForOrKill(1)

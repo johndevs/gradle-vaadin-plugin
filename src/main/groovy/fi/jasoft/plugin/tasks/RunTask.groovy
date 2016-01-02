@@ -15,29 +15,31 @@
 */
 package fi.jasoft.plugin.tasks
 
-import fi.jasoft.plugin.ApplicationServer
+import fi.jasoft.plugin.servers.ApplicationServer
 import org.gradle.api.DefaultTask
-import org.gradle.api.invocation.Gradle
 import org.gradle.api.tasks.TaskAction
 
 public class RunTask extends DefaultTask {
 
     public static final String NAME = 'vaadinRun'
 
-    def server = new ApplicationServer(project)
+    def server
 
     public RunTask() {
         dependsOn(CompileWidgetsetTask.NAME)
         dependsOn(CompileThemeTask.NAME)
-        description = 'Runs the Vaadin application on an embedded Jetty ApplicationServer'
+        description = 'Runs the Vaadin application on an embedded server'
 
         addShutdownHook {
-            server.terminate()
+            if(server){
+                server.terminate()
+            }
         }
     }
 
     @TaskAction
     public void run() {
+        server = ApplicationServer.create(project)
         server.startAndBlock()
     }
 }

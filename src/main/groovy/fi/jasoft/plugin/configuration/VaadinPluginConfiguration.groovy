@@ -67,6 +67,18 @@ class VaadinPluginConfiguration {
     boolean serverRestart = true
 
     /**
+     * Application server to use.
+     * <p>
+     * Available options are
+     * <ul>
+     *     <li>payara - Webserver with EJB/CDI support</li>
+     *     <li>jetty - Plain J2EE web server</li>
+     * </ul>
+     * Default server is payara.
+     */
+    String server = 'payara'
+
+    /**
      * Should theme be recompiled when SCSS file is changes.
      */
     boolean themeAutoRecompile = true

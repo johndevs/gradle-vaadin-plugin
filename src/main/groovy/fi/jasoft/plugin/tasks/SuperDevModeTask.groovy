@@ -15,7 +15,7 @@
 */
 package fi.jasoft.plugin.tasks
 
-import fi.jasoft.plugin.ApplicationServer
+import fi.jasoft.plugin.servers.ApplicationServer
 import fi.jasoft.plugin.Util
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
@@ -57,7 +57,7 @@ class SuperDevModeTask extends DefaultTask {
 
         runCodeServer({
 
-            server = new ApplicationServer(project, ['superdevmode'])
+            server = ApplicationServer.create(project, ['superdevmode'])
 
             server.startAndBlock();
 

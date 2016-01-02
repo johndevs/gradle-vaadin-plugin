@@ -15,6 +15,7 @@
 */
 package fi.jasoft.plugin
 
+import fi.jasoft.plugin.servers.ApplicationServer
 import fi.jasoft.plugin.tasks.CreateDirectoryZipTask
 import fi.jasoft.plugin.tasks.CreateWidgetsetGeneratorTask
 import fi.jasoft.plugin.testbench.TestbenchHub
@@ -341,7 +342,7 @@ class TaskListener implements TaskExecutionListener {
             }
 
             if (project.vaadin.testbench.runApplication) {
-                listener.testbenchAppServer = new ApplicationServer(project)
+                listener.testbenchAppServer = ApplicationServer.create(project)
                 listener.testbenchAppServer.start()
 
                 // Ensure everything is up and running before continuing with the tests

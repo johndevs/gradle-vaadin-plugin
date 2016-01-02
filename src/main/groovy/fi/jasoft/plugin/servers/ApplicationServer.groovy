@@ -13,8 +13,10 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fi.jasoft.plugin
+package fi.jasoft.plugin.servers
 
+import fi.jasoft.plugin.GradleVaadinPlugin
+import fi.jasoft.plugin.Util
 import fi.jasoft.plugin.tasks.BuildClassPathJar
 import fi.jasoft.plugin.tasks.CompileThemeTask
 import org.gradle.api.Project
@@ -28,7 +30,28 @@ import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 
-class ApplicationServer {
+abstract class ApplicationServer {
+
+    /**
+     * Creates a new application server
+     *
+     * @param project
+     *      the project to create the server for
+     * @param browserParameters
+     *      possible browser GET parameters passed to the browser that opens the page after the server has loaded
+     * @return
+     *      returns the application server
+     */
+    static ApplicationServer create(Project project, browserParameters = []){
+        switch(project.vaadin.plugin.server){
+            case PayaraApplicationServer.NAME:
+                return new PayaraApplicationServer(project, browserParameters)
+            case JettyApplicationServer.NAME:
+                return new JettyApplicationServer(project, browserParameters)
+            default:
+                throw new IllegalArgumentException("Server name not recognized. Must be either payara or jetty.")
+        }
+    }
 
     def Process process;
 
@@ -41,12 +64,41 @@ class ApplicationServer {
         this.browserParameters = browserParameters
     }
 
-    def boolean start(firstStart=false) {
+    abstract String getServerRunner()
 
-        if (process != null) {
+    abstract String getServerName()
+
+    abstract String getSuccessfullyStartedLogToken()
+
+    def FileCollection getClassPath(){
+        FileCollection cp
+        if(project.vaadin.plugin.useClassPathJar){
+            BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
+            cp = project.files(pathJarTask.archivePath)
+        } else {
+            cp = project.configurations[GradleVaadinPlugin.CONFIGURATION_RUN_SERVER]
+                    .plus(Util.getWarClasspath(project))
+                    .filter { it.file && it.canonicalFile.name.endsWith('.jar')}
+        }
+        cp
+    }
+
+    def buildClassPathFile(File buildDir) {
+
+        def buildClasspath = new File(buildDir, 'classpath.txt')
+        buildClasspath.text = Util.getWarClasspath(project)
+                .filter { it.file && it.canonicalFile.name.endsWith('.jar')}
+                .join(";")
+    }
+
+    def boolean start(boolean firstStart=false) {
+
+        if (process) {
             project.logger.error('Server is already running.')
             return false
         }
+
+        project.logger.info("Starting $serverName...")
 
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
 
@@ -73,25 +125,15 @@ class ApplicationServer {
             appServerProcess.add('-ea')
         }
 
-        FileCollection cp
-        if(project.vaadin.plugin.useClassPathJar){
-            BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
-            cp = project.files(pathJarTask.archivePath)
-        } else {
-            cp = project.configurations['vaadin-payara']
-                    .plus(Util.getWarClasspath(project))
-                    .filter { it.file && it.canonicalFile.name.endsWith('.jar')}
-        }
-
         appServerProcess.add('-cp')
-        appServerProcess.add(cp.asPath)
+        appServerProcess.add(classPath.asPath)
 
-        if (project.vaadin.jvmArgs != null) {
+        if (project.vaadin.jvmArgs) {
             appServerProcess.addAll(project.vaadin.jvmArgs)
         }
 
         // Program args
-        appServerProcess.add('fi.jasoft.plugin.ApplicationServerRunner')
+        appServerProcess.add(serverRunner)
 
         appServerProcess.add(project.vaadin.serverPort)
 
@@ -108,16 +150,14 @@ class ApplicationServer {
 
         appServerProcess.add(project.name);
 
-        def payaraDir = new File(project.buildDir.absolutePath, 'payara')
-        payaraDir.mkdirs()
-        appServerProcess.add(payaraDir.absolutePath)
+        def buildDir = new File(project.buildDir.absolutePath, serverName)
+        buildDir.mkdirs()
+        appServerProcess.add(buildDir.absolutePath)
 
-        def payaraClasspath = new File(payaraDir, 'classpath.txt')
-        payaraClasspath.text = Util.getWarClasspath(project)
-                .filter { it.file && it.canonicalFile.name.endsWith('.jar')}
-                .join(";")
+        buildClassPathFile(buildDir)
 
         // Execute server
+        project.logger.debug("Running server with the command: "+appServerProcess)
         process = appServerProcess.execute()
 
         // Watch for changes in classes
@@ -146,8 +186,8 @@ class ApplicationServer {
         paramString = paramString.replaceAll('\\?$|&$', '')
 
         // Capture log output
-        Util.logProcess(project, process, 'payara.log', { line ->
-            if(line.contains('was successfully deployed')) {
+        Util.logProcess(project, process, "${serverName}.log", { line ->
+            if(line.contains(successfullyStartedLogToken)) {
                 if(firstStart) {
                     def resultStr = "Application running on http://localhost:${project.vaadin.serverPort} "
                     if (project.vaadin.jrebel.enabled) {
@@ -176,6 +216,7 @@ class ApplicationServer {
             if(process != null){
                 // Process has not been terminated
                 project.logger.warn("Server process was not terminated cleanly before re-loading")
+                break
             }
 
             // Start server
@@ -183,7 +224,10 @@ class ApplicationServer {
             firstStart = false
 
             // Wait until server process calls destroy()
-            process.waitFor()
+            def exitCode = process.waitFor()
+            if(exitCode != 0){
+                project.logger.warn("Server process terminated with exit code "+exitCode)
+            }
 
             if(!project.vaadin.plugin.serverRestart){
                 // Auto-refresh turned off

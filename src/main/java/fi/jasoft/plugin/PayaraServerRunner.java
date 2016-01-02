@@ -26,9 +26,9 @@ import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ApplicationServerRunner {
+public class PayaraServerRunner {
 
-    // Usage: 'ApplicationServerRunner [port] [webbappdir] [classesdir] [LogLevel] [name] [workdir]'
+    // Usage: 'PayaraServerRunner [port] [webbappdir] [classesdir] [LogLevel] [name] [workdir]'
     public static void main(String[] args) throws Exception {
         int port = Integer.parseInt(args[0]);
         String webAppDir = args[1];
@@ -46,7 +46,7 @@ public class ApplicationServerRunner {
         try {
 
             BootstrapProperties bootstrap = new BootstrapProperties();
-            GlassFishRuntime runtime = GlassFishRuntime.bootstrap(bootstrap, ApplicationServerRunner.class.getClass().getClassLoader());
+            GlassFishRuntime runtime = GlassFishRuntime.bootstrap(bootstrap, PayaraServerRunner.class.getClass().getClassLoader());
             GlassFishProperties glassfishProperties = new GlassFishProperties();
             glassfishProperties.setPort("http-listener", port);
             GlassFish glassfish = runtime.newGlassFish(glassfishProperties);
@@ -70,7 +70,7 @@ public class ApplicationServerRunner {
 
             deployer.deploy(archiveURI, "--contextroot=");
         } catch (Exception ex){
-            Logger.getLogger(ApplicationServerRunner.class.getName()).log(Level.SEVERE,
+            Logger.getLogger(PayaraServerRunner.class.getName()).log(Level.SEVERE,
                     null, ex);
         }
 

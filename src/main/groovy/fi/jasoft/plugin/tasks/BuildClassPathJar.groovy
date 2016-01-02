@@ -1,5 +1,6 @@
 package fi.jasoft.plugin.tasks
 
+import fi.jasoft.plugin.GradleVaadinPlugin
 import fi.jasoft.plugin.Util
 import org.gradle.api.tasks.bundling.Jar
 
@@ -21,7 +22,7 @@ class BuildClassPathJar extends Jar {
 
         project.afterEvaluate{
 
-            def files = project.configurations['vaadin-payara']
+            def files = project.configurations[GradleVaadinPlugin.CONFIGURATION_RUN_SERVER]
                     .plus(Util.getCompileClassPath(project))
                     .filter { File file ->
                         file.isFile() && file.name.endsWith('.jar')
