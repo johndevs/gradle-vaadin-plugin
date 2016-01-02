@@ -42,7 +42,8 @@ dependencies {
     compile "org.eclipse.jetty:jetty-deploy:$jettyVersion"
 
     //Payara application server
-    compile 'fish.payara.extras:payara-embedded-web:4.1.152.1'
+    def payaraVersion = '4.1.153'
+    compile "fish.payara.extras:payara-embedded-web:$payaraVersion"
 
     // For GET requests
     compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
