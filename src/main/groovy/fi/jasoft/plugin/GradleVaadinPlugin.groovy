@@ -26,6 +26,8 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.DependencyResolveDetails
+import org.gradle.api.artifacts.DependencySet
+import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.file.FileTree
 import org.gradle.api.plugins.WarPlugin
 import org.gradle.api.plugins.WarPluginConvention
@@ -210,6 +212,11 @@ class GradleVaadinPlugin implements Plugin<Project> {
         }
     }
 
+    static void applyServletApi(DependencyHandler projectDependencies, DependencySet dependencies){
+        def servletAPI = projectDependencies.create('javax.servlet:javax.servlet-api:3.1.0')
+        dependencies.add(servletAPI)
+    }
+
     static void applyDependencies(Project project) {
         def configurations = project.configurations
         def projectDependencies = project.dependencies
@@ -225,8 +232,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
                 def vaadinThemes = projectDependencies.create("com.vaadin:vaadin-themes:${Util.getVaadinVersion(project)}")
                 dependencies.add(vaadinThemes)
 
-                def servletAPI = projectDependencies.create('javax.servlet:javax.servlet-api:3.0.1')
-                dependencies.add(servletAPI)
+                applyServletApi(projectDependencies, dependencies)
 
                 // Theme compiler
                 if(!Util.isSassCompilerSupported(project)){
@@ -273,8 +279,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
                 def portletAPI = projectDependencies.create('javax.portlet:portlet-api:2.0')
                 dependencies.add(portletAPI)
 
-                def servletAPI = projectDependencies.create('javax.servlet:javax.servlet-api:3.0.1')
-                dependencies.add(servletAPI)
+                applyServletApi(projectDependencies, dependencies)
 
                 if(Util.isPushSupported(project)){
                     def push = projectDependencies.create("com.vaadin:vaadin-push:${Util.getVaadinVersion(project)}")
