@@ -16,6 +16,7 @@
 package fi.jasoft.plugin
 
 import fi.jasoft.plugin.configuration.VaadinPluginExtension
+import fi.jasoft.plugin.servers.ApplicationServer
 import fi.jasoft.plugin.servers.JettyApplicationServer
 import fi.jasoft.plugin.servers.PayaraApplicationServer
 import fi.jasoft.plugin.tasks.*
@@ -286,41 +287,12 @@ class GradleVaadinPlugin implements Plugin<Project> {
             conf.description = 'Libraries for running the embedded server'
             conf.defaultDependencies { dependencies ->
 
+                // Needed for server runners
                 def plugin = projectDependencies.create("fi.jasoft.plugin:gradle-vaadin-plugin:${GradleVaadinPlugin.version}")
                 dependencies.add(plugin)
 
-                if(project.vaadin.plugin.server == PayaraApplicationServer.NAME){
-
-                    def payaraWebProfile = projectDependencies.create('fish.payara.extras:payara-embedded-web:4.1.152.1')
-                    dependencies.add(payaraWebProfile)
-
-                } else if(project.vaadin.plugin.server == JettyApplicationServer.NAME){
-                    def jettyVersion = '9.3.0.v20150612'
-
-                    def jettyAll =  projectDependencies.create("org.eclipse.jetty.aggregate:jetty-all:$jettyVersion")
-                    dependencies.add(jettyAll)
-
-                    def jettyAnnotations = projectDependencies.create("org.eclipse.jetty:jetty-annotations:$jettyVersion")
-                    dependencies.add(jettyAnnotations)
-
-                    def jettyPlus = projectDependencies.create("org.eclipse.jetty:jetty-plus:$jettyVersion")
-                    dependencies.add(jettyPlus)
-
-                    def jettyDeploy = projectDependencies.create("org.eclipse.jetty:jetty-deploy:$jettyVersion")
-                    dependencies.add(jettyDeploy)
-
-                    def slf4j = projectDependencies.create('org.slf4j:slf4j-simple:1.7.12')
-                    dependencies.add(slf4j)
-
-                    def asm = projectDependencies.create('org.ow2.asm:asm:5.0.3')
-                    dependencies.add(asm)
-
-                    def asmCommons = projectDependencies.create('org.ow2.asm:asm-commons:5.0.3')
-                    dependencies.add(asmCommons)
-
-                    def jspApi = projectDependencies.create('javax.servlet.jsp:jsp-api:2.2')
-                    dependencies.add(jspApi)
-                }
+                // Add server dependencies
+                ApplicationServer.create(project).defineDependecies(projectDependencies, dependencies)
             }
         })
 

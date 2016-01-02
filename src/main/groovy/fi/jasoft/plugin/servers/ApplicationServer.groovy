@@ -20,6 +20,8 @@ import fi.jasoft.plugin.Util
 import fi.jasoft.plugin.tasks.BuildClassPathJar
 import fi.jasoft.plugin.tasks.CompileThemeTask
 import org.gradle.api.Project
+import org.gradle.api.artifacts.DependencySet
+import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.WarPluginConvention
 
@@ -69,6 +71,8 @@ abstract class ApplicationServer {
     abstract String getServerName()
 
     abstract String getSuccessfullyStartedLogToken()
+
+    abstract defineDependecies(DependencyHandler projectDependencies, DependencySet dependencies)
 
     def FileCollection getClassPath(){
         FileCollection cp

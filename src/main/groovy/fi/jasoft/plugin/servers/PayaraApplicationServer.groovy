@@ -1,5 +1,8 @@
 package fi.jasoft.plugin.servers
 
+import org.gradle.api.artifacts.DependencySet
+import org.gradle.api.artifacts.dsl.DependencyHandler
+
 /**
  * Created by john on 1.1.2016.
  */
@@ -24,5 +27,11 @@ class PayaraApplicationServer extends ApplicationServer {
     @Override
     String getSuccessfullyStartedLogToken() {
         'was successfully deployed'
+    }
+
+    @Override
+    def defineDependecies(DependencyHandler projectDependencies, DependencySet dependencies) {
+        def payaraWebProfile = projectDependencies.create('fish.payara.extras:payara-embedded-web:4.1.152.1')
+        dependencies.add(payaraWebProfile)
     }
 }
