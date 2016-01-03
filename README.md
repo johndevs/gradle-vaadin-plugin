@@ -183,6 +183,7 @@ vaadin.testbench.node.browsers = [
 * ``vaadin.plugin.eclipseOutputDir`` - The directory where Eclipse will output its compiled classes. Default is project.sourceSets.main.output.classesDir.
 * ~~``vaadin.plugin.jettyAutoRefresh`` - Should jetty automatically restart when a class is changed while jetty is running.~~
 * ``vaadin.plugin.serverRestart`` - Should the server automatically restart when a class is changed.
+* ``vaadin.plugin.themeCompiler`` - The SASS compiler to use. *vaadin* and *compass* are available. *vaadin* is default.
 * ``vaadin.plugin.themeAutoRecompile`` - Should the SASS theme be recompiled on change while the vaadinRun task is executed.
 * ``vaadin.plugin.themesDirectory`` - Root directory for themes. By default *src/main/webapp/VAADIN/themes*
 * ``vaadin.plugin.useClassPathJar`` - Use a single jar to define the classpath (if the classpath is too long)
