@@ -88,7 +88,18 @@ class VaadinPluginConfiguration {
      */
     String themesDirectory = null
 
-    /*
+    /**
+     * Theme compiler to use
+     * <p>
+     *     Available options are
+     *     <ul>
+     *         <li>vaadin - Vaadin's SASS Compiler</li>
+     *         <li>compass - Compass's SASS Compiler</li>
+     *     </ul>
+     */
+    String themeCompiler = 'vaadin'
+
+    /**
      * Should a classpath Jar be used to shorten the classpath.
      */
     boolean useClassPathJar = Os.isFamily(Os.FAMILY_WINDOWS)

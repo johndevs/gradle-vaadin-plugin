@@ -21,6 +21,7 @@ import fi.jasoft.plugin.servers.JettyApplicationServer
 import fi.jasoft.plugin.servers.PayaraApplicationServer
 import fi.jasoft.plugin.tasks.*
 import org.gradle.api.Action
+import org.gradle.api.GradleException
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -234,13 +235,23 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
                 applyServletApi(projectDependencies, dependencies)
 
-                // Theme compiler
-                if(!Util.isSassCompilerSupported(project)){
-                    File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-                    FileTree themes = project.fileTree(dir: webAppDir.canonicalPath + '/VAADIN/themes', include: '**/styles.scss')
-                    if (!themes.isEmpty()) {
-                        def themeCompiler = projectDependencies.create("com.vaadin:vaadin-theme-compiler:${Util.getVaadinVersion(project)}")
-                        dependencies.add(themeCompiler)
+                File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
+                FileTree themes = project.fileTree(dir: webAppDir.canonicalPath + '/VAADIN/themes', include: '**/styles.scss')
+                if (!themes.isEmpty()) {
+                    switch (project.vaadin.plugin.themeCompiler){
+                        case 'vaadin':
+                            if(Util.getVaadinVersion(project).startsWith('7.0') || Util.getVaadinVersion(project).startsWith('7.1')){
+                                // In Vaadin 7.0 and 7.1 the compiler was shipped as a non-transitive dependency
+                                def themeCompiler = projectDependencies.create("com.vaadin:vaadin-theme-compiler:${Util.getVaadinVersion(project)}")
+                                dependencies.add(themeCompiler)
+                            }
+                            break
+                        case 'compass':
+                            def jruby = projectDependencies.create('org.jruby:jruby-complete:1.7.3')
+                            dependencies.add(jruby)
+                            break
+                        default:
+                            throw new GradleException("Selected theme compiler \"${project.vaadin.plugin.themeCompiler}\" is not valid")
                     }
                 }
             }

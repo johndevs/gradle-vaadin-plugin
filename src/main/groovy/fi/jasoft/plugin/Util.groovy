@@ -331,19 +331,6 @@ class Util {
     }
 
     /**
-     * Does the project support SCSS compiling
-     *
-     * @param project
-     *      the project to check support for
-     * @return
-     *      <code>true</code> if SCSS compiling is supported
-     */
-    static boolean isSassCompilerSupported(Project project) {
-        VersionNumber version = VersionNumber.parse(getVaadinVersion(project))
-        version.minor > 1
-    }
-
-    /**
      * Get a list of all addon themename.scss on the project classpath
      *
      * @param project
@@ -418,12 +405,11 @@ class Util {
      */
     static void logProcessToFile(final Project project, final Process process, final String filename,
                                  Closure monitor={}) {
-        project.logger.info("Logging to file")
-
-        File logDir = project.file('build/logs/')
+        File logDir = project.file("$project.buildDir/logs/")
         logDir.mkdirs()
 
-        final File logFile = new File(logDir.canonicalPath + '/' + filename)
+        final File logFile = new File(logDir, filename)
+        project.logger.info("Logging to file $logFile")
 
         Thread.start 'Info logger', {
             logFile.withWriterAppend { out ->
