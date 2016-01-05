@@ -127,36 +127,6 @@ class TaskListener implements TaskExecutionListener {
     }
 
     @PackageScope
-    static configureIdeaModule(Task task) {
-        def project = task.project
-        def conf = project.configurations
-        def module = project.idea.module
-
-        // Module name is project name
-        module.name = project.name
-
-        module.inheritOutputDirs = false
-        module.outputDir = project.sourceSets.main.output.classesDir
-        module.testOutputDir = project.sourceSets.test.output.classesDir
-
-        // Download sources and javadoc
-        module.downloadJavadoc = true
-        module.downloadSources = true
-
-        // Add configurations to classpath
-        module.scopes.COMPILE.plus += [conf[GradleVaadinPlugin.CONFIGURATION_SERVER]]
-        module.scopes.COMPILE.plus += [conf[GradleVaadinPlugin.CONFIGURATION_CLIENT]]
-
-        if (project.vaadin.testbench.enabled) {
-            module.scopes.TEST.plus += [conf[GradleVaadinPlugin.CONFIGURATION_TESTBENCH]]
-        }
-
-        if (Util.isPushSupportedAndEnabled(project)) {
-            module.scopes.COMPILE.plus += [conf[GradleVaadinPlugin.CONFIGURATION_PUSH]]
-        }
-    }
-
-    @PackageScope
     static configureEclipseWtpPluginComponent(Task task) {
         def project = task.project
         def wtp = project.eclipse.wtp

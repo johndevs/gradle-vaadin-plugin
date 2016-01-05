@@ -16,6 +16,7 @@
 package fi.jasoft.plugin
 
 import fi.jasoft.plugin.configuration.VaadinPluginExtension
+import fi.jasoft.plugin.ides.IDEAUtil
 import fi.jasoft.plugin.servers.ApplicationServer
 import fi.jasoft.plugin.servers.JettyApplicationServer
 import fi.jasoft.plugin.servers.PayaraApplicationServer
@@ -161,23 +162,24 @@ class GradleVaadinPlugin implements Plugin<Project> {
             }
 
             // Remove configurations if the plugin shouldn't manage them
-            if(!project.vaadin.manageDependencies){
-                project.configurations.removeAll({ Configuration conf ->
+            if(!p.vaadin.manageDependencies){
+                p.configurations.removeAll({ Configuration conf ->
                    conf.name.startsWith('vaadin-')
                 })
             }
-
-
         }
+
+        // Configure IDEA
+        IDEAUtil.configureIDEAModule(project)
     }
 
     static void applyRepositories(Project project) {
-        project.afterEvaluate {
-            if(!project.vaadin.manageRepositories) {
+        project.afterEvaluate { Project p ->
+            if(!p.vaadin.manageRepositories) {
                 return
             }
 
-            def repositories = project.repositories
+            def repositories = p.repositories
 
             repositories.mavenCentral()
             repositories.mavenLocal()
@@ -258,6 +260,8 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
             sources.compileClasspath += conf
             testSources.compileClasspath += conf
+
+            IDEAUtil.addConfigurationToProject(project, CONFIGURATION_SERVER)
         })
 
         configurations.create(CONFIGURATION_CLIENT, { conf ->
@@ -282,6 +286,8 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
             testSources.compileClasspath += conf
             testSources.runtimeClasspath += conf
+
+            IDEAUtil.addConfigurationToProject(project, CONFIGURATION_CLIENT)
         })
 
         configurations.create(CONFIGURATION_JAVADOC, { conf ->
@@ -325,7 +331,10 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
             testSources.compileClasspath += conf
             testSources.runtimeClasspath += conf
+
+            IDEAUtil.addConfigurationToProject(project, CONFIGURATION_PUSH)
         })
+
 
         configurations.create(CONFIGURATION_TESTBENCH, { conf ->
             conf.description = 'Libraries needed by Vaadin Testbench.'
@@ -338,7 +347,10 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
             testSources.compileClasspath += conf
             testSources.runtimeClasspath += conf
+
+            IDEAUtil.addConfigurationToProject(project, CONFIGURATION_TESTBENCH, true)
         })
+
 
         configurations.create(CONFIGURATION_SUPERDEVMODE, { conf ->
             conf.description = 'Libraries needed by Vaadin Superdevmode.'
