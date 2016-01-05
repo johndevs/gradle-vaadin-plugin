@@ -72,7 +72,7 @@ apply plugin: fi.jasoft.plugin.GradleVaadinPlugin
 | 0.8.x  |   1.x  |     7    |    7   |  8.1   |   -    | 3.0 | Idea support, Addon SCSS themes, GWT first in classpath  | 
 | 0.9.x  |   2.x  |     7    |   7,8  |  9.2   |   -    | 3.0 | Groovy support, Jetty 9, Jetty autorestart |
 | 0.10.x |   2.x  |     7    |   7,8  |  9.3   |   -    | 3.0 | Widgetset CDN support, Classpath JAR on Win as default | 
-| 0.11.x |   3.x  |     7    |   7,8  |  9.3   |  4.1*  | 3.1 | Payara as web server, dependencies as defaultDependencies, Support for parallel execution of tasks |
+| 0.11.x |   3.x  |     7    |   7,8  |  9.3   |  4.1*  | 3.1 | Payara as web server, dependencies as defaultDependencies, Support for parallel execution of tasks, Compass SASS compiler support |
 
 \* Payara becomes the default server for vaadinRun.
 
@@ -183,6 +183,7 @@ vaadin.testbench.node.browsers = [
 * ``vaadin.plugin.eclipseOutputDir`` - The directory where Eclipse will output its compiled classes. Default is project.sourceSets.main.output.classesDir.
 * ~~``vaadin.plugin.jettyAutoRefresh`` - Should jetty automatically restart when a class is changed while jetty is running.~~
 * ``vaadin.plugin.serverRestart`` - Should the server automatically restart when a class is changed.
+* ``vaadin.plugin.themeCompiler`` - The SASS compiler to use. *vaadin* and *compass* are available. *vaadin* is default.
 * ``vaadin.plugin.themeAutoRecompile`` - Should the SASS theme be recompiled on change while the vaadinRun task is executed.
 * ``vaadin.plugin.themesDirectory`` - Root directory for themes. By default *src/main/webapp/VAADIN/themes*
 * ``vaadin.plugin.useClassPathJar`` - Use a single jar to define the classpath (if the classpath is too long)
