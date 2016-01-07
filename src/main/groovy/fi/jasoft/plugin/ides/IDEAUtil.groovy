@@ -18,10 +18,16 @@ package fi.jasoft.plugin.ides
 import org.gradle.api.Project
 
 /**
- * Created by john on 5.1.2016.
+ * Intellij related utility methods
  */
 class IDEAUtil {
 
+    /**
+     * Configures the intellij module.
+     *
+     * @param project
+     *      the project to configure
+     */
     static void configureIDEAModule(Project project) {
         project.afterEvaluate { Project p ->
             if(p.hasProperty('idea')){
@@ -41,6 +47,16 @@ class IDEAUtil {
         }
     }
 
+    /**
+     * Adds a dependency configuration to the module scope
+     *
+     * @param project
+     *      the project to add the configuration to
+     * @param conf
+     *      the configuration name (must exist in project.configurations)
+     * @param test
+     *      is the configuration a test dependency
+     */
     static void addConfigurationToProject(Project project, String conf, boolean test=false){
         project.afterEvaluate { Project p ->
             if(p.hasProperty('idea')){

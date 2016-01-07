@@ -1,18 +1,35 @@
+/*
+* Copyright 2016 John Ahlroos
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package fi.jasoft.plugin.ides
 
-import fi.jasoft.plugin.GradleVaadinPlugin
-import fi.jasoft.plugin.Util
-import groovy.transform.PackageScope
 import org.apache.maven.BuildFailureException
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.plugins.ide.eclipse.model.EclipseWtp
 
 /**
- * Created by john on 6.1.2016.
+ * Eclipse related utility methods
  */
 class EclipseUtil {
 
+    /**
+     * Configures the eclipse plugin
+     *
+     * @param project
+     *      the project to configure. Must use the eclipse plugin.
+     */
     static configureEclipsePlugin(Project project) {
         project.beforeEvaluate { Project p ->
             def plugins = p.plugins
@@ -52,6 +69,14 @@ class EclipseUtil {
         }
     }
 
+    /**
+     * Adds a dependency configuration to the eclipse project classpath
+     *
+     * @param project
+     *      the project to add the configuration to
+     * @param conf
+     *      the configuration name (must exist in project.configurations)
+     */
     static void addConfigurationToProject(Project project, String conf){
         project.afterEvaluate { Project p ->
             if(p.hasProperty('eclipse')){

@@ -5,7 +5,7 @@ import fi.jasoft.plugin.Util
 import org.gradle.api.tasks.bundling.Jar
 
 /**
- * Created by john on 1/30/15.
+ * Builds a classpath jar used by external java processes.
  */
 class BuildClassPathJar extends Jar {
 

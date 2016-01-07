@@ -5,7 +5,7 @@ import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 
 /*
-* Copyright 2015 John Ahlroos
+* Copyright 2016 John Ahlroos
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
