@@ -15,6 +15,7 @@
 */
 package fi.jasoft.plugin
 
+import fi.jasoft.plugin.ides.EclipseUtil
 import fi.jasoft.plugin.servers.ApplicationServer
 import fi.jasoft.plugin.tasks.CreateDirectoryZipTask
 import fi.jasoft.plugin.tasks.CreateWidgetsetGeneratorTask
@@ -42,18 +43,6 @@ class TaskListener implements TaskExecutionListener {
         }
 
         switch (task.name) {
-            case 'eclipseClasspath':
-                configureEclipsePlugin(task)
-                break
-            case 'ideaModule':
-                configureIdeaModule(task)
-                break
-            case 'eclipseWtpFacet':
-                configureEclipseWtpPluginFacet(task)
-                break
-            case 'eclipseWtpComponent':
-                configureEclipseWtpPluginComponent(task)
-                break
             case 'compileJava':
                 ensureWidgetsetGeneratorExists(task)
                 break
