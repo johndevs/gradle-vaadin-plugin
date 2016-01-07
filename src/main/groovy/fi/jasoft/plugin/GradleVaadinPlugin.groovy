@@ -16,11 +16,13 @@
 package fi.jasoft.plugin
 
 import fi.jasoft.plugin.configuration.VaadinPluginExtension
+import fi.jasoft.plugin.ides.EclipseUtil
 import fi.jasoft.plugin.ides.IDEAUtil
 import fi.jasoft.plugin.servers.ApplicationServer
 import fi.jasoft.plugin.servers.JettyApplicationServer
 import fi.jasoft.plugin.servers.PayaraApplicationServer
 import fi.jasoft.plugin.tasks.*
+import org.apache.maven.BuildFailureException
 import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.InvalidUserDataException
@@ -146,14 +148,6 @@ class GradleVaadinPlugin implements Plugin<Project> {
         artifacts.add('archives', tasks[BuildSourcesJarTask.NAME])
         artifacts.add('archives', tasks[BuildJavadocJarTask.NAME])
 
-        project.beforeEvaluate { Project p ->
-            def plugins = p.plugins
-            if (plugins.findPlugin('eclipse') && !plugins.findPlugin('eclipse-wtp')) {
-                p.logger.warn("You are using the eclipse plugin which does not support all " +
-                        "features of the Vaadin plugin. Please use the eclipse-wtp plugin instead.")
-            }
-        }
-
         project.afterEvaluate { Project p ->
             def v = Util.getVaadinVersion(p)
             if(v !=null && v.startsWith("6")){
@@ -171,6 +165,9 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
         // Configure IDEA
         IDEAUtil.configureIDEAModule(project)
+
+        // Configure Eclipse
+        EclipseUtil.configureEclipsePlugin(project)
     }
 
     static void applyRepositories(Project project) {
@@ -262,6 +259,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
             testSources.compileClasspath += conf
 
             IDEAUtil.addConfigurationToProject(project, CONFIGURATION_SERVER)
+            EclipseUtil.addConfigurationToProject(project, CONFIGURATION_SERVER)
         })
 
         configurations.create(CONFIGURATION_CLIENT, { conf ->
@@ -288,6 +286,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
             testSources.runtimeClasspath += conf
 
             IDEAUtil.addConfigurationToProject(project, CONFIGURATION_CLIENT)
+            EclipseUtil.addConfigurationToProject(project, CONFIGURATION_CLIENT)
         })
 
         configurations.create(CONFIGURATION_JAVADOC, { conf ->
@@ -333,6 +332,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
             testSources.runtimeClasspath += conf
 
             IDEAUtil.addConfigurationToProject(project, CONFIGURATION_PUSH)
+            EclipseUtil.addConfigurationToProject(project, CONFIGURATION_PUSH)
         })
 
 
@@ -349,6 +349,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
             testSources.runtimeClasspath += conf
 
             IDEAUtil.addConfigurationToProject(project, CONFIGURATION_TESTBENCH, true)
+            EclipseUtil.addConfigurationToProject(project, CONFIGURATION_TESTBENCH)
         })
 
 

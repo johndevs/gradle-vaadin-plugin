@@ -93,59 +93,6 @@ class TaskListener implements TaskExecutionListener {
     }
 
     @PackageScope
-    static configureEclipsePlugin(Task task) {
-        def project = task.project
-        def conf = project.configurations
-        def cp = project.eclipse.classpath
-
-        // Always download sources
-        cp.downloadSources = true
-
-        // Set Eclipse's class output dir
-        if (project.vaadin.plugin.eclipseOutputDir == null) {
-            cp.defaultOutputDir = project.sourceSets.main.output.classesDir
-        }
-        else {
-            cp.defaultOutputDir = project.file(project.vaadin.plugin.eclipseOutputDir)
-        }
-
-        // Add dependencies to eclipse classpath
-        cp.plusConfigurations += [conf[GradleVaadinPlugin.CONFIGURATION_SERVER]]
-        cp.plusConfigurations += [conf[GradleVaadinPlugin.CONFIGURATION_CLIENT]]
-
-        if (project.vaadin.testbench.enabled) {
-            cp.plusConfigurations += [conf[GradleVaadinPlugin.CONFIGURATION_TESTBENCH]]
-        }
-
-        if (Util.isPushSupportedAndEnabled(project)) {
-            cp.plusConfigurations += [conf[GradleVaadinPlugin.CONFIGURATION_PUSH]]
-        }
-
-        // Configure natures
-        def natures = project.eclipse.project.natures
-        natures.add(0, 'org.springsource.ide.eclipse.gradle.core.nature' )
-    }
-
-    @PackageScope
-    static configureEclipseWtpPluginComponent(Task task) {
-        def project = task.project
-        def wtp = project.eclipse.wtp
-        wtp.component.plusConfigurations += [project.configurations[GradleVaadinPlugin.CONFIGURATION_SERVER]]
-    }
-
-    @PackageScope
-    static configureEclipseWtpPluginFacet(Task task) {
-        def wtp = task.project.eclipse.wtp as EclipseWtp
-        def facet = wtp.facet
-
-        facet.facets = []
-        facet.facet(name: 'jst.web', version: '3.0')
-        facet.facet(name: 'jst.java', version: task.project.sourceCompatibility)
-        facet.facet(name: 'com.vaadin.integration.eclipse.core', version: '7.0')
-        facet.facet(name: 'java', version: task.project.sourceCompatibility)
-    }
-
-    @PackageScope
     static ensureWidgetsetGeneratorExists(Task task) {
         def generator = task.project.vaadin.widgetsetGenerator
         if (generator != null) {
