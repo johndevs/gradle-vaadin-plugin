@@ -25,7 +25,7 @@ trait IntegrationTest {
             buildscript {
                 repositories {
                     mavenCentral()
-                    flatDir dirs: '${new File('.').absolutePath + '/build/libs'}'
+                    flatDir dirs: '${new File('.').canonicalPath + File.separator + 'build' + File.separator + 'libs'}'
                 }
 
                 dependencies {
