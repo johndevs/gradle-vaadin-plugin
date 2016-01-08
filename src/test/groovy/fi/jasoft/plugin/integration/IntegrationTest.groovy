@@ -1,10 +1,13 @@
 package fi.jasoft.plugin.integration
 
+import org.apache.commons.io.FilenameUtils
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
+
+import java.nio.file.Paths
 
 /**
  * Created by john on 7/29/15.
@@ -20,12 +23,14 @@ trait IntegrationTest {
     void setup() {
         buildFile = projectDir.newFile("build.gradle")
 
+        def libsDir = Paths.get('.', 'build', 'libs').toFile()
+
         // Apply plugin to project
         buildFile << """
             buildscript {
                 repositories {
                     mavenCentral()
-                    flatDir dirs: '${new File('.').canonicalPath + File.separator + 'build' + File.separator + 'libs'}'
+                    flatDir dirs: '${FilenameUtils.separatorsToUnix(libsDir.canonicalPath)}'
                 }
 
                 dependencies {
