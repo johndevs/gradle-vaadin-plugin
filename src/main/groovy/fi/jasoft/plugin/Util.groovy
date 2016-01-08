@@ -656,4 +656,44 @@ class Util {
     static String getVaadinVersion(Project project) {
         project.vaadin.version ?: '7.5.+'
     }
+
+    /**
+     * Gets a relative path to a parent path
+     *
+     * For example:
+     *
+     * We want to convert /foo/bar/baz/myfile.css to be relative to /foo/bar
+     *
+     * We select parent folder name to 'bar' and the path becomes baz/myfile.css
+     *
+     * @param parentFolderName
+     *      the name of the parent folder.
+     * @param file
+     *      the file to convert
+     * @return
+     *      the relative path
+     */
+    static String getRelativePathForFile(String parentFolderName, File file){
+        def parentFolder = file.parentFile
+        while(parentFolder.name != parentFolderName){
+            parentFolder = parentFolder.parentFile
+        }
+        file.canonicalPath.substring(parentFolder.canonicalPath.length() + 1)
+    }
+
+    /**
+     * Replaces a file extension with another file extension
+     *
+     * @param filePath
+     *      the path of the file
+     * @param oldExtension
+     *      the old extension
+     * @param newExtension
+     *      the new extension
+     * @return
+     *      the new file path with the new extension
+     */
+    static String replaceExtension(String filePath, String oldExtension, String newExtension) {
+        filePath.substring(0, filePath.length() - oldExtension.length()) + newExtension
+    }
 }
