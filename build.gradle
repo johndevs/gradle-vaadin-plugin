@@ -212,7 +212,7 @@ processResources {
     dependsOn project.createPOMforVaadinDirectory
 
     // Apply build properties
-    def debugDir = project.file(".").getAbsolutePath()+'/build/libs'
+    def debugDir = new File(project.buildDir, 'libs').canonicalPath
     from(sourceSets.main.resources.srcDirs){
         filter(ReplaceTokens, tokens: [
                 version: project.version,
