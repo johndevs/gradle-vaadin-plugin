@@ -16,7 +16,6 @@
 package fi.jasoft.plugin.configuration
 
 import org.gradle.api.file.SourceDirectorySet
-import org.gradle.api.internal.tasks.options.Option
 
 /**
  * Plugin configuration extension
@@ -34,7 +33,7 @@ class VaadinPluginExtension {
      */
     String widgetsetGenerator = null
 
-    /*
+    /**
      * Use the widgetset CDN located at cdn.virit.in
      */
     boolean widgetsetCDN = false

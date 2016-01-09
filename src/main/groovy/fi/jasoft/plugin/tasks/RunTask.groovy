@@ -17,7 +17,6 @@ package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.ApplicationServer
 import org.gradle.api.DefaultTask
-import org.gradle.api.invocation.Gradle
 import org.gradle.api.tasks.TaskAction
 
 public class RunTask extends DefaultTask {

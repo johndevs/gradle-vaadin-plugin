@@ -53,7 +53,7 @@ class VaadinPluginConfiguration {
      */
     String themesDirectory = null
 
-    /*
+    /**
      * Should a classpath Jar be used to shorten the classpath.
      */
     boolean useClassPathJar = Os.isFamily(Os.FAMILY_WINDOWS)

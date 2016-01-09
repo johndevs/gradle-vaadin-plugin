@@ -1,10 +1,3 @@
-package fi.jasoft.plugin.tasks
-
-import fi.jasoft.plugin.TemplateUtil
-import fi.jasoft.plugin.Util
-import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.TaskAction
-
 /*
 * Copyright 2015 John Ahlroos
 *
@@ -20,6 +13,13 @@ import org.gradle.api.tasks.TaskAction
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
+package fi.jasoft.plugin.tasks
+
+import fi.jasoft.plugin.TemplateUtil
+import fi.jasoft.plugin.Util
+import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.TaskAction
+
 class CreateTestbenchTestTask extends DefaultTask {
 
     public static final String NAME = 'vaadinCreateTestbenchTest'

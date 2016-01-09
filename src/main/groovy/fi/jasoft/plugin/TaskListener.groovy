@@ -16,8 +16,6 @@
 package fi.jasoft.plugin
 
 import fi.jasoft.plugin.DependencyListener.Configuration
-import fi.jasoft.plugin.tasks.BuildClassPathJar
-import fi.jasoft.plugin.tasks.CompileWidgetsetTask
 import fi.jasoft.plugin.tasks.CreateDirectoryZipTask
 import fi.jasoft.plugin.tasks.CreateWidgetsetGeneratorTask
 import fi.jasoft.plugin.testbench.TestbenchHub
@@ -26,14 +24,9 @@ import groovy.xml.MarkupBuilder
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.execution.TaskExecutionListener
-import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskState
 import org.gradle.api.tasks.bundling.War
-import org.gradle.plugins.ide.eclipse.EclipseWtpPlugin
 import org.gradle.plugins.ide.eclipse.model.EclipseWtp
-import org.gradle.plugins.ide.eclipse.model.EclipseWtpFacet
-import org.gradle.plugins.ide.eclipse.model.Facet
-import org.gradle.plugins.ide.eclipse.model.WtpFacet
 
 public class TaskListener implements TaskExecutionListener {
 

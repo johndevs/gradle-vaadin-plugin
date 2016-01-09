@@ -16,9 +16,7 @@
 package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.Util
-import fi.jasoft.plugin.configuration.VaadinPluginExtension
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskAction
 
