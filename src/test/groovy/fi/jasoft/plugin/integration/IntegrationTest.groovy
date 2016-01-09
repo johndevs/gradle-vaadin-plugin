@@ -29,14 +29,14 @@ trait IntegrationTest {
         Assume.assumeTrue("$libsDir does not exist", libsDir.exists())
 
         def escapedDir = libsDir.canonicalPath.replace("\\","\\\\")
-        println escapedDir
+        println "Repository for built dependencies $escapedDir"
 
         // Apply plugin to project
         buildFile << """
             buildscript {
                 repositories {
                     mavenCentral()
-                    flatDir dirs: '$escapedDir'
+                    flatDir dirs: file('$escapedDir')
                 }
 
                 dependencies {
