@@ -25,14 +25,16 @@ public class RunTask extends DefaultTask {
 
     def server = new ApplicationServer(project)
 
+    def cleanupThread = new Thread({
+        server.terminate()
+        Runtime.getRuntime().removeShutdownHook(cleanupThread)
+    })
+
     public RunTask() {
         dependsOn(CompileWidgetsetTask.NAME)
         dependsOn(CompileThemeTask.NAME)
         description = 'Runs the Vaadin application on an embedded Jetty ApplicationServer'
-
-        addShutdownHook {
-            server.terminate()
-        }
+        Runtime.getRuntime().addShutdownHook(cleanupThread)
     }
 
     @TaskAction
