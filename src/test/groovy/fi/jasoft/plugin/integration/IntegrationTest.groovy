@@ -1,8 +1,10 @@
 package fi.jasoft.plugin.integration
 
+import junit.framework.Assert
 import org.apache.commons.io.FilenameUtils
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
+import org.junit.Assume
 import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
@@ -24,13 +26,17 @@ trait IntegrationTest {
         buildFile = projectDir.newFile("build.gradle")
 
         def libsDir = Paths.get('.', 'build', 'libs').toFile()
+        Assume.assumeTrue("$libsDir does not exist", libsDir.exists())
+
+        def escapedDir = libsDir.canonicalPath.replace("\\","\\\\")
+        println escapedDir
 
         // Apply plugin to project
         buildFile << """
             buildscript {
                 repositories {
                     mavenCentral()
-                    flatDir dirs: '${FilenameUtils.separatorsToUnix(libsDir.canonicalPath)}'
+                    flatDir dirs: '$escapedDir'
                 }
 
                 dependencies {
