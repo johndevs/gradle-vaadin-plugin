@@ -25,11 +25,11 @@ trait IntegrationTest {
     void setup() {
         buildFile = projectDir.newFile("build.gradle")
 
-        def libsDir = Paths.get('.', 'build', 'libs').toFile()
-        Assume.assumeTrue("$libsDir does not exist", libsDir.exists())
 
+        def libsDir = Paths.get('.', 'build', 'libs').toFile()
         def escapedDir = libsDir.canonicalPath.replace("\\","\\\\")
         println "Repository for built dependencies $escapedDir"
+
 
         // Apply plugin to project
         buildFile << """
@@ -45,15 +45,23 @@ trait IntegrationTest {
                 }
             }
 
+            repositories {
+                flatDir dirs: file('$escapedDir')
+            }
+
             apply plugin: fi.jasoft.plugin.GradleVaadinPlugin
         """
     }
 
     String runWithArguments(String... args) {
-        GradleRunner.create().withProjectDir(projectDir.root).withArguments(args).build().output
+        setupRunner().withArguments(args).build().output
     }
 
     String runFailureExpected() {
-        GradleRunner.create().withProjectDir(projectDir.root).buildAndFail().output
+        setupRunner().buildAndFail().output
+    }
+
+    GradleRunner setupRunner() {
+        GradleRunner.create().withProjectDir(projectDir.root)
     }
 }
