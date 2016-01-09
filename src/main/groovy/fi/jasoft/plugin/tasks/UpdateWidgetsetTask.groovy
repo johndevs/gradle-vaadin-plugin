@@ -17,21 +17,14 @@ package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
-import org.apache.commons.io.FileUtils
-import org.apache.commons.io.FilenameUtils
 import org.apache.commons.lang.StringUtils
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
-import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.artifacts.ProjectDependency
-import org.gradle.api.file.FileTree
 import org.gradle.api.tasks.TaskAction
-import org.gradle.api.tasks.util.PatternFilterable
-
-import java.nio.file.Paths
 import java.util.jar.Attributes
 import java.util.jar.JarInputStream
 import java.util.jar.Manifest
@@ -67,7 +60,7 @@ class UpdateWidgetsetTask extends DefaultTask {
         // Check source dir if widgetset is present there
         if(!Util.getMainSourceSet(project).srcDirs.isEmpty()){
             File javaDir = Util.getMainSourceSet(project).srcDirs.first()
-            widgetsetFile = new File(javaDir.canonicalPath + '/' + widgetsetFQN.replaceAll(/\./, '/') + ".gwt.xml")
+            widgetsetFile = new File(javaDir, widgetsetFQN.replaceAll(/\./, File.separator) + ".gwt.xml")
             if (widgetsetFile.exists()) {
                 updateWidgetset(widgetsetFile, widgetsetFQN, project)
                 return false;
@@ -77,7 +70,7 @@ class UpdateWidgetsetTask extends DefaultTask {
         // Check resource dir if widgetset is present there
         if(!project.sourceSets.main.resources.srcDirs.isEmpty()){
             File resourceDir = project.sourceSets.main.resources.srcDirs.first()
-            widgetsetFile = new File(resourceDir.canonicalPath + '/' + widgetsetFQN.replaceAll(/\./, '/') + ".gwt.xml")
+            widgetsetFile = new File(resourceDir, widgetsetFQN.replaceAll(/\./, File.separator) + ".gwt.xml")
             if (widgetsetFile.exists()) {
                 updateWidgetset(widgetsetFile, widgetsetFQN, project)
                 return false;
@@ -86,7 +79,7 @@ class UpdateWidgetsetTask extends DefaultTask {
 
         if(widgetsetFile){
             // No widgetset detected, create one
-            new File(widgetsetFile.parent).mkdirs()
+            widgetsetFile.parentFile.mkdirs()
             widgetsetFile.createNewFile()
             updateWidgetset(widgetsetFile, widgetsetFQN, project)
             return true;
@@ -213,7 +206,8 @@ class UpdateWidgetsetTask extends DefaultTask {
         }
 
         File javaDir = Util.getMainSourceSet(project).srcDirs.first()
-        File f = new File(javaDir.canonicalPath + '/' + pkg.replaceAll(/\./, '/') + '/' + filename)
+        File f = new File(new File(javaDir, pkg.replaceAll(/\./, File.separator)), filename)
+
 
         if (f.exists() || project.vaadin.widgetsetGenerator != null) {
             substitutions['widgetsetGenerator'] = "${pkg}.${filename.replaceAll('.java$', '')}"
@@ -235,30 +229,20 @@ class UpdateWidgetsetTask extends DefaultTask {
         def stylesheets = []
 
         clientSCSS.each {
-
-            // Get the relative path to the public folder
-            def path = it.parent.substring(it.parent.lastIndexOf(PUBLIC_FOLDER) + PUBLIC_FOLDER.length())
-            if (path.startsWith(File.separator)) {
-                path = path.substring(1);
-            }
-
-            // Convert file name from scss -> css
-            def cssFile = it.name.substring(0, it.name.length() - SCSS_FILE_POSTFIX.length()) + CSS_FILE_POSTFIX
-            stylesheets.add(path ? path + File.separator + cssFile : cssFile)
+            stylesheets.add(
+                    Util.replaceExtension(
+                            Util.getRelativePathForFile(PUBLIC_FOLDER, it),
+                            SCSS_FILE_POSTFIX,
+                            CSS_FILE_POSTFIX
+                    )
+            )
         }
 
-        // Retrive CSS files
         File[] clientCSS = TemplateUtil.getFilesFromPublicFolder(project, CSS_FILE_POSTFIX)
         clientCSS.each {
-
-            // Get the relative path to the public folder
-            def path = it.parent.substring(it.parent.lastIndexOf(PUBLIC_FOLDER) + PUBLIC_FOLDER.length())
-            if (path.startsWith(File.separator)) {
-                path = path.substring(1);
-            }
-
-            def scssFile = it.name
-            stylesheets.add(path ? path + File.separator + scssFile : scssFile)
+            stylesheets.add(
+                    Util.getRelativePathForFile(PUBLIC_FOLDER, it)
+            )
         }
 
         substitutions['stylesheets'] = stylesheets
