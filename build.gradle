@@ -247,5 +247,6 @@ task integrationTest(type:Test, dependsOn:['test','jar']) {
         exceptionFormat "full"
     }
     include '**/integration/**'
+    systemProperty 'integrationTestProjectVersion', version
 }
 check.dependsOn 'integrationTest'

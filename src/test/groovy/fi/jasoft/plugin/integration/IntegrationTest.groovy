@@ -24,7 +24,8 @@ trait IntegrationTest {
     @Before
     void setup() {
         buildFile = projectDir.newFile("build.gradle")
-
+        def projectVersion = System.getProperty('integrationTestProjectVersion')
+        println "Project version set to $projectVersion"
 
         def libsDir = Paths.get('.', 'build', 'libs').toFile()
         def escapedDir = libsDir.canonicalPath.replace("\\","\\\\")
@@ -41,7 +42,7 @@ trait IntegrationTest {
 
                 dependencies {
                     classpath group: 'org.codehaus.groovy.modules.http-builder', name: 'http-builder', version: '0.7.1'
-                    classpath group: 'fi.jasoft.plugin', name: 'gradle-vaadin-plugin', version: 'SNAPSHOT-'+ new Date().format('yyyyMMdd')
+                    classpath group: 'fi.jasoft.plugin', name: 'gradle-vaadin-plugin', version: '$projectVersion'
                 }
             }
 
