@@ -29,20 +29,22 @@ class DevModeTask extends DefaultTask {
 
     def server
 
+    def cleanupThread = new Thread({
+        if(devModeProcess) {
+            devModeProcess.destroy()
+            devModeProcess = null
+        }
+        if(server) {
+            server.terminate()
+            server = null
+        }
+        Runtime.getRuntime().removeShutdownHook(cleanupThread)
+    })
+
     public DevModeTask() {
         dependsOn('classes', UpdateWidgetsetTask.NAME)
         description = "Run Development Mode for easier debugging and development of client widgets."
-
-        addShutdownHook {
-            if(devModeProcess) {
-                devModeProcess.destroy()
-                devModeProcess = null
-            }
-            if(server) {
-                server.terminate()
-                server = null
-            }
-        }
+        Runtime.getRuntime().addShutdownHook(cleanupThread)
     }
 
     @TaskAction

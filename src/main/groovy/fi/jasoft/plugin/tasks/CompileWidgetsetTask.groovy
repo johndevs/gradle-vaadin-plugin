@@ -22,9 +22,7 @@ import groovyx.net.http.RESTClient
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
-import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskAction
-import org.gradle.api.tasks.TaskExecutionException
 
 import java.util.jar.Attributes
 import java.util.jar.JarFile

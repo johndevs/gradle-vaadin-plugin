@@ -33,7 +33,7 @@ class VaadinPluginExtension {
      */
     String widgetsetGenerator = null
 
-    /*
+    /**
      * Use the widgetset CDN located at cdn.virit.in
      */
     boolean widgetsetCDN = false

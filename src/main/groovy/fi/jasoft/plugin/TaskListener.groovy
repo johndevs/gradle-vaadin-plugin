@@ -15,7 +15,6 @@
 */
 package fi.jasoft.plugin
 
-import fi.jasoft.plugin.ides.EclipseUtil
 import fi.jasoft.plugin.servers.ApplicationServer
 import fi.jasoft.plugin.tasks.CreateDirectoryZipTask
 import fi.jasoft.plugin.tasks.CreateWidgetsetGeneratorTask
@@ -27,7 +26,6 @@ import org.gradle.api.Task
 import org.gradle.api.execution.TaskExecutionListener
 import org.gradle.api.tasks.TaskState
 import org.gradle.api.tasks.bundling.War
-import org.gradle.plugins.ide.eclipse.model.EclipseWtp
 
 class TaskListener implements TaskExecutionListener {
 

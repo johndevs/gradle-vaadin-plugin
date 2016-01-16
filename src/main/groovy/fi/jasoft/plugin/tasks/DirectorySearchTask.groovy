@@ -1,13 +1,3 @@
-package fi.jasoft.plugin.tasks
-
-import groovy.json.JsonSlurper
-import org.gradle.api.DefaultTask
-import org.gradle.api.internal.tasks.options.Option
-import org.gradle.api.tasks.TaskAction
-
-import java.text.SimpleDateFormat
-import java.util.concurrent.TimeUnit
-
 /*
 * Copyright 2016 John Ahlroos
 *
@@ -23,6 +13,16 @@ import java.util.concurrent.TimeUnit
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
+package fi.jasoft.plugin.tasks
+
+import groovy.json.JsonSlurper
+import org.gradle.api.DefaultTask
+import org.gradle.api.internal.tasks.options.Option
+import org.gradle.api.tasks.TaskAction
+
+import java.text.SimpleDateFormat
+import java.util.concurrent.TimeUnit
+
 class DirectorySearchTask extends DefaultTask {
 
     public static final String NAME = 'vaadinAddons'

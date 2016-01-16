@@ -1,9 +1,3 @@
-package fi.jasoft.plugin.testbench
-
-import fi.jasoft.plugin.Util
-import org.gradle.api.Project
-import org.gradle.api.file.FileCollection
-
 /*
 * Copyright 2016 John Ahlroos
 *
@@ -19,6 +13,12 @@ import org.gradle.api.file.FileCollection
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
+package fi.jasoft.plugin.testbench
+
+import fi.jasoft.plugin.Util
+import org.gradle.api.Project
+import org.gradle.api.file.FileCollection
+
 class TestbenchNode {
 
     private final Project project

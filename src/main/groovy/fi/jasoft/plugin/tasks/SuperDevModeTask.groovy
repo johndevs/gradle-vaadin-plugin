@@ -28,24 +28,25 @@ class SuperDevModeTask extends DefaultTask {
 
     def Process codeserverProcess = null
 
-    def server = null
+    def ApplicationServer server = null
+
+    def cleanupThread = new Thread({
+        if(codeserverProcess){
+            codeserverProcess.destroy()
+            codeserverProcess = null
+        }
+
+        if(server) {
+            server.terminate()
+            server = null
+        }
+        Runtime.getRuntime().removeShutdownHook(cleanupThread)
+    })
 
     def SuperDevModeTask() {
         dependsOn(CompileWidgetsetTask.NAME)
         description = "Run Super Development Mode for easier client widget development."
-
-
-        addShutdownHook {
-           if(codeserverProcess){
-               codeserverProcess.destroy()
-               codeserverProcess = null
-           }
-
-            if(server) {
-                server.terminate()
-                server = null
-            }
-        }
+        Runtime.getRuntime().addShutdownHook(cleanupThread)
     }
 
     @TaskAction

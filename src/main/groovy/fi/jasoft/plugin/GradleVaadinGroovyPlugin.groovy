@@ -1,10 +1,8 @@
 package fi.jasoft.plugin
 
-import fi.jasoft.plugin.configuration.VaadinPluginExtension
 import fi.jasoft.plugin.configuration.VaadinPluginGroovyExtension
 import org.gradle.api.Project
 import org.gradle.api.plugins.GroovyPlugin
-import org.gradle.api.plugins.WarPlugin
 
 /**
  * Created by john on 7/20/14.

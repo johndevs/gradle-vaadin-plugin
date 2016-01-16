@@ -21,7 +21,7 @@ import groovy.io.FileType
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
-import org.gradle.api.artifacts.DependencyResolveDetails
+
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.SourceDirectorySet
@@ -39,7 +39,6 @@ import java.nio.file.WatchEvent
 import java.nio.file.attribute.BasicFileAttributes
 import java.util.jar.Attributes
 import java.util.jar.JarInputStream
-import java.util.jar.Manifest
 
 /**
  * Utility class for Vaadin tasks
