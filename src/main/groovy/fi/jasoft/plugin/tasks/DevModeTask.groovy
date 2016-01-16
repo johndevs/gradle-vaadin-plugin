@@ -72,7 +72,7 @@ class DevModeTask extends DefaultTask {
 
         def classpath = Util.getClientCompilerClassPath(project)
 
-        def devmodeProcess = ['java']
+        def devmodeProcess = [Util.getJavaBinary(project)]
         devmodeProcess += ['-cp', classpath.getAsPath()]
         devmodeProcess += 'com.google.gwt.dev.DevMode'
         devmodeProcess += project.vaadin.widgetset

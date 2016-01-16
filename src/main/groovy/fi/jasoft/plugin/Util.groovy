@@ -738,4 +738,27 @@ class Util {
     static String replaceExtension(String filePath, String oldExtension, String newExtension) {
         filePath.substring(0, filePath.length() - oldExtension.length()) + newExtension
     }
+
+    /**
+     * Returns the path to the java binary
+     *
+     * @return
+     */
+    static String getJavaBinary(Project project){
+        String javaHome
+        if(project.hasProperty('org.gradle.java.home')){
+            javaHome = project.properties['org.gradle.java.home']
+        } else if(System.getProperty('JAVA_HOME')){
+            javaHome = System.getProperty('JAVA_HOME')
+        }
+
+        if(javaHome){
+            def javaBin =  new File(javaHome, 'bin')
+            def java = new File(javaBin, 'java')
+            return java.canonicalPath
+        }else {
+            // Fallback to Java on PATH
+            return 'java'
+        }
+    }
 }

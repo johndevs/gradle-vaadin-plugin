@@ -138,7 +138,7 @@ class CompileThemeTask extends DefaultTask {
      *      the process that runs the compiler
      */
     static Process executeVaadinSassCompiler(Project project, String themePath, String targetCSSFile){
-        def compileProcess = ['java']
+        def compileProcess = [Util.getJavaBinary(project)]
         compileProcess += ['-cp',  Util.getCompileClassPathOrJar(project).asPath]
         compileProcess += 'com.vaadin.sass.SassCompiler'
         compileProcess += [themePath, targetCSSFile]
@@ -159,7 +159,7 @@ class CompileThemeTask extends DefaultTask {
             gemsDir.mkdirs()
 
             project.logger.info("Installing compass ruby gem...")
-            def gemProcess = ['java']
+            def gemProcess = [Util.getJavaBinary(project)]
             gemProcess += ['-cp',  Util.getCompileClassPathOrJar(project).asPath]
             gemProcess += 'org.jruby.Main'
             gemProcess += "-S gem install -i $gemsDir --no-rdoc --no-ri compass".tokenize()
@@ -259,7 +259,7 @@ class CompileThemeTask extends DefaultTask {
         def themePath = new File(unpackedThemesDir, themeDir.name)
 
         project.logger.info("Compiling $themePath with compass compiler")
-        def compileProcess = ['java']
+        def compileProcess = [Util.getJavaBinary(project)]
         compileProcess += ['-cp',  Util.getCompileClassPathOrJar(project).asPath]
         compileProcess += 'org.jruby.Main'
         compileProcess += "-S compass compile --sass-dir $themePath --css-dir $themeDir --images-dir $themePath --javascripts-dir $themePath --relative-assets".tokenize()

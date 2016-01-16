@@ -241,7 +241,7 @@ class CompileWidgetsetTask extends DefaultTask {
             classpath = Util.getClientCompilerClassPath(project)
         }
 
-        def widgetsetCompileProcess = ['java']
+        def widgetsetCompileProcess = [Util.getJavaBinary(project)]
 
         if (gwt.jvmArgs) {
             widgetsetCompileProcess += gwt.jvmArgs as List

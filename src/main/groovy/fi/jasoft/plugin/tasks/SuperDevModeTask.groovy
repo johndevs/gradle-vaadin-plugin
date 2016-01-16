@@ -75,7 +75,7 @@ class SuperDevModeTask extends DefaultTask {
         def SDMClassPath = project.configurations['vaadin-superdevmode'];
         def classpath = SDMClassPath + Util.getClientCompilerClassPath(project)
 
-        def superdevmodeProcess = ['java']
+        def superdevmodeProcess = [Util.getJavaBinary(project)]
         superdevmodeProcess += ['-cp', classpath.getAsPath()]
         superdevmodeProcess += 'com.google.gwt.dev.codeserver.CodeServer'
         superdevmodeProcess += ['-bindAddress', project.vaadin.devmode.bindAddress]

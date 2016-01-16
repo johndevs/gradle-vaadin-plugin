@@ -106,7 +106,7 @@ abstract class ApplicationServer {
 
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
 
-        def appServerProcess = ['java']
+        def appServerProcess = [Util.getJavaBinary(project)]
 
         // Debug
         if (project.vaadin.debug) {

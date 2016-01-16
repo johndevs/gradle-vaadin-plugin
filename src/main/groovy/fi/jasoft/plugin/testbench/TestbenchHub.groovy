@@ -39,7 +39,7 @@ class TestbenchHub {
 
         FileCollection cp = project.configurations['vaadin-testbench'] + Util.getClassPath(project)
 
-        process = ['java']
+        process = [Util.getJavaBinary(project)]
 
         process.add('-cp')
         process.add(cp.getAsPath())
