@@ -139,7 +139,10 @@ gwt.jvmArgs = ['-Xmx500M', '-XX:MaxPermSize=256M']
 * ``vaadin.gwt.sourcePaths`` - Source folders where GWT code that should be compiled to JS is found. Default is 'client' and 'shared'.
 * ``vaadin.gwt.collapsePermutations`` - Should all permutations be compiled into a single js file for faster compilation time (but larger file size).
 * ``vaadin.gwt.gwtSdkFirstInClasspath`` - Should GWT be placed first in the classpath when compiling the widgetset.
-* ``vaadin.gwt.outputDirectory`` - (Optional) root directory, for generated files; default is the web-app directory from the WAR plugin.  E.g. ``/VAADIN/widgetsets`` is generated there.
+* ``vaadin.gwt.outputDirectory`` - (Optional) root directory (a `File`), for generated files; default is the web-app directory from the WAR plugin. Automatically adds ``/VAADIN/widgetsets``.  Example:
+```
+vaadin.gwt.outputDirectory = file('build/resources/main/')
+```
 
 ## Vaadin Devmode configurations
 * ``vaadin.devmode.noserver`` - Do not run the embedded Jetty server when running devmode. Default is false.
