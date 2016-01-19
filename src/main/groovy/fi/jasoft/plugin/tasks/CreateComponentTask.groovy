@@ -18,13 +18,15 @@ package fi.jasoft.plugin.tasks
 import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
 import org.gradle.api.DefaultTask
+import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
 
 class CreateComponentTask extends DefaultTask {
 
     public static final String NAME = 'vaadinCreateComponent'
 
-    private String componentName
+    @Option(option = 'name', description = 'Component name')
+    def componentName = 'MyComponent'
 
     public CreateComponentTask() {
         description = "Creates a new Vaadin Component."
@@ -32,25 +34,12 @@ class CreateComponentTask extends DefaultTask {
 
     @TaskAction
     public void run() {
-
         if (project.vaadin.widgetset == null) {
             project.logger.error("No widgetset found. Please define a widgetset using the vaadin.widgetset property.")
             return
         }
 
-        componentName = Util.readLine('\nComponent Name (MyComponent): ')
-        if (componentName == null || componentName == '') {
-            componentName = 'MyComponent'
-        }
-
         createComponentClasses()
-
-        if (project.vaadin.widgetset != null) {
-            String compile = Util.readLine("\nCompile widgetset (Y/N)[Y]: ")
-            if (compile == null || compile == '' || compile == 'Y') {
-                project.tasks[CompileWidgetsetTask.NAME].run()
-            }
-        }
     }
 
     private void createComponentClasses() {

@@ -8,7 +8,7 @@ import static org.junit.Assert.assertTrue
 /**
  * Created by john on 1/6/15.
  */
-class ProjectDependenciesTest implements IntegrationTest {
+class ProjectDependenciesTest extends IntegrationTest {
 
     @Test void 'Project has Vaadin extension'(){
 

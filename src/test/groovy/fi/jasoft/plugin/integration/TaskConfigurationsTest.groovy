@@ -8,7 +8,7 @@ import static org.junit.Assert.assertTrue
 /**
  * Created by john on 1/6/15.
  */
-class TaskConfigurationsTest implements IntegrationTest {
+class TaskConfigurationsTest extends IntegrationTest {
 
     @Test void 'Eclipse default configuration'() {
 

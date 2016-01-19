@@ -18,13 +18,15 @@ package fi.jasoft.plugin.tasks
 import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
 import org.gradle.api.DefaultTask
+import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
 
 class CreateAddonThemeTask extends DefaultTask {
 
     public static final String NAME = 'vaadinCreateAddonTheme'
 
-    private String themeName
+    @Option(option = 'name', description = 'Theme name')
+    def themeName = 'MyAddonTheme'
 
     public CreateAddonThemeTask() {
         description = "Creates a new theme for addon project."
@@ -34,19 +36,12 @@ class CreateAddonThemeTask extends DefaultTask {
     public void run() {
 
         // Build theme name from addon title
-        def title = 'MyAddonTheme'
-        if(project.vaadin.addon.title != null && project.vaadin.addon.title != ''){
+        if(!themeName && project.vaadin.addon.title){
               title = project.vaadin.addon.title as String;
-              title = title.toLowerCase().replaceAll(/[_ ](\w)?/){ wholeMatch, firstLetter ->
+              themeName = title.toLowerCase().replaceAll(/[_ ](\w)?/){ wholeMatch, firstLetter ->
                   firstLetter?.toUpperCase() ?: ""
               }.capitalize()
         }
-
-        themeName = Util.readLine("\nTheme Name ($title): ")
-        if (themeName == null || themeName == '') {
-            themeName = title
-        }
-
         createTheme(themeName)
     }
 

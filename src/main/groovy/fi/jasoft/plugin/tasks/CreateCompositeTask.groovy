@@ -18,6 +18,7 @@ package fi.jasoft.plugin.tasks
 import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
 import org.gradle.api.DefaultTask
+import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
 
 
@@ -25,9 +26,11 @@ public class CreateCompositeTask extends DefaultTask {
 
     public static final String NAME = 'vaadinCreateComposite'
 
-    private String componentName
+    @Option(option = 'name', description = 'Component name')
+    def componentName = 'MyComposite'
 
-    private String componentPackage
+    @Option(option = 'package', description = 'Package name')
+    def componentPackage = "com.example.${componentName.toLowerCase()}"
 
     public CreateCompositeTask() {
         description = "Creates a new Vaadin Composite."
@@ -35,22 +38,10 @@ public class CreateCompositeTask extends DefaultTask {
 
     @TaskAction
     public void run() {
-
-        componentName = Util.readLine('\nComposite Name (MyComposite): ')
-        if (componentName == null || componentName == '') {
-            componentName = 'MyComposite'
-        }
-
-        if (project.vaadin.widgetset) {
+        if(!componentPackage && project.vaadin.widgetset){
             String widgetsetClass = project.vaadin.widgetset
             String widgetsetPackage = widgetsetClass.substring(0, widgetsetClass.lastIndexOf("."))
             componentPackage = widgetsetPackage + '.' + componentName.toLowerCase();
-
-        } else {
-            componentPackage = Util.readLine("\nComposite Package (com.example.${componentName.toLowerCase()}): ")
-            if (componentPackage == null || componentPackage == '') {
-                componentPackage = "com.example.${componentName.toLowerCase()}"
-            }
         }
 
         createCompositeClass()

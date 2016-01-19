@@ -18,6 +18,7 @@ package fi.jasoft.plugin.tasks
 import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
 import org.gradle.api.DefaultTask
+import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
 import org.gradle.util.VersionNumber
 
@@ -25,7 +26,8 @@ class CreateThemeTask extends DefaultTask {
 
     public static final String NAME = 'vaadinCreateTheme'
 
-    private String themeName
+    @Option(option = 'name', description = 'Theme name')
+    def themeName = 'MyTheme'
 
     public CreateThemeTask() {
         description = "Creates a new Vaadin Theme"
@@ -33,12 +35,6 @@ class CreateThemeTask extends DefaultTask {
 
     @TaskAction
     public void run() {
-
-        themeName = Util.readLine('\nTheme Name (MyTheme): ')
-        if (themeName == null || themeName == '') {
-            themeName = 'MyTheme'
-        }
-
         createTheme(themeName)
     }
 

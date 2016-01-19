@@ -18,15 +18,18 @@ package fi.jasoft.plugin.tasks
 import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
 import org.gradle.api.DefaultTask
+import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
 
 class CreateTestbenchTestTask extends DefaultTask {
 
     public static final String NAME = 'vaadinCreateTestbenchTest'
 
-    private String testName
+    @Option(option = 'name', description = 'Test name')
+    def testName = 'MyTest'
 
-    private String testPackage
+    @Option(option = 'package', description = 'Test package')
+    def testPackage = 'com.example.tests'
 
     public CreateTestbenchTestTask() {
         description = "Creates a new Testbench test"
@@ -34,17 +37,6 @@ class CreateTestbenchTestTask extends DefaultTask {
 
     @TaskAction
     public run() {
-
-        testName = Util.readLine('\nTest Name (MyTest): ')
-        if (testName == '') {
-            testName = 'MyTest'
-        }
-
-        testPackage = Util.readLine('\nTest package (com.example.tests): ')
-        if (testPackage == '') {
-            testPackage = 'com.example.tests'
-        }
-
         createTestClass()
     }
 

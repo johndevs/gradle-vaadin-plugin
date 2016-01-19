@@ -27,13 +27,13 @@ class CreateProjectTask extends DefaultTask {
     public static final NAME = 'vaadinCreateProject'
 
     @Option(option = 'name', description = 'Application name')
-    def String applicationName
+    def String applicationName = 'MyApplication'
 
     @Option(option = 'package', description = 'Application UI package')
-    def String applicationPackage
+    def String applicationPackage = "com.example.${applicationName.toLowerCase()}"
 
     @Option(option = 'widgetset', description = 'Widgetset name')
-    def String widgetsetFQN
+    def String widgetsetFQN = null
 
     public CreateProjectTask() {
         description = "Creates a new Vaadin Project."
@@ -41,11 +41,6 @@ class CreateProjectTask extends DefaultTask {
 
     @TaskAction
     public void run() {
-
-        if(!applicationName){
-            applicationName = System.console() ? Util.readLine('\nApplication Name (MyApplication): ') : 'MyApplication'
-        }
-
         if(!applicationPackage){
             if(widgetsetFQN?.contains('.')){
                 String widgetsetName = widgetsetFQN.tokenize('.').last()
@@ -53,8 +48,6 @@ class CreateProjectTask extends DefaultTask {
             } else if (project.vaadin.widgetset?.contains('.')) {
                 String widgetsetName = project.vaadin.widgetset.tokenize('.').last()
                 applicationPackage = project.vaadin.widgetset[0..(-widgetsetName.size() - 2)]
-            } else {
-                applicationPackage = System.console() ? Util.readLine("\nApplication Package (com.example.${applicationName.toLowerCase()}): ") : 'com.example.' + applicationName.toLowerCase()
             }
         }
 

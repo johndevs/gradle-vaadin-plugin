@@ -38,7 +38,11 @@ class DevModeTask extends DefaultTask {
             server.terminate()
             server = null
         }
-        Runtime.getRuntime().removeShutdownHook(cleanupThread)
+        try {
+            Runtime.getRuntime().removeShutdownHook(cleanupThread)
+        } catch(IllegalStateException e){
+            // Shutdown of the JVM in progress already, we don't need to remove the hook it will be removed by the JVM
+        }
     })
 
     public DevModeTask() {

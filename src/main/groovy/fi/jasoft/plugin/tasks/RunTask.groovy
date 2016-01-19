@@ -16,7 +16,9 @@
 package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.servers.ApplicationServer
+import fi.jasoft.plugin.servers.PayaraApplicationServer
 import org.gradle.api.DefaultTask
+import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
 
 public class RunTask extends DefaultTask {
@@ -25,9 +27,19 @@ public class RunTask extends DefaultTask {
 
     def server
 
+    @Option(option = 'stopAfterStart', description = 'Should the server stop after starting')
+    def boolean stopAfterStarting = false
+
     def cleanupThread = new Thread({
-        server.terminate()
-        Runtime.getRuntime().removeShutdownHook(cleanupThread)
+        if(server){
+            server.terminate()
+            server = null
+        }
+        try {
+            Runtime.getRuntime().removeShutdownHook(cleanupThread)
+        } catch(IllegalStateException e){
+            // Shutdown of the JVM in progress already, we don't need to remove the hook it will be removed by the JVM
+        }
     })
 
     public RunTask() {
@@ -39,7 +51,7 @@ public class RunTask extends DefaultTask {
 
     @TaskAction
     public void run() {
-        server = ApplicationServer.create(project)
-        server.startAndBlock()
+        server = ApplicationServer.create(project, [])
+        server.startAndBlock(stopAfterStarting)
     }
 }

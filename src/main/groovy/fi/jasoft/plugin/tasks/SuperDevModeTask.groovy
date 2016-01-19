@@ -17,8 +17,10 @@ package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.servers.ApplicationServer
 import fi.jasoft.plugin.Util
+import fi.jasoft.plugin.servers.PayaraApplicationServer
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskAction
 
@@ -40,7 +42,12 @@ class SuperDevModeTask extends DefaultTask {
             server.terminate()
             server = null
         }
-        Runtime.getRuntime().removeShutdownHook(cleanupThread)
+
+        try {
+            Runtime.getRuntime().removeShutdownHook(cleanupThread)
+        } catch(IllegalStateException e){
+            // Shutdown of the JVM in progress already, we don't need to remove the hook it will be removed by the JVM
+        }
     })
 
     def SuperDevModeTask() {

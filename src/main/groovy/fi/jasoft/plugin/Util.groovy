@@ -46,47 +46,6 @@ import java.util.jar.JarInputStream
 class Util {
 
     /**
-     * Reads an input string from the console
-     *
-     * @param format
-     *      The string format according to String.format
-     *
-     * @return
-     *      The input from the console
-     */
-    static String readLine(String format) {
-        readLine(format, null)
-    }
-
-    /**
-     * Reads an input string from the console
-     *
-     * @param format
-     *      The string format according to String.format
-     * @param args
-     *      The arguments provided to Console.readLine
-     * @return
-     *      The input from the console
-     */
-    static String readLine(String format, Object... args) {
-        def console = System.console()
-        try {
-            if (console) {
-                return console.readLine(format, args)
-            }
-
-            System.out.print(String.format(format, args));
-
-            def reader = new BufferedReader(new InputStreamReader(System.in));
-            return reader.readLine();
-
-        } catch (IOException ioe) {
-            // Ignore
-        }
-        null
-    }
-
-    /**
      * Get the compile time classpath of a project
      *
      * @param project

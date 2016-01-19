@@ -88,14 +88,13 @@ abstract class ApplicationServer {
     }
 
     def buildClassPathFile(File buildDir) {
-
         def buildClasspath = new File(buildDir, 'classpath.txt')
         buildClasspath.text = Util.getWarClasspath(project)
                 .filter { it.file && it.canonicalFile.name.endsWith('.jar')}
                 .join(";")
     }
 
-    def boolean start(boolean firstStart=false) {
+    def boolean start(boolean firstStart=false, boolean stopAfterStart=false) {
 
         if (process) {
             project.logger.error('Server is already running.')
@@ -202,7 +201,12 @@ abstract class ApplicationServer {
                     project.logger.lifecycle(resultStr)
                     project.logger.lifecycle('Press [Ctrl+C] to terminate server...')
 
-                    Util.openBrowser((Project)project, "http://localhost:${(Integer)project.vaadin.serverPort}/${paramString}")
+                    if(stopAfterStart){
+                        println "Terminating immediatly"
+                        terminate()
+                    } else {
+                        Util.openBrowser((Project)project, "http://localhost:${(Integer)project.vaadin.serverPort}/${paramString}")
+                    }
                 } else {
                     project.logger.lifecycle("Server reload complete.")
                 }
@@ -210,7 +214,7 @@ abstract class ApplicationServer {
         })
     }
 
-    def startAndBlock() {
+    def startAndBlock(boolean stopAfterStart=false) {
         def firstStart = true
 
         while(true){
@@ -224,7 +228,7 @@ abstract class ApplicationServer {
             }
 
             // Start server
-            start(firstStart)
+            start(firstStart, stopAfterStart)
             firstStart = false
 
             // Wait until server process calls destroy()
@@ -233,7 +237,7 @@ abstract class ApplicationServer {
                 project.logger.warn("Server process terminated with exit code "+exitCode)
             }
 
-            if(!project.vaadin.plugin.serverRestart){
+            if(!project.vaadin.plugin.serverRestart || stopAfterStart){
                 // Auto-refresh turned off
                 break
             }

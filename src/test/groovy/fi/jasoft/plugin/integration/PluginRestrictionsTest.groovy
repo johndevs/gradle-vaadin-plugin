@@ -7,7 +7,7 @@ import static org.testng.Assert.assertTrue
 /**
  * Created by john on 1/6/15.
  */
-class PluginRestrictionsTest implements IntegrationTest {
+class PluginRestrictionsTest extends IntegrationTest {
 
     @Test void 'No Vaadin 6 support'() {
         buildFile << """
