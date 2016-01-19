@@ -32,9 +32,12 @@ class UpdateAddonStylesTask extends DefaultTask {
         project.afterEvaluate {
 
             // Themes dirs
-            themeDir?.eachDir {
-                inputs.dir it.canonicalPath
-                outputs.file "${it.canonicalPath}/addons.scss"
+            def themesDir = Util.getThemesDirectory(project)
+            if(themesDir && themesDir.exists()){
+                themesDir.eachDir {
+                    inputs.dir it.canonicalPath
+                    outputs.file "${it.canonicalPath}/addons.scss"
+                }
             }
 
             // Add classpath jar
@@ -45,22 +48,15 @@ class UpdateAddonStylesTask extends DefaultTask {
         }
     }
 
-    def getThemeDir(){
-        File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-        File themesDir = new File(webAppDir.canonicalPath + '/VAADIN/themes')
-        if (!themesDir.exists()) {
-            return null;
-        }
-        themesDir
-    }
-
     @TaskAction
     public void run() {
         if (!Util.isAddonStylesSupported(project)) {
             return
         }
 
-        themeDir?.eachDir {
+        def themesDir = Util.getThemesDirectory(project)
+        themesDir.mkdirs()
+        themesDir.eachDir {
             project.logger.info("Updating ${it.canonicalPath}/addons.scss")
 
             def importer = [Util.getJavaBinary(project)]

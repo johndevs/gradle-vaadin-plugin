@@ -85,6 +85,17 @@ class PluginExtensionTest extends PluginTestBase {
         assert vaadin.gwt.extraArgs == null
         assert vaadin.gwt.sourcePaths == ['client', 'shared'] as String[]
         assert vaadin.gwt.collapsePermutations == true
+        assert vaadin.gwt.outputDirectory == null
+    }
+
+    @Test void "GWT output directory supports string and file representation"(){
+        VaadinPluginExtension vaadin = project.extensions.vaadin
+
+        vaadin.gwt.outputDirectory = '/tmp'
+        assert vaadin.gwt.outputDirectory.canonicalPath == '/tmp'
+
+        vaadin.gwt.outputDirectory = new File(".")
+        assert vaadin.gwt.outputDirectory.canonicalPath == new File(".").canonicalPath
     }
 
     @Test

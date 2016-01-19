@@ -95,4 +95,11 @@ class GWTConfiguration {
      * (Optional) root directory, for generated files; default is the web-app dir from the WAR plugin
      */
     File outputDirectory = null
+
+    /**
+     * Support String representation of directory
+     */
+    void setOutputDirectory(String directory){
+        outputDirectory = directory as File
+    }
 }
