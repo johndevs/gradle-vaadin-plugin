@@ -17,7 +17,7 @@ package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
-
+import groovy.transform.PackageScope
 import org.apache.commons.lang.StringUtils
 
 import org.gradle.api.DefaultTask
@@ -44,18 +44,17 @@ class UpdateWidgetsetTask extends DefaultTask {
 
     public UpdateWidgetsetTask() {
         description = "Updates the widgetset xml file"
+        onlyIf { project.vaadin.manageWidgetset && project.vaadin.widgetset }
     }
 
     @TaskAction
     void run() {
-        if (project.vaadin.widgetset) {
-            ensureWidgetPresent(project)
-        }
+       ensureWidgetPresent(project)
     }
 
     static boolean ensureWidgetPresent(Project project, String widgetsetFQN=project.vaadin.widgetset) {
-        if (!project.vaadin.manageWidgetset) {
-            return false;
+        if (!project.vaadin.manageWidgetset || !widgetsetFQN) {
+            return false
         }
 
         File widgetsetFile
@@ -66,7 +65,7 @@ class UpdateWidgetsetTask extends DefaultTask {
             widgetsetFile = new File(javaDir, widgetsetFQN.replaceAll(/\./, File.separator) + ".gwt.xml")
             if (widgetsetFile.exists()) {
                 updateWidgetset(widgetsetFile, widgetsetFQN, project)
-                return false;
+                return false
             }
         }
 
@@ -76,7 +75,7 @@ class UpdateWidgetsetTask extends DefaultTask {
             widgetsetFile = new File(resourceDir, widgetsetFQN.replaceAll(/\./, File.separator) + ".gwt.xml")
             if (widgetsetFile.exists()) {
                 updateWidgetset(widgetsetFile, widgetsetFQN, project)
-                return false;
+                return false
             }
         }
 
@@ -85,13 +84,14 @@ class UpdateWidgetsetTask extends DefaultTask {
             widgetsetFile.parentFile.mkdirs()
             widgetsetFile.createNewFile()
             updateWidgetset(widgetsetFile, widgetsetFQN, project)
-            return true;
+            return true
         } else {
             throw new GradleException("No source or resource directory present. Cannot generate widgeset file.")
         }
     }
 
-    private static void updateWidgetset(File widgetsetFile, String widgetsetFQN, Project project) {
+    @PackageScope
+    static updateWidgetset(File widgetsetFile, String widgetsetFQN, Project project) {
         def substitutions = [:]
 
         def inherits = ['com.vaadin.DefaultWidgetSet']

@@ -91,8 +91,8 @@ class PluginExtensionTest extends PluginTestBase {
     @Test void "GWT output directory supports string and file representation"(){
         VaadinPluginExtension vaadin = project.extensions.vaadin
 
-        vaadin.gwt.outputDirectory = '/tmp'
-        assert vaadin.gwt.outputDirectory.canonicalPath == '/tmp'
+        vaadin.gwt.outputDirectory = "."
+        assert vaadin.gwt.outputDirectory.canonicalPath == new File(".").canonicalPath
 
         vaadin.gwt.outputDirectory = new File(".")
         assert vaadin.gwt.outputDirectory.canonicalPath == new File(".").canonicalPath
