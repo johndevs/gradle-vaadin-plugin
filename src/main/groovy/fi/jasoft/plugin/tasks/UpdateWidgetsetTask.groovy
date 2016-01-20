@@ -42,6 +42,12 @@ class UpdateWidgetsetTask extends DefaultTask {
 
     private static final String SCSS_FILE_POSTFIX = 'scss'
 
+    private static final String GWT_MODULE_XML_POSTFIX = '.gwt.xml'
+
+    private static final String DEFAULT_WIDGETSET = 'com.vaadin.DefaultWidgetSet'
+
+    private static final String DEFAULT_LEGACY_WIDGETSET = 'com.vaadin.terminal.gwt.DefaultWidgetSet'
+
     public UpdateWidgetsetTask() {
         description = "Updates the widgetset xml file"
         onlyIf { project.vaadin.manageWidgetset && project.vaadin.widgetset }
@@ -62,7 +68,7 @@ class UpdateWidgetsetTask extends DefaultTask {
         // Check source dir if widgetset is present there
         if(!Util.getMainSourceSet(project).srcDirs.isEmpty()){
             File javaDir = Util.getMainSourceSet(project).srcDirs.first()
-            widgetsetFile = new File(javaDir, widgetsetFQN.replaceAll(/\./, File.separator) + ".gwt.xml")
+            widgetsetFile = new File(javaDir, convertFQNToFilePath(widgetsetFQN, GWT_MODULE_XML_POSTFIX))
             if (widgetsetFile.exists()) {
                 updateWidgetset(widgetsetFile, widgetsetFQN, project)
                 return false
@@ -72,7 +78,7 @@ class UpdateWidgetsetTask extends DefaultTask {
         // Check resource dir if widgetset is present there
         if(!project.sourceSets.main.resources.srcDirs.isEmpty()){
             File resourceDir = project.sourceSets.main.resources.srcDirs.first()
-            widgetsetFile = new File(resourceDir, widgetsetFQN.replaceAll(/\./, File.separator) + ".gwt.xml")
+            widgetsetFile = new File(resourceDir, convertFQNToFilePath(widgetsetFQN, GWT_MODULE_XML_POSTFIX))
             if (widgetsetFile.exists()) {
                 updateWidgetset(widgetsetFile, widgetsetFQN, project)
                 return false
@@ -90,11 +96,19 @@ class UpdateWidgetsetTask extends DefaultTask {
         }
     }
 
+    static String convertFQNToFilePath(String fqn, String postfix){
+        fqn.replace('.', File.separator) + postfix
+    }
+
+    static String convertFilePathToFQN(String path, String postfix){
+        StringUtils.removeEnd(path, postfix).replace(File.separator, '.')
+    }
+
     @PackageScope
     static updateWidgetset(File widgetsetFile, String widgetsetFQN, Project project) {
         def substitutions = [:]
 
-        def inherits = ['com.vaadin.DefaultWidgetSet']
+        def inherits = [DEFAULT_WIDGETSET]
 
         // Scan classpath for Vaadin addons and inherit their widgetsets
         Configuration compileConf =  project.configurations.compile
@@ -106,18 +120,18 @@ class UpdateWidgetsetTask extends DefaultTask {
 
                     // Scan in source folder
                     Util.getMainSourceSet(depProject).srcDirs.each { File srcDir ->
-                        depProject.fileTree(srcDir.absolutePath).include('**/*/*.gwt.xml').each { File file ->
+                        depProject.fileTree(srcDir.absolutePath).include("**/*/*$GWT_MODULE_XML_POSTFIX").each { File file ->
                             def path = file.absolutePath.substring(srcDir.absolutePath.size()+1)
-                            def widgetset = StringUtils.removeEnd(path, ".gwt.xml").replaceAll(File.separator, '.')
+                            def widgetset = convertFilePathToFQN(path, GWT_MODULE_XML_POSTFIX)
                             inherits.push(widgetset)
                         }
                     }
 
                     // Scan in resource folders
                     depProject.sourceSets.main.resources.srcDirs.each { File srcDir ->
-                        depProject.fileTree(srcDir.absolutePath).include('**/*/*.gwt.xml').each { File file ->
+                        depProject.fileTree(srcDir.absolutePath).include("**/*/*$GWT_MODULE_XML_POSTFIX").each { File file ->
                             def path = file.absolutePath.substring(srcDir.absolutePath.size()+1)
-                            def widgetset = StringUtils.removeEnd(path, ".gwt.xml").replaceAll(File.separator, '.')
+                            def widgetset = convertFilePathToFQN(path, GWT_MODULE_XML_POSTFIX)
                             inherits.push(widgetset)
                         }
                     }
@@ -132,8 +146,8 @@ class UpdateWidgetsetTask extends DefaultTask {
                             String widgetsets = attributes.getValue('Vaadin-Widgetsets')
                             if (widgetsets != null) {
                                 for (String widgetset : widgetsets.split(",")) {
-                                    if (widgetset != 'com.vaadin.terminal.gwt.DefaultWidgetSet'
-                                            && widgetset != 'com.vaadin.DefaultWidgetSet') {
+                                    if (widgetset != DEFAULT_LEGACY_WIDGETSET
+                                            && widgetset != DEFAULT_WIDGETSET) {
                                         inherits.push(widgetset)
                                     }
                                 }
