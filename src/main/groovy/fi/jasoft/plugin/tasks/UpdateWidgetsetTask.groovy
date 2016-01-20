@@ -102,7 +102,7 @@ class UpdateWidgetsetTask extends DefaultTask {
     }
 
     static String convertFilePathToFQN(String path, String postfix){
-        StringUtils.removeEnd(path, postfix).replaceAll(File.separator, '.')
+        StringUtils.removeEnd(path, postfix).replaceAll(Matcher.quoteReplacement(File.separator), '.')
     }
 
     @PackageScope
