@@ -17,6 +17,8 @@ package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
+import groovy.transform.PackageScope
+import org.apache.commons.lang.StringUtils
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -35,6 +37,8 @@ class UpdateWidgetsetTask extends DefaultTask {
     private static final String CSS_FILE_POSTFIX = 'css'
 
     private static final String SCSS_FILE_POSTFIX = 'scss'
+
+    private static final String GWT_MODULE_XML_POSTFIX = '.gwt.xml'
 
     public UpdateWidgetsetTask() {
         description = "Updates the widgetset xml file"
@@ -57,7 +61,7 @@ class UpdateWidgetsetTask extends DefaultTask {
         // Check source dir if widgetset is present there
         if(!Util.getMainSourceSet(project).srcDirs.isEmpty()){
             File javaDir = Util.getMainSourceSet(project).srcDirs.first()
-            widgetsetFile = new File(javaDir, widgetsetFQN.replaceAll(/\./, File.separator) + ".gwt.xml")
+            widgetsetFile = new File(javaDir, convertFQNToFilePath(widgetsetFQN, GWT_MODULE_XML_POSTFIX))
             if (widgetsetFile.exists()) {
                 updateWidgetset(widgetsetFile, widgetsetFQN, project)
                 return false;
@@ -67,7 +71,7 @@ class UpdateWidgetsetTask extends DefaultTask {
         // Check resource dir if widgetset is present there
         if(!project.sourceSets.main.resources.srcDirs.isEmpty()){
             File resourceDir = project.sourceSets.main.resources.srcDirs.first()
-            widgetsetFile = new File(resourceDir, widgetsetFQN.replaceAll(/\./, File.separator) + ".gwt.xml")
+            widgetsetFile = new File(resourceDir, convertFQNToFilePath(widgetsetFQN, GWT_MODULE_XML_POSTFIX))
             if (widgetsetFile.exists()) {
                 updateWidgetset(widgetsetFile, widgetsetFQN, project)
                 return false;
@@ -85,7 +89,12 @@ class UpdateWidgetsetTask extends DefaultTask {
         }
     }
 
-    private static void updateWidgetset(File widgetsetFile, String widgetsetFQN, Project project) {
+    static String convertFQNToFilePath(String fqn, String postfix=''){
+        fqn.replace('.', File.separator) + postfix
+    }
+
+    @PackageScope
+    static updateWidgetset(File widgetsetFile, String widgetsetFQN, Project project) {
         def substitutions = [:]
 
         def inherits = ['com.vaadin.DefaultWidgetSet']
@@ -163,12 +172,12 @@ class UpdateWidgetsetTask extends DefaultTask {
         if (project.vaadin.widgetsetGenerator == null) {
 
             name = widgetsetFQN.tokenize('.').last()
-            pkg = widgetsetFQN.replaceAll('.' + name, '') + '.client.ui'
+            pkg = widgetsetFQN.replace('.' + name, '') + '.client.ui'
             filename = name + "Generator.java"
 
         } else {
             name = project.vaadin.widgetsetGenerator.tokenize('.').last()
-            pkg = project.vaadin.widgetsetGenerator.replaceAll('.' + name, '')
+            pkg = project.vaadin.widgetsetGenerator.replace('.' + name, '')
             filename = name + ".java"
         }
 
@@ -177,11 +186,9 @@ class UpdateWidgetsetTask extends DefaultTask {
         }
 
         File javaDir = Util.getMainSourceSet(project).srcDirs.first()
-        File f = new File(new File(javaDir, pkg.replaceAll(/\./, File.separator)), filename)
-
-
+        File f = new File(new File(javaDir, convertFQNToFilePath(pkg)), filename)
         if (f.exists() || project.vaadin.widgetsetGenerator != null) {
-            substitutions['widgetsetGenerator'] = "${pkg}.${filename.replaceAll('.java$', '')}"
+            substitutions['widgetsetGenerator'] = "${pkg}.${StringUtils.removeEnd(filename, '.java')}"
         }
 
         //###################################################################
