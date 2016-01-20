@@ -28,6 +28,7 @@ import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.tasks.TaskAction
 
+import java.nio.file.Paths
 import java.util.jar.Attributes
 import java.util.jar.JarInputStream
 import java.util.jar.Manifest
@@ -97,12 +98,12 @@ class UpdateWidgetsetTask extends DefaultTask {
         }
     }
 
-    static String convertFQNToFilePath(String fqn, String postfix){
-        fqn.replaceAll(/\./, Matcher.quoteReplacement(File.separator)) + postfix
+    static String convertFQNToFilePath(String fqn, String postfix=''){
+        fqn.replace('.', File.separator) + postfix
     }
 
     static String convertFilePathToFQN(String path, String postfix){
-        StringUtils.removeEnd(path, postfix).replaceAll(Matcher.quoteReplacement(File.separator), '.')
+        StringUtils.removeEnd(path, postfix).replace(File.separator, '.')
     }
 
     @PackageScope
@@ -210,12 +211,12 @@ class UpdateWidgetsetTask extends DefaultTask {
         if (project.vaadin.widgetsetGenerator == null) {
 
             name = widgetsetFQN.tokenize('.').last()
-            pkg = widgetsetFQN.replaceAll('.' + name, '') + '.client.ui'
+            pkg = widgetsetFQN.replace('.' + name, '') + '.client.ui'
             filename = name + "Generator.java"
 
         } else {
             name = project.vaadin.widgetsetGenerator.tokenize('.').last()
-            pkg = project.vaadin.widgetsetGenerator.replaceAll('.' + name, '')
+            pkg = project.vaadin.widgetsetGenerator.replace('.' + name, '')
             filename = name + ".java"
         }
 
@@ -224,11 +225,9 @@ class UpdateWidgetsetTask extends DefaultTask {
         }
 
         File javaDir = Util.getMainSourceSet(project).srcDirs.first()
-        File f = new File(new File(javaDir, pkg.replaceAll(/\./, File.separator)), filename)
-
-
+        File f = new File(new File(javaDir, convertFQNToFilePath(pkg)), filename)
         if (f.exists() || project.vaadin.widgetsetGenerator != null) {
-            substitutions['widgetsetGenerator'] = "${pkg}.${filename.replaceAll('.java$', '')}"
+            substitutions['widgetsetGenerator'] = "${pkg}.${StringUtils.removeEnd(filename, '.java')}"
         }
 
         //###################################################################
