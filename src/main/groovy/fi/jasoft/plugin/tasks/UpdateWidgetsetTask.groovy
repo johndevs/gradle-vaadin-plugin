@@ -31,6 +31,7 @@ import org.gradle.api.tasks.TaskAction
 import java.util.jar.Attributes
 import java.util.jar.JarInputStream
 import java.util.jar.Manifest
+import java.util.regex.Matcher
 
 class UpdateWidgetsetTask extends DefaultTask {
 
@@ -97,11 +98,11 @@ class UpdateWidgetsetTask extends DefaultTask {
     }
 
     static String convertFQNToFilePath(String fqn, String postfix){
-        fqn.replace('.', File.separator) + postfix
+        fqn.replaceAll(/\./, Matcher.quoteReplacement(File.separator)) + postfix
     }
 
     static String convertFilePathToFQN(String path, String postfix){
-        StringUtils.removeEnd(path, postfix).replace(File.separator, '.')
+        StringUtils.removeEnd(path, postfix).replaceAll(File.separator, '.')
     }
 
     @PackageScope
