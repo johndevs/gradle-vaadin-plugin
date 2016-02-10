@@ -350,6 +350,7 @@ public class TaskListener implements TaskExecutionListener {
     private void configureAddonZipMetadata(Task task) {
 
         def attributes = [
+                'Vaadin-Package-Version': 1,
                 'Vaadin-License-Title': project.vaadin.addon.license,
                 'Implementation-Title': project.vaadin.addon.title,
                 'Implementation-Version': project.version != null ? project.version : '',
