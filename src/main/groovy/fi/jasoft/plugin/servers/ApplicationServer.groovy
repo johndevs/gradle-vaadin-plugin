@@ -57,6 +57,8 @@ abstract class ApplicationServer {
 
     def Process process;
 
+    def boolean reloadInProgress = false
+
     def final Project project;
 
     def List browserParameters
@@ -202,7 +204,6 @@ abstract class ApplicationServer {
                     project.logger.lifecycle('Press [Ctrl+C] to terminate server...')
 
                     if(stopAfterStart){
-                        println "Terminating immediatly"
                         terminate()
                     } else {
                         Util.openBrowser((Project)project, "http://localhost:${(Integer)project.vaadin.serverPort}/${paramString}")
@@ -210,6 +211,11 @@ abstract class ApplicationServer {
                 } else {
                     project.logger.lifecycle("Server reload complete.")
                 }
+            }
+
+            if(line.contains('ERROR')){
+                // Terminate if server logs an error
+                terminate()
             }
         })
     }
@@ -233,23 +239,30 @@ abstract class ApplicationServer {
 
             // Wait until server process calls destroy()
             def exitCode = process.waitFor()
-            if(exitCode != 0){
-                project.logger.warn("Server process terminated with exit code "+exitCode)
+            if(!reloadInProgress && exitCode != 0){
+                project.logger.warn("Server process terminated with exit code $exitCode. See log for further details.")
+                terminate()
+                break
             }
 
             if(!project.vaadin.plugin.serverRestart || stopAfterStart){
                 // Auto-refresh turned off
                 break
             }
+
+            reloadInProgress = false
         }
     }
 
     def terminate() {
-        if(process){
-            process.destroy()
-            process = null
-            project.logger.info("Application server terminated.")
-        }
+        process?.destroy()
+        process = null
+        project.logger.info("Application server terminated.")
+    }
+
+    def reload() {
+        reloadInProgress = true
+        terminate()
     }
 
     static watchClassDirectoryForChanges(final ApplicationServer server) {
@@ -280,7 +293,7 @@ abstract class ApplicationServer {
             if(project.vaadin.plugin.serverRestart && server.process){
                 // Force restart of server
                 project.logger.lifecycle("Reloading server...")
-                server.terminate()
+                server.reload()
             }
             false
         })

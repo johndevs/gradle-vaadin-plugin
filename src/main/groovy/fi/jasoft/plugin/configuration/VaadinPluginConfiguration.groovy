@@ -37,7 +37,7 @@ class VaadinPluginConfiguration {
     /**
      * The directory where Eclipse will output its compiled classes.
      */
-    String eclipseOutputDir = null
+    String eclipseOutputDir = 'bin'
 
     /**
      * Should jetty restart when a class is changed in the build directory.

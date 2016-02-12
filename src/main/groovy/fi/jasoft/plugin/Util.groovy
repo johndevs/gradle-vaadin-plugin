@@ -495,7 +495,7 @@ class Util {
 
             key.pollEvents().each { WatchEvent event ->
                 if (!stop && event.kind() != StandardWatchEventKinds.OVERFLOW) {
-                    stop = closure.call(key, event)
+                    stop = !closure.call(key, event)
                 }
             }
             if(!key.reset() || stop) break
