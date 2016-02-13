@@ -1,0 +1,24 @@
+package ${designPackage};
+
+import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.Notification;
+
+/**
+ * Implementation file for ${designName}Design
+ */
+public class ${designName} extends ${designName}Design{
+
+	public ${designName}() {
+		/*
+		 * Attach logic to button
+		 */
+		myButton.addClickListener(new ClickListener() {
+
+			@Override
+			public void buttonClick(ClickEvent event) {
+				Notification.show("Button clicked!");
+			}
+		});
+	}
+}

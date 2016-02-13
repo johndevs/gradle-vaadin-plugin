@@ -16,6 +16,7 @@
 package fi.jasoft.plugin
 
 import groovy.text.SimpleTemplateEngine
+import org.apache.commons.lang.StringUtils
 import org.gradle.api.Project
 
 class TemplateUtil {
@@ -39,7 +40,7 @@ class TemplateUtil {
      *      Should resulting blank lines be removed. By default false.
      *
      */
-    static writeTemplate(templateFileName, targetDir, targetFileName = templateFileName, substitutions = [:], removeBlankLines = false) {
+    static writeTemplate(String templateFileName, File targetDir, String targetFileName = templateFileName, Map substitutions = [:], removeBlankLines = false) {
         def templateUrl = TemplateUtil.class.getClassLoader().getResource("templates/${templateFileName}.template")
         if (templateUrl == null) {
             throw new FileNotFoundException("Could not find template 'templates/${templateFileName}.template'")
@@ -83,5 +84,14 @@ class TemplateUtil {
         .inject(project.sourceSets.main.resources){a, b -> a + b}
         .matching {include "**/*/public/**/*.$postfix"}
         .files
+    }
+
+
+    static String convertFQNToFilePath(String fqn, String postfix=''){
+        fqn.replace('.', File.separator) + postfix
+    }
+
+    static String convertFilePathToFQN(String path, String postfix){
+        StringUtils.removeEnd(path, postfix).replace(File.separator, '.')
     }
 }

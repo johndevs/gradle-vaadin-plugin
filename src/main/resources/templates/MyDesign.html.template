@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html>
+ <body> 
+  <vaadin-vertical-layout size-full="true"> 
+   <vaadin-button plain-text="" _id="myButton">
+     Click me! 
+   </vaadin-button> 
+  </vaadin-vertical-layout>  
+ </body>
+</html>

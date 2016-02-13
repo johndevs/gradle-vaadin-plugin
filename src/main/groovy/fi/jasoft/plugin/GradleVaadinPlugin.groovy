@@ -429,6 +429,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
         tasks.create(name: CreateCompositeTask.NAME, type: CreateCompositeTask, group: VAADIN_TASK_GROUP)
         tasks.create(name: CreateThemeTask.NAME, type: CreateThemeTask, group: VAADIN_TASK_GROUP)
         tasks.create(name: CreateWidgetsetGeneratorTask.NAME, type: CreateWidgetsetGeneratorTask, group: VAADIN_TASK_GROUP)
+        tasks.create(name: CreateDesignTask.NAME, type: CreateDesignTask, group: VAADIN_TASK_GROUP)
 
         tasks.create(name: CompileWidgetsetTask.NAME, type: CompileWidgetsetTask, group: VAADIN_TASK_GROUP)
         tasks.create(name: DevModeTask.NAME, type: DevModeTask, group: VAADIN_TASK_GROUP)

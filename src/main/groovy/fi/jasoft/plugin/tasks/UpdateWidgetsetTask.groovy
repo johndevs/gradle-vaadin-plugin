@@ -70,7 +70,7 @@ class UpdateWidgetsetTask extends DefaultTask {
         // Check source dir if widgetset is present there
         if(!Util.getMainSourceSet(project).srcDirs.isEmpty()){
             File javaDir = Util.getMainSourceSet(project).srcDirs.first()
-            widgetsetFile = new File(javaDir, convertFQNToFilePath(widgetsetFQN, GWT_MODULE_XML_POSTFIX))
+            widgetsetFile = new File(javaDir, TemplateUtil.convertFQNToFilePath(widgetsetFQN, GWT_MODULE_XML_POSTFIX))
             if (widgetsetFile.exists()) {
                 updateWidgetset(widgetsetFile, widgetsetFQN, project)
                 return false
@@ -80,7 +80,7 @@ class UpdateWidgetsetTask extends DefaultTask {
         // Check resource dir if widgetset is present there
         if(!project.sourceSets.main.resources.srcDirs.isEmpty()){
             File resourceDir = project.sourceSets.main.resources.srcDirs.first()
-            widgetsetFile = new File(resourceDir, convertFQNToFilePath(widgetsetFQN, GWT_MODULE_XML_POSTFIX))
+            widgetsetFile = new File(resourceDir, TemplateUtil.convertFQNToFilePath(widgetsetFQN, GWT_MODULE_XML_POSTFIX))
             if (widgetsetFile.exists()) {
                 updateWidgetset(widgetsetFile, widgetsetFQN, project)
                 return false
@@ -96,14 +96,6 @@ class UpdateWidgetsetTask extends DefaultTask {
         } else {
             throw new GradleException("No source or resource directory present. Cannot generate widgeset file.")
         }
-    }
-
-    static String convertFQNToFilePath(String fqn, String postfix=''){
-        fqn.replace('.', File.separator) + postfix
-    }
-
-    static String convertFilePathToFQN(String path, String postfix){
-        StringUtils.removeEnd(path, postfix).replace(File.separator, '.')
     }
 
     @PackageScope
@@ -124,7 +116,7 @@ class UpdateWidgetsetTask extends DefaultTask {
                     Util.getMainSourceSet(depProject).srcDirs.each { File srcDir ->
                         depProject.fileTree(srcDir.absolutePath).include("**/*/*$GWT_MODULE_XML_POSTFIX").each { File file ->
                             def path = file.absolutePath.substring(srcDir.absolutePath.size()+1)
-                            def widgetset = convertFilePathToFQN(path, GWT_MODULE_XML_POSTFIX)
+                            def widgetset = TemplateUtil.convertFilePathToFQN(path, GWT_MODULE_XML_POSTFIX)
                             inherits.push(widgetset)
                         }
                     }
@@ -133,7 +125,7 @@ class UpdateWidgetsetTask extends DefaultTask {
                     depProject.sourceSets.main.resources.srcDirs.each { File srcDir ->
                         depProject.fileTree(srcDir.absolutePath).include("**/*/*$GWT_MODULE_XML_POSTFIX").each { File file ->
                             def path = file.absolutePath.substring(srcDir.absolutePath.size()+1)
-                            def widgetset = convertFilePathToFQN(path, GWT_MODULE_XML_POSTFIX)
+                            def widgetset = TemplateUtil.convertFilePathToFQN(path, GWT_MODULE_XML_POSTFIX)
                             inherits.push(widgetset)
                         }
                     }
@@ -225,7 +217,7 @@ class UpdateWidgetsetTask extends DefaultTask {
         }
 
         File javaDir = Util.getMainSourceSet(project).srcDirs.first()
-        File f = new File(new File(javaDir, convertFQNToFilePath(pkg)), filename)
+        File f = new File(new File(javaDir, TemplateUtil.convertFQNToFilePath(pkg)), filename)
         if (f.exists() || project.vaadin.widgetsetGenerator != null) {
             substitutions['widgetsetGenerator'] = "${pkg}.${StringUtils.removeEnd(filename, '.java')}"
         }
