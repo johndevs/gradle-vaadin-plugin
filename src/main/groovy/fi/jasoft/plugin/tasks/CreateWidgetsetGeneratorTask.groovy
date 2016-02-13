@@ -17,7 +17,9 @@ package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
+import groovy.transform.PackageScope
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 
 class CreateWidgetsetGeneratorTask extends DefaultTask {
@@ -29,34 +31,32 @@ class CreateWidgetsetGeneratorTask extends DefaultTask {
     }
 
     @TaskAction
-    public void run() {
-
-        if (project.vaadin.widgetset == null) {
-            project.logger.error("No widgetset found. Please define a widgetset using the vaadin.widgetset property.")
-            return
+    def run() {
+        if (!project.vaadin.widgetset) {
+            throw new GradleException("No widgetset found. Please define a widgetset using the vaadin.widgetset property.")
         }
-
         createWidgetsetGeneratorClass()
     }
 
-    private void createWidgetsetGeneratorClass() {
-
-        def javaDir = Util.getMainSourceSet(project, true).srcDirs.iterator().next()
+    @PackageScope
+    def createWidgetsetGeneratorClass() {
+        def javaDir = Util.getMainSourceSet(project, true).srcDirs.first()
+        def widgetset = project.vaadin.widgetset as String
+        def widgetsetGenerator = project.vaadin.widgetsetGenerator as String
 
         String name, pkg, filename
-        if (project.vaadin.widgetsetGenerator == null) {
-            name = project.vaadin.widgetset.tokenize('.').last()
-            pkg = project.vaadin.widgetset.replaceAll('.' + name, '') + '.client.ui'
+        if (!widgetsetGenerator) {
+            name = widgetset.tokenize('.').last()
+            pkg = widgetset.replaceAll('.' + name, '') + '.client.ui'
             filename = name + "Generator.java"
 
         } else {
-            name = project.vaadin.widgetsetGenerator.tokenize('.').last()
-            pkg = project.vaadin.widgetsetGenerator.replaceAll('.' + name, '')
+            name = widgetsetGenerator.tokenize('.').last()
+            pkg = widgetsetGenerator.replaceAll('.' + name, '')
             filename = name + ".java"
         }
 
-        def dir = (javaDir.canonicalPath + '/' + pkg.replaceAll(/\./, '/')) as File
-
+        def dir = new File(javaDir, TemplateUtil.convertFQNToFilePath(pkg))
         dir.mkdirs()
 
         def substitutions = [:]
