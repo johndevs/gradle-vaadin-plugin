@@ -17,10 +17,13 @@ package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
+import groovy.transform.PackageScope
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
+
+import java.rmi.server.UID
 
 class CreateProjectTask extends DefaultTask {
 
@@ -40,7 +43,7 @@ class CreateProjectTask extends DefaultTask {
     }
 
     @TaskAction
-    public void run() {
+    def run() {
         if(!applicationPackage){
             if(widgetsetFQN?.contains('.')){
                 String widgetsetName = widgetsetFQN.tokenize('.').last()
@@ -66,7 +69,8 @@ class CreateProjectTask extends DefaultTask {
         }
     }
 
-    private void createUIClass(Project project) {
+    @PackageScope
+    def createUIClass(Project project) {
 
         def substitutions = [:]
 
@@ -107,18 +111,15 @@ class CreateProjectTask extends DefaultTask {
 
         //#######################################################################
 
-        File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
-        File uidir = new File(javaDir.canonicalPath + '/' + applicationPackage.replaceAll(/\./, '/'))
-        uidir.mkdirs()
-
         if(Util.isGroovyProject(project)){
-            TemplateUtil.writeTemplate('MyUI.groovy', uidir, applicationName + "UI.groovy", substitutions)
+            TemplateUtil.writeTemplate('MyUI.groovy', UIDir, applicationName + "UI.groovy", substitutions)
         } else {
-            TemplateUtil.writeTemplate('MyUI.java', uidir, applicationName + "UI.java", substitutions)
+            TemplateUtil.writeTemplate('MyUI.java', UIDir, applicationName + "UI.java", substitutions)
         }
     }
 
-    private void createServletClass(Project project) {
+    @PackageScope
+    def createServletClass(Project project) {
 
         def substitutions = [:]
 
@@ -142,15 +143,19 @@ class CreateProjectTask extends DefaultTask {
 
         //#######################################################################
 
-        File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
-        File uidir = new File(javaDir.canonicalPath + '/' + applicationPackage.replaceAll(/\./, '/'))
-        uidir.mkdirs()
-
         if(Util.isGroovyProject(project)){
-            TemplateUtil.writeTemplate("MyServlet.groovy", uidir, applicationName + "Servlet.groovy", substitutions)
+            TemplateUtil.writeTemplate("MyServlet.groovy", UIDir, applicationName + "Servlet.groovy", substitutions)
         } else {
-            TemplateUtil.writeTemplate("MyServlet.java", uidir, applicationName + "Servlet.java", substitutions)
+            TemplateUtil.writeTemplate("MyServlet.java", UIDir, applicationName + "Servlet.java", substitutions)
         }
+    }
+
+    @PackageScope
+    def File getUIDir(){
+        def javaDir = Util.getMainSourceSet(project).srcDirs.first()
+        def uidir = new File(javaDir, TemplateUtil.convertFQNToFilePath(applicationPackage))
+        uidir.mkdirs()
+        uidir
     }
 }
 
