@@ -32,7 +32,7 @@ class PluginConfigurationTest extends PluginTestBase{
     @Test
     void areVaadinPluginPropertiesConfigured(){
         VaadinPluginExtension vaadin = project.extensions.vaadin;
-        assert vaadin.plugin.eclipseOutputDir == null
+        assert vaadin.plugin.eclipseOutputDir == 'bin'
     }
 
 }
