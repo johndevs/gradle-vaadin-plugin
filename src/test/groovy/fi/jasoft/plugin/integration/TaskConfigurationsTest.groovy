@@ -19,7 +19,6 @@ class TaskConfigurationsTest extends IntegrationTest {
                 def classpath = project.eclipse.classpath
                 println 'Download sources ' +  classpath.downloadSources
                 println 'Eclipse output dir ' + project.vaadin.plugin.eclipseOutputDir
-                println 'Classes dir is default output dir ' + (classpath.defaultOutputDir == project.sourceSets.main.output.classesDir)
 
                 def confs = project.configurations
                 println 'Server in classpath ' + (confs.getByName('vaadin-server') in classpath.plusConfigurations)
@@ -33,8 +32,7 @@ class TaskConfigurationsTest extends IntegrationTest {
         def result = runWithArguments('verifyEclipseClassPath')
 
         assertTrue result, result.contains( 'Download sources true')
-        assertTrue result, result.contains( 'Eclipse output dir null')
-        assertTrue result, result.contains( 'Classes dir is default output dir true')
+        assertTrue result, result.contains( 'Eclipse output dir bin')
 
         assertTrue result, result.contains( 'Server in classpath true')
         assertTrue result, result.contains( 'Client in classpath true')
