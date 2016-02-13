@@ -17,6 +17,7 @@ package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
+import groovy.transform.PackageScope
 import org.gradle.api.DefaultTask
 import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
@@ -47,9 +48,11 @@ public class CreateCompositeTask extends DefaultTask {
         createCompositeClass()
     }
 
-    private void createCompositeClass() {
-        File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
-        File componentDir = new File(javaDir.canonicalPath + '/' + componentPackage.replaceAll(/\./, '/'))
+    @PackageScope
+    def createCompositeClass() {
+        def javaDir = Util.getMainSourceSet(project).srcDirs.first()
+
+        def componentDir = new File(javaDir, TemplateUtil.convertFQNToFilePath(componentPackage))
         componentDir.mkdirs()
 
         def substitutions = [:]
@@ -61,6 +64,5 @@ public class CreateCompositeTask extends DefaultTask {
         } else {
             TemplateUtil.writeTemplate("MyComposite.java", componentDir, componentName + ".java", substitutions)
         }
-
     }
 }
