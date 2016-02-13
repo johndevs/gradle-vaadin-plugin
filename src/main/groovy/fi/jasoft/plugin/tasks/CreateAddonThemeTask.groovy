@@ -17,6 +17,7 @@ package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
+import groovy.transform.PackageScope
 import org.gradle.api.DefaultTask
 import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
@@ -33,7 +34,7 @@ class CreateAddonThemeTask extends DefaultTask {
     }
 
     @TaskAction
-    public void run() {
+    def run() {
 
         // Build theme name from addon title
         if(!themeName && project.vaadin.addon.title){
@@ -45,14 +46,18 @@ class CreateAddonThemeTask extends DefaultTask {
         createTheme(themeName)
     }
 
-    public void createTheme(String themeName) {
-        File resourceDir = project.sourceSets.main.resources.srcDirs.iterator().next()
-        File themeDir = new File(resourceDir.canonicalPath + '/VAADIN/addons/' + themeName)
+    @PackageScope
+    def createTheme(String themeName) {
+        File resourceDir = project.sourceSets.main.resources.srcDirs.first()
+
+        def vaadinDir = new File(resourceDir, 'VAADIN')
+        def addonsDir = new File(vaadinDir, 'addons')
+        File themeDir = new File(addonsDir, themeName)
         themeDir.mkdirs()
 
         def substitutions = [:]
         substitutions['themeName'] = themeName
-        substitutions['theme'] = substitutions['themeName'].toLowerCase()
+        substitutions['theme'] = themeName.toLowerCase()
 
         TemplateUtil.writeTemplate('myaddon.scss', themeDir, themeName+'.scss', substitutions)
     }
