@@ -17,6 +17,7 @@ package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
+import groovy.transform.PackageScope
 import org.gradle.api.DefaultTask
 import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
@@ -34,18 +35,19 @@ class CreateThemeTask extends DefaultTask {
     }
 
     @TaskAction
-    public void run() {
+    def run() {
         createTheme(themeName)
     }
 
-    public void createTheme(String themeName) {
-        File themeDir = project.file(Util.getThemesDirectory(project).canonicalPath + "/${themeName}")
+    @PackageScope
+    def createTheme(String themeName) {
+        def themeDir = new File(Util.getThemesDirectory(project), themeName)
         themeDir.mkdirs()
 
         def substitutions = [:]
         substitutions['themeName'] = themeName
-        substitutions['theme'] = substitutions['themeName'].toLowerCase()
-        substitutions['themeImport'] = substitutions['theme'] + '.scss'
+        substitutions['theme'] = themeName.toLowerCase()
+        substitutions['themeImport'] = themeName + '.scss'
 
         VersionNumber version = VersionNumber.parse(Util.getVaadinVersion(project))
         substitutions['basetheme'] = version.minor < 3 ? 'reindeer' : 'valo'
