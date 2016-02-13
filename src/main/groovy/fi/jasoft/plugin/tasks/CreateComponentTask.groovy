@@ -18,6 +18,7 @@ package fi.jasoft.plugin.tasks
 import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
 
@@ -34,30 +35,27 @@ class CreateComponentTask extends DefaultTask {
 
     @TaskAction
     public void run() {
-        if (project.vaadin.widgetset == null) {
-            project.logger.error("No widgetset found. Please define a widgetset using the vaadin.widgetset property.")
-            return
+        if (!project.vaadin.widgetset) {
+            throw new GradleException('No widgetset found. Please define a widgetset using the vaadin.widgetset property.')
         }
-
         createComponentClasses()
     }
 
     private void createComponentClasses() {
+        def widgetset = project.vaadin.widgetset as String
+        def widgetsetPackagePath =  TemplateUtil.convertFQNToFilePath(widgetset.substring(0, widgetset.lastIndexOf('.')))
 
-        def widgetsetRelativePath = project.vaadin.widgetset.replaceAll(/\./, '/') + '.gwt.xml'
-        def widgetsetPackagePath = widgetsetRelativePath.split("\\/").getAt(0..<-1).join('/')
+        def srcDir = Util.getMainSourceSet(project, true).srcDirs.first()
+        def widgetsetDir = new File(srcDir, widgetsetPackagePath)
 
-        def serverDir = Util.getMainSourceSet(project, true).srcDirs.iterator().next()
-        def clientDir = Util.getMainSourceSet(project, true).srcDirs.iterator().next()
-
-        def componentDir = (serverDir.canonicalPath + '/' + widgetsetPackagePath + '/server/' + componentName.toLowerCase() ) as File
-        def widgetDir = (clientDir.canonicalPath + '/' + widgetsetPackagePath + '/client/' + componentName.toLowerCase() ) as File
-
+        def componentDir = new File(new File(widgetsetDir, 'server'), componentName.toLowerCase())
         componentDir.mkdirs()
+
+        def widgetDir = new File(new File(widgetsetDir, 'client'), componentName.toLowerCase())
         widgetDir.mkdirs()
 
-        String widgetsetName = project.vaadin.widgetset.tokenize('.').last()
-        String widgetsetPackage = project.vaadin.widgetset.replaceAll('.' + widgetsetName, '')
+        String widgetsetName = widgetset.tokenize('.').last()
+        String widgetsetPackage = widgetset.replaceAll('.' + widgetsetName, '')
 
         def substitutions = [:]
         substitutions['componentServerPackage'] = widgetsetPackage + '.server.' + componentName.toLowerCase()
