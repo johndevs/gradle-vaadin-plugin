@@ -240,7 +240,7 @@ abstract class ApplicationServer {
             // Wait until server process calls destroy()
             def exitCode = process.waitFor()
             if(!reloadInProgress && exitCode != 0){
-                project.logger.warn("Server process terminated with exit code $exitCode. See log for further details.")
+                project.logger.warn("Server process terminated with exit code $exitCode. See ${serverName}.log for further details.")
                 terminate()
                 break
             }
