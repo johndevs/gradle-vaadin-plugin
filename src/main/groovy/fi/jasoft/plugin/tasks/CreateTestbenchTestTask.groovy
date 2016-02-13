@@ -17,6 +17,7 @@ package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
+import groovy.transform.PackageScope
 import org.gradle.api.DefaultTask
 import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
@@ -36,15 +37,14 @@ class CreateTestbenchTestTask extends DefaultTask {
     }
 
     @TaskAction
-    public run() {
+    def run() {
         createTestClass()
     }
 
-    private void createTestClass() {
-
-        File javaDir = Util.getMainTestSourceSet(project).srcDirs.iterator().next()
-        File packageDir = new File(javaDir.canonicalPath + "/" + testPackage.replaceAll(/\./, '/'))
-
+    @PackageScope
+    def createTestClass() {
+        def javaDir = Util.getMainTestSourceSet(project).srcDirs.first()
+        def packageDir = new File(javaDir, TemplateUtil.convertFQNToFilePath(testPackage))
         packageDir.mkdirs()
 
         def substitutions = [:]
