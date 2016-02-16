@@ -104,6 +104,16 @@ bintray {
 task configurePluginPom << {
     configure(install.repositories.mavenInstaller) {
         pom.project {
+
+           dependencies {
+               dependency {
+                   groupId 'org.codehaus.groovy.modules.http-builder'
+                   artifactId 'http-builder'
+                   version '0.7.1'
+                   type 'pom'
+               }
+           }
+
            licenses {
                license {
                  name 'The Apache Software License, Version 2.0'
@@ -124,8 +134,8 @@ task configurePluginPom << {
                connection 'scm:git://github.com/johndevs/gradle-vaadin-plugin'
                developerConnection 'scm:git@github.com:johndevs/gradle-vaadin-plugin'
           }
-       }
-       pom.scopeMappings.mappings.remove(configurations.compile)
+        }
+        pom.scopeMappings.mappings.remove(configurations.compile)
    }
 }
 install.dependsOn configurePluginPom
