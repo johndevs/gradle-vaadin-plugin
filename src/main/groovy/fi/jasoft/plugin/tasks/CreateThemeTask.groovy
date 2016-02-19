@@ -28,7 +28,7 @@ class CreateThemeTask extends DefaultTask {
     public static final String NAME = 'vaadinCreateTheme'
 
     @Option(option = 'name', description = 'Theme name')
-    def themeName = 'MyTheme'
+    def String themeName = 'MyTheme'
 
     public CreateThemeTask() {
         description = "Creates a new Vaadin Theme"
@@ -47,7 +47,7 @@ class CreateThemeTask extends DefaultTask {
         def substitutions = [:]
         substitutions['themeName'] = themeName
         substitutions['theme'] = themeName.toLowerCase()
-        substitutions['themeImport'] = themeName + '.scss'
+        substitutions['themeImport'] = themeName.toLowerCase() + '.scss'
 
         VersionNumber version = VersionNumber.parse(Util.getVaadinVersion(project))
         substitutions['basetheme'] = version.minor < 3 ? 'reindeer' : 'valo'
