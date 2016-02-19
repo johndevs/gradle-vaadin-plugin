@@ -54,7 +54,21 @@ class TemplateUtil {
             content = content.replaceAll("(?m)^[ \t]*\r?\n", "")
         }
 
-        File targetFile = new File(targetDir.canonicalPath + '/' + targetFileName)
+        writeTemplateFromString(content, targetDir, targetFileName)
+    }
+
+    /**
+     * Writes template content to file
+     *
+     * @param templateContent
+     *      the content of the template
+     * @param targetDir
+     *      the target directory
+     * @param targetFileName
+     *      the target file name
+     */
+    static writeTemplateFromString(String templateContent, File targetDir, String targetFileName) {
+        File targetFile = new File(targetDir, targetFileName)
         if (!targetFile.exists()) {
             targetFile.parentFile.mkdirs()
             targetFile.createNewFile()
@@ -64,7 +78,7 @@ class TemplateUtil {
             throw new FileNotFoundException("Could not write to target file " + targetFile.canonicalPath)
         }
 
-        targetFile.write(content)
+        targetFile.write(templateContent)
     }
 
     /**

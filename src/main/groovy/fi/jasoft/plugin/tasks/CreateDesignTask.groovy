@@ -5,6 +5,7 @@ import fi.jasoft.plugin.Util
 import groovy.transform.PackageScope
 import org.apache.commons.io.FilenameUtils
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
 
@@ -33,6 +34,9 @@ class CreateDesignTask extends DefaultTask{
     @Option(option = 'templates', description = 'Lists the available templates. Add your templates to .vaadin/designer/templates to use them here.')
     def boolean listTemplates = false
 
+    @Option(option = 'template', description = "The selected tempalte to use. Must be included in --templates")
+    def String template = null
+
     public CreateDesignTask(){
         description = 'Creates a new design file'
     }
@@ -49,12 +53,16 @@ class CreateDesignTask extends DefaultTask{
 
         createDesignFile()
 
-        if(createCompanionFile){
-            createDesignCompanionFile()
-        }
+        if(!template){
+            // TODO add support for generating companion files for any template
 
-        if(createImplementationFile){
-            createDesignImplementationFile()
+            if(createCompanionFile){
+                createDesignCompanionFile()
+            }
+
+            if(createImplementationFile){
+                createDesignImplementationFile()
+            }
         }
     }
 
@@ -64,7 +72,14 @@ class CreateDesignTask extends DefaultTask{
         File designDir = new File(resourcesDir, TemplateUtil.convertFQNToFilePath(designPackage))
         designDir.mkdirs()
 
-        TemplateUtil.writeTemplate('MyDesign.html', designDir, designName + 'Design.html')
+        if(template){
+            if(!templates.containsKey(template)){
+                throw new GradleException("Template with name $template could not be found.")
+            }
+            TemplateUtil.writeTemplateFromString(templates[template].text, designDir, designName + 'Design.html')
+        } else {
+            TemplateUtil.writeTemplate('MyDesign.html', designDir, designName + 'Design.html')
+        }
     }
 
     @PackageScope
