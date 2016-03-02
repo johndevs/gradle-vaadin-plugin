@@ -453,7 +453,7 @@ class Util {
                 }
             }
         } else {
-            File logDir = project.file(new File(project.buildDir, 'logs'))
+            File logDir = new File(project.buildDir, 'logs')
             logDir.mkdirs()
 
             final File logFile = new File(logDir, filename)
