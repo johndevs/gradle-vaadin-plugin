@@ -610,16 +610,16 @@ class Util {
     }
 
     /**
-     * Returns all addon jars in the proejct
+     * Returns all addon jars in the project
      *
      * @param project
      *      The project to look in
      * @return
      *      a set of addon dependencies
      */
-    static Set findAddonsInProject(Project project) {
+    static Set findAddonsInProject(Project project, String byAttribute='Vaadin-Widgetsets') {
         def addons = []
-        def widgetsetAttribute = new Attributes.Name('Vaadin-Widgetsets')
+        def attribute = new Attributes.Name(byAttribute)
         project.configurations.all.each { Configuration conf ->
             conf.allDependencies.each { Dependency dependency ->
                 conf.files(dependency).each { File file ->
@@ -627,12 +627,13 @@ class Util {
                         def jarStream = new JarInputStream(stream)
                         def mf = jarStream.getManifest()
                         def attributes = mf?.mainAttributes
-                        if (attributes?.getValue(widgetsetAttribute)) {
+                        if (attributes?.getValue(attribute)) {
                             if (!dependency.name.startsWith('vaadin-client')) {
                                 addons << [
                                         groupId: dependency.group,
                                         artifactId: dependency.name,
-                                        version: dependency.version
+                                        version: dependency.version,
+                                        file: file
                                 ]
                             }
                         }

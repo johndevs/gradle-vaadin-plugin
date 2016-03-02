@@ -17,6 +17,7 @@ package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.Util
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskAction
 
@@ -59,9 +60,21 @@ class UpdateAddonStylesTask extends DefaultTask {
         themesDir.eachDir {
             project.logger.info("Updating ${it.canonicalPath}/addons.scss")
 
+            // Get compile classpath
+            FileCollection classpath = Util.getCompileClassPathOrJar(project)
+
+            // SASSAddonImportFileCreator cannot handle classpath jar, so if
+            // that is used we need to manually add the addons to the classpath
+            // even though they are listen inside the classpath jar
+            if(project.vaadin.plugin.useClassPathJar){
+                Util.findAddonsInProject(project, 'Vaadin-Stylesheets').each {
+                    classpath = classpath.plus(project.files(it.file))
+                }
+            }
+
             def importer = ['java']
             importer.add('-cp')
-            importer.add(Util.getCompileClassPathOrJar(project).asPath)
+            importer.add(classpath.asPath)
             importer.add('com.vaadin.server.themeutils.SASSAddonImportFileCreator')
             importer.add(it.canonicalPath)
 
