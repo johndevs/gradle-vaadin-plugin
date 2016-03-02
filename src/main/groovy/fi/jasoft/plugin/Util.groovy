@@ -453,10 +453,10 @@ class Util {
                 }
             }
         } else {
-            File logDir = project.file('build/logs/')
+            File logDir = project.file(new File(project.buildDir, 'logs'))
             logDir.mkdirs()
 
-            final File logFile = new File(logDir.canonicalPath + '/' + filename)
+            final File logFile = new File(logDir, filename)
             Thread.start 'Info logger', {
                 logFile.withWriterAppend { out ->
                     try {
