@@ -36,13 +36,9 @@ class PluginExtensionTest extends PluginTestBase {
         assert vaadin.widgetset == null
         assert vaadin.widgetsetGenerator == null
         assert vaadin.version == null
-        assert vaadin.debug == true
-        assert vaadin.debugPort == 8000
         assert vaadin.manageWidgetset == true
         assert vaadin.manageDependencies == true
         assert vaadin.manageRepositories == true
-        assert vaadin.serverPort == 8080
-        assert vaadin.jvmArgs == null
         assert vaadin.jrebel instanceof JRebelConfiguration
         assert vaadin.devmode instanceof DevelopmentModeConfiguration
         assert vaadin.plugin instanceof VaadinPluginConfiguration
@@ -58,12 +54,8 @@ class PluginExtensionTest extends PluginTestBase {
             widgetset 'com.example.Widgetset'
             widgetsetGenerator 'com.example.generator'
             version  "7+"
-            debug true
-            debugPort 8000
             manageWidgetset true
             manageDependencies true
-            serverPort 8080
-            jvmArgs null
             mainSourceSet null
             push false
         }
@@ -142,14 +134,12 @@ class PluginExtensionTest extends PluginTestBase {
         VaadinPluginExtension vaadin = project.extensions.vaadin
         assert vaadin.plugin instanceof VaadinPluginConfiguration
         assert vaadin.plugin.logToConsole == false
-        assert vaadin.plugin.openInBrowser == true
     }
 
     @Test
     void testPluginConfigurationClosure(){
         assert project.extensions.vaadin.plugin.logToConsole == false
         project.vaadin.plugin {
-            openInBrowser true
             logToConsole true
         }
         assert project.extensions.vaadin.plugin.logToConsole == true

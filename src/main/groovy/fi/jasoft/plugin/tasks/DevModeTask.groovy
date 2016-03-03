@@ -17,6 +17,7 @@ package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.servers.ApplicationServer
 import fi.jasoft.plugin.Util
+import fi.jasoft.plugin.configuration.ApplicationServerConfiguration
 import org.gradle.api.DefaultTask
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskAction
@@ -28,6 +29,8 @@ class DevModeTask extends DefaultTask {
     def Process devModeProcess
 
     def server
+
+    def ApplicationServerConfiguration configuration
 
     def cleanupThread = new Thread({
         if(devModeProcess) {
@@ -49,6 +52,7 @@ class DevModeTask extends DefaultTask {
         dependsOn('classes', UpdateWidgetsetTask.NAME)
         description = "Run Development Mode for easier debugging and development of client widgets."
         Runtime.getRuntime().addShutdownHook(cleanupThread)
+        configuration = extensions.create('configuration', ApplicationServerConfiguration)
     }
 
     @TaskAction
@@ -63,7 +67,9 @@ class DevModeTask extends DefaultTask {
 
         if (!project.vaadin.devmode.noserver) {
             server = ApplicationServer.create(
-                    project, ["gwt.codesvr=${project.vaadin.devmode.bindAddress}:${project.vaadin.devmode.codeServerPort}"]
+                    project,
+                    ["gwt.codesvr=${project.vaadin.devmode.bindAddress}:${project.vaadin.devmode.codeServerPort}"],
+                    configuration
             ).startAndBlock()
             devModeProcess.waitForOrKill(1)
         } else {

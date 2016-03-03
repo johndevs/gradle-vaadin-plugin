@@ -17,10 +17,9 @@ package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.servers.ApplicationServer
 import fi.jasoft.plugin.Util
-import fi.jasoft.plugin.servers.PayaraApplicationServer
+import fi.jasoft.plugin.configuration.ApplicationServerConfiguration
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
-import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskAction
 
@@ -31,6 +30,9 @@ class SuperDevModeTask extends DefaultTask {
     def Process codeserverProcess = null
 
     def ApplicationServer server = null
+
+    def ApplicationServerConfiguration configuration
+
 
     def cleanupThread = new Thread({
         if(codeserverProcess){
@@ -54,6 +56,7 @@ class SuperDevModeTask extends DefaultTask {
         dependsOn(CompileWidgetsetTask.NAME)
         description = "Run Super Development Mode for easier client widget development."
         Runtime.getRuntime().addShutdownHook(cleanupThread)
+        configuration = extensions.create('configuration', ApplicationServerConfiguration)
     }
 
     @TaskAction
@@ -65,7 +68,9 @@ class SuperDevModeTask extends DefaultTask {
 
         runCodeServer({
 
-            server = ApplicationServer.create(project, ['superdevmode'])
+            server = ApplicationServer.create(project,
+                    ['superdevmode'],
+                    configuration)
 
             server.startAndBlock();
 

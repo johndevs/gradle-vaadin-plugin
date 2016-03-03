@@ -15,6 +15,8 @@
 */
 package fi.jasoft.plugin.servers
 
+import fi.jasoft.plugin.configuration.ApplicationServerConfiguration
+import org.gradle.api.Project
 import org.gradle.api.artifacts.DependencySet
 import org.gradle.api.artifacts.dsl.DependencyHandler
 
@@ -27,8 +29,8 @@ class JettyApplicationServer extends ApplicationServer {
 
     def jettyVersion = '9.3.6.v20151106'
 
-    JettyApplicationServer(Object project, Object browserParameters) {
-        super(project, browserParameters)
+    JettyApplicationServer(Project project, List browserParameters, ApplicationServerConfiguration configuration) {
+        super(project, browserParameters, configuration)
     }
 
     @Override

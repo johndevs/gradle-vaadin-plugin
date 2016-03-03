@@ -40,7 +40,6 @@ class PluginConfigurationTransformTest {
 
         // Test direct properties
         assertEquals("43211", vaadin.version("43211"))
-        assertEquals(9999, vaadin.serverPort(9999))
 
         // Test delegated properties
         vaadin.gwt.style = "INFO"

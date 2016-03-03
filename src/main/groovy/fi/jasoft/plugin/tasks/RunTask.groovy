@@ -16,12 +16,12 @@
 package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.servers.ApplicationServer
-import fi.jasoft.plugin.servers.PayaraApplicationServer
+import fi.jasoft.plugin.configuration.ApplicationServerConfiguration
 import org.gradle.api.DefaultTask
 import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
 
-public class RunTask extends DefaultTask {
+class RunTask extends DefaultTask {
 
     public static final String NAME = 'vaadinRun'
 
@@ -29,6 +29,8 @@ public class RunTask extends DefaultTask {
 
     @Option(option = 'stopAfterStart', description = 'Should the server stop after starting')
     def boolean stopAfterStarting = false
+
+    def ApplicationServerConfiguration configuration
 
     def cleanupThread = new Thread({
         if(server){
@@ -47,11 +49,12 @@ public class RunTask extends DefaultTask {
         dependsOn(CompileThemeTask.NAME)
         description = 'Runs the Vaadin application on an embedded Jetty ApplicationServer'
         Runtime.getRuntime().addShutdownHook(cleanupThread)
+        configuration = extensions.create('configuration', ApplicationServerConfiguration)
     }
 
     @TaskAction
     public void run() {
-        server = ApplicationServer.create(project, [])
+        server = ApplicationServer.create(project, [], configuration)
         server.startAndBlock(stopAfterStarting)
     }
 }

@@ -17,8 +17,10 @@ package fi.jasoft.plugin.servers
 
 import fi.jasoft.plugin.GradleVaadinPlugin
 import fi.jasoft.plugin.Util
+import fi.jasoft.plugin.configuration.ApplicationServerConfiguration
 import fi.jasoft.plugin.tasks.BuildClassPathJar
 import fi.jasoft.plugin.tasks.CompileThemeTask
+import fi.jasoft.plugin.tasks.RunTask
 import org.gradle.api.Project
 import org.gradle.api.artifacts.DependencySet
 import org.gradle.api.artifacts.dsl.DependencyHandler
@@ -44,12 +46,14 @@ abstract class ApplicationServer {
      * @return
      *      returns the application server
      */
-    static ApplicationServer create(Project project, browserParameters = []){
-        switch(project.vaadin.plugin.server){
+    static ApplicationServer create(Project project,
+                                    List browserParameters = [],
+                                    ApplicationServerConfiguration configuration=project.tasks[RunTask.NAME].extensions.configuration){
+        switch(configuration.server){
             case PayaraApplicationServer.NAME:
-                return new PayaraApplicationServer(project, browserParameters)
+                return new PayaraApplicationServer(project, browserParameters, configuration)
             case JettyApplicationServer.NAME:
-                return new JettyApplicationServer(project, browserParameters)
+                return new JettyApplicationServer(project, browserParameters, configuration)
             default:
                 throw new IllegalArgumentException("Server name not recognized. Must be either payara or jetty.")
         }
@@ -61,11 +65,14 @@ abstract class ApplicationServer {
 
     def final Project project;
 
-    def List browserParameters
+    def List browserParameters = []
 
-    def ApplicationServer(project, browserParameters = []) {
+    def ApplicationServerConfiguration configuration
+
+    def ApplicationServer(Project project, List browserParameters, ApplicationServerConfiguration configuration) {
         this.project = project
         this.browserParameters = browserParameters
+        this.configuration = configuration
     }
 
     abstract String getServerRunner()
@@ -96,6 +103,7 @@ abstract class ApplicationServer {
                 .join(";")
     }
 
+
     def boolean start(boolean firstStart=false, boolean stopAfterStart=false) {
 
         if (process) {
@@ -110,13 +118,13 @@ abstract class ApplicationServer {
         def appServerProcess = [Util.getJavaBinary(project)]
 
         // Debug
-        if (project.vaadin.debug) {
+        if (configuration.debug) {
             appServerProcess.add('-Xdebug')
-            appServerProcess.add("-Xrunjdwp:transport=dt_socket,address=${project.vaadin.debugPort},server=y,suspend=n")
+            appServerProcess.add("-Xrunjdwp:transport=dt_socket,address=${configuration.debugPort},server=y,suspend=n")
         }
 
         // Jrebel
-        if (project.vaadin.jrebel.enabled && project.vaadin.debug) {
+        if (project.vaadin.jrebel.enabled && configuration.debug) {
             if (project.vaadin.jrebel.location != null && new File(project.vaadin.jrebel.location).exists()) {
                 appServerProcess.add('-noverify')
                 appServerProcess.add("-javaagent:${project.vaadin.jrebel.location}")
@@ -126,21 +134,21 @@ abstract class ApplicationServer {
         }
 
         // JVM options
-        if (project.vaadin.debug) {
+        if (configuration.debug) {
             appServerProcess.add('-ea')
         }
 
         appServerProcess.add('-cp')
         appServerProcess.add(classPath.asPath)
 
-        if (project.vaadin.jvmArgs) {
-            appServerProcess.addAll(project.vaadin.jvmArgs)
+        if (configuration.jvmArgs) {
+            appServerProcess.addAll(configuration.jvmArgs)
         }
 
         // Program args
         appServerProcess.add(serverRunner)
 
-        appServerProcess.add(project.vaadin.serverPort)
+        appServerProcess.add(configuration.serverPort.toString())
 
         appServerProcess.add(webAppDir.canonicalPath + '/')
 
@@ -155,7 +163,7 @@ abstract class ApplicationServer {
 
         appServerProcess.add(project.name);
 
-        def buildDir = new File(project.buildDir.absolutePath, serverName)
+        def buildDir = new File(project.buildDir, serverName)
         buildDir.mkdirs()
         appServerProcess.add(buildDir.absolutePath)
 
@@ -166,7 +174,7 @@ abstract class ApplicationServer {
         process = appServerProcess.execute()
 
         // Watch for changes in classes
-        if(project.vaadin.plugin.serverRestart) {
+        if(configuration.serverRestart) {
             def self = this
             Thread.start 'Class Directory Watcher', {
                 ApplicationServer.watchClassDirectoryForChanges(self)
@@ -174,7 +182,7 @@ abstract class ApplicationServer {
         }
 
         // Watch for changes in theme
-        if(firstStart && project.vaadin.plugin.themeAutoRecompile){
+        if(firstStart && configuration.themeAutoRecompile){
             Thread.start 'Theme Directory Watcher', {
                 watchThemeDirectoryForChanges()
             }
@@ -182,7 +190,7 @@ abstract class ApplicationServer {
 
         // Build browser GET parameters
         def paramString = ''
-        if (project.vaadin.debug) {
+        if (configuration.debug) {
             paramString += '?debug'
             paramString += '&' + browserParameters.join('&')
         } else if(!browserParameters.isEmpty()){
@@ -194,19 +202,19 @@ abstract class ApplicationServer {
         Util.logProcess(project, process, "${serverName}.log", { line ->
             if(line.contains(successfullyStartedLogToken)) {
                 if(firstStart) {
-                    def resultStr = "Application running on http://localhost:${project.vaadin.serverPort} "
+                    def resultStr = "Application running on http://localhost:${configuration.serverPort} "
                     if (project.vaadin.jrebel.enabled) {
-                        resultStr += "(debugger on ${project.vaadin.debugPort}, JRebel active)"
-                    } else if (project.vaadin.debug) {
-                        resultStr += "(debugger on ${project.vaadin.debugPort})"
+                        resultStr += "(debugger on ${configuration.debugPort}, JRebel active)"
+                    } else if (configuration.debug) {
+                        resultStr += "(debugger on ${configuration.debugPort})"
                     }
                     project.logger.lifecycle(resultStr)
                     project.logger.lifecycle('Press [Ctrl+C] to terminate server...')
 
                     if(stopAfterStart){
                         terminate()
-                    } else {
-                        Util.openBrowser((Project)project, "http://localhost:${(Integer)project.vaadin.serverPort}/${paramString}")
+                    } else if(configuration.openInBrowser){
+                        Util.openBrowser((Project)project, "http://localhost:${(Integer)configuration.serverPort}/${paramString}")
                     }
                 } else {
                     project.logger.lifecycle("Server reload complete.")
@@ -320,3 +328,4 @@ abstract class ApplicationServer {
         }
     }
 }
+
