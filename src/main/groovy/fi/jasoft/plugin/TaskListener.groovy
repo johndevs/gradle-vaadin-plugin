@@ -174,6 +174,7 @@ class TaskListener implements TaskExecutionListener {
     static configureAddonZipMetadata(Task task) {
         def project = task.project
         def attributes = [
+                'Vaadin-Package-Version': 1,
                 'Vaadin-License-Title': project.vaadin.addon.license,
                 'Implementation-Title': project.vaadin.addon.title,
                 'Implementation-Version': project.version != null ? project.version : '',
@@ -286,5 +287,4 @@ class TaskListener implements TaskExecutionListener {
         task.failOnError = false
         task.options.addStringOption("sourcepath", "")
     }
-
 }

@@ -35,6 +35,7 @@ public class RunTask extends DefaultTask {
             server.terminate()
             server = null
         }
+
         try {
             Runtime.getRuntime().removeShutdownHook(cleanupThread)
         } catch(IllegalStateException e){
