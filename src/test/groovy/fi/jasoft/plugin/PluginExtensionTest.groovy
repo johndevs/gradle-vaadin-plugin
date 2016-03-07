@@ -16,9 +16,11 @@
 package fi.jasoft.plugin
 
 import fi.jasoft.plugin.configuration.AddonConfiguration
+import fi.jasoft.plugin.configuration.CompileWidgetsetConfiguration
 import fi.jasoft.plugin.configuration.DevelopmentModeConfiguration
 import fi.jasoft.plugin.configuration.GWTConfiguration
 import fi.jasoft.plugin.configuration.JRebelConfiguration
+import fi.jasoft.plugin.configuration.SuperDevModeConfiguration
 import fi.jasoft.plugin.configuration.VaadinPluginConfiguration
 import fi.jasoft.plugin.configuration.VaadinPluginExtension
 import org.junit.Test
@@ -64,30 +66,20 @@ class PluginExtensionTest extends PluginTestBase {
 
     @Test
     void areGWTPropertiesConfigured(){
-        VaadinPluginExtension vaadin = project.extensions.vaadin
-        assert vaadin.gwt instanceof GWTConfiguration
-        assert vaadin.gwt.style == "OBF"
-        assert vaadin.gwt.optimize == 0
-        assert vaadin.gwt.logLevel == "INFO"
-        assert vaadin.gwt.localWorkers == Runtime.getRuntime().availableProcessors()
-        assert vaadin.gwt.draftCompile == true
-        assert vaadin.gwt.strict == true
-        assert vaadin.gwt.userAgent == null
-        assert vaadin.gwt.jvmArgs == null
-        assert vaadin.gwt.extraArgs == null
-        assert vaadin.gwt.sourcePaths == ['client', 'shared'] as String[]
-        assert vaadin.gwt.collapsePermutations == true
-        assert vaadin.gwt.outputDirectory == null
-    }
-
-    @Test void "GWT output directory supports string and file representation"(){
-        VaadinPluginExtension vaadin = project.extensions.vaadin
-
-        vaadin.gwt.outputDirectory = "."
-        assert vaadin.gwt.outputDirectory.canonicalPath == new File(".").canonicalPath
-
-        vaadin.gwt.outputDirectory = new File(".")
-        assert vaadin.gwt.outputDirectory.canonicalPath == new File(".").canonicalPath
+        CompileWidgetsetConfiguration conf = project.vaadinCompileWidgetset.configuration
+        assert conf instanceof CompileWidgetsetConfiguration
+        assert conf.style == "OBF"
+        assert conf.optimize == 0
+        assert conf.logLevel == "INFO"
+        assert conf.localWorkers == Runtime.getRuntime().availableProcessors()
+        assert conf.draftCompile == true
+        assert conf.strict == true
+        assert conf.userAgent == null
+        assert conf.jvmArgs == null
+        assert conf.extraArgs == null
+        assert conf.sourcePaths == ['client', 'shared'] as String[]
+        assert conf.collapsePermutations == true
+        assert conf.outputDirectory == null
     }
 
     @Test
@@ -110,12 +102,11 @@ class PluginExtensionTest extends PluginTestBase {
 
     @Test
     void areDevModePropertiesConfigured(){
-        VaadinPluginExtension vaadin = project.extensions.vaadin
-        assert vaadin.devmode instanceof DevelopmentModeConfiguration
-        assert vaadin.devmode.noserver == false
-        assert vaadin.devmode.superDevMode == true
-        assert vaadin.devmode.bindAddress == '127.0.0.1'
-        assert vaadin.devmode.codeServerPort == 9997
+        SuperDevModeConfiguration conf = project.vaadinSuperDevMode.configuration
+        assert conf instanceof SuperDevModeConfiguration
+        assert conf.noserver == false
+        assert conf.bindAddress == '127.0.0.1'
+        assert conf.codeServerPort == 9997
     }
 
     @Test

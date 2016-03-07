@@ -42,7 +42,7 @@ class PluginConfigurationTransformTest {
         assertEquals("43211", vaadin.version("43211"))
 
         // Test delegated properties
-        vaadin.gwt.style = "INFO"
-        assertEquals("INFO",vaadin.gwt.style)
+        vaadin.plugin.eclipseOutputDir = "foobar"
+        assertEquals("foobar",vaadin.plugin.eclipseOutputDir)
     }
 }

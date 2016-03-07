@@ -92,8 +92,7 @@ class DevModeTask extends DefaultTask {
         def genDir = new File(devmodeDir, 'gen')
         genDir.mkdirs()
 
-        def vaadinDir = new File(webAppDir, 'VAADIN')
-        def widgetsetDir = new File(vaadinDir, 'widgetsets')
+        def widgetsetDir = Util.getWidgetsetDirectory(project)
         widgetsetDir.mkdirs()
 
         def devmodeProcess = [Util.getJavaBinary(project)]

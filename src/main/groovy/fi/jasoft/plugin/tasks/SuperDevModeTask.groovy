@@ -78,9 +78,7 @@ class SuperDevModeTask extends DefaultTask {
     def runCodeServer(Closure readyClosure) {
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
         File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
-
-        def vaadinDir = new File(webAppDir, 'VAADIN')
-        def widgetsetsDir = new File(vaadinDir, 'widgetsets')
+        def widgetsetsDir = Util.getWidgetsetDirectory(project)
         widgetsetsDir.mkdirs()
 
         def SDMClassPath = project.configurations['vaadin-superdevmode'];

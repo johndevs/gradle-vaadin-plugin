@@ -75,6 +75,7 @@ class VaadinPluginExtension {
     /**
      * The configuration for Development mode
      */
+    @Deprecated
     final DevelopmentModeConfiguration devmode
 
     /**
@@ -90,8 +91,8 @@ class VaadinPluginExtension {
     /**
      * Configuration options for GWT
      */
-    final GWTConfiguration gwt = new GWTConfiguration()
-
+    @Deprecated
+    final GWTConfiguration gwt
     /**
      * Configuration options for TestBench
      */
@@ -112,6 +113,7 @@ class VaadinPluginExtension {
      */
     boolean push = false
 
+    @PackageScope
     @Deprecated
     final Project project
 
@@ -120,6 +122,7 @@ class VaadinPluginExtension {
         this.project = project
         plugin = new VaadinPluginConfiguration(project)
         devmode = new DevelopmentModeConfiguration(project)
+        gwt = new GWTConfiguration(project)
     }
 
     /**
