@@ -48,7 +48,7 @@ abstract class ApplicationServer {
      */
     static ApplicationServer create(Project project,
                                     List browserParameters = [],
-                                    ApplicationServerConfiguration configuration=project.tasks[RunTask.NAME].extensions.configuration){
+                                    ApplicationServerConfiguration configuration=project.vaadinRun.configuration){
         switch(configuration.server){
             case PayaraApplicationServer.NAME:
                 return new PayaraApplicationServer(project, browserParameters, configuration)

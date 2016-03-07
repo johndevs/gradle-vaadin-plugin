@@ -15,9 +15,9 @@
 */
 package fi.jasoft.plugin.tasks
 
+import fi.jasoft.plugin.configuration.SuperDevModeConfiguration
 import fi.jasoft.plugin.servers.ApplicationServer
 import fi.jasoft.plugin.Util
-import fi.jasoft.plugin.configuration.ApplicationServerConfiguration
 import org.gradle.api.DefaultTask
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskAction
@@ -30,7 +30,7 @@ class DevModeTask extends DefaultTask {
 
     def server
 
-    def ApplicationServerConfiguration configuration
+    def SuperDevModeConfiguration configuration
 
     def cleanupThread = new Thread({
         if(devModeProcess) {
@@ -52,7 +52,7 @@ class DevModeTask extends DefaultTask {
         dependsOn('classes', UpdateWidgetsetTask.NAME)
         description = "Run Development Mode for easier debugging and development of client widgets."
         Runtime.getRuntime().addShutdownHook(cleanupThread)
-        configuration = extensions.create('configuration', ApplicationServerConfiguration)
+        configuration = extensions.create('configuration', SuperDevModeConfiguration)
     }
 
     @TaskAction
@@ -68,8 +68,7 @@ class DevModeTask extends DefaultTask {
         if (!project.vaadin.devmode.noserver) {
             server = ApplicationServer.create(
                     project,
-                    ["gwt.codesvr=${project.vaadin.devmode.bindAddress}:${project.vaadin.devmode.codeServerPort}"],
-                    configuration
+                    ["gwt.codesvr=${configuration.bindAddress}:${configuration.codeServerPort}"]
             ).startAndBlock()
             devModeProcess.waitForOrKill(1)
         } else {
@@ -82,23 +81,38 @@ class DevModeTask extends DefaultTask {
 
         def classpath = Util.getClientCompilerClassPath(project)
 
+        def devmodeDir = new File(project.buildDir, 'devmode')
+
+        def deployDir = new File(devmodeDir, 'deploy')
+        deployDir.mkdirs()
+
+        def logsDir = new File(devmodeDir, 'logs')
+        logsDir.mkdirs()
+
+        def genDir = new File(devmodeDir, 'gen')
+        genDir.mkdirs()
+
+        def vaadinDir = new File(webAppDir, 'VAADIN')
+        def widgetsetDir = new File(vaadinDir, 'widgetsets')
+        widgetsetDir.mkdirs()
+
         def devmodeProcess = [Util.getJavaBinary(project)]
-        devmodeProcess += ['-cp', classpath.getAsPath()]
+        devmodeProcess += ['-cp', classpath.asPath]
         devmodeProcess += 'com.google.gwt.dev.DevMode'
         devmodeProcess += project.vaadin.widgetset
         devmodeProcess += '-noserver'
-        devmodeProcess += ['-war', webAppDir.canonicalPath + '/VAADIN/widgetsets']
-        devmodeProcess += ['-gen', 'build/devmode/gen']
-        devmodeProcess += ['-startupUrl', "http://localhost:${project.vaadin.serverPort}"]
-        devmodeProcess += ['-logLevel', project.vaadin.gwt.logLevel]
-        devmodeProcess += ['-deploy', 'build/devmode/deploy']
-        devmodeProcess += ['-workDir', 'build/devmode/']
-        devmodeProcess += ['-logdir', 'build/devmode/logs']
-        devmodeProcess += ['-codeServerPort', project.vaadin.devmode.codeServerPort]
-        devmodeProcess += ['-bindAddress', project.vaadin.devmode.bindAddress]
+        devmodeProcess += ['-war', widgetsetDir.canonicalPath]
+        devmodeProcess += ['-gen', genDir.canonicalPath]
+        devmodeProcess += ['-startupUrl', "http://localhost:${project.vaadinRun.configuration.serverPort}"]
+        devmodeProcess += ['-logLevel', configuration.logLevel]
+        devmodeProcess += ['-deploy', deployDir.canonicalPath]
+        devmodeProcess += ['-workDir', devmodeDir.canonicalPath]
+        devmodeProcess += ['-logdir', logsDir.canonicalPath]
+        devmodeProcess += ['-codeServerPort', configuration.codeServerPort]
+        devmodeProcess += ['-bindAddress', configuration.bindAddress]
 
         if (project.vaadin.devmode.extraArgs) {
-            devmodeProcess += project.vaadin.devmode.extraArgs as List
+            devmodeProcess += configuration.extraArgs as List
         }
 
         devModeProcess = devmodeProcess.execute()

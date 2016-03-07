@@ -15,9 +15,9 @@
 */
 package fi.jasoft.plugin.tasks
 
+import fi.jasoft.plugin.configuration.SuperDevModeConfiguration
 import fi.jasoft.plugin.servers.ApplicationServer
 import fi.jasoft.plugin.Util
-import fi.jasoft.plugin.configuration.ApplicationServerConfiguration
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.plugins.WarPluginConvention
@@ -31,8 +31,7 @@ class SuperDevModeTask extends DefaultTask {
 
     def ApplicationServer server = null
 
-    def ApplicationServerConfiguration configuration
-
+    def SuperDevModeConfiguration configuration
 
     def cleanupThread = new Thread({
         if(codeserverProcess){
@@ -56,7 +55,7 @@ class SuperDevModeTask extends DefaultTask {
         dependsOn(CompileWidgetsetTask.NAME)
         description = "Run Super Development Mode for easier client widget development."
         Runtime.getRuntime().addShutdownHook(cleanupThread)
-        configuration = extensions.create('configuration', ApplicationServerConfiguration)
+        configuration = extensions.create('configuration', SuperDevModeConfiguration)
     }
 
     @TaskAction
@@ -68,9 +67,7 @@ class SuperDevModeTask extends DefaultTask {
 
         runCodeServer({
 
-            server = ApplicationServer.create(project,
-                    ['superdevmode'],
-                    configuration)
+            server = ApplicationServer.create(project, ['superdevmode'])
 
             server.startAndBlock();
 
@@ -81,24 +78,26 @@ class SuperDevModeTask extends DefaultTask {
     def runCodeServer(Closure readyClosure) {
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
         File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
-        File widgetsetsDir = new File(webAppDir.canonicalPath + '/VAADIN/widgetsets')
+
+        def vaadinDir = new File(webAppDir, 'VAADIN')
+        def widgetsetsDir = new File(vaadinDir, 'widgetsets')
         widgetsetsDir.mkdirs()
 
         def SDMClassPath = project.configurations['vaadin-superdevmode'];
         def classpath = SDMClassPath + Util.getClientCompilerClassPath(project)
 
         def superdevmodeProcess = [Util.getJavaBinary(project)]
-        superdevmodeProcess += ['-cp', classpath.getAsPath()]
+        superdevmodeProcess += ['-cp', classpath.asPath]
         superdevmodeProcess += 'com.google.gwt.dev.codeserver.CodeServer'
-        superdevmodeProcess += ['-bindAddress', project.vaadin.devmode.bindAddress]
+        superdevmodeProcess += ['-bindAddress', configuration.bindAddress]
         superdevmodeProcess += ['-port', 9876]
         superdevmodeProcess += ['-workDir', widgetsetsDir.canonicalPath]
         superdevmodeProcess += ['-src', javaDir.canonicalPath]
-        superdevmodeProcess += ['-logLevel', project.vaadin.gwt.logLevel]
+        superdevmodeProcess += ['-logLevel', configuration.logLevel]
         superdevmodeProcess += ['-noprecompile']
 
         if (project.vaadin.devmode.extraArgs) {
-            superdevmodeProcess += project.vaadin.devmode.extraArgs as List
+            superdevmodeProcess += configuration.extraArgs as List
         }
 
         superdevmodeProcess += project.vaadin.widgetset

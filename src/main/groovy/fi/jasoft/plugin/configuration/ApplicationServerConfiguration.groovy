@@ -15,8 +15,6 @@
 */
 package fi.jasoft.plugin.configuration
 
-import org.gradle.api.Project
-
 /**
  * Configuration class for configuring the Application Server
  */
@@ -69,20 +67,4 @@ class ApplicationServerConfiguration {
      * Should the application be opened in a browser when it has been launched
      */
     boolean openInBrowser = true
-
-    /**
-     * Applies the values from a Project
-     *
-     * @param project
-     *      the project to get the values from
-     */
-    @Deprecated
-    def apply(Project project) {
-        debug = project.vaadin.debug
-        debugPort = project.vaadin.debugPort
-        jvmArgs = project.vaadin.jvmArgs
-        serverRestart = project.vaadin.plugin.serverRestart
-        serverPort = project.vaadin.serverPort
-        themeAutoRecompile = project.vaadin.plugin.themeAutoRecompile
-    }
 }

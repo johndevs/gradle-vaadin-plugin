@@ -75,7 +75,7 @@ class VaadinPluginExtension {
     /**
      * The configuration for Development mode
      */
-    final DevelopmentModeConfiguration devmode = new DevelopmentModeConfiguration()
+    final DevelopmentModeConfiguration devmode
 
     /**
      * The configuration for the plugin itself
@@ -119,6 +119,7 @@ class VaadinPluginExtension {
     VaadinPluginExtension(Project project){
         this.project = project
         plugin = new VaadinPluginConfiguration(project)
+        devmode = new DevelopmentModeConfiguration(project)
     }
 
     /**
