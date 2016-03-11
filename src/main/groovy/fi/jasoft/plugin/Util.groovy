@@ -99,7 +99,7 @@ class Util {
             collection += project.files(dir)
         }
 
-        if(project.vaadin.gwt.gwtSdkFirstInClasspath){
+        if(project.vaadinCompileWidgetset.configuration.gwtSdkFirstInClasspath){
             collection = moveGwtSdkFirstInClasspath(project, collection)
         }
 
@@ -516,8 +516,10 @@ class Util {
         if(project.vaadin.plugin.themesDirectory){
             project.file(project.vaadin.plugin.themesDirectory)
         } else {
-            File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-            project.file(webAppDir.canonicalPath + '/VAADIN/themes')
+            def webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
+            def vaadinDir = new File(webAppDir, 'VAADIN')
+            def themesDir = new File(vaadinDir, 'themes')
+            themesDir
         }
     }
 
@@ -530,8 +532,10 @@ class Util {
      *      The widgetset directory
      */
     static File getWidgetsetDirectory(Project project) {
-        File webAppDir = project.vaadin.gwt.outputDirectory ?: project.convention.getPlugin(WarPluginConvention).webAppDir
-        project.file(webAppDir.canonicalPath +'/VAADIN/widgetsets')
+        def webAppDir = project.vaadinCompileWidgetset.configuration.outputDirectory ?: project.convention.getPlugin(WarPluginConvention).webAppDir
+        def vaadinDir = new File(webAppDir, 'VAADIN')
+        def widgetsetsDir = new File(vaadinDir, 'widgetsets')
+        widgetsetsDir
     }
 
     /**
@@ -543,8 +547,10 @@ class Util {
      *      The widgetset directory
      */
     static File getWidgetsetCacheDirectory(Project project) {
-        File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-        project.file(webAppDir.canonicalPath +'/VAADIN/gwt-unitCache')
+        def webAppDir = project.vaadinCompileWidgetset.configuration.outputDirectory ?: project.convention.getPlugin(WarPluginConvention).webAppDir
+        def vaadinDir = new File(webAppDir, 'VAADIN')
+        def unitCacheDir = new File(vaadinDir, 'gwt-unitCache')
+        unitCacheDir
     }
 
     /**

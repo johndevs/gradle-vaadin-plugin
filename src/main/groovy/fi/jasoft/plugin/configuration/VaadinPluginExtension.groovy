@@ -15,6 +15,10 @@
 */
 package fi.jasoft.plugin.configuration
 
+import fi.jasoft.plugin.MessageLogger
+import groovy.transform.PackageScope
+import org.gradle.api.GradleException
+import org.gradle.api.Project
 import org.gradle.api.file.SourceDirectorySet
 
 /**
@@ -44,19 +48,9 @@ class VaadinPluginExtension {
     String version = null
 
     /**
-     * Should application be run in debug mode. When running in production set this to true
-     */
-    boolean debug = true
-
-    /**
      * Should the Vaadin client side profiler be used
      */
     boolean profiler = false
-
-    /**
-     * The port the debugger listens to
-     */
-    int debugPort = 8000
 
     /**
      * Should the plugin manage the widgetset (gwt.xml file)
@@ -74,16 +68,6 @@ class VaadinPluginExtension {
     boolean manageRepositories = true
 
     /**
-     * The port the vaadin application should run on
-     */
-    int serverPort = 8080
-
-    /**
-     * Extra jvm args passed to the JVM running the Vaadin application
-     */
-    String[] jvmArgs = null
-
-    /**
      * The configuration for JRebel
      */
     final JRebelConfiguration jrebel = new JRebelConfiguration()
@@ -91,12 +75,13 @@ class VaadinPluginExtension {
     /**
      * The configuration for Development mode
      */
-    final DevelopmentModeConfiguration devmode = new DevelopmentModeConfiguration()
+    @Deprecated
+    final DevelopmentModeConfiguration devmode
 
     /**
      * The configuration for the plugin itself
      */
-    final VaadinPluginConfiguration plugin = new VaadinPluginConfiguration()
+    final VaadinPluginConfiguration plugin
 
     /**
      * Configuration options for addons
@@ -106,8 +91,8 @@ class VaadinPluginExtension {
     /**
      * Configuration options for GWT
      */
-    final GWTConfiguration gwt = new GWTConfiguration()
-
+    @Deprecated
+    final GWTConfiguration gwt
     /**
      * Configuration options for TestBench
      */
@@ -127,4 +112,104 @@ class VaadinPluginExtension {
      * Should server push be enabled.
      */
     boolean push = false
+
+    @PackageScope
+    @Deprecated
+    final Project project
+
+    @Deprecated
+    VaadinPluginExtension(Project project){
+        this.project = project
+        plugin = new VaadinPluginConfiguration(project)
+        devmode = new DevelopmentModeConfiguration(project)
+        gwt = new GWTConfiguration(project)
+    }
+
+    /**
+     * Should application be run in debug mode. When running in production set this to true
+     */
+    @Deprecated
+    void debug(boolean debug){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.debug',
+                'This property has been replaced by vaadinRun.configuration.debug.')
+        project.vaadinRun.configuration.debug = debug
+    }
+    @Deprecated
+    void setDebug(boolean debug){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.debug',
+                'This property has been replaced by vaadinRun.configuration.debug.')
+        project.vaadinRun.configuration.debug = debug
+    }
+    @Deprecated
+    void isDebug(boolean debug){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.debug',
+                'This property has been replaced by vaadinRun.configuration.debug.')
+        project.vaadinRun.configuration.debug
+    }
+
+    /**
+     * The port the debugger listens to
+     */
+    @Deprecated
+    void debugPort(int port){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.debugPort',
+                'This property has been replaced by vaadinRun.configuration.debugPort.')
+        project.vaadinRun.configuration.debugPort = port
+    }
+    @Deprecated
+    void setDebugPort(int port){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.debugPort',
+                'This property has been replaced by vaadinRun.configuration.debugPort.')
+        project.vaadinRun.configuration.debugPort = port
+    }
+    @Deprecated
+    boolean isDebugPort(){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.debugPort',
+                'This property has been replaced by vaadinRun.configuration.debugPort.')
+        project.vaadinRun.configuration.debugPort
+    }
+
+    /**
+     * The port the vaadin application should run on
+     */
+    @Deprecated
+    void serverPort(int port){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.serverPort',
+                'This property has been replaced by vaadinRun.configuration.serverPort.')
+        project.vaadinRun.configuration.serverPort = port
+    }
+    @Deprecated
+    void setServerPort(int port){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.serverPort',
+                'This property has been replaced by vaadinRun.configuration.serverPort.')
+        project.vaadinRun.configuration.serverPort = port
+    }
+    @Deprecated
+    int getServerPort(){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.serverPort',
+                'This property has been replaced by vaadinRun.configuration.serverPort.')
+        project.vaadinRun.configuration.serverPort
+    }
+
+    /**
+     * Extra jvm args passed to the JVM running the Vaadin application
+     */
+    @Deprecated
+    void jvmArgs(String[] args){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.jvmArgs',
+                'This property has been replaced by vaadinRun.configuration.jvmArgs.')
+        project.vaadinRun.configuration.jvmArgs = args
+    }
+    @Deprecated
+    void setJvmArgs(String[] args){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.jvmArgs',
+                'This property has been replaced by vaadinRun.configuration.jvmArgs.')
+        project.vaadinRun.configuration.jvmArgs = args
+    }
+    @Deprecated
+    String[] getJvmArgs(){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.jvmArgs',
+                'This property has been replaced by vaadinRun.configuration.jvmArgs.')
+        project.vaadinRun.configuration.jvmArgs
+    }
 }

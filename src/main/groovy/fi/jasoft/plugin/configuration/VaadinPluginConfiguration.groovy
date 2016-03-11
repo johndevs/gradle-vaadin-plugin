@@ -17,6 +17,8 @@ package fi.jasoft.plugin.configuration
 
 import fi.jasoft.plugin.MessageLogger
 import org.apache.tools.ant.taskdefs.condition.Os
+import org.gradle.api.GradleException
+import org.gradle.api.Project
 
 /**
  * General configuration options for the plugin itself
@@ -30,58 +32,9 @@ class VaadinPluginConfiguration {
     boolean logToConsole = false
 
     /**
-     * Should the application be opened in a browser when it has been launched
-     */
-    boolean openInBrowser = true
-
-    /**
      * The directory where Eclipse will output its compiled classes.
      */
     String eclipseOutputDir = 'bin'
-
-    /**
-     * Should jetty restart when a class is changed in the build directory.
-     *
-     * @deprecated
-     */
-    @Deprecated
-    void jettyAutoRefresh(boolean refresh){
-        isJettyAutoRefresh()
-        serverRestart = refresh
-    }
-    @Deprecated
-    void setJettyAutoRefresh(boolean refresh){
-        isJettyAutoRefresh()
-        serverRestart = refresh
-    }
-    @Deprecated
-    boolean isJettyAutoRefresh(){
-        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.plugin.jettyAutoRefresh',
-                'This property has been replaced by vaadin.plugin.serverRestart.')
-        serverRestart
-    }
-
-    /**
-     * Should the server restart after every change.
-     */
-    boolean serverRestart = true
-
-    /**
-     * Application server to use.
-     * <p>
-     * Available options are
-     * <ul>
-     *     <li>payara - Webserver with EJB/CDI support</li>
-     *     <li>jetty - Plain J2EE web server</li>
-     * </ul>
-     * Default server is payara.
-     */
-    String server = 'payara'
-
-    /**
-     * Should theme be recompiled when SCSS file is changes.
-     */
-    boolean themeAutoRecompile = true
 
     /**
      * Custom directory where themes can be found
@@ -103,4 +56,80 @@ class VaadinPluginConfiguration {
      * Should a classpath Jar be used to shorten the classpath.
      */
     boolean useClassPathJar = Os.isFamily(Os.FAMILY_WINDOWS)
+
+    @Deprecated
+    transient Project project
+
+    @Deprecated
+    VaadinPluginConfiguration(Project project){
+        this.project = project
+    }
+
+    /**
+     * Should the application be opened in a browser when it has been launched
+     */
+    @Deprecated
+    void openInBrowser(boolean open){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.plugin.openInBrowser',
+                'This property has been replaced by vaadinRun.configuration.openInBrowser.')
+        project.vaadinRun.configuration.openInBrowser = open
+    }
+    @Deprecated
+    void setOpenInBrowser(boolean open){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.plugin.openInBrowser',
+                'This property has been replaced by vaadinRun.configuration.openInBrowser.')
+        project.vaadinRun.configuration.openInBrowser = open
+    }
+    @Deprecated
+    boolean isOpenInBrowser(){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.plugin.openInBrowser',
+                'This property has been replaced by vaadinRun.configuration.openInBrowser.')
+        project.vaadinRun.configuration.openInBrowser
+    }
+
+    /**
+     * Should theme be recompiled when SCSS file is changes.
+     */
+    @Deprecated
+    void themeAutoRecompile(boolean recompile){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.plugin.themeAutoRecompile',
+                'This property has been replaced by vaadinRun.configuration.themeAutoRecompile.')
+        project.vaadinRun.configuration.themeAutoRecompile = recompile
+        throw new GradleException('Property no longer valid.')
+    }
+    @Deprecated
+    void setThemeAutoRecompile(boolean recompile){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.plugin.themeAutoRecompile',
+                'This property has been replaced by vaadinRun.configuration.themeAutoRecompile.')
+        project.vaadinRun.configuration.themeAutoRecompile = recompile
+    }
+    @Deprecated
+    boolean isThemeAutoRecompile(){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.plugin.themeAutoRecompile',
+                'This property has been replaced by vaadinRun.configuration.themeAutoRecompile.')
+        project.vaadinRun.configuration.themeAutoRecompile
+    }
+    /**
+     * Should jetty restart when a class is changed in the build directory.
+     *
+     * @deprecated
+     */
+    @Deprecated
+    void jettyAutoRefresh(boolean refresh){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.plugin.jettyAutoRefresh',
+                'This property has been replaced by vaadinRun.configuration.serverRestart.')
+        project.vaadinRun.configuration.serverRestart = refresh
+    }
+    @Deprecated
+    void setJettyAutoRefresh(boolean refresh){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.plugin.jettyAutoRefresh',
+                'This property has been replaced by vaadinRun.configuration.serverRestart.')
+        project.vaadinRun.configuration.serverRestart = refresh
+    }
+    @Deprecated
+    boolean isJettyAutoRefresh(){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.plugin.jettyAutoRefresh',
+                'This property has been replaced by vaadinRun.configuration.serverRestart.')
+        project.vaadinRun.configuration.serverRestart
+    }
 }

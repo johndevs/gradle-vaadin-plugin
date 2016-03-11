@@ -19,10 +19,7 @@ import fi.jasoft.plugin.configuration.VaadinPluginExtension
 import fi.jasoft.plugin.ides.EclipseUtil
 import fi.jasoft.plugin.ides.IDEAUtil
 import fi.jasoft.plugin.servers.ApplicationServer
-import fi.jasoft.plugin.servers.JettyApplicationServer
-import fi.jasoft.plugin.servers.PayaraApplicationServer
 import fi.jasoft.plugin.tasks.*
-import org.apache.maven.BuildFailureException
 import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.InvalidUserDataException
@@ -98,7 +95,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
         }
 
         // Extensions
-        project.extensions.create('vaadin', VaadinPluginExtension)
+        project.extensions.create('vaadin', VaadinPluginExtension, project)
 
         // Dependency resolution
         gradle.taskGraph.addTaskExecutionListener(new TaskListener())

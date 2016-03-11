@@ -16,7 +16,10 @@
 package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.Util
+import fi.jasoft.plugin.configuration.ApplicationServerConfiguration
+import fi.jasoft.plugin.configuration.CompileWidgetsetConfiguration
 import fi.jasoft.plugin.configuration.VaadinPluginExtension
+import groovy.transform.PackageScope
 import groovyx.net.http.ContentType
 import groovyx.net.http.RESTClient
 import org.gradle.api.DefaultTask
@@ -34,10 +37,13 @@ class CompileWidgetsetTask extends DefaultTask {
 
     static final WIDGETSET_CDN_URL = 'http://cdn.virit.in'
 
+    def CompileWidgetsetConfiguration configuration
+
     /**
      * HTTP POST request sent to CDN for requesting a widgetset.
      */
-    private def queryWidgetsetRequest = { version, style ->
+    @PackageScope
+    def queryWidgetsetRequest = { version, style ->
         [
             path: '/api/compiler/compile',
             query: [
@@ -56,7 +62,8 @@ class CompileWidgetsetTask extends DefaultTask {
     /**
      * HTTP POST request sent to CDN for downloading a widgetset.
      */
-    private def downloadWidgetsetRequest = { version, style ->
+    @PackageScope
+    def downloadWidgetsetRequest = { version, style ->
         [
             path: '/api/compiler/download',
             body: [
@@ -72,14 +79,15 @@ class CompileWidgetsetTask extends DefaultTask {
     /**
      * Called by the downloadWidgetsetRequest once the response with the zipped contents arrive
      */
-    private def writeWidgetsetToFileSystem = { request, zipStream ->
-        def widgetsetName = project.vaadin.widgetset.replaceAll("[^a-zA-Z0-9]+","")
+    @PackageScope
+    def writeWidgetsetToFileSystem = { request, zipStream ->
+        String widgetsetName = project.vaadin.widgetset.replaceAll("[^a-zA-Z0-9]+","")
 
         if(widgetsetName != project.vaadin.widgetset){
             logger.warn("Widgetset name cannot contain special characters when using CDN. Illegal characters removed, please update your @Widgetset annotation or web.xml accordingly.")
         }
 
-        def widgetsetDirectory = new File(Util.getWidgetsetDirectory(project).absolutePath, widgetsetName)
+        def widgetsetDirectory = new File(Util.getWidgetsetDirectory(project), widgetsetName)
         widgetsetDirectory.mkdirs()
 
         def generatedWidgetSetName = request.headers.wsId as String
@@ -110,10 +118,10 @@ class CompileWidgetsetTask extends DefaultTask {
         zipStream.close();
     }
 
-    public CompileWidgetsetTask() {
+    CompileWidgetsetTask() {
         dependsOn('classes', UpdateWidgetsetTask.NAME, BuildClassPathJar.NAME)
         description = "Compiles Vaadin Addons and components into Javascript."
-
+        configuration = extensions.create('configuration', CompileWidgetsetConfiguration)
         project.afterEvaluate {
 
             /* Monitor changes in dependencies since upgrading a
@@ -203,7 +211,6 @@ class CompileWidgetsetTask extends DefaultTask {
 
     private void compileLocally() {
         def vaadin = project.vaadin as VaadinPluginExtension
-        def gwt = vaadin.gwt
 
         // Ensure widgetset directory exists
         Util.getWidgetsetDirectory(project).mkdirs()
@@ -234,7 +241,7 @@ class CompileWidgetsetTask extends DefaultTask {
             }
 
             // Ensure gwt sdk libs are in the correct order
-            if(project.vaadin.gwt.gwtSdkFirstInClasspath){
+            if(configuration.gwtSdkFirstInClasspath){
                 classpath = Util.moveGwtSdkFirstInClasspath(project, classpath)
             }
         } else {
@@ -243,30 +250,30 @@ class CompileWidgetsetTask extends DefaultTask {
 
         def widgetsetCompileProcess = [Util.getJavaBinary(project)]
 
-        if (gwt.jvmArgs) {
-            widgetsetCompileProcess += gwt.jvmArgs as List
+        if (configuration.jvmArgs) {
+            widgetsetCompileProcess += configuration.jvmArgs as List
         }
 
         widgetsetCompileProcess += ['-cp',  classpath.asPath]
 
         widgetsetCompileProcess += 'com.google.gwt.dev.Compiler'
 
-        widgetsetCompileProcess += ['-style', gwt.style]
-        widgetsetCompileProcess += ['-optimize', gwt.optimize]
+        widgetsetCompileProcess += ['-style', configuration.style]
+        widgetsetCompileProcess += ['-optimize', configuration.optimize]
         widgetsetCompileProcess += ['-war', Util.getWidgetsetDirectory(project).canonicalPath]
-        widgetsetCompileProcess += ['-logLevel', gwt.logLevel]
-        widgetsetCompileProcess += ['-localWorkers', gwt.localWorkers]
+        widgetsetCompileProcess += ['-logLevel', configuration.logLevel]
+        widgetsetCompileProcess += ['-localWorkers', configuration.localWorkers]
 
-        if (gwt.draftCompile) {
+        if (configuration.draftCompile) {
             widgetsetCompileProcess += '-draftCompile'
         }
 
-        if (gwt.strict) {
+        if (configuration.strict) {
             widgetsetCompileProcess += '-strict'
         }
 
-        if (gwt.extraArgs) {
-            widgetsetCompileProcess += gwt.extraArgs as List
+        if (configuration.extraArgs) {
+            widgetsetCompileProcess += configuration.extraArgs as List
         }
 
         widgetsetCompileProcess += vaadin.widgetset
@@ -304,7 +311,7 @@ class CompileWidgetsetTask extends DefaultTask {
         logger.info("Querying widgetset for Vaadin "+Util.getResolvedVaadinVersion(project))
         def client = new RESTClient(WIDGETSET_CDN_URL)
 
-        def request = queryWidgetsetRequest(Util.getResolvedVaadinVersion(project), project.vaadin.gwt.style)
+        def request = queryWidgetsetRequest(Util.getResolvedVaadinVersion(project), configuration.style)
         logger.info(request.toString())
 
         def response = client.post(request)
@@ -329,7 +336,7 @@ class CompileWidgetsetTask extends DefaultTask {
 
         client.post(downloadWidgetsetRequest(
             Util.getResolvedVaadinVersion(project),
-            project.vaadin.gwt.style
+            configuration.style
         ), writeWidgetsetToFileSystem)
     }
 }
