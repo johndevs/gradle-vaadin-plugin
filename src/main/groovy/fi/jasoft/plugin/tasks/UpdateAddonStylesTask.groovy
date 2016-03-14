@@ -67,7 +67,7 @@ class UpdateAddonStylesTask extends DefaultTask {
             // that is used we need to manually add the addons to the classpath
             // even though they are listen inside the classpath jar
             if(project.vaadin.plugin.useClassPathJar){
-                Util.findAddonsInProject(project, 'Vaadin-Stylesheets').each {
+                Util.findAddonsInProject(project, 'Vaadin-Stylesheets', true).each {
                     classpath = classpath.plus(project.files(it.file))
                 }
             }

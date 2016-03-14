@@ -99,7 +99,7 @@ class Util {
             collection += project.files(dir)
         }
 
-        if(project.vaadinCompileWidgetset.configuration.gwtSdkFirstInClasspath){
+        if(project.vaadinCompile.configuration.gwtSdkFirstInClasspath){
             collection = moveGwtSdkFirstInClasspath(project, collection)
         }
 
@@ -532,7 +532,7 @@ class Util {
      *      The widgetset directory
      */
     static File getWidgetsetDirectory(Project project) {
-        def webAppDir = project.vaadinCompileWidgetset.configuration.outputDirectory ?: project.convention.getPlugin(WarPluginConvention).webAppDir
+        def webAppDir = project.vaadinCompile.configuration.outputDirectory ?: project.convention.getPlugin(WarPluginConvention).webAppDir
         def vaadinDir = new File(webAppDir, 'VAADIN')
         def widgetsetsDir = new File(vaadinDir, 'widgetsets')
         widgetsetsDir
@@ -547,7 +547,7 @@ class Util {
      *      The widgetset directory
      */
     static File getWidgetsetCacheDirectory(Project project) {
-        def webAppDir = project.vaadinCompileWidgetset.configuration.outputDirectory ?: project.convention.getPlugin(WarPluginConvention).webAppDir
+        def webAppDir = project.vaadinCompile.configuration.outputDirectory ?: project.convention.getPlugin(WarPluginConvention).webAppDir
         def vaadinDir = new File(webAppDir, 'VAADIN')
         def unitCacheDir = new File(vaadinDir, 'gwt-unitCache')
         unitCacheDir
@@ -582,7 +582,7 @@ class Util {
      * @return
      *      a set of addon dependencies
      */
-    static Set findAddonsInProject(Project project, String byAttribute='Vaadin-Widgetsets') {
+    static Set findAddonsInProject(Project project, String byAttribute='Vaadin-Widgetsets', Boolean includeFile=false) {
         def addons = []
         def attribute = new Attributes.Name(byAttribute)
         project.configurations.all.each { Configuration conf ->
@@ -595,12 +595,20 @@ class Util {
                             def attributes = mf?.mainAttributes
                             if (attributes?.getValue(attribute)) {
                                 if (!dependency.name.startsWith('vaadin-client')) {
-                                    addons << [
-                                            groupId: dependency.group,
-                                            artifactId: dependency.name,
-                                            version: dependency.version,
-                                            file: file
-                                    ]
+                                    if(includeFile){
+                                        addons << [
+                                                groupId: dependency.group,
+                                                artifactId: dependency.name,
+                                                version: dependency.version,
+                                                file: file
+                                        ]
+                                    } else {
+                                        addons << [
+                                                groupId: dependency.group,
+                                                artifactId: dependency.name,
+                                                version: dependency.version,
+                                        ]
+                                    }
                                 }
                             }
                         }

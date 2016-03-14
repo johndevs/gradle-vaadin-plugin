@@ -33,9 +33,9 @@ import java.util.zip.ZipInputStream
 
 class CompileWidgetsetTask extends DefaultTask {
 
-    static final NAME = 'vaadinCompileWidgetset'
+    static final NAME = 'vaadinCompile'
 
-    static final WIDGETSET_CDN_URL = 'http://cdn.virit.in'
+    static final WIDGETSET_CDN_URL = 'https://wscdn.vaadin.com'
 
     def CompileWidgetsetConfiguration configuration
 
@@ -96,7 +96,7 @@ class CompileWidgetsetTask extends DefaultTask {
             def fileName = ze.name as String
 
             // Replace the generated widgetset filename with the real one
-            final File outfile = new File(widgetsetDirectory.absolutePath,
+            final File outfile = new File(widgetsetDirectory,
                     fileName.replace(generatedWidgetSetName, widgetsetName));
 
             // Create directories and file
@@ -122,6 +122,7 @@ class CompileWidgetsetTask extends DefaultTask {
         dependsOn('classes', UpdateWidgetsetTask.NAME, BuildClassPathJar.NAME)
         description = "Compiles Vaadin Addons and components into Javascript."
         configuration = extensions.create('configuration', CompileWidgetsetConfiguration)
+
         project.afterEvaluate {
 
             /* Monitor changes in dependencies since upgrading a
@@ -161,7 +162,7 @@ class CompileWidgetsetTask extends DefaultTask {
     public void run() {
         def vaadin = project.vaadin as VaadinPluginExtension
         if(vaadin.widgetset){
-            if(vaadin.widgetsetCDN){
+            if(project.vaadinCompile.configuration.widgetsetCDN){
                 compileRemotely()
             } else {
                 compileLocally()

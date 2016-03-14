@@ -38,11 +38,6 @@ class VaadinPluginExtension {
     String widgetsetGenerator = null
 
     /**
-     * Use the widgetset CDN located at cdn.virit.in
-     */
-    boolean widgetsetCDN = false
-
-    /**
      * The vaadin version to use. By default latest Vaadin 7 version.
      */
     String version = null
@@ -211,5 +206,27 @@ class VaadinPluginExtension {
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.jvmArgs',
                 'This property has been replaced by vaadinRun.configuration.jvmArgs.')
         project.vaadinRun.configuration.jvmArgs
+    }
+
+    /**
+     * Extra jvm args passed to the JVM running the Vaadin application
+     */
+    @Deprecated
+    void widgetsetCDN(Boolean enabled){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.widgetsetCDN',
+                'This property has been replaced by vaadinCompile.configuration.widgetsetCDN.')
+        project.vaadinCompile.configuration.widgetsetCDN = enabled
+    }
+    @Deprecated
+    void setWidgetsetCDN(Boolean enabled){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.widgetsetCDN',
+                'This property has been replaced by vaadinCompile.configuration.widgetsetCDN.')
+        project.vaadinCompile.configuration.widgetsetCDN = enabled
+    }
+    @Deprecated
+    Boolean getWidgetsetCDN(){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.widgetsetCDN',
+                'This property has been replaced by vaadinCompile.configuration.widgetsetCDN.')
+        project.vaadinCompile.configuration.widgetsetCDN
     }
 }

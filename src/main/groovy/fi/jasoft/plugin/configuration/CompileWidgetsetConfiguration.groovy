@@ -1,10 +1,9 @@
 package fi.jasoft.plugin.configuration
 
-import fi.jasoft.plugin.MessageLogger
-
 /**
  * Created by john on 3/7/16.
  */
+@PluginConfiguration
 class CompileWidgetsetConfiguration {
 
     /**
@@ -81,4 +80,9 @@ class CompileWidgetsetConfiguration {
      * (Optional) root directory, for generated files; default is the web-app dir from the WAR plugin
      */
     String outputDirectory = null
+
+    /**
+     * Use the widgetset CDN located at cdn.virit.in
+     */
+    boolean widgetsetCDN = false
 }

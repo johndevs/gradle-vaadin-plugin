@@ -66,7 +66,7 @@ class PluginExtensionTest extends PluginTestBase {
 
     @Test
     void areGWTPropertiesConfigured(){
-        CompileWidgetsetConfiguration conf = project.vaadinCompileWidgetset.configuration
+        CompileWidgetsetConfiguration conf = project.vaadinCompile.configuration
         assert conf instanceof CompileWidgetsetConfiguration
         assert conf.style == "OBF"
         assert conf.optimize == 0

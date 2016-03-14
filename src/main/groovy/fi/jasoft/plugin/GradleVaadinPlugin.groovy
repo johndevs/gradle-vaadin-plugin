@@ -262,7 +262,9 @@ class GradleVaadinPlugin implements Plugin<Project> {
         configurations.create(CONFIGURATION_CLIENT, { conf ->
             conf.description = 'Libraries needed for compiling the widgetset.'
             conf.defaultDependencies { dependencies ->
-                if(!project.vaadin.widgetset){
+                if(project.vaadinCompile.configuration.widgetsetCDN){
+                    // Downloading widgetset from CDN, no dependencies needed
+                } else if(!project.vaadin.widgetset){
                     def widgetsetCompiled = projectDependencies.create("com.vaadin:vaadin-client-compiled:${Util.getVaadinVersion(project)}")
                     dependencies.add(widgetsetCompiled)
                 } else {

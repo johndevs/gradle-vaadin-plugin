@@ -153,15 +153,15 @@ class UpdateWidgetsetTask extends DefaultTask {
         }
 
         // Custom inherits
-        if (project.vaadinCompileWidgetset.configuration.extraInherits != null) {
-            inherits.addAll(project.vaadinCompileWidgetset.configuration.extraInherits)
+        if (project.vaadinCompile.configuration.extraInherits != null) {
+            inherits.addAll(project.vaadinCompile.configuration.extraInherits)
         }
 
         substitutions['inherits'] = inherits
 
         //###################################################################
 
-        substitutions['sourcePaths'] = project.vaadinCompileWidgetset.configuration.sourcePaths
+        substitutions['sourcePaths'] = project.vaadinCompile.configuration.sourcePaths
 
         //###################################################################
 
@@ -175,7 +175,7 @@ class UpdateWidgetsetTask extends DefaultTask {
         def properties = [:]
 
         def ua = 'ie8,ie9,gecko1_8,safari'
-        if (project.vaadinCompileWidgetset.configuration.userAgent == null) {
+        if (project.vaadinCompile.configuration.userAgent == null) {
             if (Util.isOperaUserAgentSupported(project)) {
                 ua += ',opera'
             }
@@ -183,7 +183,7 @@ class UpdateWidgetsetTask extends DefaultTask {
                 ua += ',ie10'
             }
         } else {
-            ua = project.vaadinCompileWidgetset.configuration.userAgent
+            ua = project.vaadinCompile.configuration.userAgent
         }
         properties.put('user.agent', ua)
 
@@ -191,7 +191,7 @@ class UpdateWidgetsetTask extends DefaultTask {
             properties.put('vaadin.profiler', true)
         }
 
-        if (!project.vaadinCompileWidgetset.configuration.logging) {
+        if (!project.vaadinCompile.configuration.logging) {
             properties.put('gwt.logging.enabled', false)
         }
 
@@ -258,7 +258,7 @@ class UpdateWidgetsetTask extends DefaultTask {
 
         //###################################################################
 
-        substitutions['collapsePermutations'] = project.vaadinCompileWidgetset.configuration.collapsePermutations
+        substitutions['collapsePermutations'] = project.vaadinCompile.configuration.collapsePermutations
 
         //###################################################################
 
