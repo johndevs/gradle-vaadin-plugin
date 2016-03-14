@@ -28,7 +28,7 @@ class CreateThemeTask extends DefaultTask {
     public static final String NAME = 'vaadinCreateTheme'
 
     @Option(option = 'name', description = 'Theme name')
-    def String themeName = 'MyTheme'
+    def String themeName
 
     public CreateThemeTask() {
         description = "Creates a new Vaadin Theme"
@@ -36,6 +36,9 @@ class CreateThemeTask extends DefaultTask {
 
     @TaskAction
     def run() {
+        if(!themeName){
+            themeName = project.getName()
+        }
         createTheme(themeName)
     }
 

@@ -15,7 +15,7 @@ class CreateThemeTest extends IntegrationTest {
     @Test void 'Create default theme'() {
         runWithArguments(CreateThemeTask.NAME, CompileThemeTask.NAME)
         def themesDir = Paths.get(projectDir.root.canonicalPath, 'src', 'main', 'webapp', 'VAADIN', 'themes').toFile()
-        assertThemeInDirectory(themesDir, 'MyTheme')
+        assertThemeInDirectory(themesDir, projectDir.root.getName())
     }
 
     @Test void 'Create theme with name'() {
@@ -28,7 +28,7 @@ class CreateThemeTest extends IntegrationTest {
         buildFile << "vaadin.plugin.themesDirectory = 'build/mythemedir'"
         runWithArguments(CreateThemeTask.NAME, CompileThemeTask.NAME)
         def themesDir = Paths.get(projectDir.root.canonicalPath, 'build', 'mythemedir').toFile()
-        assertThemeInDirectory(themesDir, 'MyTheme')
+        assertThemeInDirectory(themesDir, projectDir.root.getName())
     }
 
     private void assertThemeInDirectory(File directory, String themeName){
