@@ -50,7 +50,7 @@ abstract class IntegrationTest {
     }
 
     String runWithArguments(String... args) {
-        setupRunner().withArguments(args).build().output
+        setupRunner().withArguments((args as List) + ['--stacktrace']).build().output
     }
 
     String runFailureExpected() {

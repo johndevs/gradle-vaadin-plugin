@@ -60,9 +60,9 @@ class SuperDevModeTask extends DefaultTask {
 
     @TaskAction
     def run() {
-        if(!project.vaadin.widgetset) {
-            logger.error 'No widgetset defined (can be set with vaadin.widgetset in build.gradle)'
-            throw new GradleException("Property vaadin.widgetset not set.")
+        if(!project.vaadinCompile.configuration.widgetset) {
+            logger.error 'No widgetset defined (can be set with vaadinCompile.configuration.widgetset in build.gradle)'
+            throw new GradleException("Property vaadinCompile.configuration.widgetset not set.")
         }
 
         runCodeServer({
@@ -76,7 +76,6 @@ class SuperDevModeTask extends DefaultTask {
     }
 
     def runCodeServer(Closure readyClosure) {
-        File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
         File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
         def widgetsetsDir = Util.getWidgetsetDirectory(project)
         widgetsetsDir.mkdirs()
@@ -98,7 +97,7 @@ class SuperDevModeTask extends DefaultTask {
             superdevmodeProcess += configuration.extraArgs as List
         }
 
-        superdevmodeProcess += project.vaadin.widgetset
+        superdevmodeProcess += project.vaadinCompile.configuration.widgetset
 
         codeserverProcess = superdevmodeProcess.execute()
 

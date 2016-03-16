@@ -28,29 +28,9 @@ import org.gradle.api.file.SourceDirectorySet
 class VaadinPluginExtension {
 
     /**
-     * The widgetset to use for the project. Leave emptu for a pure server side project
-     */
-    String widgetset
-
-    /**
-     * The widgetset generator to use
-     */
-    String widgetsetGenerator = null
-
-    /**
      * The vaadin version to use. By default latest Vaadin 7 version.
      */
     String version = null
-
-    /**
-     * Should the Vaadin client side profiler be used
-     */
-    boolean profiler = false
-
-    /**
-     * Should the plugin manage the widgetset (gwt.xml file)
-     */
-    boolean manageWidgetset = true
 
     /**
      * Should the plugin manage the vaadin dependencies
@@ -68,12 +48,6 @@ class VaadinPluginExtension {
     final JRebelConfiguration jrebel = new JRebelConfiguration()
 
     /**
-     * The configuration for Development mode
-     */
-    @Deprecated
-    final DevelopmentModeConfiguration devmode
-
-    /**
      * The configuration for the plugin itself
      */
     final VaadinPluginConfiguration plugin
@@ -83,11 +57,6 @@ class VaadinPluginExtension {
      */
     final AddonConfiguration addon = new AddonConfiguration()
 
-    /**
-     * Configuration options for GWT
-     */
-    @Deprecated
-    final GWTConfiguration gwt
     /**
      * Configuration options for TestBench
      */
@@ -107,6 +76,18 @@ class VaadinPluginExtension {
      * Should server push be enabled.
      */
     boolean push = false
+
+    /**
+     * Configuration options for GWT
+     */
+    @Deprecated
+    final GWTConfiguration gwt
+
+    /**
+     * The configuration for Development mode
+     */
+    @Deprecated
+    final DevelopmentModeConfiguration devmode
 
     @PackageScope
     @Deprecated
@@ -228,5 +209,94 @@ class VaadinPluginExtension {
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.widgetsetCDN',
                 'This property has been replaced by vaadinCompile.configuration.widgetsetCDN.')
         project.vaadinCompile.configuration.widgetsetCDN
+    }
+
+    /**
+     * Should the Vaadin client side profiler be used
+     */
+    @Deprecated
+    void profiler(Boolean enabled){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.profiler',
+                'This property has been replaced by vaadinCompile.configuration.profiler.')
+        project.vaadinCompile.configuration.profiler = enabled
+    }
+    @Deprecated
+    void setProfiler(Boolean enabled){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.profiler',
+                'This property has been replaced by vaadinCompile.configuration.profiler.')
+        project.vaadinCompile.configuration.profiler = enabled
+    }
+    @Deprecated
+    Boolean getProfiler(){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.profiler',
+                'This property has been replaced by vaadinCompile.configuration.profiler.')
+        project.vaadinCompile.configuration.profiler
+    }
+
+
+    /**
+     * Should the plugin manage the widgetset (gwt.xml file)
+     */
+    @Deprecated
+    void manageWidgetset(Boolean enabled){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.manageWidgetset',
+                'This property has been replaced by vaadinCompile.configuration.manageWidgetset.')
+        project.vaadinCompile.configuration.manageWidgetset = enabled
+    }
+    @Deprecated
+    void setManageWidgetset(Boolean enabled){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.manageWidgetset',
+                'This property has been replaced by vaadinCompile.configuration.manageWidgetset.')
+        project.vaadinCompile.configuration.manageWidgetset = enabled
+    }
+    @Deprecated
+    Boolean getManageWidgetset(){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.manageWidgetset',
+                'This property has been replaced by vaadinCompile.configuration.manageWidgetset.')
+        project.vaadinCompile.configuration.manageWidgetset
+    }
+
+    /**
+     * The widgetset to use for the project. Leave emptu for a pure server side project
+     */
+    @Deprecated
+    void widgetset(String widgetset){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.widgetset',
+                'This property has been replaced by vaadinCompile.configuration.widgetset.')
+        project.vaadinCompile.configuration.widgetset = widgetset
+    }
+    @Deprecated
+    void setWidgetset(String widgetset){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.widgetset',
+                'This property has been replaced by vaadinCompile.configuration.widgetset.')
+        project.vaadinCompile.configuration.widgetset = widgetset
+    }
+    @Deprecated
+    String getWidgetset(){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.widgetset',
+                'This property has been replaced by vaadinCompile.configuration.widgetset.')
+        project.vaadinCompile.configuration.widgetset
+    }
+
+    /**
+     * The widgetset generator to use
+     */
+    @Deprecated
+    void widgetsetGenerator(String widgetsetGenerator){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadinCompile.configuration.widgetsetGenerator',
+                'This property has been replaced by vaadinCompile.configuration.widgetsetGenerator.')
+        project.vaadinCompile.configuration.widgetsetGenerator = widgetsetGenerator
+    }
+    @Deprecated
+    void setWidgetsetGenerator(String widgetsetGenerator){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.widgetsetGenerator',
+                'This property has been replaced by vaadinCompile.configuration.widgetsetGenerator.')
+        project.vaadinCompile.configuration.widgetsetGenerator = widgetsetGenerator
+    }
+    @Deprecated
+    String getWidgetsetGenerator(){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.widgetsetGenerator',
+                'This property has been replaced by vaadinCompile.configuration.widgetsetGenerator.')
+        project.vaadinCompile.configuration.widgetsetGenerator
     }
 }

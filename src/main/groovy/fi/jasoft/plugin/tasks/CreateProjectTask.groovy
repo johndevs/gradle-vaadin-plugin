@@ -17,6 +17,7 @@ package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
+import fi.jasoft.plugin.configuration.CompileWidgetsetConfiguration
 import groovy.transform.PackageScope
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
@@ -44,6 +45,8 @@ class CreateProjectTask extends DefaultTask {
 
     @TaskAction
     def run() {
+        def configuration = project.vaadinCompile.configuration as CompileWidgetsetConfiguration
+
         if(!applicationName){
             applicationName = project.getName()
         }
@@ -51,9 +54,9 @@ class CreateProjectTask extends DefaultTask {
             if(widgetsetFQN?.contains('.')){
                 String widgetsetName = widgetsetFQN.tokenize('.').last()
                 applicationPackage = widgetsetFQN[0..(-widgetsetName.size() - 2)]
-            } else if (project.vaadin.widgetset?.contains('.')) {
-                String widgetsetName = project.vaadin.widgetset.tokenize('.').last()
-                applicationPackage = project.vaadin.widgetset[0..(-widgetsetName.size() - 2)]
+            } else if (configuration.widgetset?.contains('.')) {
+                String widgetsetName = configuration.widgetset.tokenize('.').last()
+                applicationPackage = configuration.widgetset[0..(-widgetsetName.size() - 2)]
             } else {
                 applicationPackage = "com.example.${applicationName.toLowerCase()}"
             }
@@ -125,6 +128,7 @@ class CreateProjectTask extends DefaultTask {
 
     @PackageScope
     def createServletClass(Project project) {
+        def configuration = project.vaadinCompile.configuration as CompileWidgetsetConfiguration
 
         def substitutions = [:]
 
@@ -136,11 +140,11 @@ class CreateProjectTask extends DefaultTask {
 
         def initParams = ['ui': "$applicationPackage.${applicationName}UI"]
 
-        if (project.vaadin.widgetset != null) {
-            if(project.vaadinCompile.configuration.widgetsetCDN){
-                initParams.put('widgetset', project.vaadin.widgetset.replaceAll("[^a-zA-Z0-9]+",""))
+        if (configuration.widgetset) {
+            if(configuration.widgetsetCDN){
+                initParams.put('widgetset', configuration.widgetset.replaceAll("[^a-zA-Z0-9]+","") as GString)
             } else {
-                initParams.put('widgetset', project.vaadin.widgetset)
+                initParams.put('widgetset', configuration.widgetset as GString)
             }
         }
 

@@ -58,8 +58,8 @@ class DevModeTask extends DefaultTask {
     @TaskAction
     public void run() {
 
-        if (project.vaadin.widgetset == null) {
-            project.logger.error("No widgetset defined. Please define a widgetset by using the vaadin.widgetset property.")
+        if (project.vaadinCompile.configuration.widgetset) {
+            project.logger.error("No widgetset defined. Please define a widgetset by using the vaadinCompile.configuration.widgetset property.")
             return
         }
 
@@ -77,8 +77,6 @@ class DevModeTask extends DefaultTask {
     }
 
     protected void runDevelopmentMode() {
-        File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-
         def classpath = Util.getClientCompilerClassPath(project)
 
         def devmodeDir = new File(project.buildDir, 'devmode')
@@ -98,7 +96,7 @@ class DevModeTask extends DefaultTask {
         def devmodeProcess = [Util.getJavaBinary(project)]
         devmodeProcess += ['-cp', classpath.asPath]
         devmodeProcess += 'com.google.gwt.dev.DevMode'
-        devmodeProcess += project.vaadin.widgetset
+        devmodeProcess += project.vaadinCompile.configuration.widgetset
         devmodeProcess += '-noserver'
         devmodeProcess += ['-war', widgetsetDir.canonicalPath]
         devmodeProcess += ['-gen', genDir.canonicalPath]

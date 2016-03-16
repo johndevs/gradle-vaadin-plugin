@@ -17,6 +17,8 @@ package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
+import fi.jasoft.plugin.configuration.CompileWidgetsetConfiguration
+import fi.jasoft.plugin.configuration.VaadinPluginConfiguration
 import groovy.transform.PackageScope
 import org.apache.commons.lang.StringUtils
 
@@ -52,7 +54,7 @@ class UpdateWidgetsetTask extends DefaultTask {
 
     public UpdateWidgetsetTask() {
         description = "Updates the widgetset xml file"
-        onlyIf { project.vaadin.manageWidgetset && project.vaadin.widgetset }
+        onlyIf { project.vaadinCompile.configuration.manageWidgetset && project.vaadinCompile.configuration.widgetset }
     }
 
     @TaskAction
@@ -60,8 +62,8 @@ class UpdateWidgetsetTask extends DefaultTask {
        ensureWidgetPresent(project)
     }
 
-    static boolean ensureWidgetPresent(Project project, String widgetsetFQN=project.vaadin.widgetset) {
-        if (!project.vaadin.manageWidgetset || !widgetsetFQN) {
+    static boolean ensureWidgetPresent(Project project, String widgetsetFQN=project.vaadinCompile.configuration.widgetset) {
+        if (!project.vaadinCompile.configuration.manageWidgetset || !widgetsetFQN) {
             return false
         }
 
@@ -100,6 +102,8 @@ class UpdateWidgetsetTask extends DefaultTask {
 
     @PackageScope
     static updateWidgetset(File widgetsetFile, String widgetsetFQN, Project project) {
+        def configuration = project.vaadinCompile.configuration as CompileWidgetsetConfiguration
+
         def substitutions = [:]
 
         def inherits = [DEFAULT_WIDGETSET]
@@ -153,15 +157,15 @@ class UpdateWidgetsetTask extends DefaultTask {
         }
 
         // Custom inherits
-        if (project.vaadinCompile.configuration.extraInherits != null) {
-            inherits.addAll(project.vaadinCompile.configuration.extraInherits)
+        if (configuration.extraInherits) {
+            inherits.addAll(configuration.extraInherits)
         }
 
         substitutions['inherits'] = inherits
 
         //###################################################################
 
-        substitutions['sourcePaths'] = project.vaadinCompile.configuration.sourcePaths
+        substitutions['sourcePaths'] = configuration.sourcePaths
 
         //###################################################################
 
@@ -175,7 +179,7 @@ class UpdateWidgetsetTask extends DefaultTask {
         def properties = [:]
 
         def ua = 'ie8,ie9,gecko1_8,safari'
-        if (project.vaadinCompile.configuration.userAgent == null) {
+        if (!configuration.userAgent) {
             if (Util.isOperaUserAgentSupported(project)) {
                 ua += ',opera'
             }
@@ -183,15 +187,15 @@ class UpdateWidgetsetTask extends DefaultTask {
                 ua += ',ie10'
             }
         } else {
-            ua = project.vaadinCompile.configuration.userAgent
+            ua = configuration.userAgent
         }
         properties.put('user.agent', ua)
 
-        if (project.vaadin.profiler) {
+        if (configuration.profiler) {
             properties.put('vaadin.profiler', true)
         }
 
-        if (!project.vaadinCompile.configuration.logging) {
+        if (!configuration.logging) {
             properties.put('gwt.logging.enabled', false)
         }
 
@@ -200,15 +204,15 @@ class UpdateWidgetsetTask extends DefaultTask {
         //###################################################################
 
         String name, pkg, filename
-        if (project.vaadin.widgetsetGenerator == null) {
+        if (configuration.widgetsetGenerator == null) {
 
             name = widgetsetFQN.tokenize('.').last()
             pkg = widgetsetFQN.replace('.' + name, '') + '.client.ui'
             filename = name + "Generator.java"
 
         } else {
-            name = project.vaadin.widgetsetGenerator.tokenize('.').last()
-            pkg = project.vaadin.widgetsetGenerator.replace('.' + name, '')
+            name = configuration.widgetsetGenerator.tokenize('.').last()
+            pkg = configuration.widgetsetGenerator.replace('.' + name, '')
             filename = name + ".java"
         }
 
@@ -218,7 +222,7 @@ class UpdateWidgetsetTask extends DefaultTask {
 
         File javaDir = Util.getMainSourceSet(project).srcDirs.first()
         File f = new File(new File(javaDir, TemplateUtil.convertFQNToFilePath(pkg)), filename)
-        if (f.exists() || project.vaadin.widgetsetGenerator != null) {
+        if (f.exists() || configuration.widgetsetGenerator != null) {
             substitutions['widgetsetGenerator'] = "${pkg}.${StringUtils.removeEnd(filename, '.java')}"
         }
 
@@ -258,7 +262,7 @@ class UpdateWidgetsetTask extends DefaultTask {
 
         //###################################################################
 
-        substitutions['collapsePermutations'] = project.vaadinCompile.configuration.collapsePermutations
+        substitutions['collapsePermutations'] = configuration.collapsePermutations
 
         //###################################################################
 

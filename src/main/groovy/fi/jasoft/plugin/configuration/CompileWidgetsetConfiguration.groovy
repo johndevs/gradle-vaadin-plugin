@@ -85,4 +85,24 @@ class CompileWidgetsetConfiguration {
      * Use the widgetset CDN located at cdn.virit.in
      */
     boolean widgetsetCDN = false
+
+    /**
+     * Should the Vaadin client side profiler be used
+     */
+    boolean profiler = false
+
+    /**
+     * Should the plugin manage the widgetset (gwt.xml file)
+     */
+    boolean manageWidgetset = true
+
+    /**
+     * The widgetset to use for the project. Leave emptu for a pure server side project
+     */
+    String widgetset = null
+
+    /**
+     * The widgetset generator to use
+     */
+    String widgetsetGenerator = null
 }

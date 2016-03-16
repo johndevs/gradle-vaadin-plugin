@@ -35,14 +35,14 @@ class CreateComponentTask extends DefaultTask {
 
     @TaskAction
     public void run() {
-        if (!project.vaadin.widgetset) {
-            throw new GradleException('No widgetset found. Please define a widgetset using the vaadin.widgetset property.')
+        if (!project.vaadinCompile.configuration.widgetset) {
+            throw new GradleException('No widgetset found. Please define a widgetset using the vaadinCompile.configuration.widgetset property.')
         }
         createComponentClasses()
     }
 
     private void createComponentClasses() {
-        def widgetset = project.vaadin.widgetset as String
+        def widgetset = project.vaadinCompile.configuration.widgetset as String
         def widgetsetPackagePath =  TemplateUtil.convertFQNToFilePath(widgetset.substring(0, widgetset.lastIndexOf('.')))
 
         def srcDir = Util.getMainSourceSet(project, true).srcDirs.first()

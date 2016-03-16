@@ -289,8 +289,8 @@ abstract class ApplicationServer {
             File file = path.toFile()
 
             // Ignore client classes, as restarting server will not do you any good
-            if(project.vaadin.widgetset){
-                def widgetsetPath = (project.vaadin.widgetset as String).tokenize('.')[0..-2].join('/')+'/client/'
+            if(project.vaadinCompile.configuration.widgetset){
+                def widgetsetPath = (project.vaadinCompile.configuration.widgetset as String).tokenize('.')[0..-2].join('/')+'/client/'
                 if(file.absolutePath.contains(widgetsetPath)){
                     //TODO when file based widgetset recompiling is implmeneted we could recompile the widgetset here instead
                     project.logger.info("Ignored client side class change in ${file.absolutePath}")

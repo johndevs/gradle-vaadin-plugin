@@ -35,10 +35,7 @@ class PluginExtensionTest extends PluginTestBase {
     @Test
     void areVaadinPropertiesConfigured(){
         VaadinPluginExtension vaadin = project.extensions.vaadin;
-        assert vaadin.widgetset == null
-        assert vaadin.widgetsetGenerator == null
         assert vaadin.version == null
-        assert vaadin.manageWidgetset == true
         assert vaadin.manageDependencies == true
         assert vaadin.manageRepositories == true
         assert vaadin.jrebel instanceof JRebelConfiguration

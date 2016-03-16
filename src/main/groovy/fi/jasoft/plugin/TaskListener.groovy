@@ -81,7 +81,7 @@ class TaskListener implements TaskExecutionListener {
 
     @PackageScope
     static ensureWidgetsetGeneratorExists(Task task) {
-        def generator = task.project.vaadin.widgetsetGenerator
+        def generator = task.project.vaadinCompile.configuration.widgetsetGenerator
         if (generator != null) {
             String name = generator.tokenize('.').last()
             String pkg = generator.replaceAll('.' + name, '')
@@ -114,7 +114,7 @@ class TaskListener implements TaskExecutionListener {
         def project = task.project
 
         // Resolve widgetset
-        def widgetset = project.vaadin.widgetset
+        def widgetset = project.vaadinCompile.configuration.widgetset
         if (widgetset == null) {
             widgetset = GradleVaadinPlugin.DEFAULT_WIDGETSET
         }

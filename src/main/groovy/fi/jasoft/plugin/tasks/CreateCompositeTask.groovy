@@ -17,6 +17,7 @@ package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
+import fi.jasoft.plugin.configuration.CompileWidgetsetConfiguration
 import groovy.transform.PackageScope
 import org.gradle.api.DefaultTask
 import org.gradle.api.internal.tasks.options.Option
@@ -39,8 +40,9 @@ public class CreateCompositeTask extends DefaultTask {
 
     @TaskAction
     public void run() {
-        if(!componentPackage && project.vaadin.widgetset){
-            String widgetsetClass = project.vaadin.widgetset
+        def configuration = project.vaadinCompile.configuration as CompileWidgetsetConfiguration
+        if(!componentPackage && configuration.widgetset){
+            String widgetsetClass = configuration.widgetset
             String widgetsetPackage = widgetsetClass.substring(0, widgetsetClass.lastIndexOf("."))
             componentPackage = widgetsetPackage + '.' + componentName.toLowerCase();
         }

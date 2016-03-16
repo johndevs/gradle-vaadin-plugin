@@ -651,7 +651,7 @@ class Util {
         classpath += project.configurations[GradleVaadinPlugin.CONFIGURATION_SERVER]
 
         // Include client if no widgetset to provide pre-compiled widgetset
-        if(!project.vaadin.widgetset){
+        if(!project.vaadinCompile.configuration.widgetset){
             classpath += project.configurations[GradleVaadinPlugin.CONFIGURATION_CLIENT]
         }
 

@@ -81,9 +81,9 @@ class CompileWidgetsetTask extends DefaultTask {
      */
     @PackageScope
     def writeWidgetsetToFileSystem = { request, zipStream ->
-        String widgetsetName = project.vaadin.widgetset.replaceAll("[^a-zA-Z0-9]+","")
+        String widgetsetName = project.vaadinCompile.configuration.widgetset.replaceAll("[^a-zA-Z0-9]+","")
 
-        if(widgetsetName != project.vaadin.widgetset){
+        if(widgetsetName != project.vaadinCompile.configuration.widgetset){
             logger.warn("Widgetset name cannot contain special characters when using CDN. Illegal characters removed, please update your @Widgetset annotation or web.xml accordingly.")
         }
 
@@ -160,8 +160,7 @@ class CompileWidgetsetTask extends DefaultTask {
 
     @TaskAction
     public void run() {
-        def vaadin = project.vaadin as VaadinPluginExtension
-        if(vaadin.widgetset){
+        if(project.vaadinCompile.configuration.widgetset){
             if(project.vaadinCompile.configuration.widgetsetCDN){
                 compileRemotely()
             } else {
@@ -171,8 +170,7 @@ class CompileWidgetsetTask extends DefaultTask {
     }
 
     private void compileRemotely() {
-        def vaadin = project.vaadin as VaadinPluginExtension
-        if(vaadin.widgetset ==~ /[A-Za-z0-9]+/){
+        if(project.vaadinCompile.configuration.widgetset ==~ /[A-Za-z0-9]+/){
 
             // Ensure widgetset directory exists
             Util.getWidgetsetDirectory(project).mkdirs()
@@ -277,7 +275,7 @@ class CompileWidgetsetTask extends DefaultTask {
             widgetsetCompileProcess += configuration.extraArgs as List
         }
 
-        widgetsetCompileProcess += vaadin.widgetset
+        widgetsetCompileProcess += project.vaadinCompile.configuration.widgetset
 
         def Process process = widgetsetCompileProcess.execute()
         def failed = false
