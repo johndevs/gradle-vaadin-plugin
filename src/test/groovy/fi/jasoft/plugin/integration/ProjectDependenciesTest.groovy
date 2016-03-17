@@ -1,5 +1,6 @@
 package fi.jasoft.plugin.integration
 
+import fi.jasoft.plugin.tasks.CreateProjectTask
 import org.junit.Test
 
 import static org.junit.Assert.assertFalse
@@ -95,10 +96,27 @@ class ProjectDependenciesTest extends IntegrationTest {
     @Test void 'Client dependencies added when widgetset present'() {
 
         buildFile << """
-            vaadin {
-                widgetset 'com.example.TestWidgetset'
+            vaadinCompile {
+                configuration {
+                    widgetset 'com.example.TestWidgetset'
+                }
             }
 
+            task testClientDependencies << {
+                def confs = project.configurations
+                def client = confs.getByName('vaadin-client')
+                println 'Has client dependency ' + !client.dependencies.empty
+                println 'Has client-compiled dependency ' +  !client.dependencies.findAll {it.name == 'vaadin-client-compiled'}.empty
+            }
+        """.stripIndent()
+
+        def result = runWithArguments('testClientDependencies')
+        assertTrue result, result.contains( 'Has client dependency true')
+        assertTrue result, result.contains( 'Has client-compiled dependency false')
+    }
+
+    @Test void 'Client dependencies added when widgetset is automatically detected'() {
+        buildFile << """
             task testClientDependencies << {
                 def confs = project.configurations
                 def client = confs.getByName('vaadin-server')
@@ -106,6 +124,8 @@ class ProjectDependenciesTest extends IntegrationTest {
                 println 'Has client-compiled dependency ' +  !client.dependencies.findAll {it.name == 'vaadin-client-compiled'}.empty
             }
         """.stripIndent()
+
+        runWithArguments(CreateProjectTask.NAME, '--widgetset=com.example.MyWidgetset')
 
         def result = runWithArguments('testClientDependencies')
         assertTrue result, result.contains( 'Has client dependency true')
