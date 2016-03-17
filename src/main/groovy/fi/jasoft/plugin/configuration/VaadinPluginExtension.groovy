@@ -262,19 +262,25 @@ class VaadinPluginExtension {
     @Deprecated
     void widgetset(String widgetset){
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.widgetset',
-                'This property has been replaced by vaadinCompile.configuration.widgetset.')
+                'This property has been replaced by automatic widgetset detection. ' +
+                        'You should be able to remove this property definition completely. ' +
+                        'If you do need to set it manually you can set vaadinCompile.configuration.widgetset.')
         project.vaadinCompile.configuration.widgetset = widgetset
     }
     @Deprecated
     void setWidgetset(String widgetset){
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.widgetset',
-                'This property has been replaced by vaadinCompile.configuration.widgetset.')
+                'This property has been replaced by automatic widgetset detection. ' +
+                        'You should be able to remove this property definition completely. ' +
+                        'If you do need to set it manually you can set vaadinCompile.configuration.widgetset.')
         project.vaadinCompile.configuration.widgetset = widgetset
     }
     @Deprecated
     String getWidgetset(){
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.widgetset',
-                'This property has been replaced by vaadinCompile.configuration.widgetset.')
+                'This property has been replaced by automatic widgetset detection. ' +
+                        'You should be able to remove this property definition completely. ' +
+                        'If you do need to set it manually you can set vaadinCompile.configuration.widgetset.')
         project.vaadinCompile.configuration.widgetset
     }
 

@@ -18,6 +18,7 @@ package fi.jasoft.plugin
 import fi.jasoft.plugin.configuration.VaadinPluginExtension
 import fi.jasoft.plugin.tasks.BuildClassPathJar
 import groovy.io.FileType
+import groovy.transform.PackageScope
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
@@ -476,10 +477,12 @@ class Util {
 
             @Override
             public FileVisitResult preVisitDirectory(Path p, BasicFileAttributes attrs){
-                p.register(watchService,
-                        StandardWatchEventKinds.ENTRY_CREATE,
-                        StandardWatchEventKinds.ENTRY_DELETE,
-                        StandardWatchEventKinds.ENTRY_MODIFY)
+                if(p.toFile().exists()){
+                    p.register(watchService,
+                            StandardWatchEventKinds.ENTRY_CREATE,
+                            StandardWatchEventKinds.ENTRY_DELETE,
+                            StandardWatchEventKinds.ENTRY_MODIFY)
+                }
                 FileVisitResult.CONTINUE
             }
         }
@@ -734,5 +737,55 @@ class Util {
             // Fallback to Java on PATH
             return 'java'
         }
+    }
+
+    /**
+     * Resolves the first available widgetset from Project
+     */
+    static String getWidgetset(Project project) {
+        if(project.vaadinCompile.configuration.widgetset){
+            return project.vaadinCompile.configuration.widgetset
+        }
+
+        // Search for widgetset
+        def widgetsetFile = resolveWidgetsetFile(project)
+        if(widgetsetFile){
+            def sourceDirs = project.sourceSets.main.allSource
+            def File rootDir = sourceDirs.srcDirs.find { File directory ->
+                project.fileTree(directory.absolutePath).contains(widgetsetFile)
+            }
+            if(rootDir){
+                def relativePath= new File( rootDir.toURI().relativize( widgetsetFile.toURI() ).toString() )
+                def widgetset = TemplateUtil.convertFilePathToFQN(relativePath.path, '.gwt.xml')
+                project.logger.info "Detected widgetset $widgetset from project"
+                widgetset
+            }
+        }
+    }
+
+    /**
+     * Resolves the widgetset file automatically from sources
+     */
+    static File resolveWidgetsetFile(Project project) {
+        def sourceDirs = project.sourceSets.main.allSource
+        def modules = []
+        sourceDirs.srcDirs.each {
+            modules.addAll(project.fileTree(it.absolutePath).include('**/*/*.gwt.xml'))
+        }
+        if(!modules.isEmpty()){
+            return modules.first()
+        }
+
+        if(project.vaadinCompile.configuration.widgetset){
+            // No widgetset file detected, create one
+            File resourceDir = project.sourceSets.main.resources.srcDirs.first()
+            def widgetsetFile = new File(resourceDir,
+                    TemplateUtil.convertFQNToFilePath(project.vaadinCompile.configuration.widgetset, '.gwt.xml'))
+            widgetsetFile.parentFile.mkdirs()
+            widgetsetFile.createNewFile()
+            return widgetsetFile
+        }
+
+        null
     }
 }

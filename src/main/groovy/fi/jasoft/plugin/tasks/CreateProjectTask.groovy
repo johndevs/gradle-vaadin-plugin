@@ -70,11 +70,7 @@ class CreateProjectTask extends DefaultTask {
             project.tasks[CreateThemeTask.NAME].createTheme(applicationName)
         }
 
-        if(widgetsetFQN){
-            UpdateWidgetsetTask.ensureWidgetPresent(project, widgetsetFQN)
-        } else {
-            project.tasks[UpdateWidgetsetTask.NAME].run()
-        }
+        UpdateWidgetsetTask.ensureWidgetPresent(project, widgetsetFQN)
     }
 
     @PackageScope
@@ -140,11 +136,11 @@ class CreateProjectTask extends DefaultTask {
 
         def initParams = ['ui': "$applicationPackage.${applicationName}UI"]
 
-        if (configuration.widgetset) {
+        if (widgetsetFQN) {
             if(configuration.widgetsetCDN){
-                initParams.put('widgetset', configuration.widgetset.replaceAll("[^a-zA-Z0-9]+","") as GString)
+                initParams.put('widgetset', "${widgetsetFQN.replaceAll("[^a-zA-Z0-9]+","")}")
             } else {
-                initParams.put('widgetset', configuration.widgetset as GString)
+                initParams.put('widgetset', "$widgetsetFQN")
             }
         }
 

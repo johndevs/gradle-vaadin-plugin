@@ -15,6 +15,7 @@
 */
 package fi.jasoft.plugin.tasks
 
+import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
 import fi.jasoft.plugin.configuration.ApplicationServerConfiguration
 import fi.jasoft.plugin.configuration.CompileWidgetsetConfiguration
@@ -25,6 +26,7 @@ import groovyx.net.http.RESTClient
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
+import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.tasks.TaskAction
 
 import java.util.jar.Attributes
@@ -159,17 +161,27 @@ class CompileWidgetsetTask extends DefaultTask {
     }
 
     @TaskAction
-    public void run() {
-        if(project.vaadinCompile.configuration.widgetset){
-            if(project.vaadinCompile.configuration.widgetsetCDN){
+    def run() {
+        def configuration = project.vaadinCompile.configuration as CompileWidgetsetConfiguration
+        if(configuration.widgetset){
+            if(configuration.widgetsetCDN){
                 compileRemotely()
             } else {
                 compileLocally()
             }
+        } else {
+            def widgetset = Util.getWidgetset(project)
+            if(widgetset){
+                compileLocally(widgetset)
+            }
         }
     }
 
-    private void compileRemotely() {
+    /**
+     * Compiles the widgetset on the remote CDN
+     */
+    @PackageScope
+    def compileRemotely() {
         if(project.vaadinCompile.configuration.widgetset ==~ /[A-Za-z0-9]+/){
 
             // Ensure widgetset directory exists
@@ -208,7 +220,11 @@ class CompileWidgetsetTask extends DefaultTask {
         }
     }
 
-    private void compileLocally() {
+    /**
+     * Compiles the widgetset locally
+     */
+    @PackageScope
+    def compileLocally(String widgetset = project.vaadinCompile.configuration.widgetset) {
         def vaadin = project.vaadin as VaadinPluginExtension
 
         // Ensure widgetset directory exists
@@ -275,7 +291,7 @@ class CompileWidgetsetTask extends DefaultTask {
             widgetsetCompileProcess += configuration.extraArgs as List
         }
 
-        widgetsetCompileProcess += project.vaadinCompile.configuration.widgetset
+        widgetsetCompileProcess += widgetset
 
         def Process process = widgetsetCompileProcess.execute()
         def failed = false
@@ -306,7 +322,8 @@ class CompileWidgetsetTask extends DefaultTask {
      * @return
      *      Returns the status json
      */
-    private queryRemoteWidgetset(){
+    @PackageScope
+    def queryRemoteWidgetset(){
         logger.info("Querying widgetset for Vaadin "+Util.getResolvedVaadinVersion(project))
         def client = new RESTClient(WIDGETSET_CDN_URL)
 
@@ -325,7 +342,8 @@ class CompileWidgetsetTask extends DefaultTask {
      * @return
      *      Returns a stream with the widgetset files
      */
-    private ZipInputStream downloadWidgetset() {
+    @PackageScope
+    def ZipInputStream downloadWidgetset() {
         def client = new RESTClient(WIDGETSET_CDN_URL)
         client.headers['User-Agent'] = 'VWSCDN-1.3.0 ( / / ; / ; )'
         client.headers['Accept'] = 'application/x-zip'

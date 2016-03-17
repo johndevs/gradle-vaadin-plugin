@@ -60,9 +60,8 @@ class SuperDevModeTask extends DefaultTask {
 
     @TaskAction
     def run() {
-        if(!project.vaadinCompile.configuration.widgetset) {
-            logger.error 'No widgetset defined (can be set with vaadinCompile.configuration.widgetset in build.gradle)'
-            throw new GradleException("Property vaadinCompile.configuration.widgetset not set.")
+        if(!Util.getWidgetset(project)) {
+            throw new GradleException("No widgetset found in project.")
         }
 
         runCodeServer({
@@ -97,7 +96,7 @@ class SuperDevModeTask extends DefaultTask {
             superdevmodeProcess += configuration.extraArgs as List
         }
 
-        superdevmodeProcess += project.vaadinCompile.configuration.widgetset
+        superdevmodeProcess += Util.getWidgetset(project)
 
         codeserverProcess = superdevmodeProcess.execute()
 

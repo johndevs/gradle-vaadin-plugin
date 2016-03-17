@@ -275,36 +275,39 @@ abstract class ApplicationServer {
 
     static watchClassDirectoryForChanges(final ApplicationServer server) {
         def project = server.project
+
         def classesDir
-        if (project.vaadin.plugin.eclipseOutputDir == null) {
-            classesDir = project.sourceSets.main.output.classesDir
-        } else {
+        if(project.vaadin.plugin.eclipseOutputDir && project.file(project.vaadin.plugin.eclipseOutputDir).exists()){
             classesDir = project.file(project.vaadin.plugin.eclipseOutputDir)
+        } else {
+            classesDir = project.sourceSets.main.output.classesDir
         }
 
-        Util.watchDirectoryForChanges(project, (File) classesDir, { WatchKey key, WatchEvent event ->
-            Path basePath = (Path) key.watchable();
-            WatchEvent<Path> watchEventPath = (WatchEvent<Path>) event
-            Path path =  basePath.resolve(watchEventPath.context())
-            File file = path.toFile()
+        if(classesDir && classesDir.exists()){
+            Util.watchDirectoryForChanges(project, (File) classesDir, { WatchKey key, WatchEvent event ->
+                Path basePath = (Path) key.watchable();
+                WatchEvent<Path> watchEventPath = (WatchEvent<Path>) event
+                Path path =  basePath.resolve(watchEventPath.context())
+                File file = path.toFile()
 
-            // Ignore client classes, as restarting server will not do you any good
-            if(project.vaadinCompile.configuration.widgetset){
-                def widgetsetPath = (project.vaadinCompile.configuration.widgetset as String).tokenize('.')[0..-2].join('/')+'/client/'
-                if(file.absolutePath.contains(widgetsetPath)){
-                    //TODO when file based widgetset recompiling is implmeneted we could recompile the widgetset here instead
-                    project.logger.info("Ignored client side class change in ${file.absolutePath}")
-                    return false
+                // Ignore client classes, as restarting server will not do you any good
+                if(Util.getWidgetset(project)){
+                    def widgetsetPath = (Util.getWidgetset(project) as String).tokenize('.')[0..-2].join('/')+'/client/'
+                    if(file.absolutePath.contains(widgetsetPath)){
+                        //TODO when file based widgetset recompiling is implmeneted we could recompile the widgetset here instead
+                        project.logger.info("Ignored client side class change in ${file.absolutePath}")
+                        return false
+                    }
                 }
-            }
 
-            if(project.vaadin.plugin.serverRestart && server.process){
-                // Force restart of server
-                project.logger.lifecycle("Reloading server...")
-                server.reload()
-            }
-            false
-        })
+                if(project.vaadin.plugin.serverRestart && server.process){
+                    // Force restart of server
+                    project.logger.lifecycle("Reloading server...")
+                    server.reload()
+                }
+                false
+            })
+        }
     }
 
     def watchThemeDirectoryForChanges() {

@@ -19,6 +19,7 @@ import fi.jasoft.plugin.configuration.SuperDevModeConfiguration
 import fi.jasoft.plugin.servers.ApplicationServer
 import fi.jasoft.plugin.Util
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskAction
 
@@ -57,10 +58,8 @@ class DevModeTask extends DefaultTask {
 
     @TaskAction
     public void run() {
-
-        if (project.vaadinCompile.configuration.widgetset) {
-            project.logger.error("No widgetset defined. Please define a widgetset by using the vaadinCompile.configuration.widgetset property.")
-            return
+        if(!Util.getWidgetset(project)) {
+            throw new GradleException("No widgetset found in project.")
         }
 
         runDevelopmentMode()
@@ -96,7 +95,7 @@ class DevModeTask extends DefaultTask {
         def devmodeProcess = [Util.getJavaBinary(project)]
         devmodeProcess += ['-cp', classpath.asPath]
         devmodeProcess += 'com.google.gwt.dev.DevMode'
-        devmodeProcess += project.vaadinCompile.configuration.widgetset
+        devmodeProcess += Util.getWidgetset(project)
         devmodeProcess += '-noserver'
         devmodeProcess += ['-war', widgetsetDir.canonicalPath]
         devmodeProcess += ['-gen', genDir.canonicalPath]

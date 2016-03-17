@@ -54,7 +54,7 @@ class UpdateWidgetsetTask extends DefaultTask {
 
     public UpdateWidgetsetTask() {
         description = "Updates the widgetset xml file"
-        onlyIf { project.vaadinCompile.configuration.manageWidgetset && project.vaadinCompile.configuration.widgetset }
+        onlyIf { project.vaadinCompile.configuration.manageWidgetset && Util.getWidgetset(project) }
     }
 
     @TaskAction
@@ -62,42 +62,24 @@ class UpdateWidgetsetTask extends DefaultTask {
        ensureWidgetPresent(project)
     }
 
-    static boolean ensureWidgetPresent(Project project, String widgetsetFQN=project.vaadinCompile.configuration.widgetset) {
+    @PackageScope
+    static File ensureWidgetPresent(Project project, String widgetsetFQN=Util.getWidgetset(project)) {
         if (!project.vaadinCompile.configuration.manageWidgetset || !widgetsetFQN) {
-            return false
+            return null
         }
 
-        File widgetsetFile
+        File widgetsetFile = Util.resolveWidgetsetFile(project)
 
-        // Check source dir if widgetset is present there
-        if(!Util.getMainSourceSet(project).srcDirs.isEmpty()){
-            File javaDir = Util.getMainSourceSet(project).srcDirs.first()
-            widgetsetFile = new File(javaDir, TemplateUtil.convertFQNToFilePath(widgetsetFQN, GWT_MODULE_XML_POSTFIX))
-            if (widgetsetFile.exists()) {
-                updateWidgetset(widgetsetFile, widgetsetFQN, project)
-                return false
-            }
-        }
-
-        // Check resource dir if widgetset is present there
-        if(!project.sourceSets.main.resources.srcDirs.isEmpty()){
+        if(!widgetsetFile){
+            // No widgetset file detected, create one
             File resourceDir = project.sourceSets.main.resources.srcDirs.first()
             widgetsetFile = new File(resourceDir, TemplateUtil.convertFQNToFilePath(widgetsetFQN, GWT_MODULE_XML_POSTFIX))
-            if (widgetsetFile.exists()) {
-                updateWidgetset(widgetsetFile, widgetsetFQN, project)
-                return false
-            }
-        }
-
-        if(widgetsetFile){
-            // No widgetset detected, create one
             widgetsetFile.parentFile.mkdirs()
             widgetsetFile.createNewFile()
-            updateWidgetset(widgetsetFile, widgetsetFQN, project)
-            return true
-        } else {
-            throw new GradleException("No source or resource directory present. Cannot generate widgeset file.")
         }
+
+        updateWidgetset(widgetsetFile, widgetsetFQN, project)
+        widgetsetFile
     }
 
     @PackageScope
