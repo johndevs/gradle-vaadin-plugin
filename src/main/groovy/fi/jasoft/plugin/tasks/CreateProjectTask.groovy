@@ -48,7 +48,7 @@ class CreateProjectTask extends DefaultTask {
         def configuration = project.vaadinCompile.configuration as CompileWidgetsetConfiguration
 
         if(!applicationName){
-            applicationName = project.getName()
+            applicationName = project.name.capitalize()
         }
         if(!applicationPackage){
             if(widgetsetFQN?.contains('.')){
