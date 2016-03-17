@@ -208,7 +208,7 @@ class Util {
      *      the URL to open
      */
     static void openBrowser(Project project, String url) {
-        if (project.vaadin.plugin.openInBrowser && java.awt.Desktop.isDesktopSupported()) {
+        if (project.vaadinRun.configuration.openInBrowser && java.awt.Desktop.isDesktopSupported()) {
             Thread.startDaemon {
                 java.awt.Desktop.desktop.browse url.toURI()
             }

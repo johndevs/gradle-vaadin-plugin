@@ -30,6 +30,9 @@ class RunTask extends DefaultTask {
     @Option(option = 'stopAfterStart', description = 'Should the server stop after starting')
     def boolean stopAfterStarting = false
 
+    @Option(option = 'nobrowser', description = 'Do not open browser after server has started')
+    def boolean nobrowser = false
+
     def ApplicationServerConfiguration configuration
 
     def cleanupThread = new Thread({
@@ -55,6 +58,9 @@ class RunTask extends DefaultTask {
 
     @TaskAction
     public void run() {
+        if(nobrowser){
+            configuration.openInBrowser = false
+        }
         server = ApplicationServer.create(project, [], configuration)
         server.startAndBlock(stopAfterStarting)
     }
