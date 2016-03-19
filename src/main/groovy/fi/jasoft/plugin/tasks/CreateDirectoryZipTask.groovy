@@ -13,11 +13,15 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-
 package fi.jasoft.plugin.tasks
 
 import org.gradle.api.tasks.bundling.Zip
 
+/**
+ * Creates a Zip archive that is compatible with Vaadin Directory
+ *
+ * @author John Ahlroos
+ */
 class CreateDirectoryZipTask extends Zip {
 
     public static final String NAME = 'vaadinAddonZip'

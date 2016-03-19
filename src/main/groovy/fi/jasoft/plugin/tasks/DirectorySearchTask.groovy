@@ -23,9 +23,15 @@ import org.gradle.api.tasks.TaskAction
 import java.text.SimpleDateFormat
 import java.util.concurrent.TimeUnit
 
+/**
+ * Searches for an addon in the Vaadin Directory
+ *
+ * @author John Ahlroos
+ */
 class DirectorySearchTask extends DefaultTask {
 
     public static final String NAME = 'vaadinAddons'
+    public static final String SPACE = ' '
 
     private final String directoryUrl = 'https://vaadin.com/Directory/resource/addon/all?detailed=true'
 
@@ -49,17 +55,19 @@ class DirectorySearchTask extends DefaultTask {
     @TaskAction
     void run() {
 
+        String fetchingAddonLog = 'Fetching addon listing from vaadin.com...'
         if (!cachedAddonResponse.exists()) {
-            project.logger.info("Fetching addon listing from vaadin.com...")
+            project.logger.info(fetchingAddonLog)
             cachedAddonResponse.parentFile.mkdirs()
             cachedAddonResponse.createNewFile()
             cachedAddonResponse.write(directoryUrl.toURL().text)
 
-        } else if (new Date(cachedAddonResponse.lastModified()).before(new Date(System.currentTimeMillis() - maxCacheAge))) {
-            project.logger.info("Fetching addon listing from vaadin.com...")
+        } else if (new Date(cachedAddonResponse.lastModified()).before(
+                new Date(System.currentTimeMillis() - maxCacheAge))) {
+            project.logger.info(fetchingAddonLog)
             cachedAddonResponse.write(directoryUrl.toURL().text)
         } else {
-            project.logger.info("Reading addon listing from local cache...")
+            project.logger.info('Reading addon listing from local cache...')
         }
 
         def args = project.getProperties()
@@ -71,12 +79,12 @@ class DirectorySearchTask extends DefaultTask {
 
     private void listAddons(String search, String sort, boolean verbose) {
         def json = new JsonSlurper().parseText(cachedAddonResponse.text)
-        def dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+        def dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
 
-        println ' '
+        println SPACE
 
         json.addon.findAll {
-            return (search == null || it.name.toLowerCase().contains(search) || it.summary.toLowerCase().contains(search))
+            search == null || it.name.toLowerCase().contains(search) || it.summary.toLowerCase().contains(search)
 
         }.sort {
             switch (sort) {
@@ -104,7 +112,7 @@ class DirectorySearchTask extends DefaultTask {
                     print(" \"${it.groupId}:${it.artifactId}:${it.version}\"")
                 }
             }
-            println ' '
+            println SPACE
         }
     }
 

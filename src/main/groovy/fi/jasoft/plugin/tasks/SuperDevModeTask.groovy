@@ -23,6 +23,11 @@ import org.gradle.api.GradleException
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskAction
 
+/**
+ * Runs the GWT codeserver as well as runs the application in SuperDevMode mode.
+ *
+ * @author John Ahlroos
+ */
 class SuperDevModeTask extends DefaultTask {
 
     static final String NAME = 'vaadinSuperDevMode'
@@ -48,6 +53,7 @@ class SuperDevModeTask extends DefaultTask {
             Runtime.getRuntime().removeShutdownHook(cleanupThread)
         } catch(IllegalStateException e){
             // Shutdown of the JVM in progress already, we don't need to remove the hook it will be removed by the JVM
+            project.logger.debug('Shutdownhook could not be removed. This can be ignored.', e)
         }
     })
 
@@ -66,7 +72,7 @@ class SuperDevModeTask extends DefaultTask {
 
         runCodeServer({
 
-            server = ApplicationServer.create(project, ['superdevmode'])
+            server = ApplicationServer.get(project, ['superdevmode'])
 
             server.startAndBlock();
 
@@ -79,8 +85,8 @@ class SuperDevModeTask extends DefaultTask {
         def widgetsetsDir = Util.getWidgetsetDirectory(project)
         widgetsetsDir.mkdirs()
 
-        def SDMClassPath = project.configurations['vaadin-superdevmode'];
-        def classpath = SDMClassPath + Util.getClientCompilerClassPath(project)
+        def sdmClassPath = project.configurations['vaadin-superdevmode'];
+        def classpath = sdmClassPath + Util.getClientCompilerClassPath(project)
 
         def superdevmodeProcess = [Util.getJavaBinary(project)]
         superdevmodeProcess += ['-cp', classpath.asPath]

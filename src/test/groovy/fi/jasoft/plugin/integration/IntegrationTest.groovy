@@ -1,5 +1,21 @@
+/*
+* Copyright 2016 John Ahlroos
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package fi.jasoft.plugin.integration
 
+import groovy.transform.PackageScope
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.Before
 import org.junit.Rule
@@ -8,14 +24,14 @@ import org.junit.rules.TemporaryFolder
 import java.nio.file.Paths
 
 /**
- * Created by john on 7/29/15.
+ * Base class for integration tests
  */
-abstract class IntegrationTest {
+class IntegrationTest {
 
     @Rule
-    public final TemporaryFolder projectDir = new TemporaryFolder()
+    public TemporaryFolder projectDir = new TemporaryFolder()
 
-    File buildFile
+    protected File buildFile
 
     @Before
     void setup() {
@@ -49,15 +65,15 @@ abstract class IntegrationTest {
         """
     }
 
-    String runWithArguments(String... args) {
+    protected String runWithArguments(String... args) {
         setupRunner().withArguments((args as List) + ['--stacktrace']).build().output
     }
 
-    String runFailureExpected() {
+    protected String runFailureExpected() {
         setupRunner().buildAndFail().output
     }
 
-    GradleRunner setupRunner() {
+    protected GradleRunner setupRunner() {
         GradleRunner.create().withProjectDir(projectDir.root)
     }
 }

@@ -23,9 +23,15 @@ import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
 import org.gradle.util.VersionNumber
 
+/**
+ * Creates a new theme
+ *
+ * @author John Ahlroos
+ */
 class CreateThemeTask extends DefaultTask {
 
     public static final String NAME = 'vaadinCreateTheme'
+    public static final String STYLES_SCSS_FILE = 'styles.scss'
 
     @Option(option = 'name', description = 'Theme name')
     def String themeName
@@ -39,24 +45,26 @@ class CreateThemeTask extends DefaultTask {
         if(!themeName){
             themeName = project.getName()
         }
-        createTheme(themeName)
+        makeTheme(themeName)
     }
 
     @PackageScope
-    def createTheme(String themeName) {
+    def makeTheme(String themeName) {
         def themeDir = new File(Util.getThemesDirectory(project), themeName)
         themeDir.mkdirs()
 
         def substitutions = [:]
         substitutions['themeName'] = themeName
         substitutions['theme'] = themeName.toLowerCase()
-        substitutions['themeImport'] = themeName.toLowerCase() + '.scss'
+
+        String themeScssFile = themeName.toLowerCase() + '.scss'
+        substitutions['themeImport'] = themeScssFile
 
         VersionNumber version = VersionNumber.parse(Util.getVaadinVersion(project))
         substitutions['basetheme'] = version.minor < 3 ? 'reindeer' : 'valo'
 
-        TemplateUtil.writeTemplate('styles.scss', themeDir, 'styles.scss', substitutions)
-        TemplateUtil.writeTemplate('MyTheme.scss', themeDir, substitutions['themeImport'], substitutions)
+        TemplateUtil.writeTemplate(STYLES_SCSS_FILE, themeDir, STYLES_SCSS_FILE, substitutions)
+        TemplateUtil.writeTemplate('MyTheme.scss', themeDir, themeScssFile, substitutions)
 
         project.tasks[UpdateAddonStylesTask.NAME].run()
     }

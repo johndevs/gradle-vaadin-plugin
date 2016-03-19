@@ -17,6 +17,11 @@ package fi.jasoft.plugin.tasks
 
 import org.gradle.api.tasks.bundling.Jar
 
+/**
+ * Build the Javadoc jar
+ *
+ * @author John Ahlroos
+ */
 class BuildJavadocJarTask extends Jar {
 
     public static final String NAME = 'vaadinJavadocJar'

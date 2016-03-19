@@ -32,64 +32,86 @@ import java.lang.annotation.Retention
 import java.lang.annotation.RetentionPolicy
 import java.lang.annotation.Target
 
+/**
+ * Interface for Plugin configurations used as extensions.
+ */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.TYPE)
-@GroovyASTTransformationClass(classes = [PluginConfigurationTransformation.class])
-public @interface PluginConfiguration { }
+@GroovyASTTransformationClass(classes = [PluginConfigurationTransformation])
+@interface PluginConfiguration { }
 
+/**
+ * Transforms the configuration class by adding necessary methods for setting a value
+ * without using a equal('=') sign.
+ */
 @GroovyASTTransformation(phase = CompilePhase.SEMANTIC_ANALYSIS)
-public class PluginConfigurationTransformation implements ASTTransformation {
+class PluginConfigurationTransformation implements ASTTransformation {
 
-    def createClosureSetterMethod(FieldNode field) {
+    /**
+     * Create a setter method that has a closure as a parameter
+     *
+     * @param field
+     *      the field to make the setter for
+     */
+    static makeClosureSetterMethod(FieldNode field) {
         new AstBuilder().buildFromSpec {
-            method(field.name, Opcodes.ACC_PUBLIC, Object, {
+            method(field.name, Opcodes.ACC_PUBLIC, Object) {
                 parameters {
-                    parameter 'closure': Object.class
+                    parameter 'closure':Object
                     Closure
                 }
-                exceptions {}
+                exceptions { }
                 block {
                     owner.expression.addAll new AstBuilder().buildFromString(
-                        "def c = closure as Closure\n" +
-                        "c.delegate = "+field.name+"\n" +
-                        "c.resolveStrategy = Closure.DELEGATE_FIRST\n" +
-                        "c.call()"
+                        'Closure c = closure as Closure\n' +
+                        "c.delegate = $field.name\n" +
+                        'c.resolveStrategy = Closure.DELEGATE_FIRST\n' +
+                        'c.call()'
                     )
                 }
-                annotations {}
-            })
-        }[0] as MethodNode
+                annotations { }
+            }
+        }.get(0) as MethodNode
     }
 
-    def createValueSetterMethod(FieldNode field) {
+    /**
+     * Make a setter method that uses the field name e.g if field name is
+     * "foo" then setter name is foo(value)
+     *
+     * @param field
+     *      the field to make the setter for
+     */
+    static makeValueSetterMethod(FieldNode field) {
         new AstBuilder().buildFromSpec {
-            method(field.name, Opcodes.ACC_PUBLIC, field.type.typeClass, {
+            method(field.name, Opcodes.ACC_PUBLIC, field.type.typeClass) {
                 parameters {
-                    parameter 'value': field.type.typeClass
+                    parameter 'value':field.type.typeClass
                 }
-                exceptions {}
+                exceptions { }
                 block {
                     owner.expression.addAll new AstBuilder().buildFromString(
-                            "this."+field.name+" = value"
+                            "this.$field.name = value"
                     )
                 }
-                annotations {}
-            })
-        }[0] as MethodNode
+                annotations { }
+            }
+        }.get(0) as MethodNode
     }
 
     @Override
     void visit(ASTNode[] astNodes, SourceUnit sourceUnit) {
-        if(!astNodes) return
+        if (!astNodes) {
+            return
+        }
 
-        def clazz = astNodes[1] as ClassNode
+        ClassNode clazz = astNodes[1] as ClassNode
 
-        for(FieldNode field : clazz.fields){
-            def MethodNode method
-            if(field.final) {
-                method = createClosureSetterMethod(field)
+        for (FieldNode field : clazz.fields) {
+            MethodNode method
+            if (field.final) {
+                method = makeClosureSetterMethod(field)
             } else {
-                method = createValueSetterMethod(field)
+                method = makeValueSetterMethod(field)
             }
             clazz.addMethod(method)
         }

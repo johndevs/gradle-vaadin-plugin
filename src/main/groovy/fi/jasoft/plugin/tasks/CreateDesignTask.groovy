@@ -1,23 +1,42 @@
+/*
+* Copyright 2016 John Ahlroos
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
 import groovy.transform.PackageScope
-import org.apache.commons.io.FilenameUtils
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
 
-import java.nio.file.Path
 import java.nio.file.Paths
 
 /**
- * Created by john on 13.2.2016.
+ * Creates a new Vaadin Design
+ *
+ * @author John Ahlroos
  */
 class CreateDesignTask extends DefaultTask{
 
     public static final String NAME = 'vaadinCreateDesign'
+
+    private static final String DESIGN_PACKAGE_KEY = 'designPackage'
+    private static final String DESIGN_NAME_KEY = 'designName'
+    public static final String DESIGN_HTML_FILE = 'Design.html'
 
     @Option(option = 'name', description = 'The name of the design')
     def String designName = 'Basic'
@@ -31,7 +50,8 @@ class CreateDesignTask extends DefaultTask{
     @Option(option = 'implementationFile', description = 'Create implemenation file for the design')
     def boolean createImplementationFile = true
 
-    @Option(option = 'templates', description = 'Lists the available templates. Add your templates to .vaadin/designer/templates to use them here.')
+    @Option(option = 'templates', description =
+            'Lists the available templates. Add your templates to .vaadin/designer/templates to use them here.')
     def boolean listTemplates = false
 
     @Option(option = 'template', description = "The selected tempalte to use. Must be included in --templates")
@@ -51,23 +71,23 @@ class CreateDesignTask extends DefaultTask{
             return
         }
 
-        createDesignFile()
+        makeDesignFile()
 
         if(!template){
             // TODO add support for generating companion files for any template
 
             if(createCompanionFile){
-                createDesignCompanionFile()
+                makeDesignCompanionFile()
             }
 
             if(createImplementationFile){
-                createDesignImplementationFile()
+                makeDesignImplementationFile()
             }
         }
     }
 
     @PackageScope
-    def createDesignFile() {
+    def makeDesignFile() {
         File resourcesDir = project.sourceSets.main.resources.srcDirs.first()
         File designDir = new File(resourcesDir, TemplateUtil.convertFQNToFilePath(designPackage))
         designDir.mkdirs()
@@ -76,34 +96,34 @@ class CreateDesignTask extends DefaultTask{
             if(!templates.containsKey(template)){
                 throw new GradleException("Template with name $template could not be found.")
             }
-            TemplateUtil.writeTemplateFromString(templates[template].text, designDir, designName + 'Design.html')
+            TemplateUtil.writeTemplateFromString(templates[template].text, designDir, designName + DESIGN_HTML_FILE)
         } else {
-            TemplateUtil.writeTemplate('MyDesign.html', designDir, designName + 'Design.html')
+            TemplateUtil.writeTemplate('MyDesign.html', designDir, designName + DESIGN_HTML_FILE)
         }
     }
 
     @PackageScope
-    def createDesignCompanionFile() {
+    def makeDesignCompanionFile() {
         File javaDir = Util.getMainSourceSet(project).srcDirs.first()
         File designDir = new File(javaDir, TemplateUtil.convertFQNToFilePath(designPackage))
         designDir.mkdirs()
 
         def substitutions = [:]
-        substitutions['designPackage'] = designPackage
-        substitutions['designName'] = designName
+        substitutions[DESIGN_PACKAGE_KEY] = designPackage
+        substitutions[DESIGN_NAME_KEY] = designName
 
         TemplateUtil.writeTemplate('MyDesign.java', designDir, designName + 'Design.java', substitutions)
     }
 
     @PackageScope
-    def createDesignImplementationFile() {
+    def makeDesignImplementationFile() {
         File javaDir = Util.getMainSourceSet(project).srcDirs.first()
         File designDir = new File(javaDir, TemplateUtil.convertFQNToFilePath(designPackage))
         designDir.mkdirs()
 
         def substitutions = [:]
-        substitutions['designPackage'] = designPackage
-        substitutions['designName'] = designName
+        substitutions[DESIGN_PACKAGE_KEY] = designPackage
+        substitutions[DESIGN_NAME_KEY] = designName
 
         TemplateUtil.writeTemplate('MyDesignImpl.java', designDir, designName + '.java', substitutions)
     }

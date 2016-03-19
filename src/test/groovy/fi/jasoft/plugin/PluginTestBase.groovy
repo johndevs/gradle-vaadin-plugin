@@ -1,10 +1,3 @@
-package fi.jasoft.plugin
-
-import org.gradle.api.Project
-import org.gradle.testfixtures.ProjectBuilder
-import org.junit.After
-import org.junit.Before
-
 /*
 * Copyright 2016 John Ahlroos
 *
@@ -20,6 +13,16 @@ import org.junit.Before
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
+package fi.jasoft.plugin
+
+import org.gradle.api.Project
+import org.gradle.testfixtures.ProjectBuilder
+import org.junit.After
+import org.junit.Before
+
+/**
+ * Base class for plugin unit tests
+ */
 class PluginTestBase {
 
     protected final File testDir = new File("build/tmp/tests")

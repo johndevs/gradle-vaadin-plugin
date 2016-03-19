@@ -11,6 +11,7 @@ import org.gradle.api.tasks.bundling.War
  */
 class GroovyTaskListener implements TaskExecutionListener {
 
+    public static final String GROOVY_CONFIGURATION_NAME = 'vaadin-groovy'
     private final Project project
 
     public GroovyTaskListener(Project project) {
@@ -36,7 +37,7 @@ class GroovyTaskListener implements TaskExecutionListener {
                 War war = (War) task;
 
                 // Add groovy libs to war
-                project.war.classpath += project.configurations['vaadin-groovy']
+                project.war.classpath += project.configurations[GROOVY_CONFIGURATION_NAME]
 
                 // Ensure no duplicates
                 project.war.classpath = war.classpath.files
@@ -58,17 +59,17 @@ class GroovyTaskListener implements TaskExecutionListener {
      */
     def configureIdeaModule(Task task) {
 
-        def conf = project.configurations
-        def module = project.idea.module
+        def conf = task.project.configurations
+        def module = task.project.idea.module
 
-        module.scopes.COMPILE.plus += [conf['vaadin-groovy']]
+        module.scopes.COMPILE.plus += [conf[GROOVY_CONFIGURATION_NAME]]
     }
 
     def configureEclipsePlugin(Task task) {
-        def cp = project.eclipse.classpath
-        def conf = project.configurations
+        def cp = task.project.eclipse.classpath
+        def conf = task.project.configurations
 
         // Add dependencies to eclipse classpath
-        cp.plusConfigurations += [conf['vaadin-groovy']]
+        cp.plusConfigurations += [conf[GROOVY_CONFIGURATION_NAME]]
     }
 }

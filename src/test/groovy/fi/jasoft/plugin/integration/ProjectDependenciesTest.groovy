@@ -84,7 +84,9 @@ class ProjectDependenciesTest extends IntegrationTest {
                 def confs = project.configurations
                 def client = confs.getByName('vaadin-client')
                 println 'Has client dependency ' + !client.dependencies.empty
-                println 'Has client-compiled dependency ' + !client.dependencies.findAll {it.name == 'vaadin-client-compiled'}.empty
+                println 'Has client-compiled dependency ' + !client.dependencies.findAll {
+                    it.name == 'vaadin-client-compiled'
+                }.empty
             }
          """.stripIndent()
 
@@ -106,7 +108,9 @@ class ProjectDependenciesTest extends IntegrationTest {
                 def confs = project.configurations
                 def client = confs.getByName('vaadin-client')
                 println 'Has client dependency ' + !client.dependencies.empty
-                println 'Has client-compiled dependency ' +  !client.dependencies.findAll {it.name == 'vaadin-client-compiled'}.empty
+                println 'Has client-compiled dependency ' +  !client.dependencies.findAll {
+                    it.name == 'vaadin-client-compiled'
+                }.empty
             }
         """.stripIndent()
 
@@ -121,7 +125,9 @@ class ProjectDependenciesTest extends IntegrationTest {
                 def confs = project.configurations
                 def client = confs.getByName('vaadin-server')
                 println 'Has client dependency ' + !client.dependencies.empty
-                println 'Has client-compiled dependency ' +  !client.dependencies.findAll {it.name == 'vaadin-client-compiled'}.empty
+                println 'Has client-compiled dependency ' +  !client.dependencies.findAll {
+                    it.name == 'vaadin-client-compiled'
+                }.empty
             }
         """.stripIndent()
 

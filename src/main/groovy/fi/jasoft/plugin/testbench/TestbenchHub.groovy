@@ -19,6 +19,11 @@ import fi.jasoft.plugin.Util
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 
+/**
+ * Represents a Testbench Hub
+ *
+ * @author John Ahlroos
+ */
 class TestbenchHub {
 
     private final Project project;

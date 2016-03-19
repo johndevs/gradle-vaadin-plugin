@@ -35,13 +35,18 @@ import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.tooling.UnsupportedVersionException
 import org.gradle.util.VersionNumber
 
+/**
+ * Gradle Plugin for Vaadin Projects
+ *
+ * @author John Ahlroos
+ */
 class GradleVaadinPlugin implements Plugin<Project> {
 
     public static final PLUGIN_VERSION
     public static final PLUGIN_PROPERTIES
     public static final PLUGIN_DEBUG_DIR
 
-    public static int PLUGINS_IN_PROJECT = 0;
+    private static int PLUGINS_IN_PROJECT = 0;
 
     public static final String CONFIGURATION_SERVER = 'vaadin-server'
     public static final String CONFIGURATION_CLIENT = 'vaadin-client'
@@ -55,6 +60,11 @@ class GradleVaadinPlugin implements Plugin<Project> {
     public static final String VAADIN_UTIL_TASK_GROUP = 'Vaadin Utility'
     public static final String VAADIN_TESTBENCH_TASK_GROUP = 'Vaadin Testbench'
     public static final String VAADIN_DIRECTORY_TASK_GROUP = 'Vaadin Directory'
+    public static final String ADDON_REPOSITORY_NAME = 'Vaadin addons'
+    public static final String VAADIN_SNAPSHOT_REPOSITORY_NAME = 'Vaadin snapshots'
+    public static final String JASOFT_SNAPSHOT_REPOSITORY_NAME = 'Jasoft.fi Maven repository'
+    public static final String BINTRAY_REPOSITORY_NAME = 'Bintray.com Maven repository'
+    public static final String PLUGIN_DEVELOPMENTTIME_REPOSITORY_NAME = 'Gradle Vaadin plugin development repository'
 
     static {
         PLUGIN_PROPERTIES = new Properties()
@@ -85,7 +95,8 @@ class GradleVaadinPlugin implements Plugin<Project> {
         def version = VersionNumber.parse(gradle.gradleVersion)
         def requiredVersion = new VersionNumber(2, 12, 0, null)
         if(version.baseVersion < requiredVersion) {
-            throw new UnsupportedVersionException("Your gradle version ($version) is too old. Plugin requires Gradle $requiredVersion+")
+            throw new UnsupportedVersionException("Your gradle version ($version) is too old. " +
+                    "Plugin requires Gradle $requiredVersion+")
         }
 
         PLUGINS_IN_PROJECT++;
@@ -121,7 +132,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
         // Add sources to test classpath
         project.sourceSets.test.runtimeClasspath =
-                project.sourceSets.test.runtimeClasspath.plus(project.files(project.sourceSets.main.java.srcDirs))
+                project.sourceSets.test.runtimeClasspath + (project.files(project.sourceSets.main.java.srcDirs))
 
         // War project should build the widgetset and themes
         def war = project.war
@@ -134,21 +145,24 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
         // Cleanup plugin outputs
         def clean = project.clean
-        clean.dependsOn(tasks['clean' + CompileWidgetsetTask.NAME.capitalize()])
-        clean.dependsOn(tasks['clean' + RunTask.NAME.capitalize()])
-        clean.dependsOn(tasks['clean' + CompileThemeTask.NAME.capitalize()])
-        clean.dependsOn(tasks['clean' + SuperDevModeTask.NAME.capitalize()])
-        clean.dependsOn(tasks['clean' + DevModeTask.NAME.capitalize()])
+        String cleanTaskName = 'clean'
+        clean.dependsOn(tasks[cleanTaskName + CompileWidgetsetTask.NAME.capitalize()])
+        clean.dependsOn(tasks[cleanTaskName + RunTask.NAME.capitalize()])
+        clean.dependsOn(tasks[cleanTaskName + CompileThemeTask.NAME.capitalize()])
+        clean.dependsOn(tasks[cleanTaskName + SuperDevModeTask.NAME.capitalize()])
+        clean.dependsOn(tasks[cleanTaskName + DevModeTask.NAME.capitalize()])
 
         // Utilities
         def artifacts = project.artifacts
-        artifacts.add('archives', tasks[BuildSourcesJarTask.NAME])
-        artifacts.add('archives', tasks[BuildJavadocJarTask.NAME])
+        String archivesArtifactsName = 'archives'
+        artifacts.add(archivesArtifactsName, tasks[BuildSourcesJarTask.NAME])
+        artifacts.add(archivesArtifactsName, tasks[BuildJavadocJarTask.NAME])
 
         project.afterEvaluate { Project p ->
             def v = Util.getVaadinVersion(p)
             if(v !=null && v.startsWith("6")){
-                p.logger.error("Plugin no longer supports Vaadin 6, to use Vaadin 6 apply an older version of the plugin.")
+                p.logger.error("Plugin no longer supports Vaadin 6, to use Vaadin 6 " +
+                        "apply an older version of the plugin.")
                 throw new InvalidUserDataException("Unsupported Vaadin version.")
             }
 
@@ -179,32 +193,32 @@ class GradleVaadinPlugin implements Plugin<Project> {
             repositories.mavenLocal()
 
             repositories.maven { repository ->
-                repository.name = 'Vaadin addons'
+                repository.name = ADDON_REPOSITORY_NAME
                 repository.url = 'http://maven.vaadin.com/vaadin-addons'
             }
 
             repositories.maven { repository ->
-                repository.name = 'Vaadin snapshots'
+                repository.name = VAADIN_SNAPSHOT_REPOSITORY_NAME
                 repository.url = 'http://oss.sonatype.org/content/repositories/vaadin-snapshots'
             }
 
             repositories.maven { repository ->
-                repository.name = 'Jasoft.fi Maven repository'
+                repository.name = JASOFT_SNAPSHOT_REPOSITORY_NAME
                 repository.url = 'http://mvn.jasoft.fi/maven2'
             }
 
             repositories.maven { repository ->
-                repository.name = 'Bintray.com Maven repository'
+                repository.name = BINTRAY_REPOSITORY_NAME
                 repository.url = 'http://dl.bintray.com/johndevs/maven'
             }
 
             // Add plugin development repository if specified
             if((debugDir as File)?.exists()
-                    && !repositories.findByName('Gradle Vaadin plugin development repository')) {
+                    && !repositories.findByName(PLUGIN_DEVELOPMENTTIME_REPOSITORY_NAME)) {
                 if (GradleVaadinPlugin.firstPlugin) {
                     project.logger.lifecycle("Using development libs found at " + debugDir)
                 }
-                repositories.flatDir(name: 'Gradle Vaadin plugin development repository', dirs: debugDir)
+                repositories.flatDir(name: PLUGIN_DEVELOPMENTTIME_REPOSITORY_NAME, dirs: debugDir)
             }
         }
     }
@@ -223,22 +237,29 @@ class GradleVaadinPlugin implements Plugin<Project> {
         configurations.create(CONFIGURATION_SERVER, { conf ->
             conf.description = 'Libraries needed by Vaadin server side applications.'
             conf.defaultDependencies { dependencies ->
-                def vaadinServer = projectDependencies.create("com.vaadin:vaadin-server:${Util.getVaadinVersion(project)}")
+                def vaadinServer = projectDependencies.create(
+                        "com.vaadin:vaadin-server:${Util.getVaadinVersion(project)}")
                 dependencies.add(vaadinServer)
 
-                def vaadinThemes = projectDependencies.create("com.vaadin:vaadin-themes:${Util.getVaadinVersion(project)}")
+                def vaadinThemes = projectDependencies.create(
+                        "com.vaadin:vaadin-themes:${Util.getVaadinVersion(project)}")
                 dependencies.add(vaadinThemes)
 
                 applyServletApi(projectDependencies, dependencies)
 
                 File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-                FileTree themes = project.fileTree(dir: webAppDir.canonicalPath + '/VAADIN/themes', include: '**/styles.scss')
+                FileTree themes = project.fileTree(
+                        dir: webAppDir.canonicalPath + '/VAADIN/themes',
+                        include: '**/styles.scss')
+
                 if (!themes.isEmpty()) {
                     switch (project.vaadin.plugin.themeCompiler){
                         case 'vaadin':
-                            if(Util.getVaadinVersion(project).startsWith('7.0') || Util.getVaadinVersion(project).startsWith('7.1')){
+                            if(Util.getVaadinVersion(project).startsWith('7.0')
+                                    || Util.getVaadinVersion(project).startsWith('7.1')){
                                 // In Vaadin 7.0 and 7.1 the compiler was shipped as a non-transitive dependency
-                                def themeCompiler = projectDependencies.create("com.vaadin:vaadin-theme-compiler:${Util.getVaadinVersion(project)}")
+                                def themeCompiler = projectDependencies.create(
+                                        "com.vaadin:vaadin-theme-compiler:${Util.getVaadinVersion(project)}")
                                 dependencies.add(themeCompiler)
                             }
                             break
@@ -247,7 +268,8 @@ class GradleVaadinPlugin implements Plugin<Project> {
                             dependencies.add(jruby)
                             break
                         default:
-                            throw new GradleException("Selected theme compiler \"${project.vaadin.plugin.themeCompiler}\" is not valid")
+                            throw new GradleException(
+                                    "Selected theme compiler \"${project.vaadin.plugin.themeCompiler}\" is not valid")
                     }
                 }
             }
@@ -262,20 +284,23 @@ class GradleVaadinPlugin implements Plugin<Project> {
         configurations.create(CONFIGURATION_CLIENT, { conf ->
             conf.description = 'Libraries needed for compiling the widgetset.'
             conf.defaultDependencies { dependencies ->
-                if(project.vaadinCompile.configuration.widgetsetCDN){
-                    // Downloading widgetset from CDN, no dependencies needed
-                } else if(!Util.getWidgetset(project)){
-                    def widgetsetCompiled = projectDependencies.create("com.vaadin:vaadin-client-compiled:${Util.getVaadinVersion(project)}")
-                    dependencies.add(widgetsetCompiled)
-                } else {
-                    def vaadinClient = projectDependencies.create("com.vaadin:vaadin-client:${Util.getVaadinVersion(project)}")
-                    dependencies.add(vaadinClient)
+                if(!project.vaadinCompile.configuration.widgetsetCDN) {
+                    if (!Util.getWidgetset(project)) {
+                        def widgetsetCompiled = projectDependencies.create(
+                                "com.vaadin:vaadin-client-compiled:${Util.getVaadinVersion(project)}")
+                        dependencies.add(widgetsetCompiled)
+                    } else {
+                        def vaadinClient = projectDependencies.create(
+                                "com.vaadin:vaadin-client:${Util.getVaadinVersion(project)}")
+                        dependencies.add(vaadinClient)
 
-                    def widgetsetCompiler = projectDependencies.create("com.vaadin:vaadin-client-compiler:${Util.getVaadinVersion(project)}")
-                    dependencies.add(widgetsetCompiler)
+                        def widgetsetCompiler = projectDependencies.create(
+                                "com.vaadin:vaadin-client-compiler:${Util.getVaadinVersion(project)}")
+                        dependencies.add(widgetsetCompiler)
 
-                    def validationAPI = projectDependencies.create('javax.validation:validation-api:1.0.0.GA')
-                    dependencies.add(validationAPI)
+                        def validationAPI = projectDependencies.create('javax.validation:validation-api:1.0.0.GA')
+                        dependencies.add(validationAPI)
+                    }
                 }
             }
 
@@ -308,11 +333,12 @@ class GradleVaadinPlugin implements Plugin<Project> {
             conf.defaultDependencies { dependencies ->
 
                 // Needed for server runners
-                def plugin = projectDependencies.create("fi.jasoft.plugin:gradle-vaadin-plugin:${GradleVaadinPlugin.version}")
+                def plugin = projectDependencies.create(
+                        "fi.jasoft.plugin:gradle-vaadin-plugin:${GradleVaadinPlugin.version}")
                 dependencies.add(plugin)
 
                 // Add server dependencies
-                ApplicationServer.create(project).defineDependecies(projectDependencies, dependencies)
+                ApplicationServer.get(project).defineDependecies(projectDependencies, dependencies)
             }
         })
 
@@ -339,7 +365,8 @@ class GradleVaadinPlugin implements Plugin<Project> {
             conf.description = 'Libraries needed by Vaadin Testbench.'
             conf.defaultDependencies { dependencies ->
                 if(project.vaadin.testbench.enabled) {
-                    def testbench = projectDependencies.create("com.vaadin:vaadin-testbench:${project.vaadin.testbench.version}")
+                    def testbench = projectDependencies.create(
+                            "com.vaadin:vaadin-testbench:${project.vaadin.testbench.version}")
                     dependencies.add(testbench)
                 }
             }
@@ -356,10 +383,12 @@ class GradleVaadinPlugin implements Plugin<Project> {
             conf.description = 'Libraries needed by Vaadin Superdevmode.'
             conf.defaultDependencies { dependencies ->
 
-                def jettyAll = projectDependencies.create( 'org.eclipse.jetty.aggregate:jetty-all-server:8.1.15.v20140411')
+                def jettyAll = projectDependencies.create(
+                        'org.eclipse.jetty.aggregate:jetty-all-server:8.1.15.v20140411')
                 dependencies.add(jettyAll)
 
-                def plugin = projectDependencies.create("fi.jasoft.plugin:gradle-vaadin-plugin:${GradleVaadinPlugin.version}")
+                def plugin = projectDependencies.create(
+                        "fi.jasoft.plugin:gradle-vaadin-plugin:${GradleVaadinPlugin.version}")
                 dependencies.add(plugin)
 
                 def asm = projectDependencies.create('org.ow2.asm:asm:5.0.3')
@@ -427,7 +456,8 @@ class GradleVaadinPlugin implements Plugin<Project> {
         tasks.create(name: CreateComponentTask.NAME, type: CreateComponentTask, group: VAADIN_TASK_GROUP)
         tasks.create(name: CreateCompositeTask.NAME, type: CreateCompositeTask, group: VAADIN_TASK_GROUP)
         tasks.create(name: CreateThemeTask.NAME, type: CreateThemeTask, group: VAADIN_TASK_GROUP)
-        tasks.create(name: CreateWidgetsetGeneratorTask.NAME, type: CreateWidgetsetGeneratorTask, group: VAADIN_TASK_GROUP)
+        tasks.create(name: CreateWidgetsetGeneratorTask.NAME, type: CreateWidgetsetGeneratorTask,
+                group: VAADIN_TASK_GROUP)
         tasks.create(name: CreateDesignTask.NAME, type: CreateDesignTask, group: VAADIN_TASK_GROUP)
 
         tasks.create(name: CompileWidgetsetTask.NAME, type: CompileWidgetsetTask, group: VAADIN_TASK_GROUP)
@@ -450,12 +480,15 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
     static void applyVaadinTestbenchTasks(Project project) {
         def tasks = project.tasks
-        tasks.create(name: CreateTestbenchTestTask.NAME, type: CreateTestbenchTestTask, group: VAADIN_TESTBENCH_TASK_GROUP)
+        tasks.create(name: CreateTestbenchTestTask.NAME, type: CreateTestbenchTestTask,
+                group: VAADIN_TESTBENCH_TASK_GROUP)
     }
 
     static void applyVaadinDirectoryTasks(Project project) {
         def tasks = project.tasks
-        tasks.create(name: DirectorySearchTask.NAME, type: DirectorySearchTask, group: VAADIN_DIRECTORY_TASK_GROUP)
-        tasks.create(name: CreateDirectoryZipTask.NAME, type: CreateDirectoryZipTask, group: VAADIN_DIRECTORY_TASK_GROUP)
+        tasks.create(name: DirectorySearchTask.NAME, type: DirectorySearchTask,
+                group: VAADIN_DIRECTORY_TASK_GROUP)
+        tasks.create(name: CreateDirectoryZipTask.NAME, type: CreateDirectoryZipTask,
+                group: VAADIN_DIRECTORY_TASK_GROUP)
     }
 }

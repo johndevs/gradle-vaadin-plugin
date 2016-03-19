@@ -21,7 +21,11 @@ import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskAction
 
-
+/**
+ * Updates the addon.scss file listing with addons styles found in the classpath
+ *
+ * @author John Ahlroos
+ */
 class UpdateAddonStylesTask extends DefaultTask {
 
     public static final String NAME = 'vaadinUpdateAddonStyles'
@@ -68,7 +72,7 @@ class UpdateAddonStylesTask extends DefaultTask {
             // even though they are listen inside the classpath jar
             if(project.vaadin.plugin.useClassPathJar){
                 Util.findAddonsInProject(project, 'Vaadin-Stylesheets', true).each {
-                    classpath = classpath.plus(project.files(it.file))
+                    classpath += project.files(it.file)
                 }
             }
 

@@ -1,37 +1,57 @@
+/*
+* Copyright 2016 John Ahlroos
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package fi.jasoft.plugin
 
 import fi.jasoft.plugin.configuration.VaadinPluginGroovyExtension
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ConfigurationContainer
+import org.gradle.api.artifacts.Dependency
+import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.plugins.GroovyPlugin
 
 /**
- * Created by john on 7/20/14.
+ * Vaadin Plugin for Groovy projects
  */
 class GradleVaadinGroovyPlugin extends GradleVaadinPlugin {
+
+    static String EXTENSION_NAME = 'vaadin-groovy'
+
+    static String CONFIGURATION_NAME = 'vaadin-groovy'
 
     @Override
     void apply(Project project) {
         super.apply(project)
 
         // Extensions
-        project.extensions.create('vaadin-groovy', VaadinPluginGroovyExtension)
+        project.extensions.create(EXTENSION_NAME, VaadinPluginGroovyExtension)
 
         // Dependencies
         project.gradle.taskGraph.addTaskExecutionListener(new GroovyTaskListener(project))
 
-        def configurations = project.configurations
-        def projectDependencies = project.dependencies
-        configurations.create('vaadin-groovy', { conf ->
+        ConfigurationContainer configurations = project.configurations
+        DependencyHandler projectDependencies = project.dependencies
+        configurations.create(CONFIGURATION_NAME) { conf ->
             conf.description = 'Libraries needed to use Groovy with Vaadin'
             conf.defaultDependencies { dependencies ->
-                def groovy = projectDependencies.create('org.codehaus.groovy:groovy-all:2.3.4')
+                Dependency groovy = projectDependencies.create('org.codehaus.groovy:groovy-all:2.3.4')
                 dependencies.add(groovy)
             }
-        })
+        }
 
         // Plugins
         project.plugins.apply(GroovyPlugin)
-
-
     }
 }

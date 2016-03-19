@@ -17,6 +17,11 @@ package fi.jasoft.plugin.tasks
 
 import org.gradle.api.tasks.bundling.Jar
 
+/**
+ * Build the sources jar
+ *
+ * @author John Ahlroos
+ */
 class BuildSourcesJarTask extends Jar {
 
     public static final String NAME = 'vaadinSourcesJar'

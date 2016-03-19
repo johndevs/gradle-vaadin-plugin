@@ -23,6 +23,13 @@ import org.gradle.api.GradleException
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskAction
 
+/**
+ * Runs GWT DevMode
+ *
+ * @author John Ahlroos
+ * @deprecated Replaced by SuperDevMode
+ */
+@Deprecated
 class DevModeTask extends DefaultTask {
 
     public static final String NAME = 'vaadinDevMode'
@@ -46,6 +53,7 @@ class DevModeTask extends DefaultTask {
             Runtime.getRuntime().removeShutdownHook(cleanupThread)
         } catch(IllegalStateException e){
             // Shutdown of the JVM in progress already, we don't need to remove the hook it will be removed by the JVM
+            project.logger.debug('Shutdownhook could not be removed. This can be ignored.', e)
         }
     })
 
@@ -65,7 +73,7 @@ class DevModeTask extends DefaultTask {
         runDevelopmentMode()
 
         if (!project.vaadin.devmode.noserver) {
-            server = ApplicationServer.create(
+            server = ApplicationServer.get(
                     project,
                     ["gwt.codesvr=${configuration.bindAddress}:${configuration.codeServerPort}"]
             ).startAndBlock()

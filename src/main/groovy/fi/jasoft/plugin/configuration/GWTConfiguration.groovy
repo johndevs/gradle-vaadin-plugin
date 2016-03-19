@@ -37,15 +37,13 @@ class GWTConfiguration {
      */
     @Deprecated
     void style(String style){
-        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.gwt.style',
-                'This property has been replaced by vaadinCompile.configuration.style.')
         project.vaadinCompile.configuration.style = style
+        getStyle()
     }
     @Deprecated
     void setStyle(String style){
-        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.gwt.style',
-                'This property has been replaced by vaadinCompile.configuration.style.')
         project.vaadinCompile.configuration.style = style
+        getStyle()
     }
     @Deprecated
     String getStyle(){
@@ -59,15 +57,13 @@ class GWTConfiguration {
      */
     @Deprecated
     void optimize(Integer optimize){
-        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.gwt.optimize',
-                'This property has been replaced by vaadinCompile.configuration.optimize.')
         project.vaadinCompile.configuration.optimize = optimize
+        getOptimize()
     }
     @Deprecated
     void setOptimize(Integer optimize){
-        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.gwt.optimize',
-                'This property has been replaced by vaadinCompile.configuration.optimize.')
         project.vaadinCompile.configuration.optimize = optimize
+        getOptimize()
     }
     @Deprecated
     Integer getOptimize(){
@@ -81,15 +77,13 @@ class GWTConfiguration {
      */
     @Deprecated
     void logging(Boolean logging){
-        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.gwt.logging',
-                'This property has been replaced by vaadinCompile.configuration.logging.')
         project.vaadinCompile.configuration.logging = logging
+        isLogging()
     }
     @Deprecated
     void setLogging(Boolean logging){
-        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.gwt.logging',
-                'This property has been replaced by vaadinCompile.configuration.logging.')
         project.vaadinCompile.configuration.logging = logging
+        isLogging()
     }
     @Deprecated
     Boolean isLogging(){
@@ -103,15 +97,13 @@ class GWTConfiguration {
      */
     @Deprecated
     void logLevel(String logLevel){
-        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.gwt.logLevel',
-                'This property has been replaced by vaadinCompile.configuration.logLevel.')
         project.vaadinCompile.configuration.logLevel = logLevel
+        getLogLevel()
     }
     @Deprecated
     void setLogLevel(String logLevel){
-        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.gwt.logLevel',
-                'This property has been replaced by vaadinCompile.configuration.logLevel.')
         project.vaadinCompile.configuration.logLevel = logLevel
+        getLogLevel()
     }
     @Deprecated
     String getLogLevel(){
@@ -125,15 +117,13 @@ class GWTConfiguration {
      */
     @Deprecated
     void localWorkers(Integer localWorkers){
-        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.gwt.localWorkers',
-                'This property has been replaced by vaadinCompile.configuration.localWorkers.')
         project.vaadinCompile.configuration.localWorkers = localWorkers
+        getLocalWorkers()
     }
     @Deprecated
     void setLocalWorkers(Integer localWorkers){
-        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.gwt.localWorkers',
-                'This property has been replaced by vaadinCompile.configuration.localWorkers.')
         project.vaadinCompile.configuration.localWorkers = localWorkers
+        getLocalWorkers()
     }
     @Deprecated
     Integer getLocalWorkers(){
@@ -147,15 +137,13 @@ class GWTConfiguration {
      */
     @Deprecated
     void draftCompile(Boolean draftCompile){
-        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.gwt.draftCompile',
-                'This property has been replaced by vaadinCompile.configuration.draftCompile.')
         project.vaadinCompile.configuration.draftCompile = draftCompile
+        isDraftCompile()
     }
     @Deprecated
     void setDraftCompile(Boolean draftCompile){
-        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.gwt.draftCompile',
-                'This property has been replaced by vaadinCompile.configuration.draftCompile.')
         project.vaadinCompile.configuration.draftCompile = draftCompile
+        isDraftCompile()
     }
     @Deprecated
     Boolean isDraftCompile(){
@@ -169,15 +157,13 @@ class GWTConfiguration {
      */
     @Deprecated
     void strict(Boolean strict){
-        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.gwt.strict',
-                'This property has been replaced by vaadinCompile.configuration.strict.')
         project.vaadinCompile.configuration.strict = strict
+        isStrict()
     }
     @Deprecated
     void setStrict(Boolean strict){
-        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.gwt.strict',
-                'This property has been replaced by vaadinCompile.configuration.strict.')
         project.vaadinCompile.configuration.strict = strict
+        isStrict()
     }
     @Deprecated
     Boolean isStrict(){
@@ -191,15 +177,13 @@ class GWTConfiguration {
      */
     @Deprecated
     void userAgent(String userAgent){
-        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.gwt.userAgent',
-                'This property has been replaced by vaadinCompile.configuration.userAgent.')
         project.vaadinCompile.configuration.userAgent = userAgent
+        getUserAgent()
     }
     @Deprecated
     void setUserAgent(String userAgent){
-        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.gwt.userAgent',
-                'This property has been replaced by vaadinCompile.configuration.userAgent.')
         project.vaadinCompile.configuration.userAgent = userAgent
+        getUserAgent()
     }
     @Deprecated
     String getUserAgent(){
@@ -213,15 +197,13 @@ class GWTConfiguration {
      */
     @Deprecated
     void jvmArgs(String[] jvmArgs){
-        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.gwt.jvmArgs',
-                'This property has been replaced by vaadinCompile.configuration.jvmArgs.')
         project.vaadinCompile.configuration.jvmArgs = jvmArgs
+        getJvmArgs()
     }
     @Deprecated
     void setJvmArgs(String[] jvmArgs){
-        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.gwt.jvmArgs',
-                'This property has been replaced by vaadinCompile.configuration.jvmArgs.')
         project.vaadinCompile.configuration.jvmArgs = jvmArgs
+        getJvmArgs()
     }
     @Deprecated
     String[] getJvmArgs(){
@@ -235,15 +217,13 @@ class GWTConfiguration {
      */
     @Deprecated
     void extraArgs(String[] extraArgs){
-        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.gwt.extraArgs',
-                'This property has been replaced by vaadinCompile.configuration.extraArgs.')
         project.vaadinCompile.configuration.extraArgs = extraArgs
+        getExtraArgs()
     }
     @Deprecated
     void setExtraArgs(String[] extraArgs){
-        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.gwt.extraArgs',
-                'This property has been replaced by vaadinCompile.configuration.extraArgs.')
         project.vaadinCompile.configuration.extraArgs = extraArgs
+        getExtraArgs()
     }
     @Deprecated
     String[] getExtraArgs(){
@@ -257,15 +237,13 @@ class GWTConfiguration {
      */
     @Deprecated
     void sourcePaths(String[] sourcePaths){
-        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.gwt.sourcePaths',
-                'This property has been replaced by vaadinCompile.configuration.sourcePaths.')
         project.vaadinCompile.configuration.sourcePaths = sourcePaths
+        getSourcePaths()
     }
     @Deprecated
     void setSourcePaths(String[] sourcePaths){
-        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.gwt.sourcePaths',
-                'This property has been replaced by vaadinCompile.configuration.sourcePaths.')
         project.vaadinCompile.configuration.sourcePaths = sourcePaths
+        getSourcePaths()
     }
     @Deprecated
     String[] getSourcePaths(){
@@ -279,15 +257,13 @@ class GWTConfiguration {
      */
     @Deprecated
     void collapsePermutations(Boolean collapsePermutations){
-        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.gwt.collapsePermutations',
-                'This property has been replaced by vaadinCompile.configuration.collapsePermutations.')
         project.vaadinCompile.configuration.collapsePermutations = collapsePermutations
+        isCollapsePermutations()
     }
     @Deprecated
     void setCollapsePermutations(Boolean collapsePermutations){
-        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.gwt.collapsePermutations',
-                'This property has been replaced by vaadinCompile.configuration.collapsePermutations.')
         project.vaadinCompile.configuration.collapsePermutations = collapsePermutations
+        isCollapsePermutations()
     }
     @Deprecated
     Boolean isCollapsePermutations(){
@@ -301,15 +277,13 @@ class GWTConfiguration {
      */
     @Deprecated
     void extraInherits(String[] extraInherits){
-        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.gwt.extraInherits',
-                'This property has been replaced by vaadinCompile.configuration.extraInherits.')
         project.vaadinCompile.configuration.extraInherits = extraInherits
+        getExtraInherits()
     }
     @Deprecated
     void setExtraInherits(String[] extraInherits){
-        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.gwt.extraInherits',
-                'This property has been replaced by vaadinCompile.configuration.extraInherits.')
         project.vaadinCompile.configuration.extraInherits = extraInherits
+        getExtraInherits()
     }
     @Deprecated
     String[] getExtraInherits(){
@@ -323,15 +297,13 @@ class GWTConfiguration {
      */
     @Deprecated
     void gwtSdkFirstInClasspath(Boolean gwtSdkFirstInClasspath){
-        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.gwt.gwtSdkFirstInClasspath',
-                'This property has been replaced by vaadinCompile.configuration.gwtSdkFirstInClasspath.')
         project.vaadinCompile.configuration.gwtSdkFirstInClasspath = gwtSdkFirstInClasspath
+        isGwtSdkFirstInClasspath()
     }
     @Deprecated
     void setGwtSdkFirstInClasspath(Boolean gwtSdkFirstInClasspath){
-        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.gwt.gwtSdkFirstInClasspath',
-                'This property has been replaced by vaadinCompile.configuration.gwtSdkFirstInClasspath.')
         project.vaadinCompile.configuration.gwtSdkFirstInClasspath = gwtSdkFirstInClasspath
+        isGwtSdkFirstInClasspath()
     }
     @Deprecated
     Boolean isGwtSdkFirstInClasspath(){
@@ -345,26 +317,23 @@ class GWTConfiguration {
      */
     @Deprecated
     void outputDirectory(File outputDirectory){
-        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.gwt.outputDirectory',
-                'This property has been replaced by vaadinCompile.configuration.outputDirectory.')
         project.vaadinCompile.configuration.outputDirectory = outputDirectory.canonicalPath
+        getOutputDirectory()
     }
     @Deprecated
     void setOutputDirectory(File outputDirectory){
-        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.gwt.outputDirectory',
-                'This property has been replaced by vaadinCompile.configuration.outputDirectory.')
         project.vaadinCompile.configuration.outputDirectory = outputDirectory.canonicalPath
+        getOutputDirectory()
     }
     @Deprecated
     void setOutputDirectory(String directory){
-        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.gwt.outputDirectory',
-                'This property has been replaced by vaadinCompile.configuration.outputDirectory.')
         project.vaadinCompile.configuration.outputDirectory = directory
+        getOutputDirectory()
     }
     @Deprecated
     File getOutputDirectory(){
-        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.gwt.sourcePaths',
-                'This property has been replaced by vaadinCompile.configuration.sourcePaths.')
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.gwt.outputDirectory',
+                'This property has been replaced by vaadinCompile.configuration.outputDirectory.')
         project.vaadinCompile.configuration.outputDirectory as File
     }
 

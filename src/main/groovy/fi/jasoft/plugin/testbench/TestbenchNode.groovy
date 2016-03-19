@@ -19,6 +19,11 @@ import fi.jasoft.plugin.Util
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 
+/**
+ * Represents a Testbench Node
+ *
+ * @author John Ahlroos
+ */
 class TestbenchNode {
 
     private final Project project

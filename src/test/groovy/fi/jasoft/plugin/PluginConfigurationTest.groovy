@@ -22,6 +22,9 @@ import org.junit.Test
 
 import static org.junit.Assert.assertTrue
 
+/**
+ * Tests that the plugin configurations are configured correctly on the project
+ */
 class PluginConfigurationTest extends PluginTestBase{
 
     @Test

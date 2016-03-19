@@ -46,6 +46,21 @@ import java.util.jar.JarInputStream
  */
 class Util {
 
+    private static final String PLUS = '+'
+    private static final String SPACE = ' '
+    private static final String VAADIN_PROPERTY = 'vaadin'
+    private static final String WARNING_LOG_MARKER = '[WARN]'
+    private static final String ERROR_LOG_MARKER = '[ERROR]'
+    private static final String INFO_LOG_MARKER = '[INFO]'
+    private static final String INFO_LOGGER = 'Info logger'
+    private static final String ERROR_LOGGER = 'Error logger'
+    private static final String STREAM_CLOSED_LOG_MESSAGE = 'Stream was closed'
+    private static final String VAADIN = 'VAADIN'
+    private static final String GRADLE_HOME = 'org.gradle.java.home'
+    private static final String JAVA_HOME = 'JAVA_HOME'
+    private static final String JAVA_BIN_NAME = 'java'
+    private static final String GWT_MODULE_POSTFIX = '.gwt.xml'
+
     /**
      * Get the compile time classpath of a project
      *
@@ -120,7 +135,7 @@ class Util {
      */
     static FileCollection moveGwtSdkFirstInClasspath(Project project , FileCollection collection){
         FileCollection gwtCompilerClasspath = project.configurations[GradleVaadinPlugin.CONFIGURATION_CLIENT];
-        return gwtCompilerClasspath + collection.minus(gwtCompilerClasspath);
+        return gwtCompilerClasspath + (collection - gwtCompilerClasspath);
     }
 
     /**
@@ -172,7 +187,7 @@ class Util {
      */
     static isPushSupported(Project project) {
         String version = Util.getVaadinVersion(project)
-        version == '+' || (version.startsWith('7') && !version.startsWith('7.0'))
+        version == PLUS || (version.startsWith('7') && !version.startsWith('7.0'))
     }
 
     /**
@@ -225,7 +240,7 @@ class Util {
      *      <code>true</code> if the IE10 user agent is supported
      */
     static boolean isIE10UserAgentSupported(Project project) {
-        if (getVaadinVersion(project) == '+') {
+        if (getVaadinVersion(project) == PLUS) {
             return true
         }
         VersionNumber version = VersionNumber.parse(getVaadinVersion(project))
@@ -255,7 +270,7 @@ class Util {
      *      <code>true</code> if Servlet 3 is supported
      */
     static boolean isServlet3Project(Project project) {
-        if (getVaadinVersion(project) == '+') {
+        if (getVaadinVersion(project) == PLUS) {
             return true
         }
         VersionNumber version = VersionNumber.parse(getVaadinVersion(project))
@@ -273,14 +288,14 @@ class Util {
     static boolean isRootProject(Project project) {
 
         // Check if project is the root project
-        if (project.hasProperty('vaadin') && project.equals(project.getRootProject())) {
+        if (project.hasProperty(VAADIN_PROPERTY) && project == project.rootProject) {
             return true
         }
 
         // If not traverse upwards and see if there are any other vaadin projects in the hierarchy
-        while (!project.equals(project.getRootProject())) {
-            project = project.getRootProject()
-            if (project.hasProperty('vaadin')) {
+        while (project != project.rootProject) {
+            project = project.rootProject
+            if (project.hasProperty(VAADIN_PROPERTY)) {
                 return false
             }
         }
@@ -367,46 +382,48 @@ class Util {
         File logDir = project.file("$project.buildDir/logs/")
         logDir.mkdirs()
 
-        final File logFile = new File(logDir, filename)
-        project.logger.info("Logging to file $logFile")
+        final File LOGFILE = new File(logDir, filename)
+        project.logger.info("Logging to file $LOGFILE")
 
-        Thread.start 'Info logger', {
-            logFile.withWriterAppend { out ->
+        Thread.start INFO_LOGGER, {
+            LOGFILE.withWriterAppend { out ->
                 try {
                     def errorOccurred = false
 
                     process.inputStream.eachLine { output ->
                         monitor.call(output)
-                        if (output.contains("[WARN]")) {
-                            out.println "[WARN] " + output.replaceAll("\\[WARN\\]", '').trim()
-                        } else if(output.contains('[ERROR]')){
+                        if (output.contains(WARNING_LOG_MARKER)) {
+                            out.println WARNING_LOG_MARKER + SPACE + output.replace(WARNING_LOG_MARKER, '').trim()
+                        } else if(output.contains(ERROR_LOG_MARKER)){
                             errorOccurred = true
-                            out.println "[ERROR] "+output.replaceAll("\\[ERROR\\]",'').trim()
+                            out.println ERROR_LOG_MARKER + SPACE + output.replace(ERROR_LOG_MARKER,'').trim()
                         } else {
-                            out.println "[INFO] " + output.trim()
+                            out.println INFO_LOG_MARKER + SPACE + output.trim()
                         }
                         out.flush()
                         if(errorOccurred){
                             // An error has occurred, dump everything to console
-                            project.logger.error(output.replaceAll("\\[ERROR\\]",'').trim())
+                            project.logger.error(output.replace(ERROR_LOG_MARKER,'').trim())
                         }
                     }
                 } catch (IOException e) {
                     // Stream might be closed
+                    project.logger.debug(STREAM_CLOSED_LOG_MESSAGE, e)
                 }
             }
         }
 
-        Thread.start 'Error logger', {
-            logFile.withWriterAppend { out ->
+        Thread.start ERROR_LOGGER, {
+            LOGFILE.withWriterAppend { out ->
                 try {
                     process.errorStream.eachLine { output ->
                         monitor.call(output)
-                        out.println "[ERROR] "+output.replaceAll("\\[ERROR\\]",'').trim()
+                        out.println ERROR_LOG_MARKER + SPACE + output.replace(ERROR_LOG_MARKER,'').trim()
                         out.flush()
                     }
                 } catch (IOException e) {
                     // Stream might be closed
+                    project.logger.debug(STREAM_CLOSED_LOG_MESSAGE, e)
                 }
             }
         }
@@ -425,36 +442,38 @@ class Util {
     static void logProcessToConsole(final Project project, final Process process, Closure monitor={}) {
         project.logger.info("Logging to console")
 
-        Thread.start 'Info logger', {
+        Thread.start INFO_LOGGER, {
             try {
                 def errorOccurred = false
                 process.inputStream.eachLine { output ->
                     monitor.call(output)
-                    if (output.contains("[WARN]")) {
-                        project.logger.warn(output.replaceAll("\\[WARN\\]", '').trim())
-                    } else if(output.contains('[ERROR]')){
+                    if (output.contains(WARNING_LOG_MARKER)) {
+                        project.logger.warn(output.replace(WARNING_LOG_MARKER, '').trim())
+                    } else if(output.contains(ERROR_LOG_MARKER)){
                         errorOccurred = true
                     } else {
                         project.logger.info(output.trim())
                     }
                     if(errorOccurred){
                         // An error has occurred, dump everything to console
-                        project.logger.error(output.replaceAll("\\[ERROR\\]",'').trim())
+                        project.logger.error(output.replace(ERROR_LOG_MARKER, '').trim())
                     }
                 }
             } catch(IOException e){
                 // Stream might be closed
+                project.logger.debug(STREAM_CLOSED_LOG_MESSAGE, e)
             }
         }
 
-        Thread.start 'Error logger', {
+        Thread.start ERROR_LOGGER, {
             try {
                 process.errorStream.eachLine { String output ->
                     monitor.call(output)
-                    project.logger.error(output.replaceAll("\\[ERROR\\]", '').trim())
+                    project.logger.error(output.replace(ERROR_LOG_MARKER, '').trim())
                 }
             } catch(IOException e){
                 // Stream might be closed
+                project.logger.debug(STREAM_CLOSED_LOG_MESSAGE, e)
             }
         }
     }
@@ -501,7 +520,9 @@ class Util {
                     stop = !closure.call(key, event)
                 }
             }
-            if(!key.reset() || stop) break
+            if(!key.reset() || stop){
+                break
+            }
         }
 
         project.logger.info "Stopped watching directory"
@@ -520,7 +541,7 @@ class Util {
             project.file(project.vaadin.plugin.themesDirectory)
         } else {
             def webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-            def vaadinDir = new File(webAppDir, 'VAADIN')
+            def vaadinDir = new File(webAppDir, VAADIN)
             def themesDir = new File(vaadinDir, 'themes')
             themesDir
         }
@@ -535,8 +556,9 @@ class Util {
      *      The widgetset directory
      */
     static File getWidgetsetDirectory(Project project) {
-        def webAppDir = project.vaadinCompile.configuration.outputDirectory ?: project.convention.getPlugin(WarPluginConvention).webAppDir
-        def vaadinDir = new File(webAppDir, 'VAADIN')
+        def webAppDir = project.vaadinCompile.configuration.outputDirectory ?:
+                project.convention.getPlugin(WarPluginConvention).webAppDir
+        def vaadinDir = new File(webAppDir, VAADIN)
         def widgetsetsDir = new File(vaadinDir, 'widgetsets')
         widgetsetsDir
     }
@@ -550,8 +572,9 @@ class Util {
      *      The widgetset directory
      */
     static File getWidgetsetCacheDirectory(Project project) {
-        def webAppDir = project.vaadinCompile.configuration.outputDirectory ?: project.convention.getPlugin(WarPluginConvention).webAppDir
-        def vaadinDir = new File(webAppDir, 'VAADIN')
+        def webAppDir = project.vaadinCompile.configuration.outputDirectory ?:
+                project.convention.getPlugin(WarPluginConvention).webAppDir
+        def vaadinDir = new File(webAppDir, VAADIN)
         def unitCacheDir = new File(vaadinDir, 'gwt-unitCache')
         unitCacheDir
     }
@@ -569,7 +592,8 @@ class Util {
      */
     static String getResolvedVaadinVersion(Project project) {
         def version = project.vaadin.version
-        project.configurations[GradleVaadinPlugin.CONFIGURATION_SERVER].resolvedConfiguration.firstLevelModuleDependencies.each{ dependency ->
+        project.configurations[GradleVaadinPlugin.CONFIGURATION_SERVER].
+                resolvedConfiguration.firstLevelModuleDependencies.each{ dependency ->
             if(dependency.moduleName == 'vaadin-server'){
                version = dependency.moduleVersion
            }
@@ -585,12 +609,14 @@ class Util {
      * @return
      *      a set of addon dependencies
      */
-    static Set findAddonsInProject(Project project, String byAttribute='Vaadin-Widgetsets', Boolean includeFile=false) {
+    static Set findAddonsInProject(Project project,
+                                   String byAttribute='Vaadin-Widgetsets',
+                                   Boolean includeFile=false) {
         def addons = []
         def attribute = new Attributes.Name(byAttribute)
         project.configurations.all.each { Configuration conf ->
             conf.allDependencies.each { Dependency dependency ->
-                if(!(dependency instanceof ProjectDependency)){
+                if(!(dependency in ProjectDependency)){
                     conf.files(dependency).each { File file ->
                         file.withInputStream { InputStream stream ->
                             def jarStream = new JarInputStream(stream)
@@ -723,19 +749,19 @@ class Util {
      */
     static String getJavaBinary(Project project){
         String javaHome
-        if(project.hasProperty('org.gradle.java.home')){
-            javaHome = project.properties['org.gradle.java.home']
-        } else if(System.getProperty('JAVA_HOME')){
-            javaHome = System.getProperty('JAVA_HOME')
+        if(project.hasProperty(GRADLE_HOME)){
+            javaHome = project.properties[GRADLE_HOME]
+        } else if(System.getProperty(JAVA_HOME)){
+            javaHome = System.getProperty(JAVA_HOME)
         }
 
         if(javaHome){
             def javaBin =  new File(javaHome, 'bin')
-            def java = new File(javaBin, 'java')
+            def java = new File(javaBin, JAVA_BIN_NAME)
             return java.canonicalPath
         }else {
             // Fallback to Java on PATH
-            return 'java'
+            return JAVA_BIN_NAME
         }
     }
 
@@ -756,7 +782,7 @@ class Util {
             }
             if(rootDir){
                 def relativePath= new File( rootDir.toURI().relativize( widgetsetFile.toURI() ).toString() )
-                def widgetset = TemplateUtil.convertFilePathToFQN(relativePath.path, '.gwt.xml')
+                def widgetset = TemplateUtil.convertFilePathToFQN(relativePath.path, GWT_MODULE_POSTFIX)
                 project.logger.info "Detected widgetset $widgetset from project"
                 widgetset
             }
@@ -776,11 +802,12 @@ class Util {
             return modules.first()
         }
 
-        if(project.vaadinCompile.configuration.widgetset){
+        String widgetset = project.vaadinCompile.configuration.widgetset
+        if(widgetset){
             // No widgetset file detected, create one
             File resourceDir = project.sourceSets.main.resources.srcDirs.first()
             def widgetsetFile = new File(resourceDir,
-                    TemplateUtil.convertFQNToFilePath(project.vaadinCompile.configuration.widgetset, '.gwt.xml'))
+                    TemplateUtil.convertFQNToFilePath(widgetset, GWT_MODULE_POSTFIX))
             widgetsetFile.parentFile.mkdirs()
             widgetsetFile.createNewFile()
             return widgetsetFile

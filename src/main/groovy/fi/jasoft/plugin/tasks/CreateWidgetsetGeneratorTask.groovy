@@ -22,9 +22,18 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 
+/**
+ * Creates the widgetset generated class
+ *
+ * @author John Ahlroos
+ */
 class CreateWidgetsetGeneratorTask extends DefaultTask {
 
     public static final String NAME = 'vaadinCreateWidgetsetGenerator'
+
+    private static final String DOT = '.'
+
+    private static final String JAVA_FILE_POSTFIX = '.java'
 
     public CreateWidgetsetGeneratorTask() {
         description = "Creates a new widgetset generator for optimizing the widgetset"
@@ -33,27 +42,28 @@ class CreateWidgetsetGeneratorTask extends DefaultTask {
     @TaskAction
     def run() {
         if (!project.vaadinCompile.configuration.widgetset) {
-            throw new GradleException("No widgetset found. Please define a widgetset using the vaadinCompile.configuration.widgetset property.")
+            throw new GradleException("No widgetset found. Please define a widgetset " +
+                    "using the vaadinCompile.configuration.widgetset property.")
         }
-        createWidgetsetGeneratorClass()
+        makeWidgetsetGeneratorClass()
     }
 
     @PackageScope
-    def createWidgetsetGeneratorClass() {
+    def makeWidgetsetGeneratorClass() {
         def javaDir = Util.getMainSourceSet(project, true).srcDirs.first()
         def widgetset = project.vaadinCompile.configuration.widgetset as String
         def widgetsetGenerator = project.vaadinCompile.configuration.widgetsetGenerator as String
 
         String name, pkg, filename
         if (!widgetsetGenerator) {
-            name = widgetset.tokenize('.').last()
-            pkg = widgetset.replaceAll('.' + name, '') + '.client.ui'
+            name = widgetset.tokenize(DOT).last()
+            pkg = widgetset.replaceAll(DOT + name, '') + '.client.ui'
             filename = name + "Generator.java"
 
         } else {
-            name = widgetsetGenerator.tokenize('.').last()
-            pkg = widgetsetGenerator.replaceAll('.' + name, '')
-            filename = name + ".java"
+            name = widgetsetGenerator.tokenize(DOT).last()
+            pkg = widgetsetGenerator.replaceAll(DOT + name, '')
+            filename = name + JAVA_FILE_POSTFIX
         }
 
         def dir = new File(javaDir, TemplateUtil.convertFQNToFilePath(pkg))
@@ -61,7 +71,7 @@ class CreateWidgetsetGeneratorTask extends DefaultTask {
 
         def substitutions = [:]
         substitutions['packageName'] = pkg
-        substitutions['className'] = filename.replaceAll('.java', '')
+        substitutions['className'] = filename.replaceAll(JAVA_FILE_POSTFIX, '')
 
         TemplateUtil.writeTemplate('MyConnectorBundleLoaderFactory.java', dir, filename, substitutions)
     }

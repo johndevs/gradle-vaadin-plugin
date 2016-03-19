@@ -16,12 +16,16 @@
 package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.TemplateUtil
-import fi.jasoft.plugin.Util
 import groovy.transform.PackageScope
 import org.gradle.api.DefaultTask
 import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
 
+/**
+ * Creates a theme for an addon
+ *
+ * @author John Ahlroos
+ */
 class CreateAddonThemeTask extends DefaultTask {
 
     public static final String NAME = 'vaadinCreateAddonTheme'
@@ -43,11 +47,11 @@ class CreateAddonThemeTask extends DefaultTask {
                   firstLetter?.toUpperCase() ?: ""
               }.capitalize()
         }
-        createTheme(themeName)
+        makeTheme(themeName)
     }
 
     @PackageScope
-    def createTheme(String themeName) {
+    def makeTheme(String themeName) {
         File resourceDir = project.sourceSets.main.resources.srcDirs.first()
 
         def vaadinDir = new File(resourceDir, 'VAADIN')

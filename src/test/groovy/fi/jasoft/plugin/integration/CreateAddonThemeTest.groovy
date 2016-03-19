@@ -1,8 +1,6 @@
 package fi.jasoft.plugin.integration
 
-import fi.jasoft.plugin.tasks.CompileThemeTask
 import fi.jasoft.plugin.tasks.CreateAddonThemeTask
-import fi.jasoft.plugin.tasks.CreateThemeTask
 import org.junit.Assert
 import org.junit.Test
 

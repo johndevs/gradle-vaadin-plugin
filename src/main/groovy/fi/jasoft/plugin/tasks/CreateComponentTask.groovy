@@ -17,14 +17,22 @@ package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
+import groovy.transform.PackageScope
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
 
+/**
+ * Creates a new Vaadin Component
+ *
+ * @author John Ahlroos
+ */
 class CreateComponentTask extends DefaultTask {
 
     public static final String NAME = 'vaadinCreateComponent'
+
+    private static final String DOT = '.'
 
     @Option(option = 'name', description = 'Component name')
     def componentName = 'MyComponent'
@@ -36,14 +44,17 @@ class CreateComponentTask extends DefaultTask {
     @TaskAction
     public void run() {
         if (!project.vaadinCompile.configuration.widgetset) {
-            throw new GradleException('No widgetset found. Please define a widgetset using the vaadinCompile.configuration.widgetset property.')
+            throw new GradleException('No widgetset found. Please define a widgetset using ' +
+                    'the vaadinCompile.configuration.widgetset property.')
         }
-        createComponentClasses()
+        makeComponentClasses()
     }
 
-    private void createComponentClasses() {
+    @PackageScope
+    def makeComponentClasses() {
         def widgetset = project.vaadinCompile.configuration.widgetset as String
-        def widgetsetPackagePath =  TemplateUtil.convertFQNToFilePath(widgetset.substring(0, widgetset.lastIndexOf('.')))
+        String widgetsetPackageFQN = widgetset.substring(0, widgetset.lastIndexOf(DOT))
+        def widgetsetPackagePath = TemplateUtil.convertFQNToFilePath(widgetsetPackageFQN)
 
         def srcDir = Util.getMainSourceSet(project, true).srcDirs.first()
         def widgetsetDir = new File(srcDir, widgetsetPackagePath)
@@ -54,8 +65,8 @@ class CreateComponentTask extends DefaultTask {
         def widgetDir = new File(new File(widgetsetDir, 'client'), componentName.toLowerCase())
         widgetDir.mkdirs()
 
-        String widgetsetName = widgetset.tokenize('.').last()
-        String widgetsetPackage = widgetset.replaceAll('.' + widgetsetName, '')
+        String widgetsetName = widgetset.tokenize(DOT).last()
+        String widgetsetPackage = widgetset.replaceAll(DOT + widgetsetName, '')
 
         def substitutions = [:]
         substitutions['componentServerPackage'] = widgetsetPackage + '.server.' + componentName.toLowerCase()
@@ -63,8 +74,11 @@ class CreateComponentTask extends DefaultTask {
         substitutions['componentName'] = componentName
         substitutions['componentStylename'] = componentName.toLowerCase()
 
-        TemplateUtil.writeTemplate("MyComponent.java", componentDir, componentName + ".java", substitutions)
-        TemplateUtil.writeTemplate("MyComponentWidget.java", widgetDir, componentName + "Widget.java", substitutions)
-        TemplateUtil.writeTemplate("MyComponentConnector.java", widgetDir, componentName + "Connector.java", substitutions)
+        TemplateUtil.writeTemplate("MyComponent.java", componentDir,
+                componentName + ".java", substitutions)
+        TemplateUtil.writeTemplate("MyComponentWidget.java", widgetDir,
+                componentName + "Widget.java", substitutions)
+        TemplateUtil.writeTemplate("MyComponentConnector.java", widgetDir,
+                componentName + "Connector.java", substitutions)
     }
 }

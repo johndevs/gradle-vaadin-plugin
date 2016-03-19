@@ -21,6 +21,11 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
 
+/**
+ * Runs the application on a application server
+ *
+ * @author John Ahlroos
+ */
 class RunTask extends DefaultTask {
 
     public static final String NAME = 'vaadinRun'
@@ -45,6 +50,7 @@ class RunTask extends DefaultTask {
             Runtime.getRuntime().removeShutdownHook(cleanupThread)
         } catch(IllegalStateException e){
             // Shutdown of the JVM in progress already, we don't need to remove the hook it will be removed by the JVM
+            project.logger.debug('Shutdownhook could not be removed. This can be ignored.', e)
         }
     })
 
@@ -61,7 +67,7 @@ class RunTask extends DefaultTask {
         if(nobrowser){
             configuration.openInBrowser = false
         }
-        server = ApplicationServer.create(project, [], configuration)
+        server = ApplicationServer.get(project, [], configuration)
         server.startAndBlock(stopAfterStarting)
     }
 }

@@ -21,8 +21,12 @@ import org.gradle.plugins.ide.eclipse.model.EclipseWtp
 
 /**
  * Eclipse related utility methods
+ *
+ * @author John Ahlroos
  */
 class EclipseUtil {
+
+    public static final String ECLIPSE_PROPERTY = 'eclipse'
 
     /**
      * Configures the eclipse plugin
@@ -33,14 +37,14 @@ class EclipseUtil {
     static configureEclipsePlugin(Project project) {
         project.beforeEvaluate { Project p ->
             def plugins = p.plugins
-            if (plugins.findPlugin('eclipse') && !plugins.findPlugin('eclipse-wtp')) {
+            if (plugins.findPlugin(ECLIPSE_PROPERTY) && !plugins.findPlugin('eclipse-wtp')) {
                 throw new BuildFailureException("You are using the eclipse plugin which does not support all " +
                         "features of the Vaadin plugin. Please use the eclipse-wtp plugin instead.")
             }
         }
 
         project.afterEvaluate { Project p ->
-            if(p.hasProperty('eclipse')){
+            if(p.hasProperty(ECLIPSE_PROPERTY)){
                 def cp = p.eclipse.classpath
                 def wtp = p.eclipse.wtp as EclipseWtp
 
@@ -79,7 +83,7 @@ class EclipseUtil {
      */
     static void addConfigurationToProject(Project project, String conf){
         project.afterEvaluate { Project p ->
-            if(p.hasProperty('eclipse')){
+            if(p.hasProperty(ECLIPSE_PROPERTY)){
                 def cp = p.eclipse.classpath
                 cp.plusConfigurations += [p.configurations[conf]]
 

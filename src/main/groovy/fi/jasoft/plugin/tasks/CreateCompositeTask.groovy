@@ -23,10 +23,16 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
 
-
-public class CreateCompositeTask extends DefaultTask {
+/**
+ * Creates a new Vaadin Composite
+ *
+ * @author John Ahlroos
+ */
+class CreateCompositeTask extends DefaultTask {
 
     public static final String NAME = 'vaadinCreateComposite'
+
+    private static final String DOT = '.'
 
     @Option(option = 'name', description = 'Component name')
     def componentName = 'MyComposite'
@@ -43,15 +49,15 @@ public class CreateCompositeTask extends DefaultTask {
         def configuration = project.vaadinCompile.configuration as CompileWidgetsetConfiguration
         if(!componentPackage && configuration.widgetset){
             String widgetsetClass = configuration.widgetset
-            String widgetsetPackage = widgetsetClass.substring(0, widgetsetClass.lastIndexOf("."))
-            componentPackage = widgetsetPackage + '.' + componentName.toLowerCase();
+            String widgetsetPackage = widgetsetClass.substring(0, widgetsetClass.lastIndexOf(DOT))
+            componentPackage = widgetsetPackage + DOT + componentName.toLowerCase();
         }
 
-        createCompositeClass()
+        makeCompositeClass()
     }
 
     @PackageScope
-    def createCompositeClass() {
+    def makeCompositeClass() {
         def javaDir = Util.getMainSourceSet(project).srcDirs.first()
 
         def componentDir = new File(javaDir, TemplateUtil.convertFQNToFilePath(componentPackage))

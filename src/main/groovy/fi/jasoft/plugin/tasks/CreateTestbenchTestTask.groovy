@@ -22,6 +22,11 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
 
+/**
+ * Creates a Vaadin Testbench test
+ *
+ * @author John Ahlroos
+ */
 class CreateTestbenchTestTask extends DefaultTask {
 
     public static final String NAME = 'vaadinCreateTestbenchTest'
@@ -38,11 +43,11 @@ class CreateTestbenchTestTask extends DefaultTask {
 
     @TaskAction
     def run() {
-        createTestClass()
+        makeTestClass()
     }
 
     @PackageScope
-    def createTestClass() {
+    def makeTestClass() {
         def javaDir = Util.getMainTestSourceSet(project).srcDirs.first()
         def packageDir = new File(javaDir, TemplateUtil.convertFQNToFilePath(testPackage))
         packageDir.mkdirs()

@@ -16,11 +16,13 @@
 package fi.jasoft.plugin.servers
 
 import fi.jasoft.plugin.GradleVaadinPlugin
+import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
 import fi.jasoft.plugin.configuration.ApplicationServerConfiguration
 import fi.jasoft.plugin.tasks.BuildClassPathJar
 import fi.jasoft.plugin.tasks.CompileThemeTask
-import fi.jasoft.plugin.tasks.RunTask
+import groovy.transform.PackageScope
+import org.apache.tools.ant.taskdefs.Pack
 import org.gradle.api.Project
 import org.gradle.api.artifacts.DependencySet
 import org.gradle.api.artifacts.dsl.DependencyHandler
@@ -34,7 +36,15 @@ import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 
+/**
+ * Base class for application servers
+ *
+ * @author John Ahlroos
+ */
 abstract class ApplicationServer {
+
+    private static final String JAR_FILE_POSTFIX = '.jar'
+    private static final String AMPERSAND = '&'
 
     /**
      * Creates a new application server
@@ -46,7 +56,7 @@ abstract class ApplicationServer {
      * @return
      *      returns the application server
      */
-    static ApplicationServer create(Project project,
+    static ApplicationServer get(Project project,
                                     List browserParameters = [],
                                     ApplicationServerConfiguration configuration=project.vaadinRun.configuration){
         switch(configuration.server){
@@ -69,7 +79,17 @@ abstract class ApplicationServer {
 
     def ApplicationServerConfiguration configuration
 
-    def ApplicationServer(Project project, List browserParameters, ApplicationServerConfiguration configuration) {
+    /**
+     * Create a application server
+     *
+     * @param project
+     *      the project to use
+     * @param browserParameters
+     *      the parameters passes to the browser
+     * @param configuration
+     *      the serverconfiguration
+     */
+    protected ApplicationServer(Project project, List browserParameters, ApplicationServerConfiguration configuration) {
         this.project = project
         this.browserParameters = browserParameters
         this.configuration = configuration
@@ -89,23 +109,21 @@ abstract class ApplicationServer {
             BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
             cp = project.files(pathJarTask.archivePath)
         } else {
-            cp = project.configurations[GradleVaadinPlugin.CONFIGURATION_RUN_SERVER]
-                    .plus(Util.getWarClasspath(project))
-                    .filter { it.file && it.canonicalFile.name.endsWith('.jar')}
+            cp = (project.configurations[GradleVaadinPlugin.CONFIGURATION_RUN_SERVER] + Util.getWarClasspath(project))
+                    .filter { it.file && it.canonicalFile.name.endsWith(JAR_FILE_POSTFIX)}
         }
         cp
     }
 
-    def buildClassPathFile(File buildDir) {
+    def makeClassPathFile(File buildDir) {
         def buildClasspath = new File(buildDir, 'classpath.txt')
         buildClasspath.text = Util.getWarClasspath(project)
-                .filter { it.file && it.canonicalFile.name.endsWith('.jar')}
+                .filter { it.file && it.canonicalFile.name.endsWith(JAR_FILE_POSTFIX)}
                 .join(";")
     }
 
 
     def boolean start(boolean firstStart=false, boolean stopAfterStart=false) {
-
         if (process) {
             project.logger.error('Server is already running.')
             return false
@@ -150,10 +168,10 @@ abstract class ApplicationServer {
 
         appServerProcess.add(configuration.serverPort.toString())
 
-        appServerProcess.add(webAppDir.canonicalPath + '/')
+        appServerProcess.add(webAppDir.canonicalPath + File.separator)
 
         File classesDir = project.sourceSets.main.output.classesDir
-        appServerProcess.add(classesDir.canonicalPath + '/')
+        appServerProcess.add(classesDir.canonicalPath + File.separator)
 
         if(project.logger.debugEnabled){
             appServerProcess.add('DEBUG')
@@ -167,9 +185,15 @@ abstract class ApplicationServer {
         buildDir.mkdirs()
         appServerProcess.add(buildDir.absolutePath)
 
-        buildClassPathFile(buildDir)
+        makeClassPathFile(buildDir)
 
-        // Execute server
+        executeServer(appServerProcess, firstStart)
+
+        monitorLog(firstStart, stopAfterStart)
+    }
+
+    @PackageScope
+    def executeServer(List appServerProcess, boolean firstStart=false) {
         project.logger.debug("Running server with the command: "+appServerProcess)
         process = appServerProcess.execute()
 
@@ -187,18 +211,10 @@ abstract class ApplicationServer {
                 watchThemeDirectoryForChanges()
             }
         }
+    }
 
-        // Build browser GET parameters
-        def paramString = ''
-        if (configuration.debug) {
-            paramString += '?debug'
-            paramString += '&' + browserParameters.join('&')
-        } else if(!browserParameters.isEmpty()){
-            paramString += '?' + browserParameters.join('&')
-        }
-        paramString = paramString.replaceAll('\\?$|&$', '')
-
-        // Capture log output
+    @PackageScope
+    def monitorLog(boolean firstStart=false, boolean stopAfterStart=false){
         Util.logProcess(project, process, "${serverName}.log", { line ->
             if(line.contains(successfullyStartedLogToken)) {
                 if(firstStart) {
@@ -214,7 +230,7 @@ abstract class ApplicationServer {
                     if(stopAfterStart){
                         terminate()
                     } else if(configuration.openInBrowser){
-                        Util.openBrowser((Project)project, "http://localhost:${(Integer)configuration.serverPort}/${paramString}")
+                        openBrowser()
                     }
                 } else {
                     project.logger.lifecycle("Server reload complete.")
@@ -228,6 +244,23 @@ abstract class ApplicationServer {
         })
     }
 
+    @PackageScope
+    def openBrowser() {
+        // Build browser GET parameters
+        def paramString = ''
+        if (configuration.debug) {
+            paramString += '?debug'
+            paramString += AMPERSAND + browserParameters.join(AMPERSAND)
+        } else if(!browserParameters.isEmpty()){
+            paramString += '?' + browserParameters.join(AMPERSAND)
+        }
+        paramString = paramString.replaceAll('\\?$|&$', '')
+
+        // Open browser
+        Util.openBrowser((Project)project, "http://localhost:${(Integer)configuration.serverPort}/${paramString}")
+    }
+
+    @PackageScope
     def startAndBlock(boolean stopAfterStart=false) {
         def firstStart = true
 
@@ -248,7 +281,8 @@ abstract class ApplicationServer {
             // Wait until server process calls destroy()
             def exitCode = process.waitFor()
             if(!reloadInProgress && exitCode != 0){
-                project.logger.warn("Server process terminated with exit code $exitCode. See ${serverName}.log for further details.")
+                project.logger.warn("Server process terminated with exit code $exitCode. " +
+                        "See ${serverName}.log for further details.")
                 terminate()
                 break
             }
@@ -273,6 +307,7 @@ abstract class ApplicationServer {
         terminate()
     }
 
+    @PackageScope
     static watchClassDirectoryForChanges(final ApplicationServer server) {
         def project = server.project
 
@@ -292,9 +327,11 @@ abstract class ApplicationServer {
 
                 // Ignore client classes, as restarting server will not do you any good
                 if(Util.getWidgetset(project)){
-                    def widgetsetPath = (Util.getWidgetset(project) as String).tokenize('.')[0..-2].join('/')+'/client/'
+                    def widgetsetPath = Util.getWidgetset(project).tokenize('.')[0..-2]
+                            .join(File.separator) + File.separator +'client' + File.separator
                     if(file.absolutePath.contains(widgetsetPath)){
-                        //TODO when file based widgetset recompiling is implmeneted we could recompile the widgetset here instead
+                        // TODO when file based widgetset recompiling is
+                        // implemented we could recompile the widgetset here instead
                         project.logger.info("Ignored client side class change in ${file.absolutePath}")
                         return false
                     }
@@ -310,7 +347,9 @@ abstract class ApplicationServer {
         }
     }
 
-    def watchThemeDirectoryForChanges() {
+    @PackageScope
+    static watchThemeDirectoryForChanges(final ApplicationServer server) {
+        def project = server.project
         File themesDir = Util.getThemesDirectory(project)
         if(themesDir.exists()) {
             def executor = Executors.newSingleThreadScheduledExecutor()

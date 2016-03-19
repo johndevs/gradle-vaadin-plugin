@@ -22,7 +22,7 @@ import org.junit.Test
 import org.junit.rules.TemporaryFolder
 
 /**
- * Created by john on 8.1.2016.
+ * Tests for Util utility methods
  */
 class UtilTest {
 

@@ -49,8 +49,4 @@ class CreateThemeTest extends IntegrationTest {
         def stylesCompiled = Paths.get(themeDir.canonicalPath, 'styles.css').toFile()
         assertTrue themeDir.list().toArrayString(), stylesCompiled.exists()
     }
-
-
-
-
 }

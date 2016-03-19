@@ -53,7 +53,8 @@ class TaskConfigurationsTest extends IntegrationTest {
             task verifyOutputDir(dependsOn:'eclipseClasspath') << {
                 println project.eclipse.classpath.defaultOutputDir
                 println project.file('custom/dir')
-                println 'Default output dir is set to eclipseOutputDir ' + (project.eclipse.classpath.defaultOutputDir == project.file('custom/dir'))
+                println 'Default output dir is set to eclipseOutputDir ' +
+                    (project.eclipse.classpath.defaultOutputDir == project.file('custom/dir'))
             }
         """.stripIndent()
 
@@ -75,7 +76,8 @@ class TaskConfigurationsTest extends IntegrationTest {
             task verifyTestbenchDependency(dependsOn: 'eclipseClasspath') << {
                 def confs = project.configurations
                 def classpath = project.eclipse.classpath
-                println 'Testbench on classpath ' + (confs.getByName('vaadin-testbench') in classpath.plusConfigurations)
+                println 'Testbench on classpath ' +
+                    (confs.getByName('vaadin-testbench') in classpath.plusConfigurations)
             }
 
         """.stripIndent()
@@ -91,7 +93,8 @@ class TaskConfigurationsTest extends IntegrationTest {
 
             task verifyWTP(dependsOn: eclipseWtpComponent) << {
                 def confs = project.configurations
-                println 'Server in components ' + (confs.getByName('vaadin-server') in project.eclipse.wtp.component.plusConfigurations)
+                println 'Server in components ' +
+                    (confs.getByName('vaadin-server') in project.eclipse.wtp.component.plusConfigurations)
             }
 
         """.stripIndent()
@@ -108,9 +111,12 @@ class TaskConfigurationsTest extends IntegrationTest {
             task verifyWTP(dependsOn: eclipseWtpFacet) << {
                 def facets = project.eclipse.wtp.facet.facets
                 def JavaVersion javaVersion = project.sourceCompatibility
-                println 'Vaadin Facet version ' + (facets.find { it.name=='com.vaadin.integration.eclipse.core'}.version)
+                println 'Vaadin Facet version ' + (facets.find {
+                    it.name=='com.vaadin.integration.eclipse.core'
+                }.version)
                 println 'jst.web Facet version ' + (facets.find { it.name=='jst.web'}.version)
-                println 'Java Facet version equals sourceCompatibility ' + (javaVersion.toString() == facets.find { it.name=='java'}.version)
+                println 'Java Facet version equals sourceCompatibility ' +
+                    (javaVersion.toString() == facets.find { it.name=='java'}.version)
             }
 
         """.stripIndent()
@@ -130,8 +136,10 @@ class TaskConfigurationsTest extends IntegrationTest {
 
                 def module = project.idea.module
                 println 'Module and Project name is equal ' + (project.name == module.name)
-                println 'Output dir is classes dir ' + (project.sourceSets.main.output.classesDir == module.outputDir)
-                println 'Test output dir is classes dir ' + (project.sourceSets.test.output.classesDir == module.testOutputDir)
+                println 'Output dir is classes dir ' +
+                    (project.sourceSets.main.output.classesDir == module.outputDir)
+                println 'Test output dir is classes dir ' +
+                    (project.sourceSets.test.output.classesDir == module.testOutputDir)
 
                 println 'Download Javadoc ' + module.downloadJavadoc
                 println 'Download Sources ' + module.downloadSources

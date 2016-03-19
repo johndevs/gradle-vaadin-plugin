@@ -27,16 +27,24 @@ import org.gradle.api.execution.TaskExecutionListener
 import org.gradle.api.tasks.TaskState
 import org.gradle.api.tasks.bundling.War
 
+import java.nio.file.Paths
+
+/**
+ * Listens for task executions and configures the task appropriatly
+ *
+ * @author John Ahlroos
+ */
 class TaskListener implements TaskExecutionListener {
 
-    private TestbenchHub testbenchHub
+    public static final String VAADIN_EXTENSION_NAME = 'vaadin'
+    def TestbenchHub testbenchHub
 
-    private TestbenchNode testbenchNode
+    def TestbenchNode testbenchNode
 
     ApplicationServer testbenchAppServer
 
     public void beforeExecute(Task task) {
-        if (!task.project.hasProperty('vaadin')) {
+        if (!task.project.hasProperty(VAADIN_EXTENSION_NAME)) {
             return
         }
 
@@ -64,7 +72,7 @@ class TaskListener implements TaskExecutionListener {
     }
 
     public void afterExecute(Task task, TaskState state) {
-        if (!task.project.hasProperty('vaadin')) {
+        if (!task.project.hasProperty(VAADIN_EXTENSION_NAME)) {
             return
         }
 
@@ -84,10 +92,10 @@ class TaskListener implements TaskExecutionListener {
         def generator = task.project.vaadinCompile.configuration.widgetsetGenerator
         if (generator != null) {
             String name = generator.tokenize('.').last()
-            String pkg = generator.replaceAll('.' + name, '')
+            String pkg = generator.replaceAll(".$name", '')
             String filename = name + ".java"
             File javaDir = Util.getMainSourceSet(task.project).srcDirs.iterator().next()
-            File f = task.project.file(javaDir.canonicalPath + '/' + pkg.replaceAll(/\./, '/') + '/' + filename)
+            File f = Paths.get(javaDir.canonicalPath, TemplateUtil.convertFQNToFilePath(pkg), filename).toFile()
             if (!f.exists()) {
                 task.project.tasks[CreateWidgetsetGeneratorTask.NAME].run()
             }
@@ -97,7 +105,9 @@ class TaskListener implements TaskExecutionListener {
     @PackageScope
     static File getManifest(Task task) {
         def project = task.project
-        def sources = Util.getMainSourceSet(project).srcDirs.asList() + project.sourceSets.main.resources.srcDirs.asList()
+        def sources = Util.getMainSourceSet(project).srcDirs.asList()
+        sources.addAll(project.sourceSets.main.resources.srcDirs.asList())
+
         File manifest = null
         sources.each {
             project.fileTree(it).matching({
@@ -128,11 +138,13 @@ class TaskListener implements TaskExecutionListener {
 
         //Validate values
         if (project.vaadin.addon.title == '') {
-            project.logger.warn("No vaadin.addon.title has been specified, jar not compatible with Vaadin Directory.")
+            project.logger.warn("No vaadin.addon.title has been specified, " +
+                    "jar not compatible with Vaadin Directory.")
         }
 
         if (project.version == 'unspecified') {
-            project.logger.warn("No version specified for the project, jar not compatible with Vaadin Directory.")
+            project.logger.warn("No version specified for the project, jar not " +
+                    "compatible with Vaadin Directory.")
         }
 
         // Get stylesheets
@@ -142,7 +154,8 @@ class TaskListener implements TaskExecutionListener {
                 if(path.endsWith('scss') || path.endsWith('.css')){
                     styles.add(path)
                 } else {
-                    project.logger.warn("Could not add '"+path+"' to jar manifest. Only CSS and SCSS files are supported as addon styles.")
+                    project.logger.warn("Could not add '"+path+"' to jar manifest. " +
+                            "Only CSS and SCSS files are supported as addon styles.")
                 }
             })
         }
@@ -224,7 +237,7 @@ class TaskListener implements TaskExecutionListener {
 
     @PackageScope
     static configureWAR(Task task){
-        assert task instanceof War
+        assert task in War
         War war = (War) task;
         war.exclude('VAADIN/gwt-unitCache/**')
         if (task.project.vaadin.manageDependencies) {
@@ -247,7 +260,7 @@ class TaskListener implements TaskExecutionListener {
             }
 
             if (project.vaadin.testbench.runApplication) {
-                listener.testbenchAppServer = ApplicationServer.create(project)
+                listener.testbenchAppServer = ApplicationServer.get(project)
                 listener.testbenchAppServer.start()
 
                 // Ensure everything is up and running before continuing with the tests
@@ -279,10 +292,10 @@ class TaskListener implements TaskExecutionListener {
         def project = task.project
         task.source = Util.getMainSourceSet(project)
         if (project.configurations.findByName(GradleVaadinPlugin.CONFIGURATION_JAVADOC)) {
-            task.classpath = task.classpath.plus(project.configurations[GradleVaadinPlugin.CONFIGURATION_JAVADOC])
+            task.classpath = task.classpath + (project.configurations[GradleVaadinPlugin.CONFIGURATION_JAVADOC])
         }
         if (project.configurations.findByName(GradleVaadinPlugin.CONFIGURATION_SERVER)) {
-            task.classpath = task.classpath.plus(project.configurations[GradleVaadinPlugin.CONFIGURATION_SERVER])
+            task.classpath = task.classpath + (project.configurations[GradleVaadinPlugin.CONFIGURATION_SERVER])
         }
         task.failOnError = false
         task.options.addStringOption("sourcepath", "")

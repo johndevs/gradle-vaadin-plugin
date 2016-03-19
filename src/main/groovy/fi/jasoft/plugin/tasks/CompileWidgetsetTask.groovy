@@ -15,9 +15,7 @@
 */
 package fi.jasoft.plugin.tasks
 
-import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
-import fi.jasoft.plugin.configuration.ApplicationServerConfiguration
 import fi.jasoft.plugin.configuration.CompileWidgetsetConfiguration
 import fi.jasoft.plugin.configuration.VaadinPluginExtension
 import groovy.transform.PackageScope
@@ -26,18 +24,24 @@ import groovyx.net.http.RESTClient
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
-import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.tasks.TaskAction
 
 import java.util.jar.Attributes
 import java.util.jar.JarFile
 import java.util.zip.ZipInputStream
 
+/**
+ * Compiles the Vaadin Widgetsets
+ *
+ * @author John Ahlroos
+ */
 class CompileWidgetsetTask extends DefaultTask {
 
     static final NAME = 'vaadinCompile'
 
     static final WIDGETSET_CDN_URL = 'https://wscdn.vaadin.com'
+    public static final String PUBLIC_FOLDER_PATTERN = '**/*/public/**/*.*'
+    public static final String GWT_MODULE_XML_PATTERN = '**/*/*.gwt.xml'
 
     def CompileWidgetsetConfiguration configuration
 
@@ -86,7 +90,8 @@ class CompileWidgetsetTask extends DefaultTask {
         String widgetsetName = project.vaadinCompile.configuration.widgetset.replaceAll("[^a-zA-Z0-9]+","")
 
         if(widgetsetName != project.vaadinCompile.configuration.widgetset){
-            logger.warn("Widgetset name cannot contain special characters when using CDN. Illegal characters removed, please update your @Widgetset annotation or web.xml accordingly.")
+            logger.warn("Widgetset name cannot contain special characters when using CDN. " +
+                    "Illegal characters removed, please update your @Widgetset annotation or web.xml accordingly.")
         }
 
         def widgetsetDirectory = new File(Util.getWidgetsetDirectory(project), widgetsetName)
@@ -98,7 +103,7 @@ class CompileWidgetsetTask extends DefaultTask {
             def fileName = ze.name as String
 
             // Replace the generated widgetset filename with the real one
-            final File outfile = new File(widgetsetDirectory,
+            File outfile = new File(widgetsetDirectory,
                     fileName.replace(generatedWidgetSetName, widgetsetName));
 
             // Create directories and file
@@ -136,14 +141,14 @@ class CompileWidgetsetTask extends DefaultTask {
             project.sourceSets.main.java.srcDirs.each {
                 inputs.files(project.fileTree(it.absolutePath).include('**/*/client/**/*.java'))
                 inputs.files(project.fileTree(it.absolutePath).include('**/*/shared/**/*.java'))
-                inputs.files(project.fileTree(it.absolutePath).include('**/*/public/**/*.*'))
-                inputs.files(project.fileTree(it.absolutePath).include('**/*/*.gwt.xml'))
+                inputs.files(project.fileTree(it.absolutePath).include(PUBLIC_FOLDER_PATTERN))
+                inputs.files(project.fileTree(it.absolutePath).include(GWT_MODULE_XML_PATTERN))
             }
 
             //Monitor changes in resources
             project.sourceSets.main.resources.srcDirs.each {
-                inputs.files(project.fileTree(it.absolutePath).include('**/*/public/**/*.*'))
-                inputs.files(project.fileTree(it.absolutePath).include('**/*/*.gwt.xml'))
+                inputs.files(project.fileTree(it.absolutePath).include(PUBLIC_FOLDER_PATTERN))
+                inputs.files(project.fileTree(it.absolutePath).include(GWT_MODULE_XML_PATTERN))
             }
 
             // Add classpath jar
@@ -201,12 +206,15 @@ class CompileWidgetsetTask extends DefaultTask {
                     case 'QUEUED':
                     case 'COMPILING':
                     case 'COMPILED':
-                        logger.info("Widgetset is compiling with status $status. Waiting 10 seconds and querying again.")
+                        logger.info("Widgetset is compiling with status $status. " +
+                                "Waiting 10 seconds and querying again.")
+                        int timeoutIntervall = 10000
                         if(timeout > 0){
-                            sleep(10000)
-                            timeout -= 10000
+                            sleep(timeoutIntervall)
+                            timeout -= timeoutIntervall
                         } else {
-                            throw new GradleException('Waiting for widgetset to compile timed out. Please try again at a later time.')
+                            throw new GradleException('Waiting for widgetset to compile timed out. ' +
+                                    'Please try again at a later time.')
                         }
                         break
                     case 'AVAILABLE':
@@ -216,7 +224,8 @@ class CompileWidgetsetTask extends DefaultTask {
                 }
             }
         } else {
-            throw new GradleException('Widgetset name can only contain alphanumeric characters (A-Z,a-z,0-9) when using CDN.')
+            throw new GradleException('Widgetset name can only contain ' +
+                    'alphanumeric characters (A-Z,a-z,0-9) when using CDN.')
         }
     }
 

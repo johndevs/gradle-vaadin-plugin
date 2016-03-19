@@ -24,11 +24,19 @@ import org.gradle.api.Project
 import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
 
-import java.rmi.server.UID
-
+/**
+ * Creates a new Vaadin Project
+ *
+ * @author John Ahlroos
+ */
 class CreateProjectTask extends DefaultTask {
 
     public static final NAME = 'vaadinCreateProject'
+
+    private static final String DOT = '.'
+    private static final String APPLICATION_NAME_KEY = 'applicationName'
+    private static final String APPLICATION_PACKAGE_KEY = 'applicationPackage'
+    private static final String WIDGETSET_KEY = 'widgetset'
 
     @Option(option = 'name', description = 'Application name')
     def String applicationName
@@ -51,35 +59,36 @@ class CreateProjectTask extends DefaultTask {
             applicationName = project.name.capitalize()
         }
         if(!applicationPackage){
-            if(widgetsetFQN?.contains('.')){
-                String widgetsetName = widgetsetFQN.tokenize('.').last()
-                applicationPackage = widgetsetFQN[0..(-widgetsetName.size() - 2)]
-            } else if (configuration.widgetset?.contains('.')) {
-                String widgetsetName = configuration.widgetset.tokenize('.').last()
-                applicationPackage = configuration.widgetset[0..(-widgetsetName.size() - 2)]
+            int endSlashSize = 2
+            if(widgetsetFQN?.contains(DOT)){
+                String widgetsetName = widgetsetFQN.tokenize(DOT).last()
+                applicationPackage = widgetsetFQN[0..(-widgetsetName.size() - endSlashSize)]
+            } else if (configuration.widgetset?.contains(DOT)) {
+                String widgetsetName = configuration.widgetset.tokenize(DOT).last()
+                applicationPackage = configuration.widgetset[0..(-widgetsetName.size() - endSlashSize)]
             } else {
                 applicationPackage = "com.example.${applicationName.toLowerCase()}"
             }
         }
 
-        createUIClass(project)
+        makeUIClass(project)
 
-        createServletClass(project)
+        makeServletClass(project)
 
         if (Util.isAddonStylesSupported(project)) {
-            project.tasks[CreateThemeTask.NAME].createTheme(applicationName)
+            project.tasks[CreateThemeTask.NAME].makeTheme(applicationName)
         }
 
         UpdateWidgetsetTask.ensureWidgetPresent(project, widgetsetFQN)
     }
 
     @PackageScope
-    def createUIClass(Project project) {
+    def makeUIClass(Project project) {
 
         def substitutions = [:]
 
-        substitutions['applicationName'] = applicationName
-        substitutions['applicationPackage'] = applicationPackage
+        substitutions[APPLICATION_NAME_KEY] = applicationName
+        substitutions[APPLICATION_PACKAGE_KEY] = applicationPackage
 
         //#######################################################################
 
@@ -123,13 +132,13 @@ class CreateProjectTask extends DefaultTask {
     }
 
     @PackageScope
-    def createServletClass(Project project) {
+    def makeServletClass(Project project) {
         def configuration = project.vaadinCompile.configuration as CompileWidgetsetConfiguration
 
         def substitutions = [:]
 
-        substitutions['applicationName'] = applicationName
-        substitutions['applicationPackage'] = applicationPackage
+        substitutions[APPLICATION_NAME_KEY] = applicationName
+        substitutions[APPLICATION_PACKAGE_KEY] = applicationPackage
         substitutions['asyncEnabled'] = Util.isPushSupportedAndEnabled(project)
 
         //#######################################################################
@@ -138,9 +147,9 @@ class CreateProjectTask extends DefaultTask {
 
         if (widgetsetFQN) {
             if(configuration.widgetsetCDN){
-                initParams.put('widgetset', "${widgetsetFQN.replaceAll("[^a-zA-Z0-9]+","")}")
+                initParams.put(WIDGETSET_KEY, "${widgetsetFQN.replaceAll("[^a-zA-Z0-9]+","")}")
             } else {
-                initParams.put('widgetset', "$widgetsetFQN")
+                initParams.put(WIDGETSET_KEY, "$widgetsetFQN")
             }
         }
 

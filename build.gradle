@@ -1,19 +1,12 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:0.5"
-    }
+plugins {
+    id 'groovy'
+    id 'maven'
+    id 'idea'
+    id "com.jfrog.bintray" version "1.6"
+    id 'codenarc'
 }
-
-apply plugin: "com.jfrog.bintray"
-apply plugin: 'groovy'
-apply plugin: 'maven'
-apply plugin: 'idea'
-
 
 defaultTasks 'jar'
 group = "fi.jasoft.plugin"
@@ -217,6 +210,20 @@ test {
     }
     exclude '**/integration/**'
 }
+
+
+codenarc{
+    toolVersion = '0.25.1'
+    configFile = rootProject.file('config/codenarc/ruleset.groovy')
+    maxPriority1Violations = 0
+    maxPriority2Violations = 0
+    maxPriority3Violations = 1300
+
+    codenarcTest {
+        configFile = rootProject.file('config/codenarc/ruleset-test.groovy')
+    }
+}
+
 
 task integrationTest(type:Test, dependsOn:['test','jar']) {
     classpath += files(sourceSets.ast.output.classesDir)

@@ -1,8 +1,3 @@
-package fi.jasoft.plugin
-
-import org.junit.Test
-import static junit.framework.Assert.assertEquals
-
 /*
 * Copyright 2016 John Ahlroos
 *
@@ -18,10 +13,18 @@ import static junit.framework.Assert.assertEquals
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
+package fi.jasoft.plugin
+
+import org.junit.Test
+import static junit.framework.Assert.assertEquals
+
+/**
+ * Tests the utility methods in TemplateUtil
+ */
 class TemplateUtilTest extends PluginTestBase {
 
     @Test
-    void writeTemplateWithSubstitutions() {
+    void 'write template with substitutions'() {
 
         def substitutions = [:]
         substitutions['color'] = 'brown'
@@ -35,9 +38,9 @@ class TemplateUtilTest extends PluginTestBase {
     }
 
     @Test
-    void searchForFilesInResourcesPublicFolder() {
+    void 'search for files in public resource folder'() {
 
-        createFilesInPublicFolder(testDir.canonicalPath + '/src/main/resources/com/example/client/public' as File)
+        generateFilesInPublicFolder(testDir.canonicalPath + '/src/main/resources/com/example/client/public' as File)
 
         // Get files
         def files = TemplateUtil.getFilesFromPublicFolder(project)
@@ -54,22 +57,22 @@ class TemplateUtilTest extends PluginTestBase {
     }
     
     @Test
-    void searchForFilesInMultipleSourceFolders() {
+    void 'search for files in multiple source folders'() {
         project.apply plugin: 'java'
         project.sourceSets.main.java.srcDir "src/extra/java"
-        createFilesInPublicFolder(testDir.canonicalPath + '/src/main/resources/com/example/client/public' as File)
-        createFilesInPublicFolder(testDir.canonicalPath + '/src/extra/java/com/example/client/public' as File)
+        generateFilesInPublicFolder(testDir.canonicalPath + '/src/main/resources/com/example/client/public' as File)
+        generateFilesInPublicFolder(testDir.canonicalPath + '/src/extra/java/com/example/client/public' as File)
     	
         def files = TemplateUtil.getFilesFromPublicFolder(project)
         assertEquals 6, files.size()
     }
 
     @Test
-    void searchForFilesInMainSourceSetPublicFolder() {
+    void 'search for files in main source set, public folder'() {
 
         def publicFolder = testDir.canonicalPath + '/src/main/java/com/example/client/public' as File
 
-        createFilesInPublicFolder(publicFolder)
+        generateFilesInPublicFolder(publicFolder)
 
         // Get files
         def files = TemplateUtil.getFilesFromPublicFolder(project)
@@ -85,19 +88,19 @@ class TemplateUtilTest extends PluginTestBase {
         assertEquals 'This is a css file', files.find { it.name == 'file.css'}.text
     }
 
-    void createFilesInPublicFolder(File publicFolder){
+    private void generateFilesInPublicFolder(File publicFolder){
 
         // Create public folder if it does not exist
         publicFolder.mkdirs()
 
         // Create files
-        def file_txt = (publicFolder.canonicalPath + '/file.txt') as File
-        file_txt << 'This is a text file'
+        def txtFile = (publicFolder.canonicalPath + '/file.txt') as File
+        txtFile << 'This is a text file'
 
-        def file_css = (publicFolder.canonicalPath + '/file.css') as File
-        file_css << 'This is a css file'
+        def cssFile = (publicFolder.canonicalPath + '/file.css') as File
+        cssFile << 'This is a css file'
 
-        def file_java = (publicFolder.canonicalPath + '/file.java') as File
-        file_java << 'This is a java file'
+        def javaFile = (publicFolder.canonicalPath + '/file.java') as File
+        javaFile << 'This is a java file'
     }
 }

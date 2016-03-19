@@ -29,9 +29,19 @@ import org.gradle.tooling.BuildActionFailureException
 import java.util.jar.Attributes
 import java.util.jar.JarInputStream
 
+/**
+ * Compiles the SASS theme into CSS
+ *
+ * @author John Ahlroos
+ */
 class CompileThemeTask extends DefaultTask {
 
-    public static final String NAME = 'vaadinCompileThemes'
+    static final String NAME = 'vaadinCompileThemes'
+
+    static final String STYLES_SCSS_PATTERN = '**/styles.scss'
+    static final String STYLES_CSS_FILE = 'styles.css'
+    static final String CLASSPATH_SWITCH = '-cp'
+    static final String RUBY_MAIN_CLASS = 'org.jruby.Main'
 
     public CompileThemeTask() {
         dependsOn('classes', BuildClassPathJar.NAME, UpdateAddonStylesTask.NAME)
@@ -41,8 +51,8 @@ class CompileThemeTask extends DefaultTask {
             def themesDirectory = Util.getThemesDirectory(project)
             inputs.dir themesDirectory
             inputs.files(project.fileTree(dir: themesDirectory, include: '**/*.scss').collect())
-            outputs.files(project.fileTree(dir: themesDirectory, include: '**/styles.scss').collect {
-                File theme -> new File(new File(theme.parent).canonicalPath + '/styles.css')
+            outputs.files(project.fileTree(dir: themesDirectory, include: STYLES_SCSS_PATTERN).collect {
+                File theme -> new File(new File(theme.parent), STYLES_CSS_FILE)
             })
 
             // Add classpath jar
@@ -71,7 +81,7 @@ class CompileThemeTask extends DefaultTask {
 
         project.logger.info("Compiling themes found in "+themesDir)
 
-        FileTree themes = project.fileTree(dir: themesDir, include: '**/styles.scss')
+        FileTree themes = project.fileTree(dir: themesDir, include: STYLES_SCSS_PATTERN)
 
         project.logger.info("Found ${themes.files.size() } themes.")
 
@@ -86,9 +96,9 @@ class CompileThemeTask extends DefaultTask {
             File dir = new File(theme.parent)
 
             if(isRecompile){
-                project.logger.lifecycle("Recompiling " + theme.canonicalPath + "...")
+                project.logger.lifecycle("Recompiling $theme.canonicalPath...")
             } else {
-                project.logger.info("Compiling " + theme.canonicalPath + "...")
+                project.logger.info("Compiling $theme.canonicalPath...")
             }
 
             def start = System.currentTimeMillis()
@@ -96,13 +106,15 @@ class CompileThemeTask extends DefaultTask {
             def Process process
             switch (project.vaadin.plugin.themeCompiler){
                 case 'vaadin':
-                    process = executeVaadinSassCompiler(project, theme.canonicalPath, dir.canonicalPath + '/styles.css')
+                    process = executeVaadinSassCompiler(project, theme.canonicalPath,
+                            new File(dir, STYLES_CSS_FILE).canonicalPath)
                     break
                 case 'compass':
                     process = executeCompassSassCompiler(project, gemsDir, unpackedThemesDir, dir)
                     break
                 default:
-                    throw new BuildActionFailureException("Selected theme compiler \"${project.vaadin.plugin.themeCompiler}\" is not valid",null)
+                    throw new BuildActionFailureException(
+                            "Selected theme compiler \"${project.vaadin.plugin.themeCompiler}\" is not valid",null)
             }
 
             boolean failed = false
@@ -115,12 +127,13 @@ class CompileThemeTask extends DefaultTask {
 
             process.waitFor()
 
+            long time = (System.currentTimeMillis()-start)/1000
             if(failed){
                 throw new BuildActionFailureException('Theme compilation failed. See error log for details.', null)
             } else if(isRecompile){
-                project.logger.lifecycle('Theme was recompiled in '+ (System.currentTimeMillis()-start)/1000+' seconds')
+                project.logger.lifecycle("Theme was recompiled in $time seconds")
             } else {
-                project.logger.info('Theme was compiled in '+ (System.currentTimeMillis()-start)/1000+' seconds')
+                project.logger.info("Theme was compiled in $time seconds")
             }
         }
     }
@@ -139,7 +152,7 @@ class CompileThemeTask extends DefaultTask {
      */
     static Process executeVaadinSassCompiler(Project project, String themePath, String targetCSSFile){
         def compileProcess = [Util.getJavaBinary(project)]
-        compileProcess += ['-cp',  Util.getCompileClassPathOrJar(project).asPath]
+        compileProcess += [CLASSPATH_SWITCH,  Util.getCompileClassPathOrJar(project).asPath]
         compileProcess += 'com.vaadin.sass.SassCompiler'
         compileProcess += [themePath, targetCSSFile]
         compileProcess.execute()
@@ -160,8 +173,8 @@ class CompileThemeTask extends DefaultTask {
 
             project.logger.info("Installing compass ruby gem...")
             def gemProcess = [Util.getJavaBinary(project)]
-            gemProcess += ['-cp',  Util.getCompileClassPathOrJar(project).asPath]
-            gemProcess += 'org.jruby.Main'
+            gemProcess += [CLASSPATH_SWITCH,  Util.getCompileClassPathOrJar(project).asPath]
+            gemProcess += RUBY_MAIN_CLASS
             gemProcess += "-S gem install -i $gemsDir --no-rdoc --no-ri compass".tokenize()
 
             project.logger.debug(gemProcess.toString())
@@ -173,7 +186,8 @@ class CompileThemeTask extends DefaultTask {
             Util.logProcess(project, gemProcess, 'compass-gem-install.log')
             def result = gemProcess.waitFor()
             if(result != 0){
-                throw new BuildActionFailureException("Installing Compass ruby gem failed. See compass-gem-install.log for further information.",null)
+                throw new BuildActionFailureException("Installing Compass ruby gem failed. " +
+                        "See compass-gem-install.log for further information.",null)
             }
         }
         gemsDir
@@ -198,7 +212,7 @@ class CompileThemeTask extends DefaultTask {
         def bundleName = new Attributes.Name('Bundle-Name')
         project.configurations.all.each { Configuration conf ->
             conf.allDependencies.each { Dependency dependency ->
-                if(dependency instanceof ProjectDependency) {
+                if(dependency in ProjectDependency) {
                     def dependentProject = dependency.dependencyProject
                     if(dependentProject.hasProperty('vaadin')){
                         dependentProject.copy{
@@ -210,18 +224,21 @@ class CompileThemeTask extends DefaultTask {
                     conf.files(dependency).each { File file ->
                         file.withInputStream { InputStream stream ->
                             def jarStream = new JarInputStream(stream)
-                            def mf = jarStream.getManifest()
-                            def attributes = mf?.mainAttributes
-                            if (attributes?.getValue(themesAttribute)
-                                    || attributes?.getValue(bundleName) == 'vaadin-themes' ) {
-                                project.logger.info("Unpacking $file")
-                                project.copy {
-                                    includeEmptyDirs = false
-                                    from project.zipTree(file)
-                                    into unpackedThemesDir
-                                    include 'VAADIN/themes/**/*'
-                                    eachFile { details ->
-                                        details.path -= 'VAADIN/themes/'
+                            jarStream.withStream {
+                                def mf = jarStream.manifest
+                                def attributes = mf?.mainAttributes
+                                String value = attributes?.getValue(themesAttribute)
+                                String themesValue = attributes?.getValue(bundleName) == 'vaadin-themes'
+                                if (value || themesValue) {
+                                    project.logger.info("Unpacking $file")
+                                    project.copy {
+                                        includeEmptyDirs = false
+                                        from project.zipTree(file)
+                                        into unpackedThemesDir
+                                        include 'VAADIN/themes/**/*'
+                                        eachFile { details ->
+                                            details.path -= 'VAADIN/themes/'
+                                        }
                                     }
                                 }
                             }
@@ -258,11 +275,18 @@ class CompileThemeTask extends DefaultTask {
     static Process executeCompassSassCompiler(Project project, File gemsDir, File unpackedThemesDir, File themeDir){
         def themePath = new File(unpackedThemesDir, themeDir.name)
 
+        String compassCompile = '-S compass compile '
+        compassCompile += "--sass-dir $themePath "
+        compassCompile += "--css-dir $themeDir "
+        compassCompile += "--images-dir $themePath "
+        compassCompile += "--javascripts-dir $themePath "
+        compassCompile += '--relative-assets'
+
         project.logger.info("Compiling $themePath with compass compiler")
         def compileProcess = [Util.getJavaBinary(project)]
-        compileProcess += ['-cp',  Util.getCompileClassPathOrJar(project).asPath]
-        compileProcess += 'org.jruby.Main'
-        compileProcess += "-S compass compile --sass-dir $themePath --css-dir $themeDir --images-dir $themePath --javascripts-dir $themePath --relative-assets".tokenize()
+        compileProcess += [CLASSPATH_SWITCH,  Util.getCompileClassPathOrJar(project).asPath]
+        compileProcess += RUBY_MAIN_CLASS
+        compileProcess += compassCompile.tokenize()
 
         project.logger.debug(compileProcess.toString())
         compileProcess.execute([

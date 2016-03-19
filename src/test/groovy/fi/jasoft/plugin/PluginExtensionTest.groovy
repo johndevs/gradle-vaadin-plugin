@@ -25,6 +25,9 @@ import fi.jasoft.plugin.configuration.VaadinPluginConfiguration
 import fi.jasoft.plugin.configuration.VaadinPluginExtension
 import org.junit.Test
 
+/**
+ * Tests that the plugin extensions are correctly configured
+ */
 class PluginExtensionTest extends PluginTestBase {
 
     @Test
@@ -110,7 +113,6 @@ class PluginExtensionTest extends PluginTestBase {
     void testDevModeClosure(){
         project.vaadin.devmode {
             noserver false
-            superDevMode false
             bindAddress '0.0.0.0'
             codeServerPort 9997
         }

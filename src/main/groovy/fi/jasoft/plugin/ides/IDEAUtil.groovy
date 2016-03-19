@@ -19,8 +19,12 @@ import org.gradle.api.Project
 
 /**
  * Intellij related utility methods
+ *
+ * @author John Ahlroos
  */
 class IDEAUtil {
+
+    private static final String IDEA_PROPERTY = 'idea'
 
     /**
      * Configures the intellij module.
@@ -30,7 +34,7 @@ class IDEAUtil {
      */
     static void configureIDEAModule(Project project) {
         project.afterEvaluate { Project p ->
-            if(p.hasProperty('idea')){
+            if(p.hasProperty(IDEA_PROPERTY)){
                 def module = p.idea.module
 
                 // Module name is project name
@@ -59,7 +63,7 @@ class IDEAUtil {
      */
     static void addConfigurationToProject(Project project, String conf, boolean test=false){
         project.afterEvaluate { Project p ->
-            if(p.hasProperty('idea')){
+            if(p.hasProperty(IDEA_PROPERTY)){
                 def scopes = p.idea.module.scopes
                 if(test){
                     scopes.TEST.plus += [p.configurations[conf]]
