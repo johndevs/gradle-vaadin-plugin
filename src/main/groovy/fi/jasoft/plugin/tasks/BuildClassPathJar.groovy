@@ -42,8 +42,6 @@ class BuildClassPathJar extends Jar {
 
         project.afterEvaluate{
 
-
-
             DefaultConfiguration serverConf = project.configurations
                     .getByName(GradleVaadinPlugin.CONFIGURATION_RUN_SERVER)
             FileCollection classPath = Util.getCompileClassPath(project)

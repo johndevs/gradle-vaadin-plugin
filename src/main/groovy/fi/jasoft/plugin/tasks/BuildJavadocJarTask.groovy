@@ -24,7 +24,7 @@ import org.gradle.api.tasks.bundling.Jar
  */
 class BuildJavadocJarTask extends Jar {
 
-    public static final String NAME = 'vaadinJavadocJar'
+    static final String NAME = 'vaadinJavadocJar'
 
     public BuildJavadocJarTask() {
         description = "Creates a javadoc jar for the project"

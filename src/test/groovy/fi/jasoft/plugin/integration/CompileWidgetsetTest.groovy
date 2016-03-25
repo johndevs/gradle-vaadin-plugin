@@ -28,7 +28,7 @@ class CompileWidgetsetTest extends IntegrationTest {
 
     @Test void 'Widgetset defined, manual widgetset detected and compiled'(){
         buildFile << """
-            vaadinCompile.configuration.widgetset = 'com.example.MyWidgetset'
+            vaadinCompile.widgetset = 'com.example.MyWidgetset'
         """
         runWithArguments(CreateProjectTask.NAME)
 

@@ -61,7 +61,7 @@ class DevModeTask extends DefaultTask {
         dependsOn('classes', UpdateWidgetsetTask.NAME)
         description = "Run Development Mode for easier debugging and development of client widgets."
         Runtime.getRuntime().addShutdownHook(cleanupThread)
-        configuration = extensions.create('configuration', SuperDevModeConfiguration)
+        configuration = project.extensions.create(NAME, SuperDevModeConfiguration)
     }
 
     @TaskAction
@@ -107,7 +107,7 @@ class DevModeTask extends DefaultTask {
         devmodeProcess += '-noserver'
         devmodeProcess += ['-war', widgetsetDir.canonicalPath]
         devmodeProcess += ['-gen', genDir.canonicalPath]
-        devmodeProcess += ['-startupUrl', "http://localhost:${project.vaadinRun.configuration.serverPort}"]
+        devmodeProcess += ['-startupUrl', "http://localhost:${project.vaadinRun.serverPort}"]
         devmodeProcess += ['-logLevel', configuration.logLevel]
         devmodeProcess += ['-deploy', deployDir.canonicalPath]
         devmodeProcess += ['-workDir', devmodeDir.canonicalPath]

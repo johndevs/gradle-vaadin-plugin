@@ -30,8 +30,8 @@ import org.gradle.util.VersionNumber
  */
 class CreateThemeTask extends DefaultTask {
 
-    public static final String NAME = 'vaadinCreateTheme'
-    public static final String STYLES_SCSS_FILE = 'styles.scss'
+    static final String NAME = 'vaadinCreateTheme'
+    static final String STYLES_SCSS_FILE = 'styles.scss'
 
     @Option(option = 'name', description = 'Theme name')
     def String themeName

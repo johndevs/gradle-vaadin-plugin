@@ -20,14 +20,14 @@ class RunTaskTest extends IntegrationTest {
     }
 
     @Test void 'Run Jetty server'(){
-        buildFile << "vaadinRun.configuration.server = '${JettyApplicationServer.NAME}'"
+        buildFile << "vaadinRun.server = '${JettyApplicationServer.NAME}'"
         def output = runWithArguments('--info', CreateProjectTask.NAME, RunTask.NAME, '--stopAfterStart')
         assertTrue output, output.contains('Starting '+JettyApplicationServer.NAME)
         assertServerRunning output
     }
 
     @Test void 'Run Payara server'(){
-        buildFile << "vaadinRun.configuration.server = '${PayaraApplicationServer.NAME}'"
+        buildFile << "vaadinRun.server = '${PayaraApplicationServer.NAME}'"
         def output = runWithArguments('--info', CreateProjectTask.NAME, RunTask.NAME, '--stopAfterStart')
         assertTrue output, output.contains('Starting '+PayaraApplicationServer.NAME)
         assertServerRunning output

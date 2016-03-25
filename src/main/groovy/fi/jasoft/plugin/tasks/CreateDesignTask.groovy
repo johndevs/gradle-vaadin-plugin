@@ -32,11 +32,11 @@ import java.nio.file.Paths
  */
 class CreateDesignTask extends DefaultTask{
 
-    public static final String NAME = 'vaadinCreateDesign'
+    static final String NAME = 'vaadinCreateDesign'
 
-    private static final String DESIGN_PACKAGE_KEY = 'designPackage'
-    private static final String DESIGN_NAME_KEY = 'designName'
-    public static final String DESIGN_HTML_FILE = 'Design.html'
+    static final String DESIGN_PACKAGE_KEY = 'designPackage'
+    static final String DESIGN_NAME_KEY = 'designName'
+    static final String DESIGN_HTML_FILE = 'Design.html'
 
     @Option(option = 'name', description = 'The name of the design')
     def String designName = 'Basic'

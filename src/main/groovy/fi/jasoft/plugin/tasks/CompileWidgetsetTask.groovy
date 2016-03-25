@@ -40,8 +40,8 @@ class CompileWidgetsetTask extends DefaultTask {
     static final NAME = 'vaadinCompile'
 
     static final WIDGETSET_CDN_URL = 'https://wscdn.vaadin.com'
-    public static final String PUBLIC_FOLDER_PATTERN = '**/*/public/**/*.*'
-    public static final String GWT_MODULE_XML_PATTERN = '**/*/*.gwt.xml'
+    static final String PUBLIC_FOLDER_PATTERN = '**/*/public/**/*.*'
+    static final String GWT_MODULE_XML_PATTERN = '**/*/*.gwt.xml'
 
     def CompileWidgetsetConfiguration configuration
 
@@ -87,9 +87,9 @@ class CompileWidgetsetTask extends DefaultTask {
      */
     @PackageScope
     def writeWidgetsetToFileSystem = { request, zipStream ->
-        String widgetsetName = project.vaadinCompile.configuration.widgetset.replaceAll("[^a-zA-Z0-9]+","")
+        String widgetsetName = configuration.widgetset.replaceAll("[^a-zA-Z0-9]+","")
 
-        if(widgetsetName != project.vaadinCompile.configuration.widgetset){
+        if(widgetsetName != configuration.widgetset){
             logger.warn("Widgetset name cannot contain special characters when using CDN. " +
                     "Illegal characters removed, please update your @Widgetset annotation or web.xml accordingly.")
         }
@@ -128,7 +128,7 @@ class CompileWidgetsetTask extends DefaultTask {
     CompileWidgetsetTask() {
         dependsOn('classes', UpdateWidgetsetTask.NAME, BuildClassPathJar.NAME)
         description = "Compiles Vaadin Addons and components into Javascript."
-        configuration = extensions.create('configuration', CompileWidgetsetConfiguration)
+        configuration = project.extensions.create(NAME, CompileWidgetsetConfiguration)
 
         project.afterEvaluate {
 
@@ -167,7 +167,6 @@ class CompileWidgetsetTask extends DefaultTask {
 
     @TaskAction
     def run() {
-        def configuration = project.vaadinCompile.configuration as CompileWidgetsetConfiguration
         if(configuration.widgetset){
             if(configuration.widgetsetCDN){
                 compileRemotely()
@@ -187,7 +186,7 @@ class CompileWidgetsetTask extends DefaultTask {
      */
     @PackageScope
     def compileRemotely() {
-        if(project.vaadinCompile.configuration.widgetset ==~ /[A-Za-z0-9]+/){
+        if(configuration.widgetset ==~ /[A-Za-z0-9]+/){
 
             // Ensure widgetset directory exists
             Util.getWidgetsetDirectory(project).mkdirs()
@@ -233,7 +232,7 @@ class CompileWidgetsetTask extends DefaultTask {
      * Compiles the widgetset locally
      */
     @PackageScope
-    def compileLocally(String widgetset = project.vaadinCompile.configuration.widgetset) {
+    def compileLocally(String widgetset = configuration.widgetset) {
         def vaadin = project.vaadin as VaadinPluginExtension
 
         // Ensure widgetset directory exists

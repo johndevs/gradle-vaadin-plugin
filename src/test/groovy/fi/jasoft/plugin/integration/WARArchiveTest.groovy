@@ -45,7 +45,7 @@ class WARArchiveTest extends IntegrationTest {
 
     @Test
     void 'Project with widgetset'() {
-        buildFile << "vaadinCompile.configuration.widgetset = 'com.example.TestWidgetset'\n"
+        buildFile << "vaadinCompile.widgetset = 'com.example.TestWidgetset'\n"
 
         runWithArguments('war')
 

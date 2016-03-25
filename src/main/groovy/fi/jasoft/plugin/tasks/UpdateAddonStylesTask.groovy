@@ -28,7 +28,7 @@ import org.gradle.api.tasks.TaskAction
  */
 class UpdateAddonStylesTask extends DefaultTask {
 
-    public static final String NAME = 'vaadinUpdateAddonStyles'
+    static final String NAME = 'vaadinUpdateAddonStyles'
 
     UpdateAddonStylesTask() {
         dependsOn('classes', BuildClassPathJar.NAME)

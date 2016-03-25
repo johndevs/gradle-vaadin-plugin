@@ -7,7 +7,7 @@ import static org.junit.Assert.assertFalse
 import static org.junit.Assert.assertTrue
 
 /**
- * Created by john on 1/6/15.
+ * Tests the injected dependencies
  */
 class ProjectDependenciesTest extends IntegrationTest {
 
@@ -99,9 +99,7 @@ class ProjectDependenciesTest extends IntegrationTest {
 
         buildFile << """
             vaadinCompile {
-                configuration {
-                    widgetset 'com.example.TestWidgetset'
-                }
+               widgetset 'com.example.TestWidgetset'
             }
 
             task testClientDependencies << {

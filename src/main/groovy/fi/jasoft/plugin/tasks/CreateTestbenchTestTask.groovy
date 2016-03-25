@@ -29,7 +29,7 @@ import org.gradle.api.tasks.TaskAction
  */
 class CreateTestbenchTestTask extends DefaultTask {
 
-    public static final String NAME = 'vaadinCreateTestbenchTest'
+    static final String NAME = 'vaadinCreateTestbenchTest'
 
     @Option(option = 'name', description = 'Test name')
     def testName = 'MyTest'

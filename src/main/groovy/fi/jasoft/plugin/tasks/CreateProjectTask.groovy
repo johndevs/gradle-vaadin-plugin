@@ -53,7 +53,7 @@ class CreateProjectTask extends DefaultTask {
 
     @TaskAction
     def run() {
-        def configuration = project.vaadinCompile.configuration as CompileWidgetsetConfiguration
+        def configuration = project.vaadinCompile as CompileWidgetsetConfiguration
 
         if(!applicationName){
             applicationName = project.name.capitalize()
@@ -133,7 +133,7 @@ class CreateProjectTask extends DefaultTask {
 
     @PackageScope
     def makeServletClass(Project project) {
-        def configuration = project.vaadinCompile.configuration as CompileWidgetsetConfiguration
+        def configuration = project.vaadinCompile as CompileWidgetsetConfiguration
 
         def substitutions = [:]
 

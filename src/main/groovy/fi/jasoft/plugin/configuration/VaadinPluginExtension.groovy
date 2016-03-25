@@ -106,19 +106,19 @@ class VaadinPluginExtension {
      */
     @Deprecated
     void debug(boolean debug){
-        project.vaadinRun.configuration.debug = debug
+        project.vaadinRun.debug = debug
         isDebug()
     }
     @Deprecated
     void setDebug(boolean debug){
-        project.vaadinRun.configuration.debug = debug
+        project.vaadinRun.debug = debug
         isDebug()
     }
     @Deprecated
     void isDebug(){
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.debug',
-                'This property has been replaced by vaadinRun.configuration.debug.')
-        project.vaadinRun.configuration.debug
+                'This property has been replaced by vaadinRun.debug.')
+        project.vaadinRun.debug
     }
 
     /**
@@ -126,19 +126,19 @@ class VaadinPluginExtension {
      */
     @Deprecated
     void debugPort(int port){
-        project.vaadinRun.configuration.debugPort = port
+        project.vaadinRun.debugPort = port
         isDebugPort()
     }
     @Deprecated
     void setDebugPort(int port){
-        project.vaadinRun.configuration.debugPort = port
+        project.vaadinRun.debugPort = port
         isDebugPort()
     }
     @Deprecated
     boolean isDebugPort(){
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.debugPort',
-                'This property has been replaced by vaadinRun.configuration.debugPort.')
-        project.vaadinRun.configuration.debugPort
+                'This property has been replaced by vaadinRun.debugPort.')
+        project.vaadinRun.debugPort
     }
 
     /**
@@ -146,19 +146,19 @@ class VaadinPluginExtension {
      */
     @Deprecated
     void serverPort(int port){
-        project.vaadinRun.configuration.serverPort = port
+        project.vaadinRun.serverPort = port
         getServerPort()
     }
     @Deprecated
     void setServerPort(int port){
-        project.vaadinRun.configuration.serverPort = port
+        project.vaadinRun.serverPort = port
         getServerPort()
     }
     @Deprecated
     int getServerPort(){
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.serverPort',
-                'This property has been replaced by vaadinRun.configuration.serverPort.')
-        project.vaadinRun.configuration.serverPort
+                'This property has been replaced by vaadinRun.serverPort.')
+        project.vaadinRun.serverPort
     }
 
     /**
@@ -166,19 +166,19 @@ class VaadinPluginExtension {
      */
     @Deprecated
     void jvmArgs(String[] args){
-        project.vaadinRun.configuration.jvmArgs = args
+        project.vaadinRun.jvmArgs = args
         getJvmArgs()
     }
     @Deprecated
     void setJvmArgs(String[] args){
-        project.vaadinRun.configuration.jvmArgs = args
+        project.vaadinRun.jvmArgs = args
         getJvmArgs()
     }
     @Deprecated
     String[] getJvmArgs(){
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.jvmArgs',
-                'This property has been replaced by vaadinRun.configuration.jvmArgs.')
-        project.vaadinRun.configuration.jvmArgs
+                'This property has been replaced by vaadinRun.jvmArgs.')
+        project.vaadinRun.jvmArgs
     }
 
     /**
@@ -186,19 +186,19 @@ class VaadinPluginExtension {
      */
     @Deprecated
     void widgetsetCDN(Boolean enabled){
-        project.vaadinCompile.configuration.widgetsetCDN = enabled
+        project.vaadinCompile.widgetsetCDN = enabled
         getWidgetsetCDN()
     }
     @Deprecated
     void setWidgetsetCDN(Boolean enabled){
-        project.vaadinCompile.configuration.widgetsetCDN = enabled
+        project.vaadinCompile.widgetsetCDN = enabled
         getWidgetsetCDN()
     }
     @Deprecated
     Boolean getWidgetsetCDN(){
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.widgetsetCDN',
-                'This property has been replaced by vaadinCompile.configuration.widgetsetCDN.')
-        project.vaadinCompile.configuration.widgetsetCDN
+                'This property has been replaced by vaadinCompile.widgetsetCDN.')
+        project.vaadinCompile.widgetsetCDN
     }
 
     /**
@@ -206,19 +206,19 @@ class VaadinPluginExtension {
      */
     @Deprecated
     void profiler(Boolean enabled){
-        project.vaadinCompile.configuration.profiler = enabled
+        project.vaadinCompile.profiler = enabled
         isProfiler()
     }
     @Deprecated
     void setProfiler(Boolean enabled){
-        project.vaadinCompile.configuration.profiler = enabled
+        project.vaadinCompile.profiler = enabled
         isProfiler()
     }
     @Deprecated
     Boolean isProfiler(){
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.profiler',
-                'This property has been replaced by vaadinCompile.configuration.profiler.')
-        project.vaadinCompile.configuration.profiler
+                'This property has been replaced by vaadinCompile.profiler.')
+        project.vaadinCompile.profiler
     }
 
 
@@ -227,19 +227,19 @@ class VaadinPluginExtension {
      */
     @Deprecated
     void manageWidgetset(Boolean enabled){
-        project.vaadinCompile.configuration.manageWidgetset = enabled
+        project.vaadinCompile.manageWidgetset = enabled
         isManageWidgetset()
     }
     @Deprecated
     void setManageWidgetset(Boolean enabled){
-        project.vaadinCompile.configuration.manageWidgetset = enabled
+        project.vaadinCompile.manageWidgetset = enabled
         isManageWidgetset()
     }
     @Deprecated
     Boolean isManageWidgetset(){
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.manageWidgetset',
-                'This property has been replaced by vaadinCompile.configuration.manageWidgetset.')
-        project.vaadinCompile.configuration.manageWidgetset
+                'This property has been replaced by vaadinCompile.manageWidgetset.')
+        project.vaadinCompile.manageWidgetset
     }
 
     /**
@@ -247,12 +247,12 @@ class VaadinPluginExtension {
      */
     @Deprecated
     void widgetset(String widgetset){
-        project.vaadinCompile.configuration.widgetset = widgetset
+        project.vaadinCompile.widgetset = widgetset
         getWidgetset()
     }
     @Deprecated
     void setWidgetset(String widgetset){
-        project.vaadinCompile.configuration.widgetset = widgetset
+        project.vaadinCompile.widgetset = widgetset
         getWidgetset()
     }
     @Deprecated
@@ -260,8 +260,8 @@ class VaadinPluginExtension {
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.widgetset',
                 'This property has been replaced by automatic widgetset detection. ' +
                         'You should be able to remove this property definition completely. ' +
-                        'If you do need to set it manually you can set vaadinCompile.configuration.widgetset.')
-        project.vaadinCompile.configuration.widgetset
+                        'If you do need to set it manually you can set vaadinCompile.widgetset.')
+        project.vaadinCompile.widgetset
     }
 
     /**
@@ -269,18 +269,18 @@ class VaadinPluginExtension {
      */
     @Deprecated
     void widgetsetGenerator(String widgetsetGenerator){
-        project.vaadinCompile.configuration.widgetsetGenerator = widgetsetGenerator
+        project.vaadinCompile.widgetsetGenerator = widgetsetGenerator
         getWidgetsetGenerator()
     }
     @Deprecated
     void setWidgetsetGenerator(String widgetsetGenerator){
-        project.vaadinCompile.configuration.widgetsetGenerator = widgetsetGenerator
+        project.vaadinCompile.widgetsetGenerator = widgetsetGenerator
         getWidgetsetGenerator()
     }
     @Deprecated
     String getWidgetsetGenerator(){
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.widgetsetGenerator',
-                'This property has been replaced by vaadinCompile.configuration.widgetsetGenerator.')
-        project.vaadinCompile.configuration.widgetsetGenerator
+                'This property has been replaced by vaadinCompile.widgetsetGenerator.')
+        project.vaadinCompile.widgetsetGenerator
     }
 }

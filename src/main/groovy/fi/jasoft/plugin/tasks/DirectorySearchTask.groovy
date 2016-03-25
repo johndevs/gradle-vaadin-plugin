@@ -30,8 +30,8 @@ import java.util.concurrent.TimeUnit
  */
 class DirectorySearchTask extends DefaultTask {
 
-    public static final String NAME = 'vaadinAddons'
-    public static final String SPACE = ' '
+    static final String NAME = 'vaadinAddons'
+    static final String SPACE = ' '
 
     private final String directoryUrl = 'https://vaadin.com/Directory/resource/addon/all?detailed=true'
 

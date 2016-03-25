@@ -107,8 +107,8 @@ For a better example of an actual working build.gradle using these options see h
 
 ## Vaadin Project configurations
 * ``vaadin.version`` - Vaadin version (Vaadin 6 and 7 supported). Defaults to latest Vaadin 7
-* ``vaadinCompile.configuration.widgetset`` - The fully qualified name of the widgetset (eg. com.example.helloworld.MyWidgetset)
-* ``vaadinCompile.configuration.widgetsetCDN`` - Should the widgetset CDN (virit.in) be used. Default off.
+* ``vaadinCompile.widgetset`` - The fully qualified name of the widgetset (eg. com.example.helloworld.MyWidgetset)
+* ``vaadinCompile.widgetsetCDN`` - Should the widgetset CDN (virit.in) be used. Default off.
 * ``vaadin.widgetsetGenerator`` - The fully qualified name of the widgetset generator.
 * ``vaadin.debugPort`` - On what port should the debugger listen. Default is 8000
 * ``vaadin.manageWidgetset`` - Should the plugin manage the widgetset for you. Default is true.

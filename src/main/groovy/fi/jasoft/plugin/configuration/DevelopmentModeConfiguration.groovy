@@ -40,19 +40,19 @@ class DevelopmentModeConfiguration {
      */
     @Deprecated
     void noserver(boolean noserver){
-        project.vaadinSuperDevMode.configuration.noserver = noserver
+        project.vaadinSuperDevMode.noserver = noserver
         getNoserver()
     }
     @Deprecated
     void setNoserver(boolean noserver){
-        project.vaadinSuperDevMode.configuration.noserver = noserver
+        project.vaadinSuperDevMode.noserver = noserver
         getNoserver()
     }
     @Deprecated
     boolean getNoserver(){
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.devmode.noserver',
-                'This property has been replaced by vaadinSuperDevMode.configuration.noserver.')
-        project.vaadinSuperDevMode.configuration.noserver
+                'This property has been replaced by vaadinSuperDevMode.noserver.')
+        project.vaadinSuperDevMode.noserver
     }
 
     /**
@@ -82,19 +82,19 @@ class DevelopmentModeConfiguration {
      */
     @Deprecated
     void bindAddress(String address){
-        project.vaadinSuperDevMode.configuration.bindAddress = address
+        project.vaadinSuperDevMode.bindAddress = address
         getBindAddress()
     }
     @Deprecated
     void setBindAddress(String address){
-        project.vaadinSuperDevMode.configuration.bindAddress = address
+        project.vaadinSuperDevMode.bindAddress = address
         getBindAddress()
     }
     @Deprecated
     String getBindAddress(){
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.devmode.bindAddress',
-                'This property has been replaced by vaadinSuperDevMode.configuration.bindAddress.')
-        project.vaadinSuperDevMode.configuration.bindAddress
+                'This property has been replaced by vaadinSuperDevMode.bindAddress.')
+        project.vaadinSuperDevMode.bindAddress
     }
 
     /**
@@ -102,19 +102,19 @@ class DevelopmentModeConfiguration {
      */
     @Deprecated
     void codeServerPort(Integer port){
-        project.vaadinSuperDevMode.configuration.codeServerPort = port
+        project.vaadinSuperDevMode.codeServerPort = port
         getCodeServerPort()
     }
     @Deprecated
     void setCodeServerPort(Integer port){
-        project.vaadinSuperDevMode.configuration.codeServerPort = port
+        project.vaadinSuperDevMode.codeServerPort = port
         getCodeServerPort()
     }
     @Deprecated
     Integer getCodeServerPort(){
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.devmode.codeServerPort',
-                'This property has been replaced by vaadinSuperDevMode.configuration.codeServerPort.')
-        project.vaadinSuperDevMode.configuration.codeServerPort
+                'This property has been replaced by vaadinSuperDevMode.codeServerPort.')
+        project.vaadinSuperDevMode.codeServerPort
     }
 
     /**
@@ -122,18 +122,18 @@ class DevelopmentModeConfiguration {
      */
     @Deprecated
     void extraArgs(String[] args){
-        project.vaadinSuperDevMode.configuration.extraArgs = args
+        project.vaadinSuperDevMode.extraArgs = args
         getExtraArgs()
     }
     @Deprecated
     void setExtraArgs(boolean args){
-        project.vaadinSuperDevMode.configuration.extraArgs = args
+        project.vaadinSuperDevMode.extraArgs = args
         getExtraArgs()
     }
     @Deprecated
     String[] getExtraArgs(){
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.devmode.extraArgs',
-                'This property has been replaced by vaadinSuperDevMode.configuration.extraArgs.')
-        project.vaadinSuperDevMode.configuration.extraArgs
+                'This property has been replaced by vaadinSuperDevMode.extraArgs.')
+        project.vaadinSuperDevMode.extraArgs
     }
 }

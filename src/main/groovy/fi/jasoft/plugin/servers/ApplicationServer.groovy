@@ -58,7 +58,7 @@ abstract class ApplicationServer {
      */
     static ApplicationServer get(Project project,
                                     List browserParameters = [],
-                                    ApplicationServerConfiguration configuration=project.vaadinRun.configuration){
+                                    ApplicationServerConfiguration configuration=project.vaadinRun){
         switch(configuration.server){
             case PayaraApplicationServer.NAME:
                 return new PayaraApplicationServer(project, browserParameters, configuration)

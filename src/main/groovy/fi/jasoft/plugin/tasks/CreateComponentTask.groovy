@@ -30,9 +30,9 @@ import org.gradle.api.tasks.TaskAction
  */
 class CreateComponentTask extends DefaultTask {
 
-    public static final String NAME = 'vaadinCreateComponent'
+    static final String NAME = 'vaadinCreateComponent'
 
-    private static final String DOT = '.'
+    static final String DOT = '.'
 
     @Option(option = 'name', description = 'Component name')
     def componentName = 'MyComponent'
@@ -43,16 +43,16 @@ class CreateComponentTask extends DefaultTask {
 
     @TaskAction
     public void run() {
-        if (!project.vaadinCompile.configuration.widgetset) {
+        if (!project.vaadinCompile.widgetset) {
             throw new GradleException('No widgetset found. Please define a widgetset using ' +
-                    'the vaadinCompile.configuration.widgetset property.')
+                    'the vaadinCompile.widgetset property.')
         }
         makeComponentClasses()
     }
 
     @PackageScope
     def makeComponentClasses() {
-        def widgetset = project.vaadinCompile.configuration.widgetset as String
+        def widgetset = project.vaadinCompile.widgetset as String
         String widgetsetPackageFQN = widgetset.substring(0, widgetset.lastIndexOf(DOT))
         def widgetsetPackagePath = TemplateUtil.convertFQNToFilePath(widgetsetPackageFQN)
 

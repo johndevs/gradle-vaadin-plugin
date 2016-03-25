@@ -28,7 +28,7 @@ import org.gradle.api.tasks.TaskAction
  */
 class RunTask extends DefaultTask {
 
-    public static final String NAME = 'vaadinRun'
+    static final String NAME = 'vaadinRun'
 
     def server
 
@@ -59,7 +59,7 @@ class RunTask extends DefaultTask {
         dependsOn(CompileThemeTask.NAME)
         description = 'Runs the Vaadin application on an embedded Jetty ApplicationServer'
         Runtime.getRuntime().addShutdownHook(cleanupThread)
-        configuration = extensions.create('configuration', ApplicationServerConfiguration)
+        configuration = project.extensions.create(NAME, ApplicationServerConfiguration)
     }
 
     @TaskAction

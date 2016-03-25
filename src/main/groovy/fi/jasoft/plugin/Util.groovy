@@ -115,7 +115,7 @@ class Util {
             collection += project.files(dir)
         }
 
-        if(project.vaadinCompile.configuration.gwtSdkFirstInClasspath){
+        if(project.vaadinCompile.gwtSdkFirstInClasspath){
             collection = moveGwtSdkFirstInClasspath(project, collection)
         }
 
@@ -223,7 +223,7 @@ class Util {
      *      the URL to open
      */
     static void openBrowser(Project project, String url) {
-        if (project.vaadinRun.configuration.openInBrowser && java.awt.Desktop.isDesktopSupported()) {
+        if (project.vaadinRun.openInBrowser && java.awt.Desktop.isDesktopSupported()) {
             Thread.startDaemon {
                 java.awt.Desktop.desktop.browse url.toURI()
             }
@@ -556,7 +556,7 @@ class Util {
      *      The widgetset directory
      */
     static File getWidgetsetDirectory(Project project) {
-        def webAppDir = project.vaadinCompile.configuration.outputDirectory ?:
+        def webAppDir = project.vaadinCompile.outputDirectory ?:
                 project.convention.getPlugin(WarPluginConvention).webAppDir
         def vaadinDir = new File(webAppDir, VAADIN)
         def widgetsetsDir = new File(vaadinDir, 'widgetsets')
@@ -572,7 +572,7 @@ class Util {
      *      The widgetset directory
      */
     static File getWidgetsetCacheDirectory(Project project) {
-        def webAppDir = project.vaadinCompile.configuration.outputDirectory ?:
+        def webAppDir = project.vaadinCompile.outputDirectory ?:
                 project.convention.getPlugin(WarPluginConvention).webAppDir
         def vaadinDir = new File(webAppDir, VAADIN)
         def unitCacheDir = new File(vaadinDir, 'gwt-unitCache')
@@ -769,8 +769,8 @@ class Util {
      * Resolves the first available widgetset from Project
      */
     static String getWidgetset(Project project) {
-        if(project.vaadinCompile.configuration.widgetset){
-            return project.vaadinCompile.configuration.widgetset
+        if(project.vaadinCompile.widgetset){
+            return project.vaadinCompile.widgetset
         }
 
         // Search for widgetset
@@ -802,7 +802,7 @@ class Util {
             return modules.first()
         }
 
-        String widgetset = project.vaadinCompile.configuration.widgetset
+        String widgetset = project.vaadinCompile.widgetset
         if(widgetset){
             // No widgetset file detected, create one
             File resourceDir = project.sourceSets.main.resources.srcDirs.first()

@@ -61,7 +61,7 @@ class SuperDevModeTask extends DefaultTask {
         dependsOn(CompileWidgetsetTask.NAME)
         description = "Run Super Development Mode for easier client widget development."
         Runtime.getRuntime().addShutdownHook(cleanupThread)
-        configuration = extensions.create('configuration', SuperDevModeConfiguration)
+        configuration = project.extensions.create(NAME, SuperDevModeConfiguration)
     }
 
     @TaskAction

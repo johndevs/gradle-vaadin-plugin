@@ -66,7 +66,7 @@ class PluginExtensionTest extends PluginTestBase {
 
     @Test
     void areGWTPropertiesConfigured(){
-        CompileWidgetsetConfiguration conf = project.vaadinCompile.configuration
+        CompileWidgetsetConfiguration conf = project.vaadinCompile
         assert conf instanceof CompileWidgetsetConfiguration
         assert conf.style == "OBF"
         assert conf.optimize == 0
@@ -102,7 +102,7 @@ class PluginExtensionTest extends PluginTestBase {
 
     @Test
     void areDevModePropertiesConfigured(){
-        SuperDevModeConfiguration conf = project.vaadinSuperDevMode.configuration
+        SuperDevModeConfiguration conf = project.vaadinSuperDevMode
         assert conf instanceof SuperDevModeConfiguration
         assert conf.noserver == false
         assert conf.bindAddress == '127.0.0.1'

@@ -41,9 +41,9 @@ class CreateWidgetsetGeneratorTask extends DefaultTask {
 
     @TaskAction
     def run() {
-        if (!project.vaadinCompile.configuration.widgetset) {
+        if (!project.vaadinCompile.widgetset) {
             throw new GradleException("No widgetset found. Please define a widgetset " +
-                    "using the vaadinCompile.configuration.widgetset property.")
+                    "using the vaadinCompile.widgetset property.")
         }
         makeWidgetsetGeneratorClass()
     }
@@ -51,8 +51,8 @@ class CreateWidgetsetGeneratorTask extends DefaultTask {
     @PackageScope
     def makeWidgetsetGeneratorClass() {
         def javaDir = Util.getMainSourceSet(project, true).srcDirs.first()
-        def widgetset = project.vaadinCompile.configuration.widgetset as String
-        def widgetsetGenerator = project.vaadinCompile.configuration.widgetsetGenerator as String
+        def widgetset = project.vaadinCompile.widgetset as String
+        def widgetsetGenerator = project.vaadinCompile.widgetsetGenerator as String
 
         String name, pkg, filename
         if (!widgetsetGenerator) {

@@ -42,25 +42,18 @@ class UpdateWidgetsetTask extends DefaultTask {
 
     public static final String NAME = 'vaadinUpdateWidgetset'
 
-    private static final String PUBLIC_FOLDER = 'public'
-
-    private static final String CSS_FILE_POSTFIX = 'css'
-
-    private static final String SCSS_FILE_POSTFIX = 'scss'
-
-    private static final String GWT_MODULE_XML_POSTFIX = '.gwt.xml'
-
-    private static final String DEFAULT_WIDGETSET = 'com.vaadin.DefaultWidgetSet'
-
-    private static final String DEFAULT_LEGACY_WIDGETSET = 'com.vaadin.terminal.gwt.DefaultWidgetSet'
-
-    private static final String DOT = '.'
-
-    public static final String JAVA_FILE_POSTFIX = ".java"
+    static final String PUBLIC_FOLDER = 'public'
+    static final String CSS_FILE_POSTFIX = 'css'
+    static final String SCSS_FILE_POSTFIX = 'scss'
+    static final String GWT_MODULE_XML_POSTFIX = '.gwt.xml'
+    static final String DEFAULT_WIDGETSET = 'com.vaadin.DefaultWidgetSet'
+    static final String DEFAULT_LEGACY_WIDGETSET = 'com.vaadin.terminal.gwt.DefaultWidgetSet'
+    static final String DOT = '.'
+    static final String JAVA_FILE_POSTFIX = ".java"
 
     public UpdateWidgetsetTask() {
         description = "Updates the widgetset xml file"
-        onlyIf { project.vaadinCompile.configuration.manageWidgetset && Util.getWidgetset(project) }
+        onlyIf { project.vaadinCompile.manageWidgetset && Util.getWidgetset(project) }
     }
 
     @TaskAction
@@ -70,7 +63,7 @@ class UpdateWidgetsetTask extends DefaultTask {
 
     @PackageScope
     static File ensureWidgetPresent(Project project, String widgetsetFQN=Util.getWidgetset(project)) {
-        if (!project.vaadinCompile.configuration.manageWidgetset || !widgetsetFQN) {
+        if (!project.vaadinCompile.manageWidgetset || !widgetsetFQN) {
             return null
         }
 
@@ -91,7 +84,7 @@ class UpdateWidgetsetTask extends DefaultTask {
 
     @PackageScope
     static updateWidgetset(File widgetsetFile, String widgetsetFQN, Project project) {
-        def configuration = project.vaadinCompile.configuration as CompileWidgetsetConfiguration
+        def configuration = project.vaadinCompile as CompileWidgetsetConfiguration
 
         def substitutions = [:]
 

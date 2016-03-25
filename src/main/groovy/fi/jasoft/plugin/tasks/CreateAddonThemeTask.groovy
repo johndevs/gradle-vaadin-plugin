@@ -28,7 +28,7 @@ import org.gradle.api.tasks.TaskAction
  */
 class CreateAddonThemeTask extends DefaultTask {
 
-    public static final String NAME = 'vaadinCreateAddonTheme'
+    static final String NAME = 'vaadinCreateAddonTheme'
 
     @Option(option = 'name', description = 'Theme name')
     def themeName = 'MyAddonTheme'

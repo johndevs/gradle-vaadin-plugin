@@ -30,9 +30,9 @@ import org.gradle.api.tasks.TaskAction
  */
 class CreateCompositeTask extends DefaultTask {
 
-    public static final String NAME = 'vaadinCreateComposite'
+    static final String NAME = 'vaadinCreateComposite'
 
-    private static final String DOT = '.'
+    static final String DOT = '.'
 
     @Option(option = 'name', description = 'Component name')
     def componentName = 'MyComposite'
@@ -46,7 +46,7 @@ class CreateCompositeTask extends DefaultTask {
 
     @TaskAction
     public void run() {
-        def configuration = project.vaadinCompile.configuration as CompileWidgetsetConfiguration
+        def configuration = project.vaadinCompile as CompileWidgetsetConfiguration
         if(!componentPackage && configuration.widgetset){
             String widgetsetClass = configuration.widgetset
             String widgetsetPackage = widgetsetClass.substring(0, widgetsetClass.lastIndexOf(DOT))

@@ -70,19 +70,19 @@ class VaadinPluginConfiguration {
      */
     @Deprecated
     void openInBrowser(boolean open){
-        project.vaadinRun.configuration.openInBrowser = open
+        project.vaadinRun.openInBrowser = open
         isOpenInBrowser()
     }
     @Deprecated
     void setOpenInBrowser(boolean open){
-        project.vaadinRun.configuration.openInBrowser = open
+        project.vaadinRun.openInBrowser = open
         isOpenInBrowser()
     }
     @Deprecated
     boolean isOpenInBrowser(){
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.plugin.openInBrowser',
-                'This property has been replaced by vaadinRun.configuration.openInBrowser.')
-        project.vaadinRun.configuration.openInBrowser
+                'This property has been replaced by vaadinRun.openInBrowser.')
+        project.vaadinRun.openInBrowser
     }
 
     /**
@@ -90,19 +90,19 @@ class VaadinPluginConfiguration {
      */
     @Deprecated
     void themeAutoRecompile(boolean recompile){
-        project.vaadinRun.configuration.themeAutoRecompile = recompile
+        project.vaadinRun.themeAutoRecompile = recompile
         isThemeAutoRecompile()
     }
     @Deprecated
     void setThemeAutoRecompile(boolean recompile){
-        project.vaadinRun.configuration.themeAutoRecompile = recompile
+        project.vaadinRun.themeAutoRecompile = recompile
         isThemeAutoRecompile()
     }
     @Deprecated
     boolean isThemeAutoRecompile(){
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.plugin.themeAutoRecompile',
-                'This property has been replaced by vaadinRun.configuration.themeAutoRecompile.')
-        project.vaadinRun.configuration.themeAutoRecompile
+                'This property has been replaced by vaadinRun.themeAutoRecompile.')
+        project.vaadinRun.themeAutoRecompile
     }
     /**
      * Should jetty restart when a class is changed in the build directory.
@@ -111,18 +111,18 @@ class VaadinPluginConfiguration {
      */
     @Deprecated
     void jettyAutoRefresh(boolean refresh){
-        project.vaadinRun.configuration.serverRestart = refresh
+        project.vaadinRun.serverRestart = refresh
         isJettyAutoRefresh()
     }
     @Deprecated
     void setJettyAutoRefresh(boolean refresh){
-        project.vaadinRun.configuration.serverRestart = refresh
+        project.vaadinRun.serverRestart = refresh
         isJettyAutoRefresh()
     }
     @Deprecated
     boolean isJettyAutoRefresh(){
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.plugin.jettyAutoRefresh',
-                'This property has been replaced by vaadinRun.configuration.serverRestart.')
-        project.vaadinRun.configuration.serverRestart
+                'This property has been replaced by vaadinRun.serverRestart.')
+        project.vaadinRun.serverRestart
     }
 }
