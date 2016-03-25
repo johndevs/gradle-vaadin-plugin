@@ -126,28 +126,28 @@ For a better example of an actual working build.gradle using these options see h
 * ``vaadin.profiler`` - Should the vaadin client side profiler be enabled. Default is false.
 
 ## Vaadin GWT configurations
-* ``vaadin.gwt.style`` - Compilation style of the GWT compiler. Default is OBF.
-* ``vaadin.gwt.optimize`` - Optimization level of the GWT compiler. Default is 0.
-* ``vaadin.gwt.logLevel`` - The log level of the GWT compiler. Default is INFO.
-* ``vaadin.gwt.localWorkers`` - The amount of threads the GWT compiler should use. Default is the amount of CPU's available.
-* ``vaadin.gwt.draftCompile`` - Should GWT draft compile be used. Default is false.
-* ``vaadin.gwt.strict`` - Should the GWT Compiler be run in strict mode. Default is false.
-* ``vaadin.gwt.userAgent`` - The browsers you want to support. All browser are supported by default.
-* ``vaadin.gwt.jvmArgs`` - Additional JVM arguments passed to the widgetset compiler. Default is ''. Example:
+* ``vaadinCompile.style`` - Compilation style of the GWT compiler. Default is OBF.
+* ``vaadinCompile.optimize`` - Optimization level of the GWT compiler. Default is 0.
+* ``vaadinCompile.logLevel`` - The log level of the GWT compiler. Default is INFO.
+* ``vaadinCompile.localWorkers`` - The amount of threads the GWT compiler should use. Default is the amount of CPU's available.
+* ``vaadinCompile.draftCompile`` - Should GWT draft compile be used. Default is false.
+* ``vaadinCompile.strict`` - Should the GWT Compiler be run in strict mode. Default is false.
+* ``vaadinCompile.userAgent`` - The browsers you want to support. All browser are supported by default.
+* ``vaadinCompile.jvmArgs`` - Additional JVM arguments passed to the widgetset compiler. Default is ''. Example:
 ```
 gwt.jvmArgs = ['-Xmx500M', '-XX:MaxPermSize=256M']
 ```
-* ``vaadin.gwt.extraArgs`` - Extra compiler arguments that should be passed to the widgetset compiler.
-* ``vaadin.gwt.sourcePaths`` - Source folders where GWT code that should be compiled to JS is found. Default is 'client' and 'shared'.
-* ``vaadin.gwt.collapsePermutations`` - Should all permutations be compiled into a single js file for faster compilation time (but larger file size).
-* ``vaadin.gwt.gwtSdkFirstInClasspath`` - Should GWT be placed first in the classpath when compiling the widgetset.
-* ``vaadin.gwt.outputDirectory`` - (Optional) root directory, for generated files; default is the web-app directory from the WAR plugin.  E.g. ``/VAADIN/widgetsets`` is generated there.
+* ``vaadinCompile.extraArgs`` - Extra compiler arguments that should be passed to the widgetset compiler.
+* ``vaadinCompile.sourcePaths`` - Source folders where GWT code that should be compiled to JS is found. Default is 'client' and 'shared'.
+* ``vaadinCompile.collapsePermutations`` - Should all permutations be compiled into a single js file for faster compilation time (but larger file size).
+* ``vaadinCompile.gwtSdkFirstInClasspath`` - Should GWT be placed first in the classpath when compiling the widgetset.
+* ``vaadinCompile.outputDirectory`` - (Optional) root directory, for generated files; default is the web-app directory from the WAR plugin.  E.g. ``/VAADIN/widgetsets`` is generated there.
 
 ## Vaadin Devmode configurations
-* ``vaadin.devmode.noserver`` - Do not run the embedded Jetty server when running devmode. Default is false.
-* ~~``vaadin.devmode.superDevMode`` - Add support for super devmode. Default is false.~~
-* ``vaadin.devmode.bindAddress`` - The address the DevMode server should be bound to. Default is 127.0.0.1.
-* ``vaadin.devmode.codeServerPort`` - The port the DevMode server should be bound to. Default is 9997.
+* ``vaadinDevMode.noserver`` - Do not run the embedded Jetty server when running devmode. Default is false.
+* ~~``vaadinDevMode.superDevMode`` - Add support for super devmode. Default is false.~~
+* ``vaadinDevMode.bindAddress`` - The address the DevMode server should be bound to. Default is 127.0.0.1.
+* ``vaadinDevMode.codeServerPort`` - The port the DevMode server should be bound to. Default is 9997.
 
 ## Vaadin Tooling configurations
 All Vaadin Tooling are free to try for 30 days but then requires a license. See https://vaadin.com/tools-and-services for more information.

@@ -72,7 +72,7 @@ class DevModeTask extends DefaultTask {
 
         runDevelopmentMode()
 
-        if (!project.vaadin.devmode.noserver) {
+        if (!configuration.noserver) {
             server = ApplicationServer.get(
                     project,
                     ["gwt.codesvr=${configuration.bindAddress}:${configuration.codeServerPort}"]
@@ -115,7 +115,7 @@ class DevModeTask extends DefaultTask {
         devmodeProcess += ['-codeServerPort', configuration.codeServerPort]
         devmodeProcess += ['-bindAddress', configuration.bindAddress]
 
-        if (project.vaadin.devmode.extraArgs) {
+        if (configuration.extraArgs) {
             devmodeProcess += configuration.extraArgs as List
         }
 

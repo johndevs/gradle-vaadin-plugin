@@ -98,7 +98,7 @@ class SuperDevModeTask extends DefaultTask {
         superdevmodeProcess += ['-logLevel', configuration.logLevel]
         superdevmodeProcess += ['-noprecompile']
 
-        if (project.vaadin.devmode.extraArgs) {
+        if (configuration.extraArgs) {
             superdevmodeProcess += configuration.extraArgs as List
         }
 

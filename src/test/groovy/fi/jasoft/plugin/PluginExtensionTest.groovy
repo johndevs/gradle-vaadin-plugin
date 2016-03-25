@@ -84,7 +84,7 @@ class PluginExtensionTest extends PluginTestBase {
 
     @Test
     void testGWTClosure(){
-        project.vaadin.gwt {
+        project.vaadinCompile {
                 style "PRETTY"
                 optimize 0
                 logLevel "INFO"
@@ -97,7 +97,7 @@ class PluginExtensionTest extends PluginTestBase {
                 sourcePaths (['client', 'shared'] as String[])
                 collapsePermutations false
         }
-        assert project.extensions.vaadin.gwt.style == "PRETTY"
+        assert project.extensions.vaadinCompile.style == "PRETTY"
     }
 
     @Test
@@ -111,12 +111,12 @@ class PluginExtensionTest extends PluginTestBase {
 
     @Test
     void testDevModeClosure(){
-        project.vaadin.devmode {
+        project.vaadinDevMode {
             noserver false
             bindAddress '0.0.0.0'
             codeServerPort 9997
         }
-        assert project.extensions.vaadin.devmode.bindAddress == '0.0.0.0'
+        assert project.extensions.vaadinDevMode.bindAddress == '0.0.0.0'
     }
 
     @Test
