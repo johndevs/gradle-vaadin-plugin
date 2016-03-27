@@ -76,89 +76,37 @@ apply plugin: fi.jasoft.plugin.GradleVaadinPlugin
 
 \* Payara becomes the default server for vaadinRun.
 
-# Plugin tasks
-The following tasks are available in the plugin
 
-* ``vaadinCreateComponent`` - Creates a new Vaadin Component.
-* ``vaadinCreateComposite`` - Creates a new Vaadin Composite for use with VisualDesigner.
-* ``vaadinCreateProject`` - Creates a new Vaadin Project.
-* ``vaadinCreateTheme`` - Creates a new Vaadin Theme
-* ``vaadinCreateAddonTheme`` - Creates a new Vaadin addon theme
-* ``vaadinCreateWidgetsetGenerator`` - Creates a new widgetset generator for optimizing the widgetset
-* ``vaadinCreateTestbenchTest`` - Creates a new testbench JUnit test. (Requires Testbench enabled).
-* ``vaadinDevMode`` - Run Development Mode for easier debugging and development of client widgets.
-* ``vaadinSuperDevMode`` - Run Super Development Mode for easier client widget development.
-* ``vaadinCompileThemes`` - Compiles a Vaadin SASS theme into CSS
-* ``vaadinCompile`` - Compiles Vaadin Addons and components into Javascript.
-* ``vaadinRun`` - Runs the Vaadin application on an embedded Jetty Server
-* ``vaadinAddons`` - Search for addons in the Vaadin Directory. Optional parameters: -Psearch=<term> -Psort=[name|description|date|rating] -Pverbose=[true|false]
-* ``vaadinAddonZip`` - Create Vaadin Directory compatible Addon zip archive of the project. Metadata can be configurated with the vaadin.addon.* properties.
-* ``vaadinJavadocJar`` - Generate javadoc from project and package it as a jar.
-* ``vaadinSourcesJar`` - Packages all sources a a jar.
-
-Not provided by the Vaadin plugin directly but inherited from other dependent plugins.
-* ``jar`` - Create Vaadin Directory compatible Addon jar out of the project. Metadata can be configurated with the vaadin.addon.* properties.
-* ``war``- Create a WAR archive of the project which can run on any application server.
-
-# Plugin configurations
-The following configuration options are available.
-
-For a better example of an actual working build.gradle using these options see https://gist.github.com/johndevs/11184881 .
-
-## Vaadin Project configurations
+# Project configurations
 * ``vaadin.version`` - Vaadin version (Vaadin 6 and 7 supported). Defaults to latest Vaadin 7
-* ``vaadinCompile.widgetset`` - The fully qualified name of the widgetset (eg. com.example.helloworld.MyWidgetset)
-* ``vaadinCompile.widgetsetCDN`` - Should the widgetset CDN (virit.in) be used. Default off.
-* ``vaadin.widgetsetGenerator`` - The fully qualified name of the widgetset generator.
-* ``vaadin.debugPort`` - On what port should the debugger listen. Default is 8000
-* ``vaadin.manageWidgetset`` - Should the plugin manage the widgetset for you. Default is true.
 * ``vaadin.manageDependencies`` - Should the plugin manage the Vaadin depencies for you. Default is true.
 * ``vaadin.manageRepositories`` - Should the plugin add repositories such as maven central and vaadin addons to the project.  Default is true.
-* ``vaadin.serverPort`` - The port the embedded server listens to. Default is 8080.
-* ``vaadin.jvmArgs`` - Additional JVM arguments passed to the vaadinRun task. Default is ''.
+* ``vaadin.mainSourceSet`` - Defines the main source set where all source files will be generated.
+* ``vaadin.push`` - Should vaadin push be enabled for the application. Default is false.
+
+# Addon configurations
 * ``vaadin.addon.author`` - The author of the Vaadin addon.
 * ``vaadin.addon.license`` - The licence of the Vaadin addon.
 * ``vaadin.addon.title`` - The title for the addon as seen in the Vaadin Directory.
 * ``vaadin.addon.styles`` - An array of paths relative to webroot (eg. '/VAADIN/addons/myaddon/myaddon.scss') where CSS and SCSS files for an addon can be found.
-* ``vaadin.mainSourceSet`` - Defines the main source set where all source files will be generated.
-* ``vaadin.push`` - Should vaadin push be enabled for the application. Default is false.
-* ``vaadin.debug`` - Should the application be run in debug mode. Default is true.
-* ``vaadin.profiler`` - Should the vaadin client side profiler be enabled. Default is false.
 
-## Vaadin GWT configurations
-* ``vaadinCompile.style`` - Compilation style of the GWT compiler. Default is OBF.
-* ``vaadinCompile.optimize`` - Optimization level of the GWT compiler. Default is 0.
-* ``vaadinCompile.logLevel`` - The log level of the GWT compiler. Default is INFO.
-* ``vaadinCompile.localWorkers`` - The amount of threads the GWT compiler should use. Default is the amount of CPU's available.
-* ``vaadinCompile.draftCompile`` - Should GWT draft compile be used. Default is false.
-* ``vaadinCompile.strict`` - Should the GWT Compiler be run in strict mode. Default is false.
-* ``vaadinCompile.userAgent`` - The browsers you want to support. All browser are supported by default.
-* ``vaadinCompile.jvmArgs`` - Additional JVM arguments passed to the widgetset compiler. Default is ''. Example:
-```
-gwt.jvmArgs = ['-Xmx500M', '-XX:MaxPermSize=256M']
-```
-* ``vaadinCompile.extraArgs`` - Extra compiler arguments that should be passed to the widgetset compiler.
-* ``vaadinCompile.sourcePaths`` - Source folders where GWT code that should be compiled to JS is found. Default is 'client' and 'shared'.
-* ``vaadinCompile.collapsePermutations`` - Should all permutations be compiled into a single js file for faster compilation time (but larger file size).
-* ``vaadinCompile.gwtSdkFirstInClasspath`` - Should GWT be placed first in the classpath when compiling the widgetset.
-* ``vaadinCompile.outputDirectory`` - (Optional) root directory, for generated files; default is the web-app directory from the WAR plugin.  E.g. ``/VAADIN/widgetsets`` is generated there.
+# Plugin configurations
+* ``vaadin.plugin.logToConsole``- Should server logs be logged to the console or to a log file. Default is logging to file.
+* ``vaadin.plugin.openInBrowser`` - Should the application be opened in a browser tab after the application is launched. Default true.
+* ``vaadin.plugin.eclipseOutputDir`` - The directory where Eclipse will output its compiled classes. Default is project.sourceSets.main.output.classesDir.
+* ~~``vaadin.plugin.jettyAutoRefresh`` - Should jetty automatically restart when a class is changed while jetty is running.~~
+* ``vaadin.plugin.serverRestart`` - Should the server automatically restart when a class is changed.
+* ``vaadin.plugin.themeCompiler`` - The SASS compiler to use. *vaadin* and *compass* are available. *vaadin* is default.
+* ``vaadin.plugin.themeAutoRecompile`` - Should the SASS theme be recompiled on change while the vaadinRun task is executed.
+* ``vaadin.plugin.themesDirectory`` - Root directory for themes. By default *src/main/webapp/VAADIN/themes*
+* ``vaadin.plugin.useClassPathJar`` - Use a single jar to define the classpath (if the classpath is too long)
+* ``vaadin.plugin.server`` - Which server the vaadinRun task uses. Can be either *payara* or *jetty*. Payara is used by default.
 
-## Vaadin Devmode configurations
-* ``vaadinDevMode.noserver`` - Do not run the embedded Jetty server when running devmode. Default is false.
-* ~~``vaadinDevMode.superDevMode`` - Add support for super devmode. Default is false.~~
-* ``vaadinDevMode.bindAddress`` - The address the DevMode server should be bound to. Default is 127.0.0.1.
-* ``vaadinDevMode.codeServerPort`` - The port the DevMode server should be bound to. Default is 9997.
-
-## Vaadin Tooling configurations
-All Vaadin Tooling are free to try for 30 days but then requires a license. See https://vaadin.com/tools-and-services for more information.
-
-### Vaadin JRebel
-(Licence no longer available through Vaadin, contact http://zeroturnaround.com/ for licence)
-
+# JRebel configurations
 * ``vaadin.jrebel.enabled`` - Should JRebel be used when running the project. Default is false
 * ``vaadin.jrebel.location`` - Absolute path of jrebel.jar (required if ```jrebel.enabled``` is set to true)
 
-### Vaadin Testbench
+# Vaadin Testbench configurations
 * ``vaadin.testbench.enabled`` - Should Testbench be used for UI testing?. Default is false.
 * ``vaadin.testbench.version`` - Version of testbench to use. By default the latest release of the 3.x series.
 * ``vaadin.testbench.runApplication`` - Should the application be run on embedded Jetty before the tests are run. Default true.
@@ -177,14 +125,178 @@ vaadin.testbench.node.browsers = [
 ]
 ```
 
-## Plugin configurations
-* ``vaadin.plugin.logToConsole``- Should server logs be logged to the console or to a log file. Default is logging to file.
-* ``vaadin.plugin.openInBrowser`` - Should the application be opened in a browser tab after the application is launched. Default true.
-* ``vaadin.plugin.eclipseOutputDir`` - The directory where Eclipse will output its compiled classes. Default is project.sourceSets.main.output.classesDir.
-* ~~``vaadin.plugin.jettyAutoRefresh`` - Should jetty automatically restart when a class is changed while jetty is running.~~
-* ``vaadin.plugin.serverRestart`` - Should the server automatically restart when a class is changed.
-* ``vaadin.plugin.themeCompiler`` - The SASS compiler to use. *vaadin* and *compass* are available. *vaadin* is default.
-* ``vaadin.plugin.themeAutoRecompile`` - Should the SASS theme be recompiled on change while the vaadinRun task is executed.
-* ``vaadin.plugin.themesDirectory`` - Root directory for themes. By default *src/main/webapp/VAADIN/themes*
-* ``vaadin.plugin.useClassPathJar`` - Use a single jar to define the classpath (if the classpath is too long)
-* ``vaadin.plugin.server`` - Which server the vaadinRun task uses. Can be either *payara* or *jetty*. Payara is used by default.
+# Plugin tasks
+
+## vaadinCreateComponent
+
+Creates a new Vaadin Component
+
+### Parameters 
+*  ``name`` - The class name of the component. By default *MyComponent*.
+
+## vaadinCreateComposite
+
+Creates a new Vaadin Composite.
+
+### Parameters
+* ``name`` -  The class name of the composite. By default *MyComposite*.
+* ``package`` - The package where the composite should be placed. By default *com.example.\<component name\>*. 
+
+## vaadinCreateProject
+
+Creates a new Vaadin Project.
+
+### Parameters
+* ``name`` -  The application name. By default the project name.
+* ``package`` - The package where the application classes will be placed. 
+* ``widgetset`` - The widgetset name, if applicable.
+By default, if a widgetset is defined, that package is used, otherwise *com.example.\<project name\>* is used.
+
+## vaadinCreateTheme
+
+Creates a new Vaadin Theme.
+
+### Parameters
+* ``name`` -  The name of the theme. By default the project name.
+
+## vaadinCreateAddonTheme
+
+Creates a new theme for a Vaadin Addon project.
+
+### Parameters
+* ``name`` -  The name of the theme. By default, if the addon title is used to generated the theme name, 
+otherwise *MyAddonTheme* is used.
+
+## vaadinCreateWidgetsetGenerator
+
+Creates a new widgetset generator for optimizing the widgetset
+
+## vaadinCreateTestbenchTest
+
+Creates a new Testbench test.
+
+## Parameters
+* ``name`` -  The test class name.
+* ``package`` - The test class package.
+
+## vaadinDevMode (Deprecated)
+
+Run Development Mode for easier debugging and development of client widgets.
+
+Deprecated in favor of **vaadinSuperDevMode**
+
+### Configurations
+* ``noserver`` - Should the internal server be used. Default *false*.
+* ``bindAddress`` - To what host or ip should development mode bind itself to. By default *localhost*.
+* ``codeServerPort`` - To what port should development mode bind itself to. By default *9997*.
+* ``extraArgs`` - Extra arguments passed to the code server. By default *none*.
+* ``logLevel`` - The log level. Possible levels NONE,DEBUG,TRACE,INFO. By default *INFO*.
+* ``server`` - Application server to use. Possible application servers are 'payara', 'jetty'. Default is *payara*.
+* ``debug`` - Should application be run in debug mode. When running in production set this to true. Default is *true*.
+* ``debugPort`` - The port the debugger listens to. Default is 8000.
+* ``jvmArgs`` - Extra jvm args passed to the JVM running the Vaadin application.
+* ``serverRestart`` - Should the server restart after every change. By default *true*.
+* ``serverPort`` - The port the vaadin application should run on. By default 8080.
+* ``themeAutoRecompile`` -  Should theme be recompiled when SCSS file is changes. Default is *true*.
+* ``openInBrowser`` - Should the application be opened in a browser when it has been launched. By defailt *true*.
+
+## vaadinSuperDevMode
+
+Run Super Development Mode for easier client widget development.
+
+### Configurations
+* ``noserver`` - Should the internal server be used. Default *false*.
+* ``bindAddress`` - To what host or ip should development mode bind itself to. By default *localhost*.
+* ``codeServerPort`` - To what port should development mode bind itself to. By default *9997*.
+* ``extraArgs`` - Extra arguments passed to the code server. By default *none*.
+* ``logLevel`` - The log level. Possible levels NONE,DEBUG,TRACE,INFO. By default *INFO*.
+* ``server`` - Application server to use. Possible application servers are 'payara', 'jetty'. Default is *payara*.
+* ``debug`` - Should application be run in debug mode. When running in production set this to true. Default is *true*.
+* ``debugPort`` - The port the debugger listens to. Default is 8000.
+* ``jvmArgs`` - Extra jvm args passed to the JVM running the Vaadin application.
+* ``serverRestart`` - Should the server restart after every change. By default *true*.
+* ``serverPort`` - The port the vaadin application should run on. By default 8080.
+* ``themeAutoRecompile`` -  Should theme be recompiled when SCSS file is changes. Default is *true*.
+* ``openInBrowser`` - Should the application be opened in a browser when it has been launched. By defailt *true*.
+
+## vaadinCompile
+
+Compiles Vaadin Addons and components into Javascript.
+
+### Configurations
+* ``style`` - Compilation style. By default *OBF*.
+* ``optimize`` - Should the compilation result be optimized. By default *0*.
+* ``logging`` - Should logging be enabled. By default *true*.
+* ``logLevel`` - The log level. Possible levels NONE,DEBUG,TRACE,INFO. By default *INFO*.
+* ``localWorkers`` - Amount of local workers used when compiling. By default the amount of processors.
+* ``draftCompile`` - Should draft compile be used. By default *true*.
+* ``strict`` - Should strict compiling be used. By default *true*.
+* ``userAgent`` - What user agents (browsers should be used. By defining null all user agents are used.)
+* ``jvmArgs`` - Extra jvm arguments passed the JVM running the compiler
+* ``extraArgs`` - Extra arguments passed to the compiler
+* ``sourcePaths`` - Source paths where the compiler will look for source files. By default *['client', 'shared']*.
+* ``collapsePermutations`` - Should the compiler permutations be collapsed. By default *true*.
+* ``extraInherits`` - Extra module inherits.
+* ``gwtSdkFirstInClasspath`` - Should GWT be placed first in the classpath when compiling the widgetset. By default *true*.
+* ``outputDirectory`` - (Optional) root directory, for generated files; default is the web-app dir from the WAR plugin
+* ``widgetsetCDN`` - Use external Vaadin hosted CDN for compiling the widgetset. By default *false*.
+* ``profiler`` - Should the Vaadin client side profiler be used. By defailt *false*.
+* ``manageWidgetset`` - Should the plugin manage the widgetset (gwt.xml file). By default *true*.
+* ``widgetset`` - The widgetset to use for the project. Leave empty for a pure server side project, or to autodetect widgetset.
+* ``widgetsetGenerator`` - The widgetset generator to use.
+
+## vaaadinRun
+
+Runs the Vaadin application on the application server.
+
+### Parameters
+* ``stopAfterStart`` - Should the server stop after starting. By default *false*.
+* ``nobrowser`` - Do not open browser after server has started. By default *true*.
+
+### Configurations
+* ``server`` - Application server to use. Possible application servers are 'payara', 'jetty'. Default is *payara*.
+* ``debug`` - Should application be run in debug mode. When running in production set this to true. Default is *true*.
+* ``debugPort`` - The port the debugger listens to. Default is 8000.
+* ``jvmArgs`` - Extra jvm args passed to the JVM running the Vaadin application.
+* ``serverRestart`` - Should the server restart after every change. By default *true*.
+* ``serverPort`` - The port the vaadin application should run on. By default 8080.
+* ``themeAutoRecompile`` -  Should theme be recompiled when SCSS file is changes. Default is *true*.
+* ``openInBrowser`` - Should the application be opened in a browser when it has been launched. By defailt *true*.
+
+## vaadinAddons
+
+Search for addons in the Vaadin Directory.
+
+### Parameters
+* ``search`` - String to search for in addons. By default empty string returning all addons in the directory.
+* ``sort`` - Sort criteria (options: name,description,date,rating). By default *unsorted*.
+* ``verbose`` - Should verbose descriptions be shown. By default *false*.
+
+## vaadinAddonZip
+
+Create Vaadin Directory compatible Addon zip archive of the project. Metadata can be configurated with the vaadin.addon.* properties
+
+## vaadinJavadocJar
+
+Generate javadoc from project and package it as a jar.
+
+## vaadinSourcesJar
+ 
+Packages all sources a jar.
+
+## vaadinClassPathJar
+
+Builds a classpath jar that is used for operating systems with limited command lengths (Windows).
+
+## vaadinCompileThemes
+
+Compiles a Vaadin SASS theme into CSS.
+
+## vaadinUpdateAddonStyles
+
+Updates the addon.scss file listing with addons styles found in the classpath.
+
+## vaadinUpdateWidgetset
+
+Updates the widgetset (gwt.xml) file with inherits found from the project classpath.
+
