@@ -16,6 +16,7 @@
 package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.Util
+import fi.jasoft.plugin.configuration.CompileThemeConfiguration
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -36,16 +37,19 @@ import java.util.jar.JarInputStream
  */
 class CompileThemeTask extends DefaultTask {
 
-    static final String NAME = 'vaadinCompileThemes'
+    static final String NAME = 'vaadinThemeCompile'
 
     static final String STYLES_SCSS_PATTERN = '**/styles.scss'
     static final String STYLES_CSS_FILE = 'styles.css'
     static final String CLASSPATH_SWITCH = '-cp'
     static final String RUBY_MAIN_CLASS = 'org.jruby.Main'
 
+    def CompileThemeConfiguration configuration
+
     public CompileThemeTask() {
         dependsOn('classes', BuildClassPathJar.NAME, UpdateAddonStylesTask.NAME)
         description = "Compiles a Vaadin SASS theme into CSS"
+        configuration = project.extensions.add(NAME, CompileThemeConfiguration)
 
         project.afterEvaluate {
             def themesDirectory = Util.getThemesDirectory(project)
@@ -87,7 +91,7 @@ class CompileThemeTask extends DefaultTask {
 
         File gemsDir
         File unpackedThemesDir
-        if (project.vaadin.plugin.themeCompiler == 'compass'){
+        if (project.vaadinThemeCompile.compiler == 'compass'){
             gemsDir = installCompassGem(project)
             unpackedThemesDir = unpackThemes(project)
         }
@@ -104,7 +108,7 @@ class CompileThemeTask extends DefaultTask {
             def start = System.currentTimeMillis()
 
             def Process process
-            switch (project.vaadin.plugin.themeCompiler){
+            switch (project.vaadinThemeCompile.compiler){
                 case 'vaadin':
                     process = executeVaadinSassCompiler(project, theme.canonicalPath,
                             new File(dir, STYLES_CSS_FILE).canonicalPath)
@@ -114,7 +118,7 @@ class CompileThemeTask extends DefaultTask {
                     break
                 default:
                     throw new BuildActionFailureException(
-                            "Selected theme compiler \"${project.vaadin.plugin.themeCompiler}\" is not valid",null)
+                            "Selected theme compiler \"${project.vaadinThemeCompile.compiler}\" is not valid",null)
             }
 
             boolean failed = false

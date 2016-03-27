@@ -96,11 +96,7 @@ apply plugin: fi.jasoft.plugin.GradleVaadinPlugin
 * ``vaadin.plugin.eclipseOutputDir`` - The directory where Eclipse will output its compiled classes. Default is project.sourceSets.main.output.classesDir.
 * ~~``vaadin.plugin.jettyAutoRefresh`` - Should jetty automatically restart when a class is changed while jetty is running.~~
 * ``vaadin.plugin.serverRestart`` - Should the server automatically restart when a class is changed.
-* ``vaadin.plugin.themeCompiler`` - The SASS compiler to use. *vaadin* and *compass* are available. *vaadin* is default.
-* ``vaadin.plugin.themeAutoRecompile`` - Should the SASS theme be recompiled on change while the vaadinRun task is executed.
-* ``vaadin.plugin.themesDirectory`` - Root directory for themes. By default *src/main/webapp/VAADIN/themes*
 * ``vaadin.plugin.useClassPathJar`` - Use a single jar to define the classpath (if the classpath is too long)
-* ``vaadin.plugin.server`` - Which server the vaadinRun task uses. Can be either *payara* or *jetty*. Payara is used by default.
 
 # JRebel configurations
 * ``vaadin.jrebel.enabled`` - Should JRebel be used when running the project. Default is false
@@ -245,7 +241,15 @@ Compiles Vaadin Addons and components into Javascript.
 * ``widgetset`` - The widgetset to use for the project. Leave empty for a pure server side project, or to autodetect widgetset.
 * ``widgetsetGenerator`` - The widgetset generator to use.
 
-## vaaadinRun
+## vaadinThemeCompile
+
+Compiles a Vaadin SASS theme into CSS.
+
+### Configurations
+* ``compiler`` - The SASS compiler to use. *vaadin* and *compass* are available. *vaadin* is default.
+* ``themesDirectory`` - Root directory for themes. By default *src/main/webapp/VAADIN/themes*
+
+## vaadinRun
 
 Runs the Vaadin application on the application server.
 
@@ -287,10 +291,6 @@ Packages all sources a jar.
 ## vaadinClassPathJar
 
 Builds a classpath jar that is used for operating systems with limited command lengths (Windows).
-
-## vaadinCompileThemes
-
-Compiles a Vaadin SASS theme into CSS.
 
 ## vaadinUpdateAddonStyles
 

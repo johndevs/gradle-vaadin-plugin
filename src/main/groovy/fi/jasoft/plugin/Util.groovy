@@ -537,8 +537,8 @@ class Util {
      *      The themes directory
      */
     static File getThemesDirectory(Project project) {
-        if(project.vaadin.plugin.themesDirectory){
-            project.file(project.vaadin.plugin.themesDirectory)
+        if(project.vaadinThemeCompile.themesDirectory){
+            project.file(project.vaadinThemeCompile.themesDirectory)
         } else {
             def webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
             def vaadinDir = new File(webAppDir, VAADIN)

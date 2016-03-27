@@ -253,7 +253,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
                         include: '**/styles.scss')
 
                 if (!themes.isEmpty()) {
-                    switch (project.vaadin.plugin.themeCompiler){
+                    switch (project.vaadinThemeCompile.compiler){
                         case 'vaadin':
                             if(Util.getVaadinVersion(project).startsWith('7.0')
                                     || Util.getVaadinVersion(project).startsWith('7.1')){
@@ -269,7 +269,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
                             break
                         default:
                             throw new GradleException(
-                                    "Selected theme compiler \"${project.vaadin.plugin.themeCompiler}\" is not valid")
+                                    "Selected theme compiler \"${project.vaadinThemeCompile.compiler}\" is not valid")
                     }
                 }
             }

@@ -37,22 +37,6 @@ class VaadinPluginConfiguration {
     String eclipseOutputDir = 'bin'
 
     /**
-     * Custom directory where themes can be found
-     */
-    String themesDirectory = null
-
-    /**
-     * Theme compiler to use
-     * <p>
-     *     Available options are
-     *     <ul>
-     *         <li>vaadin - Vaadin's SASS Compiler</li>
-     *         <li>compass - Compass's SASS Compiler</li>
-     *     </ul>
-     */
-    String themeCompiler = 'vaadin'
-
-    /**
      * Should a classpath Jar be used to shorten the classpath.
      */
     boolean useClassPathJar = Os.isFamily(Os.FAMILY_WINDOWS)
@@ -104,6 +88,7 @@ class VaadinPluginConfiguration {
                 'This property has been replaced by vaadinRun.themeAutoRecompile.')
         project.vaadinRun.themeAutoRecompile
     }
+
     /**
      * Should jetty restart when a class is changed in the build directory.
      *
@@ -124,5 +109,53 @@ class VaadinPluginConfiguration {
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.plugin.jettyAutoRefresh',
                 'This property has been replaced by vaadinRun.serverRestart.')
         project.vaadinRun.serverRestart
+    }
+
+    /**
+     * Custom directory where themes can be found
+     *
+     * @deprecated
+     */
+    @Deprecated
+    void themesDirectory(String directory){
+        project.vaadinThemeCompile.themesDirectory = directory
+        getThemesDirectory()
+    }
+    @Deprecated
+    void setThemesDirectory(String directory){
+        project.vaadinThemeCompile.themesDirectory = directory
+        getThemesDirectory()
+    }
+    @Deprecated
+    String getThemesDirectory(){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.plugin.themesDirectory',
+                'This property has been replaced by vaadinThemeCompile.themesDirectory.')
+        project.vaadinThemeCompile.themesDirectory
+    }
+
+    /**
+     * Theme compiler to use
+     * <p>
+     *     Available options are
+     *     <ul>
+     *         <li>vaadin - Vaadin's SASS Compiler</li>
+     *         <li>compass - Compass's SASS Compiler</li>
+     *     </ul>
+     */
+    @Deprecated
+    void themeCompiler(String directory){
+        project.vaadinThemeCompile.themeCompiler = directory
+        getThemeCompiler()
+    }
+    @Deprecated
+    void setThemeCompiler(String directory){
+        project.vaadinThemeCompile.themeCompiler = directory
+        getThemeCompiler()
+    }
+    @Deprecated
+    String getThemeCompiler(){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.plugin.themeCompiler',
+                'This property has been replaced by vaadinThemeCompile.compiler.')
+        project.vaadinThemeCompile.themeCompiler
     }
 }
