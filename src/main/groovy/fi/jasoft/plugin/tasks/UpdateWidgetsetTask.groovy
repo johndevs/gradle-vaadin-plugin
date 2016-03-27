@@ -127,9 +127,11 @@ class UpdateWidgetsetTask extends DefaultTask {
                         Manifest mf = jarStream.manifest
                         Attributes attributes = mf?.mainAttributes
                         String widgetsetsValue = attributes?.getValue('Vaadin-Widgetsets')
-                        String[] widgetsets = widgetsetsValue?.split(',')
-                        if(widgetsets){
-                            inherits += (widgetsets - [DEFAULT_LEGACY_WIDGETSET, DEFAULT_WIDGETSET])
+                        List<String> widgetsets = widgetsetsValue?.split(',')?.collect { it.trim() }
+                        widgetsets?.each { String widgetset ->
+                            if(widgetset != DEFAULT_WIDGETSET && widgetset != DEFAULT_LEGACY_WIDGETSET){
+                                inherits.push(widgetset)
+                            }
                         }
                     }
                 }

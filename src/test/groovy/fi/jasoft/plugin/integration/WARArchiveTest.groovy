@@ -18,8 +18,7 @@ class WARArchiveTest extends IntegrationTest {
         buildFile << "vaadin.version = '7.6.4'\n"
     }
 
-    @Test
-    void 'Project with no dependencies'() {
+    @Test void 'Project with no dependencies'() {
 
         runWithArguments('war')
 
@@ -43,8 +42,7 @@ class WARArchiveTest extends IntegrationTest {
         assertFilesInFolder(warFile, FILES_IN_WEBINF_LIB, 'WEB-INF/lib')
     }
 
-    @Test
-    void 'Project with widgetset'() {
+    @Test void 'Project with widgetset'() {
         buildFile << "vaadinCompile.widgetset = 'com.example.TestWidgetset'\n"
 
         runWithArguments('war')
@@ -68,8 +66,7 @@ class WARArchiveTest extends IntegrationTest {
         assertFilesInFolder(warFile, FILES_IN_WEBINF_LIB, 'WEB-INF/lib')
     }
 
-    @Test
-    void 'Project theme is included in archive'() {
+    @Test void 'Project theme is included in archive'() {
 
         runWithArguments('vaadinCreateProject')
         runWithArguments('war')
@@ -84,8 +81,7 @@ class WARArchiveTest extends IntegrationTest {
         assertFilesInFolder(warFile, THEME_FILES, "VAADIN/themes/${projectDir.root.name.capitalize()}".toString())
     }
 
-    @Test
-    void 'Project widgetset is included in archive'() {
+    @Test void 'Project widgetset is included in archive'() {
 
         runWithArguments('vaadinCreateProject', '--widgetset=com.example.Widgetset')
         runWithArguments('war')
@@ -98,8 +94,7 @@ class WARArchiveTest extends IntegrationTest {
         assertFilesInFolder(warFile, WIDGETSET_FILES, 'VAADIN/widgetsets/com.example.Widgetset', true)
     }
 
-    @Test
-    void 'Provided and runtime dependencies not included'(){
+    @Test void 'Provided and runtime dependencies not included'(){
         buildFile << """
         dependencies {
             runtime 'commons-lang:commons-lang:2.6'

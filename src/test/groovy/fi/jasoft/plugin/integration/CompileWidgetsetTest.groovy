@@ -4,6 +4,8 @@ import fi.jasoft.plugin.tasks.CompileWidgetsetTask
 import fi.jasoft.plugin.tasks.CreateProjectTask
 import org.junit.Test
 
+import java.nio.file.Paths
+
 import static org.junit.Assert.assertFalse
 import static org.junit.Assert.assertTrue
 
@@ -38,4 +40,22 @@ class CompileWidgetsetTest extends IntegrationTest {
         assertTrue result, result.contains('Linking succeeded')
     }
 
+    @Test void 'No Widgetset defined, but addons exist in project'() {
+        buildFile << """
+            dependencies {
+                compile 'org.vaadin.addons:qrcode:2.0.1'
+            }
+        """
+
+        runWithArguments(CreateProjectTask.NAME)
+
+        def widgetsetName = 'addon.client.' + projectDir.root.name.capitalize() + 'Widgetset'
+        def result = runWithArguments('--info', CompileWidgetsetTask.NAME)
+        assertTrue result, result.contains("Compiling module $widgetsetName")
+        assertTrue result, result.contains('Linking succeeded')
+
+        File widgetsetFile = Paths.get(projectDir.root.canonicalPath, 'src', 'main', 'resources',
+                'addon','client', projectDir.root.name.capitalize() + 'Widgetset.gwt.xml').toFile()
+        assertTrue "Widgetset file $widgetsetFile did not exist", widgetsetFile.exists()
+    }
 }

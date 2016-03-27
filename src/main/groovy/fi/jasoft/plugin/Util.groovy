@@ -793,6 +793,8 @@ class Util {
      * Resolves the widgetset file automatically from sources
      */
     static File resolveWidgetsetFile(Project project) {
+
+        // Search for module XML in sources
         def sourceDirs = project.sourceSets.main.allSource
         def modules = []
         sourceDirs.srcDirs.each {
@@ -802,7 +804,14 @@ class Util {
             return modules.first()
         }
 
+        // WidgetsetFile has been defined but not created, create it
         String widgetset = project.vaadinCompile.widgetset
+
+        // If addons exists in project but widgetset is not defined, use default one
+        if(!widgetset && findAddonsInProject(project).size() > 0){
+            widgetset = 'addon.client.' + project.getName().capitalize() + 'Widgetset'
+        }
+
         if(widgetset){
             // No widgetset file detected, create one
             File resourceDir = project.sourceSets.main.resources.srcDirs.first()
