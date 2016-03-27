@@ -92,10 +92,7 @@ apply plugin: fi.jasoft.plugin.GradleVaadinPlugin
 
 # Plugin configurations
 * ``vaadin.plugin.logToConsole``- Should server logs be logged to the console or to a log file. Default is logging to file.
-* ``vaadin.plugin.openInBrowser`` - Should the application be opened in a browser tab after the application is launched. Default true.
 * ``vaadin.plugin.eclipseOutputDir`` - The directory where Eclipse will output its compiled classes. Default is project.sourceSets.main.output.classesDir.
-* ~~``vaadin.plugin.jettyAutoRefresh`` - Should jetty automatically restart when a class is changed while jetty is running.~~
-* ``vaadin.plugin.serverRestart`` - Should the server automatically restart when a class is changed.
 * ``vaadin.plugin.useClassPathJar`` - Use a single jar to define the classpath (if the classpath is too long)
 
 # JRebel configurations
@@ -103,19 +100,19 @@ apply plugin: fi.jasoft.plugin.GradleVaadinPlugin
 * ``vaadin.jrebel.location`` - Absolute path of jrebel.jar (required if ```jrebel.enabled``` is set to true)
 
 # Vaadin Testbench configurations
-* ``vaadin.testbench.enabled`` - Should Testbench be used for UI testing?. Default is false.
-* ``vaadin.testbench.version`` - Version of testbench to use. By default the latest release of the 3.x series.
-* ``vaadin.testbench.runApplication`` - Should the application be run on embedded Jetty before the tests are run. Default true.
-* ``vaadin.testbench.hub.enabled`` - Should a testbench hub be started when running tests. Default false.
-* ``vaadin.testbench.hub.host`` - The hostname of the hub
-* ``vaadin.testbench.hub.port`` - The port of the hub
-* ``vaadin.testbench.node.enabled`` - Should a testbench node be started when running tests. Default false.
-* ``vaadin.testbench.node.host`` - The hostname of the node
-* ``vaadin.testbench.node.port`` - The port of the node
-* ``vaadin.testbench.node.hub`` - The URL of the hub where the node should connect to. By default http://localhost:4444/grid/register'.
-* ``vaadin.testbench.node.browsers`` - A list of supported browsers by the hub. e.g.
+* ``vaadinTestbench.enabled`` - Should Testbench be used for UI testing?. Default is false.
+* ``vaadinTestbench.version`` - Version of testbench to use. By default the latest release of the 3.x series.
+* ``vaadinTestbench.runApplication`` - Should the application be run on embedded Jetty before the tests are run. Default true.
+* ``vaadinTestbenchHub.enabled`` - Should a testbench hub be started when running tests. Default false.
+* ``vaadinTestbenchHub.host`` - The hostname of the hub
+* ``vaadinTestbenchHub.port`` - The port of the hub
+* ``vaadinTestbenchNode.enabled`` - Should a testbench node be started when running tests. Default false.
+* ``vaadinTestbenchNode.host`` - The hostname of the node
+* ``vaadinTestbenchNode.port`` - The port of the node
+* ``vaadinTestbenchNode.hub`` - The URL of the hub where the node should connect to. By default http://localhost:4444/grid/register'.
+* ``vaadinTestbenchNode.browsers`` - A list of supported browsers by the hub. e.g.
 ```groovy
-vaadin.testbench.node.browsers = [
+vaadinTestbenchNode.browsers = [
     [ browserName: 'firefox', version: 3.6, maxInstances: 5, platform: 'LINUX' ],
     [ browserName: 'chrome', version: 22, maxInstances: 1, platform: 'WINDOWS' ]
 ]
@@ -275,6 +272,31 @@ Search for addons in the Vaadin Directory.
 * ``search`` - String to search for in addons. By default empty string returning all addons in the directory.
 * ``sort`` - Sort criteria (options: name,description,date,rating). By default *unsorted*.
 * ``verbose`` - Should verbose descriptions be shown. By default *false*.
+
+## vaadinTestbench
+
+### Configurations
+* ``enabled`` - Should Testbench be enabled when running tests. Default is *false*.
+* ``version`` - What version of testbench should be used. Default is *3.+*
+* ``runApplication`` - Should the application be run before tests are run. Default is *true*.
+
+## vaadinTestbenchHub
+
+### Configurations
+* ``enabled`` - Should the testbench hub be enabled when tests are run. Default is *false*.
+* ``host`` - The host the hub should be run on. Default is *'localhost'*
+* ``port`` - The port the hub should be run on. Default is *4444*.
+
+## vaadinTestbenchNode
+
+### Configurations
+* ``enabled`` - Should the node be enabled. Default is *false*.
+* ``host`` - The hostname of the node. Default is *'localhost'*
+* ``port`` - The port of the node. Default is *4445*.
+* ``hub`` - The hub to connect to. Default is *http://localhost:4444/grid/register*.
+* ``browsers`` - TA list of browser configurations. e.g. ``browsers = [[ browserName: 'firefox', version: 3.6, 
+maxInstances: 5, platform: 'LINUX' ],...]``. See http://code.google.com/p/selenium/wiki/Grid2 for more information about available browsers and settings. 
+The browser setting will be stringified into the -browser parameter for the hub.
 
 ## vaadinAddonZip
 

@@ -16,6 +16,7 @@
 package fi.jasoft.plugin.testbench
 
 import fi.jasoft.plugin.Util
+import fi.jasoft.plugin.configuration.TestBenchNodeConfiguration
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 
@@ -30,16 +31,18 @@ class TestbenchNode {
 
     private process;
 
+    private TestBenchNodeConfiguration configuration
+
     TestbenchNode(Project project) {
         this.project = project
+        configuration = project.vaadinTestbenchNode as TestBenchNodeConfiguration
     }
 
     public start() {
-
-        def host = project.vaadin.testbench.node.host
-        def port = project.vaadin.testbench.node.port
-        def hub = project.vaadin.testbench.node.hub
-        def browsers = project.vaadin.testbench.node.browsers
+        def host = configuration.host
+        def port = configuration.port
+        def hub = configuration.hub
+        def browsers = configuration.browsers
 
         File logDir = project.file('build/testbench/')
         logDir.mkdirs()
@@ -63,7 +66,7 @@ class TestbenchNode {
         process.add(host)
 
         process.add('-port')
-        process.add(port)
+        process.add(port.toString())
 
         for (browser in browsers) {
             process.add('-browser')

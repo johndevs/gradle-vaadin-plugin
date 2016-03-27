@@ -15,6 +15,9 @@
 */
 package fi.jasoft.plugin
 
+import fi.jasoft.plugin.configuration.TestBenchConfiguration
+import fi.jasoft.plugin.configuration.TestBenchHubConfiguration
+import fi.jasoft.plugin.configuration.TestBenchNodeConfiguration
 import fi.jasoft.plugin.servers.ApplicationServer
 import fi.jasoft.plugin.tasks.CreateDirectoryZipTask
 import fi.jasoft.plugin.tasks.CreateWidgetsetGeneratorTask
@@ -248,18 +251,21 @@ class TaskListener implements TaskExecutionListener {
     @PackageScope
     static configureTest(Task task, TaskListener listener){
         def project = task.project
-        if(project.vaadin.testbench.enabled){
-            if (project.vaadin.testbench.hub.enabled) {
+        def tb = project.vaadinTestbench as TestBenchConfiguration
+        def tbHub = project.vaadinTestbenchHub as TestBenchHubConfiguration
+        def tbNode = project.vaadinTestbenchNode as TestBenchNodeConfiguration
+        if(tb.enabled){
+            if (tbHub.enabled) {
                 listener.testbenchHub = new TestbenchHub(project)
                 listener.testbenchHub.start()
             }
 
-            if (project.vaadin.testbench.node.enabled) {
+            if (tbNode.enabled) {
                 listener.testbenchNode = new TestbenchNode(project)
                 listener.testbenchNode.start()
             }
 
-            if (project.vaadin.testbench.runApplication) {
+            if (tb.runApplication) {
                 listener.testbenchAppServer = ApplicationServer.get(project)
                 listener.testbenchAppServer.start()
 

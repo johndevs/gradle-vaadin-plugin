@@ -15,6 +15,9 @@
 */
 package fi.jasoft.plugin
 
+import fi.jasoft.plugin.configuration.TestBenchConfiguration
+import fi.jasoft.plugin.configuration.TestBenchHubConfiguration
+import fi.jasoft.plugin.configuration.TestBenchNodeConfiguration
 import fi.jasoft.plugin.configuration.VaadinPluginExtension
 import fi.jasoft.plugin.ides.EclipseUtil
 import fi.jasoft.plugin.ides.IDEAUtil
@@ -42,29 +45,29 @@ import org.gradle.util.VersionNumber
  */
 class GradleVaadinPlugin implements Plugin<Project> {
 
-    public static final PLUGIN_VERSION
-    public static final PLUGIN_PROPERTIES
-    public static final PLUGIN_DEBUG_DIR
+    static final PLUGIN_VERSION
+    static final PLUGIN_PROPERTIES
+    static final PLUGIN_DEBUG_DIR
 
     private static int PLUGINS_IN_PROJECT = 0;
 
-    public static final String CONFIGURATION_SERVER = 'vaadin-server'
-    public static final String CONFIGURATION_CLIENT = 'vaadin-client'
-    public static final String CONFIGURATION_TESTBENCH = 'vaadin-testbench'
-    public static final String CONFIGURATION_PUSH = 'vaadin-push'
-    public static final String CONFIGURATION_JAVADOC = 'vaadin-javadoc'
-    public static final String DEFAULT_WIDGETSET = 'com.vaadin.DefaultWidgetSet'
-    public static final String CONFIGURATION_RUN_SERVER = 'vaadin-run-server'
-    public static final String CONFIGURATION_SUPERDEVMODE = 'vaadin-superdevmode'
-    public static final String VAADIN_TASK_GROUP = 'Vaadin'
-    public static final String VAADIN_UTIL_TASK_GROUP = 'Vaadin Utility'
-    public static final String VAADIN_TESTBENCH_TASK_GROUP = 'Vaadin Testbench'
-    public static final String VAADIN_DIRECTORY_TASK_GROUP = 'Vaadin Directory'
-    public static final String ADDON_REPOSITORY_NAME = 'Vaadin addons'
-    public static final String VAADIN_SNAPSHOT_REPOSITORY_NAME = 'Vaadin snapshots'
-    public static final String JASOFT_SNAPSHOT_REPOSITORY_NAME = 'Jasoft.fi Maven repository'
-    public static final String BINTRAY_REPOSITORY_NAME = 'Bintray.com Maven repository'
-    public static final String PLUGIN_DEVELOPMENTTIME_REPOSITORY_NAME = 'Gradle Vaadin plugin development repository'
+    static final String CONFIGURATION_SERVER = 'vaadin-server'
+    static final String CONFIGURATION_CLIENT = 'vaadin-client'
+    static final String CONFIGURATION_TESTBENCH = 'vaadin-testbench'
+    static final String CONFIGURATION_PUSH = 'vaadin-push'
+    static final String CONFIGURATION_JAVADOC = 'vaadin-javadoc'
+    static final String DEFAULT_WIDGETSET = 'com.vaadin.DefaultWidgetSet'
+    static final String CONFIGURATION_RUN_SERVER = 'vaadin-run-server'
+    static final String CONFIGURATION_SUPERDEVMODE = 'vaadin-superdevmode'
+    static final String VAADIN_TASK_GROUP = 'Vaadin'
+    static final String VAADIN_UTIL_TASK_GROUP = 'Vaadin Utility'
+    static final String VAADIN_TESTBENCH_TASK_GROUP = 'Vaadin Testbench'
+    static final String VAADIN_DIRECTORY_TASK_GROUP = 'Vaadin Directory'
+    static final String ADDON_REPOSITORY_NAME = 'Vaadin addons'
+    static final String VAADIN_SNAPSHOT_REPOSITORY_NAME = 'Vaadin snapshots'
+    static final String JASOFT_SNAPSHOT_REPOSITORY_NAME = 'Jasoft.fi Maven repository'
+    static final String BINTRAY_REPOSITORY_NAME = 'Bintray.com Maven repository'
+    static final String PLUGIN_DEVELOPMENTTIME_REPOSITORY_NAME = 'Gradle Vaadin plugin development repository'
 
     static {
         PLUGIN_PROPERTIES = new Properties()
@@ -107,6 +110,9 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
         // Extensions
         project.extensions.create('vaadin', VaadinPluginExtension, project)
+        project.extensions.create('vaadinTestbench', TestBenchConfiguration, project)
+        project.extensions.create('vaadinTestbenchHub', TestBenchHubConfiguration)
+        project.extensions.create('vaadinTestbenchNode', TestBenchNodeConfiguration)
 
         // Dependency resolution
         gradle.taskGraph.addTaskExecutionListener(new TaskListener())
@@ -364,9 +370,9 @@ class GradleVaadinPlugin implements Plugin<Project> {
         configurations.create(CONFIGURATION_TESTBENCH, { conf ->
             conf.description = 'Libraries needed by Vaadin Testbench.'
             conf.defaultDependencies { dependencies ->
-                if(project.vaadin.testbench.enabled) {
+                if(project.vaadinTestbench.enabled) {
                     def testbench = projectDependencies.create(
-                            "com.vaadin:vaadin-testbench:${project.vaadin.testbench.version}")
+                            "com.vaadin:vaadin-testbench:${project.vaadinTestbench.version}")
                     dependencies.add(testbench)
                 }
             }

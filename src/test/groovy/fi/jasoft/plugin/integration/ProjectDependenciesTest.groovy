@@ -168,10 +168,8 @@ class ProjectDependenciesTest extends IntegrationTest {
     @Test void 'Project has Testbench dependencies'() {
 
         buildFile << """
-            vaadin {
-                testbench {
-                    enabled true
-                }
+            vaadinTestbench {
+                enabled true
             }
 
             task verifyTestbenchPresent << {

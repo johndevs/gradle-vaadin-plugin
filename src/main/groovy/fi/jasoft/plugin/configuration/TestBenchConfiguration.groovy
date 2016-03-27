@@ -15,6 +15,9 @@
 */
 package fi.jasoft.plugin.configuration
 
+import fi.jasoft.plugin.MessageLogger
+import org.gradle.api.Project
+
 /**
  * Configuration options for Testbench
  */
@@ -36,13 +39,25 @@ class TestBenchConfiguration {
      */
     boolean runApplication = true
 
-    /**
-     * The Testbench Hub configuration
-     */
-    final TestBenchHubConfiguration hub = new TestBenchHubConfiguration()
+    @Deprecated
+    transient Project project
 
-    /**
-     * The Testbench node configuration
-     */
-    final TestBenchNodeConfiguration node = new TestBenchNodeConfiguration()
+    @Deprecated
+    TestBenchConfiguration(Project project){
+        this.project = project
+    }
+
+    @Deprecated
+    TestBenchHubConfiguration getHub() {
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.testbench.hub',
+                'This property has been replaced by vaadinTestbenchHub')
+        project.vaadinTestbenchHub
+    }
+
+    @Deprecated
+    TestBenchNodeConfiguration getNode() {
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.testbench.node',
+                'This property has been replaced by vaadinTestbenchNode')
+        project.vaadinTestbenchNode
+    }
 }

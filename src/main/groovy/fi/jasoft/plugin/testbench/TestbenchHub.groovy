@@ -36,8 +36,8 @@ class TestbenchHub {
 
     public start() {
 
-        def host = project.vaadin.testbench.hub.host
-        def port = project.vaadin.testbench.hub.port
+        def host = project.vaadinTestbenchHub.host
+        def port = project.vaadinTestbenchHub.port
 
         File logDir = project.file('build/testbench/')
         logDir.mkdirs()

@@ -283,4 +283,14 @@ class VaadinPluginExtension {
                 'This property has been replaced by vaadinCompile.widgetsetGenerator.')
         project.vaadinCompile.widgetsetGenerator
     }
+
+    /**
+     * Configuration options for TestBench
+     */
+    @Deprecated
+    TestBenchConfiguration getTestbench(){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.testbench',
+                'This property has been replaced by vaadinTestbench')
+        project.vaadinTestbench
+    }
 }
