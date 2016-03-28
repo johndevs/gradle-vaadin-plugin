@@ -82,55 +82,78 @@ class UpdateWidgetsetTask extends DefaultTask {
         widgetsetFile
     }
 
+
     @PackageScope
     static updateWidgetset(File widgetsetFile, String widgetsetFQN, Project project) {
         def configuration = project.vaadinCompile as CompileWidgetsetConfiguration
 
         def substitutions = [:]
+        substitutions['inherits'] = getInherits(project, configuration)
+        substitutions['sourcePaths'] = configuration.sourcePaths
+        substitutions['configurationProperties'] = getConfigurationProperties()
+        substitutions['properties'] = getGWTProperties(project, configuration)
+        substitutions['linkers'] = getLinkers(project)
+        substitutions['stylesheets'] = getClientStylesheets(project)
+        substitutions['collapsePermutations'] = configuration.collapsePermutations
 
-        def inherits = [DEFAULT_WIDGETSET]
+        String widgetsetGenerator = getWidgetsetGenerator(project, configuration, widgetsetFQN)
+        if(widgetsetGenerator){
+            substitutions['widgetsetGenerator'] = widgetsetGenerator
+        }
 
-        // Scan classpath for Vaadin addons and inherit their widgetsets
-        Configuration compileConf =  project.configurations.compile
-        compileConf.allDependencies.each { Dependency dependency ->
-            if(dependency in ProjectDependency){
-                def depProject = dependency.dependencyProject
-                if(depProject.hasProperty('vaadin')){
-                    // A vaadin submodule
+        // Write widgetset file
+        TemplateUtil.writeTemplate('Widgetset.xml', widgetsetFile.parentFile, widgetsetFile.name, substitutions, true)
+    }
 
-                    // Scan in source folder
-                    Util.getMainSourceSet(depProject).srcDirs.each { File srcDir ->
-                        depProject.fileTree(srcDir.absolutePath)
-                                .include("**/*/*$GWT_MODULE_XML_POSTFIX")
-                                .each { File file ->
-                            def path = file.absolutePath.substring(srcDir.absolutePath.size()+1)
-                            def widgetset = TemplateUtil.convertFilePathToFQN(path, GWT_MODULE_XML_POSTFIX)
-                            inherits.push(widgetset)
-                        }
-                    }
+    private static List<String> findInheritsInProject(Project project) {
+        List<String> inherits = []
 
-                    // Scan in resource folders
-                    depProject.sourceSets.main.resources.srcDirs.each { File srcDir ->
-                        depProject.fileTree(srcDir.absolutePath)
-                                .include("**/*/*$GWT_MODULE_XML_POSTFIX")
-                                .each { File file ->
-                            def path = file.absolutePath.substring(srcDir.absolutePath.size()+1)
-                            def widgetset = TemplateUtil.convertFilePathToFQN(path, GWT_MODULE_XML_POSTFIX)
-                            inherits.push(widgetset)
-                        }
-                    }
-                }
-            } else {
-                compileConf.files(dependency).each {
-                    JarInputStream jarStream = new JarInputStream(it.newDataInputStream());
-                    jarStream.withStream {
-                        Manifest mf = jarStream.manifest
-                        Attributes attributes = mf?.mainAttributes
-                        String widgetsetsValue = attributes?.getValue('Vaadin-Widgetsets')
-                        List<String> widgetsets = widgetsetsValue?.split(',')?.collect { it.trim() }
-                        widgetsets?.each { String widgetset ->
-                            if(widgetset != DEFAULT_WIDGETSET && widgetset != DEFAULT_LEGACY_WIDGETSET){
-                                inherits.push(widgetset)
+        // Scan in source folder
+        Util.getMainSourceSet(project).srcDirs.each { File srcDir ->
+            project.fileTree(srcDir.absolutePath)
+                    .include("**/*/*$GWT_MODULE_XML_POSTFIX")
+                    .each { File file ->
+                def path = file.absolutePath.substring(srcDir.absolutePath.size()+1)
+                def widgetset = TemplateUtil.convertFilePathToFQN(path, GWT_MODULE_XML_POSTFIX)
+                inherits.push(widgetset)
+            }
+        }
+
+        // Scan in resource folders
+        project.sourceSets.main.resources.srcDirs.each { File srcDir ->
+            project.fileTree(srcDir.absolutePath)
+                    .include("**/*/*$GWT_MODULE_XML_POSTFIX")
+                    .each { File file ->
+                def path = file.absolutePath.substring(srcDir.absolutePath.size()+1)
+                def widgetset = TemplateUtil.convertFilePathToFQN(path, GWT_MODULE_XML_POSTFIX)
+                inherits.push(widgetset)
+            }
+        }
+        inherits
+    }
+
+    private static List<String> findInheritsInDependencies(Project project) {
+        List<String> inherits = []
+
+        def attribute = new Attributes.Name('Vaadin-Widgetsets')
+        project.configurations.all.each { Configuration conf ->
+            conf.allDependencies.each { Dependency dependency ->
+                if(!(dependency in ProjectDependency)){
+                    conf.files(dependency).each { File file ->
+                        file.withInputStream { InputStream stream ->
+                            def jarStream = new JarInputStream(stream)
+                            jarStream.with {
+                                def mf = jarStream.getManifest()
+                                def attributes = mf?.mainAttributes
+                                def widgetsetsValue = attributes?.getValue(attribute)
+                                if (widgetsetsValue && !dependency.name.startsWith('vaadin-client')) {
+                                    List<String> widgetsets = widgetsetsValue?.split(',')?.collect { it.trim() }
+                                    widgetsets?.each { String widgetset ->
+                                        if(widgetset != DEFAULT_WIDGETSET && widgetset != DEFAULT_LEGACY_WIDGETSET){
+                                            inherits.push(widgetset)
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -138,27 +161,11 @@ class UpdateWidgetsetTask extends DefaultTask {
             }
         }
 
-        // Custom inherits
-        if (configuration.extraInherits) {
-            inherits.addAll(configuration.extraInherits)
-        }
+        inherits
+    }
 
-        substitutions['inherits'] = inherits
-
-        //###################################################################
-
-        substitutions['sourcePaths'] = configuration.sourcePaths
-
-        //###################################################################
-
-        def configurationProperties = [:]
-        configurationProperties['devModeRedirectEnabled'] = true
-
-        substitutions['configurationProperties'] = configurationProperties
-
-        //###################################################################
-
-        def properties = [:]
+    private static Map<String, Object> getGWTProperties(Project project, CompileWidgetsetConfiguration configuration){
+        Map<String, Object> properties = [:]
 
         def ua = 'ie8,ie9,gecko1_8,safari'
         if (!configuration.userAgent) {
@@ -180,11 +187,44 @@ class UpdateWidgetsetTask extends DefaultTask {
         if (!configuration.logging) {
             properties.put('gwt.logging.enabled', false)
         }
+        properties
+    }
 
-        substitutions['properties'] = properties
+    private static List<String> getInherits(Project project, CompileWidgetsetConfiguration configuration) {
+        def inherits = [DEFAULT_WIDGETSET]
 
-        //###################################################################
+        // Scan dependent projects and inherit their widgetsets
+        Configuration compileConf =  project.configurations.compile
+        compileConf.allDependencies.each { Dependency dependency ->
+            if(dependency in ProjectDependency){
+                def depProject = dependency.dependencyProject
+                if(depProject.hasProperty('vaadin')){
+                    // A vaadin submodule
+                    inherits.addAll(findInheritsInProject(depProject))
+                }
+            }
+        }
 
+        // Scan classpath for Vaadin addons and inherit their widgetsets
+        findInheritsInDependencies(project)
+
+        // Custom inherits
+        if (configuration.extraInherits) {
+            inherits.addAll(configuration.extraInherits)
+        }
+
+        inherits
+    }
+
+    private static Map<String, Object> getConfigurationProperties(){
+        Map<String, Object> configurationProperties = [:]
+        configurationProperties['devModeRedirectEnabled'] = true
+        configurationProperties
+    }
+
+    private static String getWidgetsetGenerator(Project project,
+                                                CompileWidgetsetConfiguration configuration,
+                                                String widgetsetFQN) {
         String name, pkg, filename
         if (configuration.widgetsetGenerator == null) {
 
@@ -205,24 +245,25 @@ class UpdateWidgetsetTask extends DefaultTask {
         File javaDir = Util.getMainSourceSet(project).srcDirs.first()
         File f = new File(new File(javaDir, TemplateUtil.convertFQNToFilePath(pkg)), filename)
         if (f.exists() || configuration.widgetsetGenerator != null) {
-            substitutions['widgetsetGenerator'] = "${pkg}.${StringUtils.removeEnd(filename, JAVA_FILE_POSTFIX)}"
+            return  "${pkg}.${StringUtils.removeEnd(filename, JAVA_FILE_POSTFIX)}"
         }
+        null
+    }
 
-        //###################################################################
-
-        def linkers = [:]
+    private static Map<String, Object> getLinkers(Project project) {
+        Map<String, Object> linkers = [:]
 
         File[] clientSCSS = TemplateUtil.getFilesFromPublicFolder(project, SCSS_FILE_POSTFIX)
         if (clientSCSS.length > 0) {
             linkers.put('scssintegration', 'com.vaadin.sass.linker.SassLinker')
         }
+        linkers
+    }
 
-        substitutions['linkers'] = linkers
+    private static List<String> getClientStylesheets(Project project) {
+        List<String> stylesheets = []
 
-        //###################################################################
-
-        def stylesheets = []
-
+        File[] clientSCSS = TemplateUtil.getFilesFromPublicFolder(project, SCSS_FILE_POSTFIX)
         clientSCSS.each {
             stylesheets.add(
                     Util.replaceExtension(
@@ -240,15 +281,6 @@ class UpdateWidgetsetTask extends DefaultTask {
             )
         }
 
-        substitutions['stylesheets'] = stylesheets
-
-        //###################################################################
-
-        substitutions['collapsePermutations'] = configuration.collapsePermutations
-
-        //###################################################################
-
-        // Write widgetset file
-        TemplateUtil.writeTemplate('Widgetset.xml', widgetsetFile.parentFile, widgetsetFile.name, substitutions, true)
+        stylesheets
     }
 }
