@@ -9,7 +9,7 @@ class CompileWidgetsetConfiguration {
     /**
      * Compilation style
      */
-    String style = "OBF"
+    String style = 'OBF'
 
     /**
      * Should the compilation result be optimized
@@ -24,7 +24,7 @@ class CompileWidgetsetConfiguration {
     /**
      * The log level. Possible levels NONE,DEBUG,TRACE,INFO
      */
-    String logLevel = "INFO"
+    String logLevel = 'INFO'
 
     /**
      * Amount of local workers used when compiling. By default the amount of processors.

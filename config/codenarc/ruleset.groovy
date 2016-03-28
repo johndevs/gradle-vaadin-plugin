@@ -96,7 +96,7 @@ ruleset {
     NoTabCharacter
     ParameterReassignment
     TernaryCouldBeElvis
-    TrailingComma
+    //TrailingComma
     VectorIsObsolete
 
     // rulesets/design.xml

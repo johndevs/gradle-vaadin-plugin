@@ -26,8 +26,8 @@ class BuildJavadocJarTask extends Jar {
 
     static final String NAME = 'vaadinJavadocJar'
 
-    public BuildJavadocJarTask() {
-        description = "Creates a javadoc jar for the project"
+    BuildJavadocJarTask() {
+        description = 'Creates a javadoc jar for the project'
         classifier = 'javadoc'
         dependsOn project.tasks.javadoc
         from project.tasks.javadoc.destinationDir

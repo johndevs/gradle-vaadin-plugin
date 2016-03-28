@@ -18,7 +18,6 @@ package fi.jasoft.plugin.tasks
 import fi.jasoft.plugin.Util
 import fi.jasoft.plugin.configuration.CompileThemeConfiguration
 import org.gradle.api.DefaultTask
-import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
@@ -44,23 +43,23 @@ class CompileThemeTask extends DefaultTask {
     static final String CLASSPATH_SWITCH = '-cp'
     static final String RUBY_MAIN_CLASS = 'org.jruby.Main'
 
-    def CompileThemeConfiguration configuration
+    private CompileThemeConfiguration configuration
 
-    public CompileThemeTask() {
+    CompileThemeTask() {
         dependsOn('classes', BuildClassPathJar.NAME, UpdateAddonStylesTask.NAME)
-        description = "Compiles a Vaadin SASS theme into CSS"
+        description = 'Compiles a Vaadin SASS theme into CSS'
         configuration = project.extensions.add(NAME, CompileThemeConfiguration)
 
         project.afterEvaluate {
-            def themesDirectory = Util.getThemesDirectory(project)
+            File themesDirectory = Util.getThemesDirectory(project)
             inputs.dir themesDirectory
-            inputs.files(project.fileTree(dir: themesDirectory, include: '**/*.scss').collect())
-            outputs.files(project.fileTree(dir: themesDirectory, include: STYLES_SCSS_PATTERN).collect {
+            inputs.files(project.fileTree(dir : themesDirectory, include : '**/*.scss').collect())
+            outputs.files(project.fileTree(dir : themesDirectory, include : STYLES_SCSS_PATTERN).collect {
                 File theme -> new File(new File(theme.parent), STYLES_CSS_FILE)
             })
 
             // Add classpath jar
-            if(project.vaadin.plugin.useClassPathJar) {
+            if (project.vaadin.plugin.useClassPathJar) {
                 BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
                 inputs.file(pathJarTask.archivePath)
             }
@@ -68,7 +67,7 @@ class CompileThemeTask extends DefaultTask {
     }
 
     @TaskAction
-    public void exec() {
+    void exec() {
         compile(project)
     }
 
@@ -85,7 +84,7 @@ class CompileThemeTask extends DefaultTask {
 
         project.logger.info("Compiling themes found in "+themesDir)
 
-        FileTree themes = project.fileTree(dir: themesDir, include: STYLES_SCSS_PATTERN)
+        FileTree themes = project.fileTree(dir : themesDir, include : STYLES_SCSS_PATTERN)
 
         project.logger.info("Found ${themes.files.size() } themes.")
 

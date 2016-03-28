@@ -26,8 +26,8 @@ class BuildSourcesJarTask extends Jar {
 
     static final String NAME = 'vaadinSourcesJar'
 
-    public BuildSourcesJarTask() {
-        description = "Creates a sources jar for the project"
+    BuildSourcesJarTask() {
+        description = 'Creates a sources jar for the project'
         classifier = 'sources'
         from project.sourceSets.main.allSource
     }
