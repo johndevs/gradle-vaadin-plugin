@@ -43,11 +43,6 @@ class VaadinPluginExtension {
     boolean manageRepositories = true
 
     /**
-     * The configuration for JRebel
-     */
-    final JRebelConfiguration jrebel = new JRebelConfiguration()
-
-    /**
      * The configuration for the plugin itself
      */
     final VaadinPluginConfiguration plugin

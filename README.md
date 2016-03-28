@@ -78,7 +78,7 @@ apply plugin: fi.jasoft.plugin.GradleVaadinPlugin
 
 
 # Project configurations
-* ``vaadin.version`` - Vaadin version (Vaadin 6 and 7 supported). Defaults to latest Vaadin 7
+* ``vaadin.version`` - Vaadin version. Defaults to latest Vaadin 7
 * ``vaadin.manageDependencies`` - Should the plugin manage the Vaadin depencies for you. Default is true.
 * ``vaadin.manageRepositories`` - Should the plugin add repositories such as maven central and vaadin addons to the project.  Default is true.
 * ``vaadin.mainSourceSet`` - Defines the main source set where all source files will be generated.
@@ -94,29 +94,6 @@ apply plugin: fi.jasoft.plugin.GradleVaadinPlugin
 * ``vaadin.plugin.logToConsole``- Should server logs be logged to the console or to a log file. Default is logging to file.
 * ``vaadin.plugin.eclipseOutputDir`` - The directory where Eclipse will output its compiled classes. Default is project.sourceSets.main.output.classesDir.
 * ``vaadin.plugin.useClassPathJar`` - Use a single jar to define the classpath (if the classpath is too long)
-
-# JRebel configurations
-* ``vaadin.jrebel.enabled`` - Should JRebel be used when running the project. Default is false
-* ``vaadin.jrebel.location`` - Absolute path of jrebel.jar (required if ```jrebel.enabled``` is set to true)
-
-# Vaadin Testbench configurations
-* ``vaadinTestbench.enabled`` - Should Testbench be used for UI testing?. Default is false.
-* ``vaadinTestbench.version`` - Version of testbench to use. By default the latest release of the 3.x series.
-* ``vaadinTestbench.runApplication`` - Should the application be run on embedded Jetty before the tests are run. Default true.
-* ``vaadinTestbenchHub.enabled`` - Should a testbench hub be started when running tests. Default false.
-* ``vaadinTestbenchHub.host`` - The hostname of the hub
-* ``vaadinTestbenchHub.port`` - The port of the hub
-* ``vaadinTestbenchNode.enabled`` - Should a testbench node be started when running tests. Default false.
-* ``vaadinTestbenchNode.host`` - The hostname of the node
-* ``vaadinTestbenchNode.port`` - The port of the node
-* ``vaadinTestbenchNode.hub`` - The URL of the hub where the node should connect to. By default http://localhost:4444/grid/register'.
-* ``vaadinTestbenchNode.browsers`` - A list of supported browsers by the hub. e.g.
-```groovy
-vaadinTestbenchNode.browsers = [
-    [ browserName: 'firefox', version: 3.6, maxInstances: 5, platform: 'LINUX' ],
-    [ browserName: 'chrome', version: 22, maxInstances: 1, platform: 'WINDOWS' ]
-]
-```
 
 # Plugin tasks
 

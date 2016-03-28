@@ -59,7 +59,6 @@ class TaskListener implements TaskExecutionListener {
                 configureAddonMetadata(task)
                 break
             case 'war':
-                configureJRebel(task)
                 configureWAR(task)
                 break
             case 'test':
@@ -208,34 +207,6 @@ class TaskListener implements TaskExecutionListener {
         def manifestFile = project.file(meta.absolutePath + '/MANIFEST.MF')
         manifestFile.createNewFile()
         manifestFile << attributes.collect { key, value -> "$key: $value" }.join("\n")
-    }
-
-    @PackageScope
-    static configureJRebel(Task task) {
-        def project = task.project
-        if (project.vaadin.jrebel.enabled) {
-
-            def classes = project.sourceSets.main.output.classesDir
-
-            // Ensure classes dir exists
-            classes.mkdirs();
-
-            File rebelFile = project.file(classes.absolutePath + '/rebel.xml')
-
-            def srcWebApp = project.webAppDir.absolutePath
-            def writer = new FileWriter(rebelFile)
-
-            new MarkupBuilder(writer).application() {
-                classpath {
-                    dir(name: classes.absolutePath)
-                }
-                web {
-                    link(target: '/') {
-                        dir(name: srcWebApp)
-                    }
-                }
-            }
-        }
     }
 
     @PackageScope

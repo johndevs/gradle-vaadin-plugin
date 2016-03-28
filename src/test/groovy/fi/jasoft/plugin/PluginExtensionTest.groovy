@@ -19,7 +19,6 @@ import fi.jasoft.plugin.configuration.AddonConfiguration
 import fi.jasoft.plugin.configuration.CompileWidgetsetConfiguration
 import fi.jasoft.plugin.configuration.DevelopmentModeConfiguration
 import fi.jasoft.plugin.configuration.GWTConfiguration
-import fi.jasoft.plugin.configuration.JRebelConfiguration
 import fi.jasoft.plugin.configuration.SuperDevModeConfiguration
 import fi.jasoft.plugin.configuration.VaadinPluginConfiguration
 import fi.jasoft.plugin.configuration.VaadinPluginExtension
@@ -41,7 +40,6 @@ class PluginExtensionTest extends PluginTestBase {
         assert vaadin.version == null
         assert vaadin.manageDependencies == true
         assert vaadin.manageRepositories == true
-        assert vaadin.jrebel instanceof JRebelConfiguration
         assert vaadin.devmode instanceof DevelopmentModeConfiguration
         assert vaadin.plugin instanceof VaadinPluginConfiguration
         assert vaadin.addon instanceof AddonConfiguration
@@ -152,23 +150,5 @@ class PluginExtensionTest extends PluginTestBase {
             title ''
         }
         assert project.extensions.vaadin.addon.author == 'Testing person'
-    }
-
-    @Test
-    void areJRebelPropertiesConfigured(){
-        VaadinPluginExtension vaadin = project.extensions.vaadin
-        assert vaadin.jrebel instanceof JRebelConfiguration
-        assert vaadin.jrebel.enabled == false
-        assert vaadin.jrebel.location == null
-    }
-
-    @Test
-    void testJRebelClosure(){
-        project.vaadin.jrebel{
-            enabled true
-            location 'path/to/jrebel'
-        }
-        assert project.extensions.vaadin.jrebel.enabled
-        assert project.extensions.vaadin.jrebel.location == 'path/to/jrebel'
     }
 }

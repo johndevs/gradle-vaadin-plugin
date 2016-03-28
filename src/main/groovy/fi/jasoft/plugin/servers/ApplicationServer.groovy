@@ -141,16 +141,6 @@ abstract class ApplicationServer {
             appServerProcess.add("-Xrunjdwp:transport=dt_socket,address=${configuration.debugPort},server=y,suspend=n")
         }
 
-        // Jrebel
-        if (project.vaadin.jrebel.enabled && configuration.debug) {
-            if (project.vaadin.jrebel.location != null && new File(project.vaadin.jrebel.location).exists()) {
-                appServerProcess.add('-noverify')
-                appServerProcess.add("-javaagent:${project.vaadin.jrebel.location}")
-            } else {
-                project.logger.warn('jrebel.jar not found, running without jrebel')
-            }
-        }
-
         // JVM options
         if (configuration.debug) {
             appServerProcess.add('-ea')
@@ -219,9 +209,7 @@ abstract class ApplicationServer {
             if(line.contains(successfullyStartedLogToken)) {
                 if(firstStart) {
                     def resultStr = "Application running on http://localhost:${configuration.serverPort} "
-                    if (project.vaadin.jrebel.enabled) {
-                        resultStr += "(debugger on ${configuration.debugPort}, JRebel active)"
-                    } else if (configuration.debug) {
+                    if (configuration.debug) {
                         resultStr += "(debugger on ${configuration.debugPort})"
                     }
                     project.logger.lifecycle(resultStr)
