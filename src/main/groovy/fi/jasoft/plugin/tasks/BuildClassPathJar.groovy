@@ -19,6 +19,7 @@ import fi.jasoft.plugin.GradleVaadinPlugin
 import fi.jasoft.plugin.Util
 import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.artifacts.configurations.DefaultConfiguration
+import org.gradle.api.internal.file.CompositeFileCollection
 import org.gradle.api.tasks.bundling.Jar
 
 /**
@@ -44,7 +45,7 @@ class BuildClassPathJar extends Jar {
             DefaultConfiguration serverConf = project.configurations
                     .getByName(GradleVaadinPlugin.CONFIGURATION_RUN_SERVER)
             FileCollection classPath = Util.getCompileClassPath(project)
-            List<File> files = (serverConf + classPath).filter { File file ->
+            CompositeFileCollection files = (serverConf + classPath).filter { File file ->
                         file.isFile() && file.name.endsWith('.jar')
             }
 
