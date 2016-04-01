@@ -359,7 +359,7 @@ abstract class ApplicationServer {
                     }, 1 , TimeUnit.SECONDS)
                 }
 
-                !themesDir.exists() // Terminate if theme directory no longer exists
+                themesDir.exists() // Terminate if theme directory no longer exists
             })
         }
     }
