@@ -161,6 +161,11 @@ abstract class ApplicationServer {
         appServerProcess.add(webAppDir.canonicalPath + File.separator)
 
         File classesDir = project.sourceSets.main.output.classesDir
+        if(project.vaadin.plugin.eclipseOutputDir){
+            // Eclipse might output somewhere else
+            classesDir = project.file(project.vaadin.plugin.eclipseOutputDir)
+        }
+
         appServerProcess.add(classesDir.canonicalPath + File.separator)
 
         if(project.logger.debugEnabled){
@@ -191,14 +196,15 @@ abstract class ApplicationServer {
         if(configuration.serverRestart) {
             def self = this
             Thread.start 'Class Directory Watcher', {
-                ApplicationServer.watchClassDirectoryForChanges(self)
+                watchClassDirectoryForChanges(self)
             }
         }
 
         // Watch for changes in theme
         if(firstStart && configuration.themeAutoRecompile){
+            def self = this
             Thread.start 'Theme Directory Watcher', {
-                watchThemeDirectoryForChanges()
+                watchThemeDirectoryForChanges(self)
             }
         }
     }
@@ -275,7 +281,7 @@ abstract class ApplicationServer {
                 break
             }
 
-            if(!project.vaadin.plugin.serverRestart || stopAfterStart){
+            if(!configuration.serverRestart || stopAfterStart){
                 // Auto-refresh turned off
                 break
             }
@@ -325,7 +331,7 @@ abstract class ApplicationServer {
                     }
                 }
 
-                if(project.vaadin.plugin.serverRestart && server.process){
+                if(server.configuration.serverRestart && server.process){
                     // Force restart of server
                     project.logger.lifecycle("Reloading server...")
                     server.reload()

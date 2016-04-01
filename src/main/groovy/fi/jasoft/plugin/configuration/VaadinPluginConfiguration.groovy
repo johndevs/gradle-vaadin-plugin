@@ -34,7 +34,7 @@ class VaadinPluginConfiguration {
     /**
      * The directory where Eclipse will output its compiled classes.
      */
-    String eclipseOutputDir = 'bin'
+    String eclipseOutputDir = null
 
     /**
      * Should a classpath Jar be used to shorten the classpath.

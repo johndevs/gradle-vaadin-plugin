@@ -525,7 +525,7 @@ class Util {
             }
         }
 
-        project.logger.info "Stopped watching directory"
+        project.logger.info "Stopped watching directory $dir"
     }
 
     /**

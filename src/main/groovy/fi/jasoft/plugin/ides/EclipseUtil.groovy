@@ -17,7 +17,11 @@ package fi.jasoft.plugin.ides
 
 import org.apache.maven.BuildFailureException
 import org.gradle.api.Project
+import org.gradle.api.plugins.PluginContainer
+import org.gradle.plugins.ide.eclipse.model.EclipseClasspath
+import org.gradle.plugins.ide.eclipse.model.EclipseModel
 import org.gradle.plugins.ide.eclipse.model.EclipseWtp
+import org.gradle.plugins.ide.eclipse.model.EclipseWtpFacet
 
 /**
  * Eclipse related utility methods
@@ -27,6 +31,7 @@ import org.gradle.plugins.ide.eclipse.model.EclipseWtp
 class EclipseUtil {
 
     public static final String ECLIPSE_PROPERTY = 'eclipse'
+    public static final String ECLIPSE_WTP_PLUGIN = 'eclipse-wtp'
 
     /**
      * Configures the eclipse plugin
@@ -35,20 +40,13 @@ class EclipseUtil {
      *      the project to configure. Must use the eclipse plugin.
      */
     static configureEclipsePlugin(Project project) {
-        project.beforeEvaluate { Project p ->
-            def plugins = p.plugins
-            if (plugins.findPlugin(ECLIPSE_PROPERTY) && !plugins.findPlugin('eclipse-wtp')) {
-                throw new BuildFailureException("You are using the eclipse plugin which does not support all " +
-                        "features of the Vaadin plugin. Please use the eclipse-wtp plugin instead.")
-            }
-        }
-
         project.afterEvaluate { Project p ->
             if(p.hasProperty(ECLIPSE_PROPERTY)){
-                def cp = p.eclipse.classpath
-                def wtp = p.eclipse.wtp as EclipseWtp
+                EclipseModel eclipse = p.eclipse as EclipseModel
+                eclipse.project.comment = 'Project created with the Gradle Vaadin Plugin'
 
                 // Always download sources
+                def cp = eclipse.classpath
                 cp.downloadSources = true
 
                 // Set Eclipse's class output dir
@@ -59,16 +57,27 @@ class EclipseUtil {
                 }
 
                 // Configure natures
-                def natures = p.eclipse.project.natures
+                def natures = eclipse.project.natures
                 natures.add(0, 'org.springsource.ide.eclipse.gradle.core.nature')
+                natures.add(0, 'org.eclipse.buildship.core.gradleprojectnature')
+                //natures.add(0, 'com.vaadin.integration.eclipse.widgetsetNature')
+
+                // Configure build commands
+                eclipse.project.buildCommand('org.eclipse.buildship.core.gradleprojectbuilder')
+                //eclipse.project.buildCommand('com.vaadin.integration.eclipse.addonStylesBuilder')
+                //eclipse.project.buildCommand('com.vaadin.integration.eclipse.widgetsetBuilder')
 
                 // Configure facets
-                def facet = wtp.facet
-                facet.facets = []
-                facet.facet(name: 'jst.web', version: '3.0')
-                facet.facet(name: 'jst.java', version: p.sourceCompatibility)
-                facet.facet(name: 'com.vaadin.integration.eclipse.core', version: '7.0')
-                facet.facet(name: 'java', version: p.sourceCompatibility)
+                PluginContainer plugins = p.plugins
+                if (plugins.findPlugin(ECLIPSE_WTP_PLUGIN)) {
+                    EclipseWtp wtp = eclipse.wtp
+                    EclipseWtpFacet facet = wtp.facet
+                    facet.facets = []
+                    facet.facet(name: 'jst.web', version: '3.0')
+                    facet.facet(name: 'jst.java', version: p.sourceCompatibility)
+                    //facet.facet(name: 'com.vaadin.integration.eclipse.core', version: '7.0')
+                    facet.facet(name: 'java', version: p.sourceCompatibility)
+                }
             }
         }
     }
@@ -83,11 +92,16 @@ class EclipseUtil {
      */
     static void addConfigurationToProject(Project project, String conf){
         project.afterEvaluate { Project p ->
+            PluginContainer plugins = p.plugins
             if(p.hasProperty(ECLIPSE_PROPERTY)){
-                def cp = p.eclipse.classpath
+                EclipseModel eclipse = p.eclipse as EclipseModel
+                EclipseClasspath cp = eclipse.classpath
                 cp.plusConfigurations += [p.configurations[conf]]
+            }
 
-                def wtp = p.eclipse.wtp as EclipseWtp
+            if(plugins.findPlugin(ECLIPSE_WTP_PLUGIN)) {
+                EclipseModel eclipse = p.eclipse as EclipseModel
+                EclipseWtp wtp = eclipse.wtp as EclipseWtp
                 wtp.component.plusConfigurations += [p.configurations[conf]]
             }
         }

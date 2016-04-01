@@ -28,7 +28,25 @@ class MessageLogger {
         'has been deprecated and is scheduled to be removed in Gradle Vaadin Plugin 0.12'
     }
 
+    /**
+     * Nag to use about a deprecated property
+     *
+     * @param propertyName
+     *      the name of the property
+     * @param advice
+     *      Further details about where the property has been moved
+     */
     static nagUserOfDiscontinuedProperty(String propertyName, String advice) {
         SingleMessageLogger.nagUserWith("The $propertyName property ${getDeprecationMessage()}. $advice");
+    }
+
+    /**
+     * Nag to user with a custom message
+     *
+     * @param advice
+     *      the message to show the user
+     */
+    static nag(String advice) {
+        SingleMessageLogger.nagUserWith(advice);
     }
 }
