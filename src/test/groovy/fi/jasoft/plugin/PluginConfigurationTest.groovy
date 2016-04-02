@@ -15,8 +15,6 @@
 */
 package fi.jasoft.plugin
 
-import fi.jasoft.plugin.configuration.VaadinPluginExtension
-
 import org.gradle.api.plugins.WarPlugin
 import org.junit.Test
 
@@ -30,12 +28,6 @@ class PluginConfigurationTest extends PluginTestBase{
     @Test
     void areDependantPluginsIncluded(){
         assertTrue project.plugins.hasPlugin(WarPlugin)
-    }
-
-    @Test
-    void areVaadinPluginPropertiesConfigured(){
-        VaadinPluginExtension vaadin = project.extensions.vaadin;
-        assert vaadin.plugin.eclipseOutputDir == 'bin'
     }
 
 }
