@@ -1,6 +1,7 @@
 package fi.jasoft.plugin.integration
 
 import fi.jasoft.plugin.tasks.CreateDirectoryZipTask
+import org.junit.Ignore
 import org.junit.Test
 
 import static org.junit.Assert.assertTrue
@@ -32,7 +33,7 @@ class TaskConfigurationsTest extends IntegrationTest {
         def result = runWithArguments('verifyEclipseClassPath')
 
         assertTrue result, result.contains( 'Download sources true')
-        assertTrue result, result.contains( 'Eclipse output dir bin')
+        assertTrue result, result.contains( 'Eclipse output dir null')
 
         assertTrue result, result.contains( 'Server in classpath true')
         assertTrue result, result.contains( 'Client in classpath true')
@@ -103,6 +104,7 @@ class TaskConfigurationsTest extends IntegrationTest {
         assertTrue result, result.contains('Server in components true')
     }
 
+    @Ignore("Extra facets currently disabled")
     @Test void 'Eclipse WTP facet configuration'() {
 
         buildFile << """
