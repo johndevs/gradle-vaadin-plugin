@@ -45,6 +45,7 @@ abstract class ApplicationServer {
 
     private static final String JAR_FILE_POSTFIX = '.jar'
     private static final String AMPERSAND = '&'
+    private static final String RELOADING_SERVER_MESSAGE = 'Reloading server...'
 
     /**
      * Creates a new application server
@@ -333,7 +334,7 @@ abstract class ApplicationServer {
 
                 if(server.configuration.serverRestart && server.process){
                     // Force restart of server
-                    project.logger.lifecycle("Reloading server...")
+                    project.logger.lifecycle(RELOADING_SERVER_MESSAGE)
                     server.reload()
                 }
                 false
@@ -362,7 +363,7 @@ abstract class ApplicationServer {
                         // Restart
                         if(server.configuration.serverRestart && server.process){
                             // Force restart of server
-                            project.logger.lifecycle("Reloading server...")
+                            project.logger.lifecycle(RELOADING_SERVER_MESSAGE)
                             server.reload()
                         }
                     }, 1 , TimeUnit.SECONDS)

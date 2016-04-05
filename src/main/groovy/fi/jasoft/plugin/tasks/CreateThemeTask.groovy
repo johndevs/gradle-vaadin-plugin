@@ -35,6 +35,7 @@ class CreateThemeTask extends DefaultTask {
 
     static final String NAME = 'vaadinCreateTheme'
     static final String STYLES_SCSS_FILE = 'styles.scss'
+    public static final String FAVICON_FILENAME = 'favicon.ico'
 
     @Option(option = 'name', description = 'Theme name')
     def String themeName
@@ -69,8 +70,8 @@ class CreateThemeTask extends DefaultTask {
         TemplateUtil.writeTemplate(STYLES_SCSS_FILE, themeDir, STYLES_SCSS_FILE, substitutions)
         TemplateUtil.writeTemplate('MyTheme.scss', themeDir, themeScssFile, substitutions)
 
-        def favicon = CreateThemeTask.class.getClassLoader().getResource("favicon.ico")
-        def faviconFile = new File(themeDir, 'favicon.ico')
+        def favicon = CreateThemeTask.class.getClassLoader().getResource(FAVICON_FILENAME)
+        def faviconFile = new File(themeDir, FAVICON_FILENAME)
 
         Files.copy(favicon.openStream(), faviconFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
 
