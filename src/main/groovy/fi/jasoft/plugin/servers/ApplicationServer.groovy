@@ -355,11 +355,19 @@ abstract class ApplicationServer {
                         currentTask.cancel(true)
                     }
                     currentTask = executor.schedule({
+
+                        // Recompile theme
                         CompileThemeTask.compile(project, true)
+
+                        // Restart
+                        if(server.configuration.serverRestart && server.process){
+                            // Force restart of server
+                            project.logger.lifecycle("Reloading server...")
+                            server.reload()
+                        }
                     }, 1 , TimeUnit.SECONDS)
                 }
-
-                themesDir.exists() // Terminate if theme directory no longer exists
+                false
             })
         }
     }

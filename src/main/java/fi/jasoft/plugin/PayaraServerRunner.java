@@ -46,9 +46,12 @@ public class PayaraServerRunner {
         try {
 
             BootstrapProperties bootstrap = new BootstrapProperties();
+
             GlassFishRuntime runtime = GlassFishRuntime.bootstrap(bootstrap, PayaraServerRunner.class.getClass().getClassLoader());
+
             GlassFishProperties glassfishProperties = new GlassFishProperties();
             glassfishProperties.setPort("http-listener", port);
+
             GlassFish glassfish = runtime.newGlassFish(glassfishProperties);
             glassfish.start();
 
