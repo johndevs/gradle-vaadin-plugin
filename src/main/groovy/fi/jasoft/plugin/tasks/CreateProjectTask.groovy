@@ -71,9 +71,11 @@ class CreateProjectTask extends DefaultTask {
             }
         }
 
-        makeUIClass(project)
+        makeUIClass()
 
-        makeServletClass(project)
+        makeServletClass()
+
+        makeBeansXML()
 
         if (Util.isAddonStylesSupported(project)) {
             project.tasks[CreateThemeTask.NAME].makeTheme(applicationName)
@@ -83,17 +85,14 @@ class CreateProjectTask extends DefaultTask {
     }
 
     @PackageScope
-    def makeUIClass(Project project) {
+    def makeUIClass() {
 
         def substitutions = [:]
-
         substitutions[APPLICATION_NAME_KEY] = applicationName
         substitutions[APPLICATION_PACKAGE_KEY] = applicationPackage
 
-        //#######################################################################
-
+        // Imports
         def imports = []
-
         if (Util.isPushSupportedAndEnabled(project)) {
             imports.add('com.vaadin.annotations.Push')
         }
@@ -104,10 +103,8 @@ class CreateProjectTask extends DefaultTask {
 
         substitutions['imports'] = imports
 
-        //#######################################################################
-
+        // Annotations
         def annotations = []
-
         if (Util.isPushSupportedAndEnabled(project)) {
             annotations.add('Push')
         }
@@ -122,8 +119,6 @@ class CreateProjectTask extends DefaultTask {
 
         substitutions['annotations'] = annotations
 
-        //#######################################################################
-
         if(Util.isGroovyProject(project)){
             TemplateUtil.writeTemplate('MyUI.groovy', UIDir, applicationName + "UI.groovy", substitutions)
         } else {
@@ -132,7 +127,7 @@ class CreateProjectTask extends DefaultTask {
     }
 
     @PackageScope
-    def makeServletClass(Project project) {
+    def makeServletClass() {
         def configuration = project.vaadinCompile as CompileWidgetsetConfiguration
 
         def substitutions = [:]
@@ -165,11 +160,24 @@ class CreateProjectTask extends DefaultTask {
     }
 
     @PackageScope
+    def File makeBeansXML() {
+        TemplateUtil.writeTemplate('beans.xml', metaInfDir)
+    }
+
+    @PackageScope
     def File getUIDir(){
         def javaDir = Util.getMainSourceSet(project).srcDirs.first()
         def uidir = new File(javaDir, TemplateUtil.convertFQNToFilePath(applicationPackage))
         uidir.mkdirs()
         uidir
+    }
+
+    @PackageScope
+    def File getMetaInfDir() {
+        def resourceDir = project.sourceSets.main.resources.srcDirs.iterator().next()
+        def metaInf = new File(resourceDir, 'META-INF')
+        metaInf.mkdirs()
+        metaInf
     }
 }
 
