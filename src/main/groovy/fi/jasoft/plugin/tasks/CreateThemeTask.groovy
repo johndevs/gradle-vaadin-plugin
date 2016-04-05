@@ -23,6 +23,9 @@ import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
 import org.gradle.util.VersionNumber
 
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+
 /**
  * Creates a new theme
  *
@@ -65,6 +68,11 @@ class CreateThemeTask extends DefaultTask {
 
         TemplateUtil.writeTemplate(STYLES_SCSS_FILE, themeDir, STYLES_SCSS_FILE, substitutions)
         TemplateUtil.writeTemplate('MyTheme.scss', themeDir, themeScssFile, substitutions)
+
+        def favicon = CreateThemeTask.class.getClassLoader().getResource("favicon.ico")
+        def faviconFile = new File(themeDir, 'favicon.ico')
+
+        Files.copy(favicon.openStream(), faviconFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
 
         project.tasks[UpdateAddonStylesTask.NAME].run()
     }

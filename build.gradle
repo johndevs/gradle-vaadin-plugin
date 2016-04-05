@@ -184,10 +184,13 @@ processResources {
     // Apply build properties
     def debugDir = new File(project.buildDir, 'libs').canonicalPath
     from(sourceSets.main.resources.srcDirs){
-        filter(ReplaceTokens, tokens: [
-                version: project.version,
-                debugdir: debugDir
-        ])
+        // Files Matching is required to prevent binary files from becoming corrupt
+        filesMatching('*.properties'){
+            filter(ReplaceTokens, tokens: [
+                    version: project.version,
+                    debugdir: debugDir
+            ])
+        }
     }
 }
 
