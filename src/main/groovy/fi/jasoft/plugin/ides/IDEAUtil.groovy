@@ -41,8 +41,14 @@ class IDEAUtil {
                 module.name = p.name
 
                 module.inheritOutputDirs = false
-                module.outputDir = project.sourceSets.main.output.classesDir
-                module.testOutputDir = project.sourceSets.test.output.classesDir
+
+                if (project.vaadinRun.classesDir == null) {
+                    module.outputDir = project.sourceSets.main.output.classesDir
+                    module.testOutputDir = project.sourceSets.test.output.classesDir
+                } else {
+                    module.outputDir = project.file(project.vaadinRun.classesDir)
+                    module.testOutputDir = project.file(project.vaadinRun.classesDir)
+                }
 
                 // Download sources and javadoc
                 module.downloadJavadoc = true

@@ -40,9 +40,5 @@ class PluginConfigurationTransformTest {
 
         // Test direct properties
         assertEquals("43211", vaadin.version("43211"))
-
-        // Test delegated properties
-        vaadin.plugin.eclipseOutputDir = "foobar"
-        assertEquals("foobar",vaadin.plugin.eclipseOutputDir)
     }
 }

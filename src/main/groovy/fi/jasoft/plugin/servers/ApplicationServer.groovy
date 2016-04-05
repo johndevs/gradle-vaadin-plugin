@@ -161,9 +161,9 @@ abstract class ApplicationServer {
         appServerProcess.add(webAppDir.canonicalPath + File.separator)
 
         File classesDir = project.sourceSets.main.output.classesDir
-        if(project.vaadin.plugin.eclipseOutputDir){
+        if(project.vaadinRun.classesDir){
             // Eclipse might output somewhere else
-            classesDir = project.file(project.vaadin.plugin.eclipseOutputDir)
+            classesDir = project.file(project.vaadinRun.classesDir)
         }
 
         appServerProcess.add(classesDir.canonicalPath + File.separator)
@@ -306,8 +306,8 @@ abstract class ApplicationServer {
         def project = server.project
 
         def classesDir
-        if(project.vaadin.plugin.eclipseOutputDir && project.file(project.vaadin.plugin.eclipseOutputDir).exists()){
-            classesDir = project.file(project.vaadin.plugin.eclipseOutputDir)
+        if(project.vaadinRun.classesDir && project.file(project.vaadinRun.classesDir).exists()){
+            classesDir = project.file(project.vaadinRun.classesDir)
         } else {
             classesDir = project.sourceSets.main.output.classesDir
         }

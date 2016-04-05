@@ -50,10 +50,10 @@ class EclipseUtil {
                 cp.downloadSources = true
 
                 // Set Eclipse's class output dir
-                if (p.vaadin.plugin.eclipseOutputDir == null) {
+                if (p.vaadinRun.classesDir == null) {
                     cp.defaultOutputDir = p.sourceSets.main.output.classesDir
                 } else {
-                    cp.defaultOutputDir = p.file(project.vaadin.plugin.eclipseOutputDir)
+                    cp.defaultOutputDir = p.file(p.vaadinRun.classesDir)
                 }
 
                 // Configure natures

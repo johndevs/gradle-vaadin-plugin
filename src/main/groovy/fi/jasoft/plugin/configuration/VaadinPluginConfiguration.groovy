@@ -32,11 +32,6 @@ class VaadinPluginConfiguration {
     boolean logToConsole = false
 
     /**
-     * The directory where Eclipse will output its compiled classes.
-     */
-    String eclipseOutputDir = null
-
-    /**
      * Should a classpath Jar be used to shorten the classpath.
      */
     boolean useClassPathJar = Os.isFamily(Os.FAMILY_WINDOWS)
@@ -157,5 +152,25 @@ class VaadinPluginConfiguration {
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.plugin.themeCompiler',
                 'This property has been replaced by vaadinThemeCompile.compiler.')
         project.vaadinThemeCompile.themeCompiler
+    }
+
+    /**
+     * The directory where Eclipse will output its compiled classes.
+     */
+    @Deprecated
+    void eclipseOutputDir(String directory){
+        project.vaadinRun.classesDir = directory
+        getEclipseOutputDir()
+    }
+    @Deprecated
+    void setEclipseOutputDir(String directory){
+        project.vaadinRun.classesDir = directory
+        getEclipseOutputDir()
+    }
+    @Deprecated
+    String getEclipseOutputDir(){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.plugin.eclipseOutputDir',
+                'This property has been replaced by vaadinRun.classesDir.')
+        project.vaadinRun.classesDir
     }
 }

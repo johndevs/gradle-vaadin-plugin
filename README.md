@@ -92,7 +92,6 @@ apply plugin: fi.jasoft.plugin.GradleVaadinPlugin
 
 # Plugin configurations
 * ``vaadin.plugin.logToConsole``- Should server logs be logged to the console or to a log file. Default is logging to file.
-* ``vaadin.plugin.eclipseOutputDir`` - The directory where Eclipse will output its compiled classes. Default is project.sourceSets.main.output.classesDir.
 * ``vaadin.plugin.useClassPathJar`` - Use a single jar to define the classpath (if the classpath is too long)
 
 # Plugin tasks
@@ -240,6 +239,7 @@ Runs the Vaadin application on the application server.
 * ``serverPort`` - The port the vaadin application should run on. By default 8080.
 * ``themeAutoRecompile`` -  Should theme be recompiled when SCSS file is changes. Default is *true*.
 * ``openInBrowser`` - Should the application be opened in a browser when it has been launched. By defailt *true*.
+* ``classesDir`` - The directory where the compiled application classes are located. Default is project.sourceSets.main.output.classesDir.
 
 ## vaadinAddons
 

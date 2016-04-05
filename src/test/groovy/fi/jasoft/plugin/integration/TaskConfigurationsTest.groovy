@@ -19,7 +19,7 @@ class TaskConfigurationsTest extends IntegrationTest {
             task verifyEclipseClassPath(dependsOn: 'eclipseClasspath') << {
                 def classpath = project.eclipse.classpath
                 println 'Download sources ' +  classpath.downloadSources
-                println 'Eclipse output dir ' + project.vaadin.plugin.eclipseOutputDir
+                println 'Eclipse output dir ' + project.vaadinRun.classesDir
 
                 def confs = project.configurations
                 println 'Server in classpath ' + (confs.getByName('vaadin-server') in classpath.plusConfigurations)

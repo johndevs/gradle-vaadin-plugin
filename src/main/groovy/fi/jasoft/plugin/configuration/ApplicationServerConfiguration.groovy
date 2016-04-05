@@ -67,4 +67,9 @@ class ApplicationServerConfiguration {
      * Should the application be opened in a browser when it has been launched
      */
     boolean openInBrowser = true
+
+    /**
+     * The directory where compiled application classes are found
+     */
+    String classesDir = null
 }
