@@ -59,8 +59,8 @@ class EclipseUtil {
                 // Configure natures
                 def natures = eclipse.project.natures
                 natures.add(0, 'org.springsource.ide.eclipse.gradle.core.nature')
-                natures.add(0, 'org.eclipse.buildship.core.gradleprojectnature')
-                //natures.add(0, 'com.vaadin.integration.eclipse.widgetsetNature')
+                natures.add(1, 'org.eclipse.buildship.core.gradleprojectnature')
+                //natures.add(2, 'com.vaadin.integration.eclipse.widgetsetNature')
 
                 // Configure build commands
                 eclipse.project.buildCommand('org.eclipse.buildship.core.gradleprojectbuilder')
