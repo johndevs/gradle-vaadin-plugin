@@ -75,7 +75,8 @@ class WARArchiveTest extends IntegrationTest {
             'styles.scss',
             'styles.css',
             "${projectDir.root.name}.scss".toString(),
-            'addons.scss'
+            'addons.scss',
+            'favicon.ico'
         ]
 
         assertFilesInFolder(warFile, THEME_FILES, "VAADIN/themes/${projectDir.root.name.capitalize()}".toString())
