@@ -152,7 +152,7 @@ class CompileWidgetsetTask extends DefaultTask {
             }
 
             // Add classpath jar
-            if(project.vaadin.plugin.useClassPathJar) {
+            if(project.vaadin.useClassPathJar) {
                 BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
                 inputs.file(pathJarTask.archivePath)
             }
@@ -239,7 +239,7 @@ class CompileWidgetsetTask extends DefaultTask {
         Util.getWidgetsetDirectory(project).mkdirs()
 
         FileCollection classpath = Util.getCompileClassPathOrJar(project)
-        if(vaadin.plugin.useClassPathJar){
+        if(vaadin.useClassPathJar){
             // Add client dependencies missing from the classpath jar
             classpath += Util.getClientCompilerClassPath(project).filter { File file ->
                 if(file.name.endsWith('.jar')){

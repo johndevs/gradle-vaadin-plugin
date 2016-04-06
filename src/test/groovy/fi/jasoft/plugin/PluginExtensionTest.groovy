@@ -121,16 +121,16 @@ class PluginExtensionTest extends PluginTestBase {
     void areVaadinPluginConfigurationPropertiesConfigured(){
         VaadinPluginExtension vaadin = project.extensions.vaadin
         assert vaadin.plugin instanceof VaadinPluginConfiguration
-        assert vaadin.plugin.logToConsole == false
+        assert vaadin.logToConsole == false
     }
 
     @Test
     void testPluginConfigurationClosure(){
-        assert project.extensions.vaadin.plugin.logToConsole == false
+        assert project.extensions.vaadin.logToConsole == false
         project.vaadin.plugin {
             logToConsole true
         }
-        assert project.extensions.vaadin.plugin.logToConsole == true
+        assert project.extensions.vaadin.logToConsole == true
     }
 
     @Test

@@ -37,7 +37,7 @@ class BuildClassPathJar extends Jar {
         dependsOn 'classes'
 
         onlyIf {
-            project.vaadin.plugin.useClassPathJar
+            project.vaadin.useClassPathJar
         }
 
         project.afterEvaluate {

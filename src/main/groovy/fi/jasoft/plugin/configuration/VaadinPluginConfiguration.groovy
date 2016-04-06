@@ -23,18 +23,9 @@ import org.gradle.api.Project
 /**
  * General configuration options for the plugin itself
  */
+@Deprecated
 @PluginConfiguration
 class VaadinPluginConfiguration {
-
-    /**
-     * Should all logs output by the task be redirected to the console (if false output is redirected to file)
-     */
-    boolean logToConsole = false
-
-    /**
-     * Should a classpath Jar be used to shorten the classpath.
-     */
-    boolean useClassPathJar = Os.isFamily(Os.FAMILY_WINDOWS)
 
     @Deprecated
     transient Project project
@@ -172,5 +163,45 @@ class VaadinPluginConfiguration {
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.plugin.eclipseOutputDir',
                 'This property has been replaced by vaadinRun.classesDir.')
         project.vaadinRun.classesDir
+    }
+
+    /**
+     * Should all logs output by the task be redirected to the console (if false output is redirected to file)
+     */
+    @Deprecated
+    void logToConsole(boolean logToConsole){
+        project.vaadin.logToConsole = logToConsole
+        isLogToConsole()
+    }
+    @Deprecated
+    void setLogToConsole(boolean logToConsole){
+        project.vaadin.logToConsole = logToConsole
+        isLogToConsole()
+    }
+    @Deprecated
+    boolean isLogToConsole(){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.plugin.logToConsole',
+                'This property has been replaced by vaadin.logToConsole.')
+        project.vaadin.logToConsole
+    }
+
+    /**
+     * Should a classpath Jar be used to shorten the classpath.
+     */
+    @Deprecated
+    void useClassPathJar(boolean useClassPathJar){
+        project.vaadin.useClassPathJar = useClassPathJar
+        isUseClassPathJar()
+    }
+    @Deprecated
+    void setUseClassPathJar(boolean useClassPathJar){
+        project.vaadin.useClassPathJar = useClassPathJar
+        isUseClassPathJar()
+    }
+    @Deprecated
+    boolean isUseClassPathJar(){
+        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.plugin.useClassPathJar',
+                'This property has been replaced by vaadin.useClassPathJar.')
+        project.vaadin.useClassPathJar
     }
 }

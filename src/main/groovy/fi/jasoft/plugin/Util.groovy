@@ -85,7 +85,7 @@ class Util {
     static FileCollection getCompileClassPathOrJar(Project project) {
         def vaadin = project.vaadin as VaadinPluginExtension
         FileCollection classpath
-        if(vaadin.plugin.useClassPathJar) {
+        if(vaadin.useClassPathJar) {
             // Add dependencies using the classpath jar
             BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
             classpath = project.files(pathJarTask.archivePath)
@@ -358,7 +358,7 @@ class Util {
      *      Optional additional monitor closure for processing output
      */
     static void logProcess(final Project project, final Process process, final String filename, Closure monitor={}) {
-        if(project.vaadin.plugin.logToConsole){
+        if(project.vaadin.logToConsole){
             logProcessToConsole(project,process,monitor)
         } else {
             logProcessToFile(project, process, filename, monitor)

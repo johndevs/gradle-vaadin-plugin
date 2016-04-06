@@ -17,6 +17,7 @@ package fi.jasoft.plugin.configuration
 
 import fi.jasoft.plugin.MessageLogger
 import groovy.transform.PackageScope
+import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.file.SourceDirectorySet
@@ -41,11 +42,6 @@ class VaadinPluginExtension {
      * Should the plugin manage repositories
      */
     boolean manageRepositories = true
-
-    /**
-     * The configuration for the plugin itself
-     */
-    final VaadinPluginConfiguration plugin
 
     /**
      * Configuration options for addons
@@ -73,6 +69,16 @@ class VaadinPluginExtension {
     boolean push = false
 
     /**
+     * Should all logs output by the task be redirected to the console (if false output is redirected to file)
+     */
+    boolean logToConsole = false
+
+    /**
+     * Should a classpath Jar be used to shorten the classpath.
+     */
+    boolean useClassPathJar = Os.isFamily(Os.FAMILY_WINDOWS)
+
+    /**
      * Configuration options for GWT
      */
     @Deprecated
@@ -83,6 +89,12 @@ class VaadinPluginExtension {
      */
     @Deprecated
     final DevelopmentModeConfiguration devmode
+
+    /**
+     * The configuration for the plugin itself
+     */
+    @Deprecated
+    final VaadinPluginConfiguration plugin
 
     @PackageScope
     @Deprecated

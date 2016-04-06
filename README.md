@@ -91,8 +91,8 @@ apply plugin: fi.jasoft.plugin.GradleVaadinPlugin
 * ``vaadin.addon.styles`` - An array of paths relative to webroot (eg. '/VAADIN/addons/myaddon/myaddon.scss') where CSS and SCSS files for an addon can be found.
 
 # Plugin configurations
-* ``vaadin.plugin.logToConsole``- Should server logs be logged to the console or to a log file. Default is logging to file.
-* ``vaadin.plugin.useClassPathJar`` - Use a single jar to define the classpath (if the classpath is too long)
+* ``vaadin.logToConsole``- Should server logs be logged to the console or to a log file. Default is logging to file.
+* ``vaadin.useClassPathJar`` - Use a single jar to define the classpath (if the classpath is too long)
 
 # Plugin tasks
 

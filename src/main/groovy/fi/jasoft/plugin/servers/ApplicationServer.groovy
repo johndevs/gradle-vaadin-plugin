@@ -106,7 +106,7 @@ abstract class ApplicationServer {
 
     def FileCollection getClassPath(){
         FileCollection cp
-        if(project.vaadin.plugin.useClassPathJar){
+        if(project.vaadin.useClassPathJar){
             BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
             cp = project.files(pathJarTask.archivePath)
         } else {

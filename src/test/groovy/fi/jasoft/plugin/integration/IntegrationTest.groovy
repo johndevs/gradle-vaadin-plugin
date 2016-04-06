@@ -61,7 +61,7 @@ class IntegrationTest {
 
             apply plugin: fi.jasoft.plugin.GradleVaadinPlugin
 
-            vaadin.plugin.logToConsole = true
+            vaadin.logToConsole = true
         """
     }
 

@@ -59,7 +59,7 @@ class CompileThemeTask extends DefaultTask {
             })
 
             // Add classpath jar
-            if (project.vaadin.plugin.useClassPathJar) {
+            if (project.vaadin.useClassPathJar) {
                 BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
                 inputs.file(pathJarTask.archivePath)
             }

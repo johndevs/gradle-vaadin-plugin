@@ -46,7 +46,7 @@ class UpdateAddonStylesTask extends DefaultTask {
             }
 
             // Add classpath jar
-            if(project.vaadin.plugin.useClassPathJar) {
+            if(project.vaadin.useClassPathJar) {
                 BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
                 inputs.file(pathJarTask.archivePath)
             }
@@ -70,7 +70,7 @@ class UpdateAddonStylesTask extends DefaultTask {
             // SASSAddonImportFileCreator cannot handle classpath jar, so if
             // that is used we need to manually add the addons to the classpath
             // even though they are listen inside the classpath jar
-            if(project.vaadin.plugin.useClassPathJar){
+            if(project.vaadin.useClassPathJar){
                 Util.findAddonsInProject(project, 'Vaadin-Stylesheets', true).each {
                     classpath += project.files(it.file)
                 }
