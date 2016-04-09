@@ -58,6 +58,10 @@ class CreateProjectTask extends DefaultTask {
         if(!applicationName){
             applicationName = project.name.capitalize()
         }
+
+        // Ensure name is Java compatible
+        applicationName = Util.makeStringJavaCompatible(applicationName)
+
         if(!applicationPackage){
             int endSlashSize = 2
             if(widgetsetFQN?.contains(DOT)){

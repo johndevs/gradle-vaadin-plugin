@@ -824,4 +824,26 @@ class Util {
 
         null
     }
+
+    /**
+     * Ensures that the string can be used as a Java Class Name
+     */
+    static String makeStringJavaCompatible(String string) {
+        boolean isFirstCharacter = true
+        boolean capitilizeNextCharacter = false
+        string.chars.collect { char c ->
+            String result = ''
+            if(isFirstCharacter && Character.isJavaIdentifierStart(c)){
+                isFirstCharacter = false
+                result = capitilizeNextCharacter ? c.toUpperCase() : c
+                capitilizeNextCharacter = false
+            } else if(Character.isJavaIdentifierPart(c)){
+                result = capitilizeNextCharacter ? c.toUpperCase() : c
+                capitilizeNextCharacter = false
+            } else {
+                capitilizeNextCharacter = true
+            }
+            result
+        }.join('').capitalize()
+    }
 }
