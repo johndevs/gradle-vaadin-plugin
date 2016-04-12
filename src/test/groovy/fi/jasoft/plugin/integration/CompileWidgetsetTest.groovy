@@ -2,6 +2,7 @@ package fi.jasoft.plugin.integration
 
 import fi.jasoft.plugin.tasks.CompileWidgetsetTask
 import fi.jasoft.plugin.tasks.CreateProjectTask
+import fi.jasoft.plugin.tasks.UpdateWidgetsetTask
 import org.junit.Test
 
 import java.nio.file.Paths
@@ -57,5 +58,19 @@ class CompileWidgetsetTest extends IntegrationTest {
         File widgetsetFile = Paths.get(projectDir.root.canonicalPath, 'src', 'main', 'resources',
                 'addon','client', projectDir.root.name.capitalize() + 'Widgetset.gwt.xml').toFile()
         assertTrue "Widgetset file $widgetsetFile did not exist", widgetsetFile.exists()
+    }
+
+    @Test void 'Widgetset file contains addon widgetset inherits'() {
+        buildFile << """
+            dependencies {
+                compile 'org.vaadin.addons:qrcode:2.0.1'
+            }
+        """
+
+        runWithArguments(UpdateWidgetsetTask.NAME)
+
+        File widgetsetFile = Paths.get(projectDir.root.canonicalPath, 'src', 'main', 'resources',
+                'addon','client', projectDir.root.name.capitalize() + 'Widgetset.gwt.xml').toFile()
+        assertTrue widgetsetFile.text.contains('<inherits name="fi.jasoft.qrcode.QrcodeWidgetset" />')
     }
 }
