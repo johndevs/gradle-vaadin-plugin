@@ -616,7 +616,10 @@ class Util {
         def attribute = new Attributes.Name(byAttribute)
         project.configurations.all.each { Configuration conf ->
             conf.allDependencies.each { Dependency dependency ->
-                if(!(dependency in ProjectDependency)){
+                if(dependency in ProjectDependency) {
+                    Project dependentProject = ((ProjectDependency) dependency).dependencyProject
+                    addons.addAll(findAddonsInProject(dependentProject, byAttribute, includeFile))
+                } else {
                     conf.files(dependency).each { File file ->
                         file.withInputStream { InputStream stream ->
                             def jarStream = new JarInputStream(stream)

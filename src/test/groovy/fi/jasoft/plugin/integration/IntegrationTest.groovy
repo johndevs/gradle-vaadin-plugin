@@ -35,16 +35,23 @@ class IntegrationTest {
 
     @Before
     void setup() {
-        buildFile = projectDir.newFile("build.gradle")
+        buildFile = createBuildFile(projectDir.root)
+    }
+
+    protected static File createBuildFile(File projectDir) {
+        File buildFile = new File(projectDir, 'build.gradle')
+        buildFile.createNewFile()
+
         def projectVersion = System.getProperty('integrationTestProjectVersion')
 
-        def libsDir = Paths.get('.', 'build', 'libs').toFile()
-        def escapedDir = libsDir.canonicalPath.replace("\\","\\\\")
+        File libsDir = Paths.get('.', 'build', 'libs').toFile()
+        String escapedDir = libsDir.canonicalPath.replace("\\","\\\\")
 
         // Apply plugin to project
         buildFile << """
             buildscript {
                 repositories {
+                    mavenLocal()
                     mavenCentral()
                     flatDir dirs: file('$escapedDir')
                 }
@@ -63,17 +70,22 @@ class IntegrationTest {
 
             vaadin.logToConsole = true
         """
+        buildFile
+    }
+
+    protected String runWithArgumentsOnProject(File projectDir, String... args) {
+        setupRunner(projectDir).withArguments((args as List) + ['--stacktrace']).build().output
     }
 
     protected String runWithArguments(String... args) {
-        setupRunner().withArguments((args as List) + ['--stacktrace']).build().output
+        runWithArgumentsOnProject(projectDir.root, args)
     }
 
     protected String runFailureExpected() {
         setupRunner().buildAndFail().output
     }
 
-    protected GradleRunner setupRunner() {
-        GradleRunner.create().withProjectDir(projectDir.root)
+    protected GradleRunner setupRunner(File projectDir = this.projectDir.root) {
+        GradleRunner.create().withProjectDir(projectDir)
     }
 }
