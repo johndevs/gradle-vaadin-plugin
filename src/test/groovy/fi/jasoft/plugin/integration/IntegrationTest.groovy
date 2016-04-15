@@ -37,7 +37,7 @@ class IntegrationTest {
         buildFile = makeBuildFile(projectDir.root)
     }
 
-    protected static File makeBuildFile(File projectDir) {
+    protected static File makeBuildFile(File projectDir, boolean applyPluginToFile=true) {
         File buildFile = new File(projectDir, 'build.gradle')
         buildFile.createNewFile()
 
@@ -64,12 +64,18 @@ class IntegrationTest {
             repositories {
                 flatDir dirs: file('$escapedDir')
             }
-
-            apply plugin: fi.jasoft.plugin.GradleVaadinPlugin
-
-            vaadin.logToConsole = true
         """
+
+        if(applyPluginToFile){
+            applyPlugin(buildFile)
+            buildFile << "vaadin.logToConsole = true\n"
+        }
+
         buildFile
+    }
+
+    protected static void applyPlugin(File buildFile) {
+        buildFile << "apply plugin: fi.jasoft.plugin.GradleVaadinPlugin\n"
     }
 
     protected String runWithArgumentsOnProject(File projectDir, String... args) {
