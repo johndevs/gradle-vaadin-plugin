@@ -13,8 +13,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fi.jasoft.plugin
+package fi.jasoft.plugin.unit
 
+import fi.jasoft.plugin.TemplateUtil
 import org.junit.Test
 import static junit.framework.Assert.assertEquals
 

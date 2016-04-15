@@ -13,7 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fi.jasoft.plugin
+package fi.jasoft.plugin.unit
 
 import org.gradle.api.plugins.WarPlugin
 import org.junit.Test
