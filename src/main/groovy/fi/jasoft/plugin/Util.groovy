@@ -812,7 +812,7 @@ class Util {
 
         // If addons exists in project but widgetset is not defined, use default one
         if(!widgetset && findAddonsInProject(project).size() > 0){
-            widgetset = 'addon.client.' + project.getName().capitalize() + 'Widgetset'
+            widgetset = 'AppWidgetset'
         }
 
         if(widgetset){

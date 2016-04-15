@@ -50,13 +50,13 @@ class CompileWidgetsetTest extends IntegrationTest {
 
         runWithArguments(CreateProjectTask.NAME)
 
-        def widgetsetName = 'addon.client.' + projectDir.root.name.capitalize() + 'Widgetset'
+        def widgetsetName = 'AppWidgetset'
         def result = runWithArguments('--info', CompileWidgetsetTask.NAME)
         assertTrue result, result.contains("Compiling module $widgetsetName")
         assertTrue result, result.contains('Linking succeeded')
 
         File widgetsetFile = Paths.get(projectDir.root.canonicalPath, 'src', 'main', 'resources',
-                'addon','client', projectDir.root.name.capitalize() + 'Widgetset.gwt.xml').toFile()
+                'AppWidgetset.gwt.xml').toFile()
         assertTrue "Widgetset file $widgetsetFile did not exist", widgetsetFile.exists()
     }
 
