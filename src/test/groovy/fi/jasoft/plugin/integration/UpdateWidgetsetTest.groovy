@@ -49,7 +49,7 @@ class UpdateWidgetsetTest extends IntegrationTest {
         // Setup project 1
         File project1Dir = projectDir.newFolder('project1')
         project1Dir.mkdirs()
-        File buildFile1 = createBuildFile(project1Dir)
+        File buildFile1 = makeBuildFile(project1Dir)
         buildFile1 << """
             dependencies {
                 compile 'org.vaadin.addons:qrcode:2.0.1'
@@ -59,7 +59,7 @@ class UpdateWidgetsetTest extends IntegrationTest {
         // Setup project 2
         File project2Dir = projectDir.newFolder('project2')
         project2Dir.mkdirs()
-        File buildFile2 = createBuildFile(project2Dir)
+        File buildFile2 = makeBuildFile(project2Dir)
         buildFile2 << "vaadinCompile.widgetset = 'com.example.MyWidgetset'\n"
         buildFile2 << """
             dependencies {

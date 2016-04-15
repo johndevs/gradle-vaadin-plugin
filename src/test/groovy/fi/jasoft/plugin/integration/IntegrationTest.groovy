@@ -15,7 +15,6 @@
 */
 package fi.jasoft.plugin.integration
 
-import groovy.transform.PackageScope
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.Before
 import org.junit.Rule
@@ -35,10 +34,10 @@ class IntegrationTest {
 
     @Before
     void setup() {
-        buildFile = createBuildFile(projectDir.root)
+        buildFile = makeBuildFile(projectDir.root)
     }
 
-    protected static File createBuildFile(File projectDir) {
+    protected static File makeBuildFile(File projectDir) {
         File buildFile = new File(projectDir, 'build.gradle')
         buildFile.createNewFile()
 
