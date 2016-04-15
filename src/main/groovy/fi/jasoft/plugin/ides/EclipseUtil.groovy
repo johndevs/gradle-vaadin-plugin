@@ -43,7 +43,7 @@ class EclipseUtil {
         project.afterEvaluate { Project p ->
             if(p.hasProperty(ECLIPSE_PROPERTY)){
                 EclipseModel eclipse = p.eclipse as EclipseModel
-                eclipse.project.comment = 'Project created with the Gradle Vaadin Plugin'
+                eclipse.project.comment = 'Vaadin Project'
 
                 // Always download sources
                 def cp = eclipse.classpath
