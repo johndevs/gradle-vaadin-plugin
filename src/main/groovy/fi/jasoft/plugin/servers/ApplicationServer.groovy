@@ -315,22 +315,10 @@ abstract class ApplicationServer {
 
         if(classesDir && classesDir.exists()){
             Util.watchDirectoryForChanges(project, (File) classesDir, { WatchKey key, WatchEvent event ->
-                Path basePath = (Path) key.watchable();
-                WatchEvent<Path> watchEventPath = (WatchEvent<Path>) event
-                Path path =  basePath.resolve(watchEventPath.context())
-                File file = path.toFile()
-
-                // Ignore client classes, as restarting server will not do you any good
-                if(Util.getWidgetset(project)){
-                    def widgetsetPath = Util.getWidgetset(project).tokenize('.')[0..-2]
-                            .join(File.separator) + File.separator +'client' + File.separator
-                    if(file.absolutePath.contains(widgetsetPath)){
-                        // TODO when file based widgetset recompiling is
-                        // implemented we could recompile the widgetset here instead
-                        project.logger.info("Ignored client side class change in ${file.absolutePath}")
-                        return false
-                    }
-                }
+//                Path basePath = (Path) key.watchable();
+//                WatchEvent<Path> watchEventPath = (WatchEvent<Path>) event
+//                Path path =  basePath.resolve(watchEventPath.context())
+//                File file = path.toFile()
 
                 if(server.configuration.serverRestart && server.process){
                     // Force restart of server
