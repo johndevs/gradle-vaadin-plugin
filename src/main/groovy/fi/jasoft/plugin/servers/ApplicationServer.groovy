@@ -314,6 +314,9 @@ abstract class ApplicationServer {
         }
 
         if(classesDir && classesDir.exists()){
+            def executor = Executors.newSingleThreadScheduledExecutor()
+            ScheduledFuture currentTask
+
             Util.watchDirectoryForChanges(project, (File) classesDir, { WatchKey key, WatchEvent event ->
 //                Path basePath = (Path) key.watchable();
 //                WatchEvent<Path> watchEventPath = (WatchEvent<Path>) event
@@ -321,9 +324,14 @@ abstract class ApplicationServer {
 //                File file = path.toFile()
 
                 if(server.configuration.serverRestart && server.process){
-                    // Force restart of server
-                    project.logger.lifecycle(RELOADING_SERVER_MESSAGE)
-                    server.reload()
+                    if(currentTask){
+                        currentTask.cancel(true)
+                    }
+                    currentTask = executor.schedule({
+                        // Force restart of server
+                        project.logger.lifecycle(RELOADING_SERVER_MESSAGE)
+                        server.reload()
+                    }, 1 , TimeUnit.SECONDS)
                 }
                 false
             })
