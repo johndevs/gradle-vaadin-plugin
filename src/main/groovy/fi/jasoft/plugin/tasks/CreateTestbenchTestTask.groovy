@@ -19,6 +19,7 @@ import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
 import groovy.transform.PackageScope
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
 
@@ -43,6 +44,10 @@ class CreateTestbenchTestTask extends DefaultTask {
 
     @TaskAction
     def run() {
+        if(!project.vaadinTestbench.enabled) {
+            throw new GradleException('Please enable Testbench by setting vaadinTestbench.enabled=true before creating ' +
+                    'a test')
+        }
         makeTestClass()
     }
 
@@ -55,7 +60,7 @@ class CreateTestbenchTestTask extends DefaultTask {
         def substitutions = [:]
         substitutions['packageName'] = testPackage
         substitutions['testName'] = testName
-        substitutions['appUrl'] = "http://localhost:${project.vaadin.serverPort}"
+        substitutions['appUrl'] = "http://localhost:${project.vaadinRun.serverPort}"
 
         if(Util.isGroovyProject(project)){
             TemplateUtil.writeTemplate("MyTest.groovy", packageDir, testName + ".groovy", substitutions)
