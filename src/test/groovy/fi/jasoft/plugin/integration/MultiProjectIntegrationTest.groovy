@@ -27,6 +27,8 @@ class MultiProjectIntegrationTest extends IntegrationTest {
         // Create root build file without vaadin plugin
         buildFile = makeBuildFile(projectDir.root, false)
 
+        def escapedDir = getPluginDir()
+
         // Apply plugin to subprojects instead
         buildFile << """
             allprojects {
@@ -35,6 +37,10 @@ class MultiProjectIntegrationTest extends IntegrationTest {
 
             subprojects {
                 apply plugin: fi.jasoft.plugin.GradleVaadinPlugin
+                repositories {
+                    flatDir dirs: file('$escapedDir')
+                }
+                vaadin.logToConsole = true
             }
         """
 

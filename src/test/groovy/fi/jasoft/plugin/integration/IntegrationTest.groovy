@@ -38,16 +38,19 @@ class IntegrationTest {
         buildFile = makeBuildFile(projectDir.root)
     }
 
+    protected static String getPluginDir() {
+        File libsDir = Paths.get('.', 'build', 'libs').toFile()
+        String escapedDir = libsDir.canonicalPath.replace("\\","\\\\")
+        escapedDir
+    }
+
     protected static File makeBuildFile(File projectDir, boolean applyPluginToFile=true) {
         File buildFile = new File(projectDir, 'build.gradle')
         buildFile.createNewFile()
 
         def projectVersion = System.getProperty('integrationTestProjectVersion')
 
-        File libsDir = Paths.get('.', 'build', 'libs').toFile()
-        String escapedDir = libsDir.canonicalPath.replace("\\","\\\\")
-
-        Logger.getLogger(getClass().name).info("Loading plugin from $escapedDir")
+        String escapedDir = getPluginDir()
 
         // Apply plugin to project
         buildFile << """
@@ -64,9 +67,6 @@ class IntegrationTest {
                 }
             }
 
-            repositories {
-                flatDir dirs: file('$escapedDir')
-            }
         """
 
         if(applyPluginToFile){
@@ -78,6 +78,12 @@ class IntegrationTest {
     }
 
     protected static void applyPlugin(File buildFile) {
+        String escapedDir = getPluginDir()
+        buildFile << """
+            repositories {
+                flatDir dirs: file('$escapedDir')
+            }
+        """
         buildFile << "apply plugin: fi.jasoft.plugin.GradleVaadinPlugin\n"
     }
 
