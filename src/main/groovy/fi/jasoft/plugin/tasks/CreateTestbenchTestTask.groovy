@@ -45,8 +45,8 @@ class CreateTestbenchTestTask extends DefaultTask {
     @TaskAction
     def run() {
         if(!project.vaadinTestbench.enabled) {
-            throw new GradleException('Please enable Testbench by setting vaadinTestbench.enabled=true before creating ' +
-                    'a test')
+            throw new GradleException('Please enable Testbench by setting vaadinTestbench.enabled=true before ' +
+                    'creating a test')
         }
         makeTestClass()
     }

@@ -21,6 +21,7 @@ import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 
 import java.nio.file.Paths
+import java.util.logging.Logger
 
 /**
  * Base class for integration tests
@@ -45,6 +46,8 @@ class IntegrationTest {
 
         File libsDir = Paths.get('.', 'build', 'libs').toFile()
         String escapedDir = libsDir.canonicalPath.replace("\\","\\\\")
+
+        Logger.getLogger(getClass().name).info("Loading plugin from $escapedDir")
 
         // Apply plugin to project
         buildFile << """
