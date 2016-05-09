@@ -1,5 +1,26 @@
+/*
+* Copyright 2016 John Ahlroos
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 import org.apache.tools.ant.filters.ReplaceTokens
 
+
+/***********************************************************************************************************************
+ *
+ * Plugins
+ *
+ **********************************************************************************************************************/
 plugins {
     id 'groovy'
     id 'maven'
@@ -8,6 +29,12 @@ plugins {
     id 'codenarc'
 }
 
+/***********************************************************************************************************************
+ *
+ * Basic properties
+ *
+ **********************************************************************************************************************/
+
 defaultTasks 'jar'
 group = "fi.jasoft.plugin"
 version = project.hasProperty('BUILD_VERSION') ? getProperty('BUILD_VERSION') : 'SNAPSHOT-'+ new Date().format('yyyyMMdd')
@@ -15,6 +42,11 @@ archivesBaseName ='gradle-vaadin-plugin'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+/***********************************************************************************************************************
+ *
+ * Repositories & Dependencies
+ *
+ **********************************************************************************************************************/
 repositories{
 	mavenCentral()
 }
@@ -47,6 +79,11 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
+/***********************************************************************************************************************
+ *
+ * Sources
+ *
+ **********************************************************************************************************************/
 sourceSets {
     ast {
         groovy {
@@ -55,6 +92,86 @@ sourceSets {
     }
 }
 
+/***********************************************************************************************************************
+ *
+ * Compilation
+ *
+ **********************************************************************************************************************/
+
+/**
+ * Compiles the AST transforms. These must be compiled before the main sources are compiled so the AST transforms
+ * can be applied.
+ */
+task compileGroovyAstTransforms(type: GroovyCompile) {
+    groovyOptions.with {
+        fork = true
+        keepStubs = false
+        fileExtensions = ["groovy"]
+    }
+    source = sourceSets.ast.groovy.srcDirs
+    classpath = sourceSets.main.compileClasspath
+    destinationDir = sourceSets.ast.output.classesDir
+}
+
+/**
+ * Compiles the sources
+ */
+compileGroovy {
+    dependsOn compileGroovyAstTransforms
+    classpath += files(sourceSets.ast.output.classesDir)
+}
+
+/**
+ * Compiles the tests
+ */
+compileTestGroovy {
+    dependsOn compileGroovyAstTransforms
+    classpath += files(sourceSets.ast.output.classesDir)
+}
+
+/**
+ * Processes the resources before compilation
+ */
+processResources {
+
+    // Apply build properties
+    def debugDir = new File(project.buildDir, 'libs').canonicalPath
+    from(sourceSets.main.resources.srcDirs){
+        // Files Matching is required to prevent binary files from becoming corrupt
+        filesMatching('*.properties'){
+            filter(ReplaceTokens, tokens: [
+                    version: project.version,
+                    debugdir: debugDir
+            ])
+        }
+    }
+}
+
+
+/***********************************************************************************************************************
+ *
+ * Artifacts
+ *
+ **********************************************************************************************************************/
+
+/**
+ * Main plugin artifact.
+ */
+jar {
+    manifest{
+        attributes(
+                'Vaadin-Package-Version': 1,
+                'Vaadin-License-Title': 'Apache 2.0',
+                'Implementation-Title': 'Vaadin Plugin for Gradle',
+                'Implementation-Version': version,
+                'Implementation-Vendor': 'John Ahlroos',
+        )
+    }
+}
+
+/**
+ * Plugin artifact sources.
+ */
 task sourcesJar(type: Jar) {
     from sourceSets.main.allSource
     classifier = 'sources'
@@ -62,11 +179,67 @@ task sourcesJar(type: Jar) {
     include 'fi/**/*.java'
 }
 
+/**
+ * Artifacts in build
+ */
 artifacts {
     archives jar
     archives sourcesJar
 }
 
+/***********************************************************************************************************************
+ *
+ * Tests
+ *
+ **********************************************************************************************************************/
+
+/**
+ * Configure test phase only to run ordinary unit tests.
+ */
+test {
+    classpath += files(sourceSets.ast.output.classesDir)
+    testLogging {
+        exceptionFormat "full"
+    }
+    exclude '**/integration/**'
+}
+
+/**
+ * Run integration tests with a different tasks so they are only run when running check
+ */
+task integrationTest(type:Test, dependsOn:['test','jar']) {
+    classpath += files(sourceSets.ast.output.classesDir)
+    testLogging {
+        exceptionFormat "full"
+    }
+    include '**/integration/**'
+    systemProperty 'integrationTestProjectVersion', version
+}
+check.dependsOn 'integrationTest'
+
+/**
+ * Code formatting configurations with Codenarc
+ */
+codenarc{
+    toolVersion = '0.25.1'
+    configFile = rootProject.file('config/codenarc/ruleset.groovy')
+    maxPriority1Violations = 0
+    maxPriority2Violations = 0
+    maxPriority3Violations = 1300
+    codenarcTest {
+        configFile = rootProject.file('config/codenarc/ruleset-test.groovy')
+    }
+}
+
+/***********************************************************************************************************************
+ *
+ * Deployment
+ *
+ ***********************************************************************************************************************/
+
+/**
+ * Deploy to bintray
+ */
 bintray {
     user = System.getProperty('PLUGIN_MAVEN_RELEASE_REPOSITORY_USER')
     key = System.getProperty('PLUGIN_MAVEN_RELEASE_REPOSITORY_PASSWORD')
@@ -94,45 +267,51 @@ bintray {
     }
 }
 
+/**
+ * Create the pom.xml for the plugin dependecies
+ */
 task configurePluginPom << {
     configure(install.repositories.mavenInstaller) {
         pom.project {
 
-           dependencies {
-               dependency {
-                   groupId 'org.codehaus.groovy.modules.http-builder'
-                   artifactId 'http-builder'
-                   version '0.7.1'
-                   type 'pom'
-               }
-           }
+            dependencies {
+                dependency {
+                    groupId 'org.codehaus.groovy.modules.http-builder'
+                    artifactId 'http-builder'
+                    version '0.7.1'
+                    type 'pom'
+                }
+            }
 
-           licenses {
-               license {
-                 name 'The Apache Software License, Version 2.0'
-                 url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                 distribution 'repo'
-               }
-           }
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    distribution 'repo'
+                }
+            }
 
-           developers {
-               developer {
-                   id 'johndevs'
-                   name 'John Ahlroos'
-               }
-           }
+            developers {
+                developer {
+                    id 'johndevs'
+                    name 'John Ahlroos'
+                }
+            }
 
-           scm {
-               url 'https://github.com/johndevs/gradle-vaadin-plugin'
-               connection 'scm:git://github.com/johndevs/gradle-vaadin-plugin'
-               developerConnection 'scm:git@github.com:johndevs/gradle-vaadin-plugin'
-          }
+            scm {
+                url 'https://github.com/johndevs/gradle-vaadin-plugin'
+                connection 'scm:git://github.com/johndevs/gradle-vaadin-plugin'
+                developerConnection 'scm:git@github.com:johndevs/gradle-vaadin-plugin'
+            }
         }
         pom.scopeMappings.mappings.remove(configurations.compile)
-   }
+    }
 }
 install.dependsOn configurePluginPom
 
+/**
+ * Upload archive configuration. Only used for snapshots, bintray is used fro releases.
+ */
 uploadArchives {
     dependsOn configurePluginPom
     repositories.mavenDeployer {
@@ -144,96 +323,21 @@ uploadArchives {
         configuration = configurations.deploy
 
         snapshotRepository( url: snapshotRepositoryUrl ) {
-           authentication(
-                   userName: snapshotRepositoryUser,
-                   password: snapshotRepositoryPassword,
-                   privateKey: snapshotRepositoryPrivateKey
-           )
+            authentication(
+                    userName: snapshotRepositoryUser,
+                    password: snapshotRepositoryPassword,
+                    privateKey: snapshotRepositoryPrivateKey
+            )
         }
     }
 }
 
-// Use wrapper
+
+/***********************************************************************************************************************
+ *
+ * Misc.
+ *
+ **********************************************************************************************************************/
 task wrapper(type: Wrapper) {
-	gradleVersion = '2.12'
+    gradleVersion = '2.12'
 }
-
-task compileGroovyAstTransforms(type: GroovyCompile) {
-    groovyOptions.with {
-        fork = true
-        keepStubs = false
-        fileExtensions = ["groovy"]
-    }
-    source = sourceSets.ast.groovy.srcDirs
-    classpath = sourceSets.main.compileClasspath
-    destinationDir = sourceSets.ast.output.classesDir
-}
-
-compileGroovy {
-    dependsOn compileGroovyAstTransforms
-    classpath += files(sourceSets.ast.output.classesDir)
-}
-
-compileTestGroovy {
-    dependsOn compileGroovyAstTransforms
-    classpath += files(sourceSets.ast.output.classesDir)
-}
-
-processResources {
-
-    // Apply build properties
-    def debugDir = new File(project.buildDir, 'libs').canonicalPath
-    from(sourceSets.main.resources.srcDirs){
-        // Files Matching is required to prevent binary files from becoming corrupt
-        filesMatching('*.properties'){
-            filter(ReplaceTokens, tokens: [
-                    version: project.version,
-                    debugdir: debugDir
-            ])
-        }
-    }
-}
-
-jar {
-    manifest{
-        attributes(
-            'Vaadin-Package-Version': 1,
-            'Vaadin-License-Title': 'Apache 2.0',
-            'Implementation-Title': 'Vaadin Plugin for Gradle',
-            'Implementation-Version': version,
-            'Implementation-Vendor': 'John Ahlroos',
-        )
-    }
-}
-
-test {
-    classpath += files(sourceSets.ast.output.classesDir)
-    testLogging {
-        exceptionFormat "full"
-    }
-    exclude '**/integration/**'
-}
-
-
-codenarc{
-    toolVersion = '0.25.1'
-    configFile = rootProject.file('config/codenarc/ruleset.groovy')
-    maxPriority1Violations = 0
-    maxPriority2Violations = 0
-    maxPriority3Violations = 1300
-
-    codenarcTest {
-        configFile = rootProject.file('config/codenarc/ruleset-test.groovy')
-    }
-}
-
-
-task integrationTest(type:Test, dependsOn:['test','jar']) {
-    classpath += files(sourceSets.ast.output.classesDir)
-    testLogging {
-        exceptionFormat "full"
-    }
-    include '**/integration/**'
-    systemProperty 'integrationTestProjectVersion', version
-}
-check.dependsOn 'integrationTest'

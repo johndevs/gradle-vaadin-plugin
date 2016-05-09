@@ -210,7 +210,7 @@ class Util {
      *      <code>true</code> if addon styles are supported
      */
     static boolean isAddonStylesSupported(Project project) {
-        VersionNumber version = VersionNumber.parse(getVaadinVersion(project))
+        VersionNumber version = VersionNumber.parse(getResolvedVaadinVersion(project))
         version.minor > 0
     }
 
@@ -257,7 +257,7 @@ class Util {
      *      <code>true</code> if the Opera user agent is supported
      */
     static boolean isOperaUserAgentSupported(Project project) {
-        VersionNumber version = VersionNumber.parse(getVaadinVersion(project))
+        VersionNumber version = VersionNumber.parse(getResolvedVaadinVersion(project))
         version.minor < 4
     }
 
@@ -273,7 +273,7 @@ class Util {
         if (getVaadinVersion(project) == PLUS) {
             return true
         }
-        VersionNumber version = VersionNumber.parse(getVaadinVersion(project))
+        VersionNumber version = VersionNumber.parse(getResolvedVaadinVersion(project))
         version.minor > 0
     }
 
