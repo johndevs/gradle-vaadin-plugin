@@ -29,6 +29,7 @@ import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.util.VersionNumber
 
+import java.awt.Desktop
 import java.nio.file.FileSystems
 import java.nio.file.FileVisitResult
 import java.nio.file.Files
@@ -223,10 +224,15 @@ class Util {
      *      the URL to open
      */
     static void openBrowser(Project project, String url) {
-        if (project.vaadinRun.openInBrowser && java.awt.Desktop.isDesktopSupported()) {
+        if (project.vaadinRun.openInBrowser
+                && java.awt.Desktop.isDesktopSupported()
+                && java.awt.Desktop.desktop.isSupported(Desktop.Action.BROWSE)) {
             Thread.startDaemon {
                 java.awt.Desktop.desktop.browse url.toURI()
             }
+        } else if(project.vaadinRun.openInBrowser) {
+            project.logger.info('Failed to open browser, AWT Desktop or Desktop.browse() is not supported on ' +
+                    'current platform.')
         }
     }
 
