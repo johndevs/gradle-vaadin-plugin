@@ -97,6 +97,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
     static final String JASOFT_SNAPSHOT_REPOSITORY_NAME = 'Jasoft.fi Maven repository'
     static final String BINTRAY_REPOSITORY_NAME = 'Bintray.com Maven repository'
     static final String PLUGIN_DEVELOPMENTTIME_REPOSITORY_NAME = 'Gradle Vaadin plugin development repository'
+    static final String VAADIN_PRERELEASE_REPOSITORY_NAME = 'Vaadin Pre-releases'
 
     static {
         PLUGIN_PROPERTIES = new Properties()
@@ -235,6 +236,11 @@ class GradleVaadinPlugin implements Plugin<Project> {
             repositories.maven { repository ->
                 repository.name = VAADIN_SNAPSHOT_REPOSITORY_NAME
                 repository.url = 'http://oss.sonatype.org/content/repositories/vaadin-snapshots'
+            }
+
+            repositories.maven { repository ->
+                repository.name = VAADIN_PRERELEASE_REPOSITORY_NAME
+                repository.url = 'https://maven.vaadin.com/vaadin-prereleases'
             }
 
             repositories.maven { repository ->
