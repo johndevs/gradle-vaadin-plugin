@@ -18,6 +18,7 @@ package fi.jasoft.plugin.tasks
 import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
 import groovy.transform.PackageScope
+import org.apache.commons.lang.StringUtils
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.internal.tasks.options.Option
@@ -33,6 +34,8 @@ class CreateComponentTask extends DefaultTask {
     static final String NAME = 'vaadinCreateComponent'
 
     static final String DOT = '.'
+    static final String SERVER_PACKAGE = 'server'
+    static final String CLIENT_PACKAGE = 'client'
 
     @Option(option = 'name', description = 'Component name')
     def componentName = 'MyComponent'
@@ -43,42 +46,48 @@ class CreateComponentTask extends DefaultTask {
 
     @TaskAction
     public void run() {
-        if (!project.vaadinCompile.widgetset) {
-            throw new GradleException('No widgetset found. Please define a widgetset using ' +
-                    'the vaadinCompile.widgetset property.')
-        }
         makeComponentClasses()
     }
 
     @PackageScope
     def makeComponentClasses() {
-        def widgetset = project.vaadinCompile.widgetset as String
-        String widgetsetPackageFQN = widgetset.substring(0, widgetset.lastIndexOf(DOT))
-        def widgetsetPackagePath = TemplateUtil.convertFQNToFilePath(widgetsetPackageFQN)
+
+        def widgetset = Util.getWidgetset(project)
+
+        def widgetsetPackagePath
+        def widgetsetPackage
+        if(widgetset.contains(DOT)){
+            def widgetsetPackageFQN = widgetset.substring(0, widgetset.lastIndexOf(DOT))
+            widgetsetPackagePath = TemplateUtil.convertFQNToFilePath(widgetsetPackageFQN)
+            def widgetsetName = widgetset.tokenize(DOT).last()
+            widgetsetPackage = widgetset.replaceAll("$DOT$widgetsetName", StringUtils.EMPTY)
+        } else {
+            widgetsetPackagePath = ''
+            widgetsetPackage = null
+        }
 
         def srcDir = Util.getMainSourceSet(project, true).srcDirs.first()
         def widgetsetDir = new File(srcDir, widgetsetPackagePath)
 
-        def componentDir = new File(new File(widgetsetDir, 'server'), componentName.toLowerCase())
+        def componentDir = new File(new File(widgetsetDir, SERVER_PACKAGE), componentName.toLowerCase())
         componentDir.mkdirs()
 
-        def widgetDir = new File(new File(widgetsetDir, 'client'), componentName.toLowerCase())
+        def widgetDir = new File(new File(widgetsetDir, CLIENT_PACKAGE), componentName.toLowerCase())
         widgetDir.mkdirs()
 
-        String widgetsetName = widgetset.tokenize(DOT).last()
-        String widgetsetPackage = widgetset.replaceAll(DOT + widgetsetName, '')
-
         def substitutions = [:]
-        substitutions['componentServerPackage'] = widgetsetPackage + '.server.' + componentName.toLowerCase()
-        substitutions['componentClientPackage'] = widgetsetPackage + '.client.' + componentName.toLowerCase()
+        substitutions['componentServerPackage'] = "${widgetsetPackage? widgetsetPackage + DOT : StringUtils.EMPTY}" +
+                "$SERVER_PACKAGE.${componentName.toLowerCase()}"
+        substitutions['componentClientPackage'] = "${widgetsetPackage? widgetsetPackage + DOT : StringUtils.EMPTY}" +
+                "$CLIENT_PACKAGE.${componentName.toLowerCase()}"
         substitutions['componentName'] = componentName
         substitutions['componentStylename'] = componentName.toLowerCase()
 
         TemplateUtil.writeTemplate("MyComponent.java", componentDir,
-                componentName + ".java", substitutions)
+                "${componentName}.java", substitutions)
         TemplateUtil.writeTemplate("MyComponentWidget.java", widgetDir,
-                componentName + "Widget.java", substitutions)
+                "${componentName}Widget.java", substitutions)
         TemplateUtil.writeTemplate("MyComponentConnector.java", widgetDir,
-                componentName + "Connector.java", substitutions)
+                "${componentName}Connector.java", substitutions)
     }
 }
