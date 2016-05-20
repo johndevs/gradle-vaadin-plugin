@@ -19,12 +19,15 @@ import fi.jasoft.plugin.configuration.VaadinPluginExtension
 import fi.jasoft.plugin.tasks.BuildClassPathJar
 import groovy.io.FileType
 import groovy.transform.PackageScope
+import org.apache.commons.lang.StringUtils
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
 
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.file.FileCollection
+import org.gradle.api.file.FileTreeElement
+import org.gradle.api.file.FileVisitDetails
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.util.VersionNumber
@@ -61,6 +64,10 @@ class Util {
     private static final String JAVA_HOME = 'JAVA_HOME'
     private static final String JAVA_BIN_NAME = 'java'
     private static final String GWT_MODULE_POSTFIX = '.gwt.xml'
+    private static final String CLIENT_PACKAGE_NAME = 'client'
+    
+    public static final String APP_WIDGETSET = 'AppWidgetset'
+
 
     /**
      * Get the compile time classpath of a project
@@ -658,6 +665,28 @@ class Util {
     }
 
     /**
+     * Returns the client side package if one exists in the main source set
+     *
+     * @param project
+     *      the project to search in
+     * @return
+     *
+     */
+    static String getClientPackage(Project project) {
+        def clientPackage
+        getMainSourceSet(project).srcDirs.each { File srcDir ->
+             project.fileTree(srcDir).visit { FileVisitDetails details ->
+                if(details.name == CLIENT_PACKAGE_NAME && details.directory) {
+                    details.stopVisiting()
+                    clientPackage = details.file.canonicalPath - srcDir.canonicalPath
+                    project.logger.info "Found client package $clientPackage"
+                }
+             }
+        }
+        clientPackage
+    }
+
+    /**
      * Returns the defined Vaadin version or if no version is defined then it returns the default vaadin version.
      *
      * @param project
@@ -816,9 +845,19 @@ class Util {
         // WidgetsetFile has been defined but not created, create it
         String widgetset = project.vaadinCompile.widgetset
 
+        // If client side classes exists in project use client side package to determine widgetset
+        def clientPackage = getClientPackage(project)
+        if(clientPackage) {
+            def widgetsetPath = StringUtils.removeEnd(clientPackage, File.separator + CLIENT_PACKAGE_NAME)
+            if(widgetsetPath.size() > 0){
+                widgetsetPath = TemplateUtil.convertFilePathToFQN(widgetsetPath, '') + '.'
+            }
+            widgetset =  widgetsetPath + APP_WIDGETSET
+        }
+
         // If addons exists in project but widgetset is not defined, use default one
         if(!widgetset && findAddonsInProject(project).size() > 0){
-            widgetset = 'AppWidgetset'
+            widgetset = APP_WIDGETSET
         }
 
         if(widgetset){

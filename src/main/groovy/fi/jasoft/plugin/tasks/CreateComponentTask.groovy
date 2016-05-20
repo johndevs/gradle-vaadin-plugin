@@ -53,6 +53,10 @@ class CreateComponentTask extends DefaultTask {
     def makeComponentClasses() {
 
         def widgetset = Util.getWidgetset(project)
+        if(!widgetset) {
+            // Project does not yet have a client package, addons or widgetset. use AppWidgetset
+            widgetset = Util.APP_WIDGETSET
+        }
 
         def widgetsetPackagePath
         def widgetsetPackage
