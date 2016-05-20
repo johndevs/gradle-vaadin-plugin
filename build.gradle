@@ -135,8 +135,14 @@ compileTestGroovy {
  */
 processResources {
 
-    // Apply build properties
+    // Directory where previously built versions are located
     def debugDir = new File(project.buildDir, 'libs').canonicalPath
+
+    // Mark processed resources as dirty if build properties change
+    inputs.property('version', project.version)
+    inputs.property('debugdir', debugDir)
+
+    // Apply build properties
     from(sourceSets.main.resources.srcDirs){
         // Files Matching is required to prevent binary files from becoming corrupt
         filesMatching('*.properties'){
