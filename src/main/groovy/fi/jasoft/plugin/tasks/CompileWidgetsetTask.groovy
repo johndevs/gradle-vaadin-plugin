@@ -235,7 +235,7 @@ class CompileWidgetsetTask extends DefaultTask {
     def compileLocally(String widgetset = configuration.widgetset) {
         def vaadin = project.vaadin as VaadinPluginExtension
 
-        // Ensure widgetset directory exists
+        // Re-create directory
         Util.getWidgetsetDirectory(project).mkdirs()
 
         FileCollection classpath = Util.getCompileClassPathOrJar(project)
@@ -311,16 +311,16 @@ class CompileWidgetsetTask extends DefaultTask {
         })
 
         // Block
-        process.waitFor()
+        def result = process.waitFor()
 
         /*
          * Compiler generates an extra WEB-INF folder into the widgetsets folder. Remove it.
          */
         new File(Util.getWidgetsetDirectory(project), 'WEB-INF').deleteDir()
 
-        if(failed) {
+        if(failed || result != 0) {
             // Terminate build
-            throw new GradleException('Widgetset failed to compile. See error log above.')
+            throw new GradleException('Widgetset failed to compile. See error log.')
         }
     }
 
