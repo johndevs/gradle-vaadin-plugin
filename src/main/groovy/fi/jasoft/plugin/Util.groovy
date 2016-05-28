@@ -20,6 +20,7 @@ import fi.jasoft.plugin.tasks.BuildClassPathJar
 import groovy.io.FileType
 import groovy.transform.PackageScope
 import org.apache.commons.lang.StringUtils
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
@@ -29,6 +30,7 @@ import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.FileVisitDetails
 import org.gradle.api.file.SourceDirectorySet
+import org.gradle.api.logging.LogLevel
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.util.VersionNumber
 
@@ -142,8 +144,15 @@ class Util {
      *      a new collection with the GWT SDK libs listed first
      */
     static FileCollection moveGwtSdkFirstInClasspath(Project project , FileCollection collection){
-        FileCollection gwtCompilerClasspath = project.configurations[GradleVaadinPlugin.CONFIGURATION_CLIENT];
-        return gwtCompilerClasspath + (collection - gwtCompilerClasspath);
+        if(project.vaadin.manageDependencies){
+            FileCollection gwtCompilerClasspath = project.configurations[GradleVaadinPlugin.CONFIGURATION_CLIENT];
+            return gwtCompilerClasspath + (collection - gwtCompilerClasspath);
+        } else if(project.vaadinCompile.gwtSdkFirstInClasspath){
+            project.logger.log(LogLevel.WARN, "Cannot move GWT SDK first in classpath since plugin does not manage " +
+                    "dependencies. You can set vaadinCompile.gwtSdkFirstInClasspath=false and " +
+                    "arrange the dependencies yourself if you need to.")
+        }
+        collection
     }
 
     /**
@@ -194,8 +203,8 @@ class Util {
      * @return true if push is supported
      */
     static isPushSupported(Project project) {
-        String version = Util.getVaadinVersion(project)
-        version == PLUS || (version.startsWith('7') && !version.startsWith('7.0'))
+        VersionNumber version = VersionNumber.parse(getResolvedVaadinVersion(project))
+        version.major >= 7 && version.minor > 0
     }
 
     /**
@@ -605,11 +614,12 @@ class Util {
      */
     static String getResolvedVaadinVersion(Project project) {
         def version = project.vaadin.version
-        project.configurations[GradleVaadinPlugin.CONFIGURATION_SERVER].
-                resolvedConfiguration.firstLevelModuleDependencies.each{ dependency ->
-            if(dependency.moduleName == 'vaadin-server'){
-               version = dependency.moduleVersion
-           }
+        project.configurations.all.each { Configuration conf ->
+            conf.allDependencies.each { Dependency dependency ->
+                if( dependency.name.startsWith('vaadin-server')){
+                    version = dependency.version
+                }
+            }
         }
         version
     }
