@@ -31,7 +31,7 @@ import org.gradle.api.tasks.TaskAction
 
 import java.util.jar.Attributes
 import java.util.jar.JarInputStream
-import java.util.jar.Manifest
+
 
 /**
  * Updates the GWT module XML file with correct imports
@@ -143,18 +143,20 @@ class UpdateWidgetsetTask extends DefaultTask {
                     inherits.addAll(findInheritsInDependencies(dependentProject))
                 } else{
                     conf.files(dependency).each { File file ->
-                        file.withInputStream { InputStream stream ->
-                            def jarStream = new JarInputStream(stream)
-                            jarStream.with {
-                                def mf = jarStream.getManifest()
-                                def attributes = mf?.mainAttributes
-                                def widgetsetsValue = attributes?.getValue(attribute)
+                        if(file.file && file.name.endsWith('.jar')){
+                            file.withInputStream { InputStream stream ->
+                                def jarStream = new JarInputStream(stream)
+                                jarStream.with {
+                                    def mf = jarStream.getManifest()
+                                    def attributes = mf?.mainAttributes
+                                    def widgetsetsValue = attributes?.getValue(attribute)
 
-                                if (widgetsetsValue && !dependency.name.startsWith('vaadin-client')) {
-                                    List<String> widgetsets = widgetsetsValue?.split(',')?.collect { it.trim() }
-                                    widgetsets?.each { String widgetset ->
-                                        if(widgetset != DEFAULT_WIDGETSET && widgetset != DEFAULT_LEGACY_WIDGETSET){
-                                            inherits.add(widgetset)
+                                    if (widgetsetsValue && !dependency.name.startsWith('vaadin-client')) {
+                                        List<String> widgetsets = widgetsetsValue?.split(',')?.collect { it.trim() }
+                                        widgetsets?.each { String widgetset ->
+                                            if(widgetset != DEFAULT_WIDGETSET && widgetset != DEFAULT_LEGACY_WIDGETSET){
+                                                inherits.add(widgetset)
+                                            }
                                         }
                                     }
                                 }
