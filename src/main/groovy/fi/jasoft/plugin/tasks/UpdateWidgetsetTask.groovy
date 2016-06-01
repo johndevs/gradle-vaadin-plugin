@@ -132,15 +132,18 @@ class UpdateWidgetsetTask extends DefaultTask {
         inherits
     }
 
-    private static Set<String> findInheritsInDependencies(Project project) {
+    private static Set<String> findInheritsInDependencies(Project project, List<Project> scannedProjects = []) {
         Set<String> inherits = []
+        scannedProjects << project
 
         def attribute = new Attributes.Name('Vaadin-Widgetsets')
         project.configurations.all.each { Configuration conf ->
             conf.allDependencies.each { Dependency dependency ->
                 if(dependency in ProjectDependency) {
                     Project dependentProject = ((ProjectDependency) dependency).dependencyProject
-                    inherits.addAll(findInheritsInDependencies(dependentProject))
+                    if(!(dependentProject in scannedProjects)) {
+                        inherits.addAll(findInheritsInDependencies(dependentProject, scannedProjects))
+                    }
                 } else{
                     conf.files(dependency).each { File file ->
                         if(file.file && file.name.endsWith('.jar')){
@@ -200,7 +203,7 @@ class UpdateWidgetsetTask extends DefaultTask {
         Set<String> inherits = [DEFAULT_WIDGETSET]
 
         // Scan dependent projects and inherit their widgetsets
-        Configuration compileConf =  project.configurations.compile
+        Configuration compileConf = project.configurations.compile
         compileConf.allDependencies.each { Dependency dependency ->
             if(dependency in ProjectDependency){
                 def depProject = dependency.dependencyProject
