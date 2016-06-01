@@ -644,25 +644,27 @@ class Util {
                     addons.addAll(findAddonsInProject(dependentProject, byAttribute, includeFile))
                 } else {
                     conf.files(dependency).each { File file ->
-                        file.withInputStream { InputStream stream ->
-                            def jarStream = new JarInputStream(stream)
-                            def mf = jarStream.getManifest()
-                            def attributes = mf?.mainAttributes
-                            if (attributes?.getValue(attribute)) {
-                                if (!dependency.name.startsWith('vaadin-client')) {
-                                    if(includeFile){
-                                        addons << [
-                                                groupId: dependency.group,
-                                                artifactId: dependency.name,
-                                                version: dependency.version,
-                                                file: file
-                                        ]
-                                    } else {
-                                        addons << [
-                                                groupId: dependency.group,
-                                                artifactId: dependency.name,
-                                                version: dependency.version,
-                                        ]
+                        if(file.file && file.name.endsWith('.jar')) {
+                            file.withInputStream { InputStream stream ->
+                                def jarStream = new JarInputStream(stream)
+                                def mf = jarStream.getManifest()
+                                def attributes = mf?.mainAttributes
+                                if (attributes?.getValue(attribute)) {
+                                    if (!dependency.name.startsWith('vaadin-client')) {
+                                        if (includeFile) {
+                                            addons << [
+                                                    groupId   : dependency.group,
+                                                    artifactId: dependency.name,
+                                                    version   : dependency.version,
+                                                    file      : file
+                                            ]
+                                        } else {
+                                            addons << [
+                                                    groupId   : dependency.group,
+                                                    artifactId: dependency.name,
+                                                    version   : dependency.version,
+                                            ]
+                                        }
                                     }
                                 }
                             }
