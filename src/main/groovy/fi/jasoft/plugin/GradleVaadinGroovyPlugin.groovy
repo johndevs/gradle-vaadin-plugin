@@ -17,6 +17,7 @@ package fi.jasoft.plugin
 
 import fi.jasoft.plugin.configuration.VaadinPluginGroovyExtension
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.dsl.DependencyHandler
@@ -27,31 +28,26 @@ import org.gradle.api.plugins.GroovyPlugin
  */
 class GradleVaadinGroovyPlugin extends GradleVaadinPlugin {
 
-    static String EXTENSION_NAME = 'vaadin-groovy'
-
-    static String CONFIGURATION_NAME = 'vaadin-groovy'
+    static String EXTENSION_NAME = 'vaadinGroovy'
 
     @Override
     void apply(Project project) {
         super.apply(project)
 
+        // Plugins
+        project.plugins.apply(GroovyPlugin)
+
         // Extensions
         project.extensions.create(EXTENSION_NAME, VaadinPluginGroovyExtension)
 
         // Dependencies
-        project.gradle.taskGraph.addTaskExecutionListener(new GroovyTaskListener(project))
-
-        ConfigurationContainer configurations = project.configurations
-        DependencyHandler projectDependencies = project.dependencies
-        configurations.create(CONFIGURATION_NAME) { conf ->
-            conf.description = 'Libraries needed to use Groovy with Vaadin'
-            conf.defaultDependencies { dependencies ->
-                Dependency groovy = projectDependencies.create('org.codehaus.groovy:groovy-all:2.3.4')
-                dependencies.add(groovy)
-            }
+        if(project.vaadin.manageDependencies) {
+            ConfigurationContainer configurations = project.configurations
+            Configuration compileConfiguration = configurations.findByName('compile')
+            DependencyHandler projectDependencies = project.dependencies
+            Dependency groovy = projectDependencies
+                    .create("org.codehaus.groovy:groovy-all:${project.vaadinGroovy.groovyVersion}")
+            compileConfiguration.dependencies.add(groovy)
         }
-
-        // Plugins
-        project.plugins.apply(GroovyPlugin)
     }
 }
