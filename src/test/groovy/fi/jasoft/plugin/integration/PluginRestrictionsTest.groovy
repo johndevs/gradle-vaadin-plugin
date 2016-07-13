@@ -1,8 +1,7 @@
 package fi.jasoft.plugin.integration
 
+import static org.junit.Assert.assertTrue;
 import org.junit.Test
-
-import static org.testng.Assert.assertTrue
 
 /**
  * Created by john on 1/6/15.

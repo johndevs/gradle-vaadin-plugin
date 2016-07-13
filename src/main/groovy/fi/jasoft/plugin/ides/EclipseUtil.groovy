@@ -15,7 +15,6 @@
 */
 package fi.jasoft.plugin.ides
 
-import org.apache.maven.BuildFailureException
 import org.gradle.api.Project
 import org.gradle.api.plugins.PluginContainer
 import org.gradle.plugins.ide.eclipse.model.EclipseClasspath
