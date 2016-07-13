@@ -383,7 +383,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
                 // Add server dependencies
                 ApplicationServer.get(project).defineDependecies(projectDependencies, dependencies)
             }
-        })
+        }).extendsFrom(configurations.providedRuntime)
 
         configurations.create(CONFIGURATION_PUSH, { conf ->
             conf.description = 'Libraries needed for using Vaadin Push features.'
