@@ -377,7 +377,10 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
                 // Needed for server runners
                 Dependency plugin = projectDependencies.create(
-                        "fi.jasoft.plugin:gradle-vaadin-plugin:${GradleVaadinPlugin.version}")
+                        "fi.jasoft.plugin:gradle-vaadin-plugin:${GradleVaadinPlugin.version}") {
+                    transitive = false
+                }
+
                 dependencies.add(plugin)
 
                 // Add server dependencies
