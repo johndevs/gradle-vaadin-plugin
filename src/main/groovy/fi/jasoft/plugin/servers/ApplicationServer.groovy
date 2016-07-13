@@ -21,12 +21,14 @@ import fi.jasoft.plugin.Util
 import fi.jasoft.plugin.configuration.ApplicationServerConfiguration
 import fi.jasoft.plugin.tasks.BuildClassPathJar
 import fi.jasoft.plugin.tasks.CompileThemeTask
+import groovy.io.FileType
 import groovy.transform.PackageScope
 import org.apache.tools.ant.taskdefs.Pack
 import org.gradle.api.Project
 import org.gradle.api.artifacts.DependencySet
 import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.file.FileCollection
+import org.gradle.api.logging.LogLevel
 import org.gradle.api.plugins.WarPluginConvention
 
 import java.nio.file.Path
@@ -165,6 +167,25 @@ abstract class ApplicationServer {
         if(project.vaadinRun.classesDir){
             // Eclipse might output somewhere else
             classesDir = project.file(project.vaadinRun.classesDir)
+
+            // Check if directory contains classes, if it does not then the IDE has not
+            // compiled any classes here.
+            boolean hasClassFiles = false
+            if(classesDir.exists()){
+                classesDir.eachFileRecurse(FileType.FILES) { File file ->
+                    if(file.getName().endsWith(".class")) {
+                        hasClassFiles = true
+                    }
+                }
+            }
+
+            if(!hasClassFiles) {
+                // Fallback to main class folder with a warning
+                project.logger.log(LogLevel.WARN, "The defined classesDir does not " +
+                        "contain any classes, are you sure the classes exist in that " +
+                        "directory? Falling back to default classes directory.")
+                classesDir = project.sourceSets.main.output.classesDir
+            }
         }
 
         appServerProcess.add(classesDir.canonicalPath + File.separator)
