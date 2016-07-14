@@ -28,14 +28,15 @@ import java.util.logging.Logger;
 
 public class PayaraServerRunner {
 
-    // Usage: 'PayaraServerRunner [port] [webbappdir] [classesdir] [LogLevel] [name] [workdir]'
+    // Usage: 'PayaraServerRunner [port] [webbappdir] [classesdir] [resourcesdir] [LogLevel] [name] [workdir]'
     public static void main(String[] args) throws Exception {
         int port = Integer.parseInt(args[0]);
         String webAppDir = args[1];
         String classesDir = args[2];
-        Level logLevel = Level.parse(args[3]);
-        String name = args[4];
-        String workdir = args[5];
+        String resourcesDir = args[3];
+        Level logLevel = Level.parse(args[4]);
+        String name = args[5];
+        String workdir = args[6];
 
         String[] dependencies = new String(Files.readAllBytes(Paths.get(workdir + "/classpath.txt")), StandardCharsets.UTF_8).split(";");
 
@@ -61,6 +62,7 @@ public class PayaraServerRunner {
                     ScatteredArchive.Type.WAR,
                     new File(webAppDir));
             archive.addClassPath(new File(classesDir));
+            archive.addClassPath(new File(resourcesDir));
 
             for(String dependency : dependencies){
                 archive.addClassPath(new File(dependency));

@@ -164,9 +164,11 @@ abstract class ApplicationServer {
         appServerProcess.add(webAppDir.canonicalPath + File.separator)
 
         File classesDir = project.sourceSets.main.output.classesDir
+        File resourcesDir = project.sourceSets.main.output.resourcesDir
         if(project.vaadinRun.classesDir){
             // Eclipse might output somewhere else
             classesDir = project.file(project.vaadinRun.classesDir)
+            resourcesDir = project.file(project.vaadinRun.classesDir)
 
             // Check if directory contains classes, if it does not then the IDE has not
             // compiled any classes here.
@@ -185,10 +187,12 @@ abstract class ApplicationServer {
                         "contain any classes, are you sure the classes exist in that " +
                         "directory? Falling back to default classes directory.")
                 classesDir = project.sourceSets.main.output.classesDir
+                resourcesDir = project.sourceSets.main.output.resourcesDir
             }
         }
 
         appServerProcess.add(classesDir.canonicalPath + File.separator)
+        appServerProcess.add(resourcesDir.canonicalPath + File.separator)
 
         if(project.logger.debugEnabled){
             appServerProcess.add('DEBUG')

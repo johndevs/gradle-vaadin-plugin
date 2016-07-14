@@ -30,16 +30,20 @@ import java.util.List;
 
 public class JettyServerRunner {
 
-    // Usage: 'JettyServerRunner [port] [webbappdir] [classesdir] [LogLevel]'
+    // Usage: 'JettyServerRunner [port] [webbappdir] [classesdir] [resourcesdir] [LogLevel]'
     public static void main(String[] args) throws Exception {
         int port = Integer.parseInt(args[0]);
         String webAppDir = args[1];
         String classesDir = args[2];
-        String logLevel = args[3];
+        String resourcesDir = args[3];
+        String logLevel = args[4];
 
         List<String> resources = new ArrayList<>();
         if(new File(webAppDir).exists()){
             resources.add(webAppDir);
+        }
+        if(new File(resourcesDir).exists()){
+            resources.add(resourcesDir);
         }
 
         System.setProperty("org.eclipse.jetty.LEVEL", logLevel);
