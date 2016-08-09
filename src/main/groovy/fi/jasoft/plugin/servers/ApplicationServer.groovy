@@ -30,6 +30,8 @@ import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.file.FileCollection
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.plugins.WarPluginConvention
+import org.gradle.api.tasks.SourceSet
+import org.gradle.api.tasks.SourceSetContainer
 
 import java.nio.file.Path
 import java.nio.file.WatchEvent
@@ -37,6 +39,7 @@ import java.nio.file.WatchKey
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
+import java.util.logging.Level
 
 /**
  * Base class for application servers
@@ -163,12 +166,15 @@ abstract class ApplicationServer {
 
         appServerProcess.add(webAppDir.canonicalPath + File.separator)
 
-        File classesDir = project.sourceSets.main.output.classesDir
-        File resourcesDir = project.sourceSets.main.output.resourcesDir
-        if(project.vaadinRun.classesDir){
+        SourceSetContainer sourceSets = project.sourceSets
+        SourceSet mainSourceSet = sourceSets.main
+
+        File classesDir = mainSourceSet.output.classesDir
+        File resourcesDir = mainSourceSet.output.resourcesDir
+        if(configuration.classesDir){
             // Eclipse might output somewhere else
-            classesDir = project.file(project.vaadinRun.classesDir)
-            resourcesDir = project.file(project.vaadinRun.classesDir)
+            classesDir = project.file(configuration.classesDir)
+            resourcesDir = project.file(configuration.classesDir)
 
             // Check if directory contains classes, if it does not then the IDE has not
             // compiled any classes here.
@@ -186,8 +192,8 @@ abstract class ApplicationServer {
                 project.logger.log(LogLevel.WARN, "The defined classesDir does not " +
                         "contain any classes, are you sure the classes exist in that " +
                         "directory? Falling back to default classes directory.")
-                classesDir = project.sourceSets.main.output.classesDir
-                resourcesDir = project.sourceSets.main.output.resourcesDir
+                classesDir = mainSourceSet.output.classesDir
+                resourcesDir = mainSourceSet.output.resourcesDir
             }
         }
 
@@ -195,9 +201,9 @@ abstract class ApplicationServer {
         appServerProcess.add(resourcesDir.canonicalPath + File.separator)
 
         if(project.logger.debugEnabled){
-            appServerProcess.add('DEBUG')
+            appServerProcess.add(Level.FINEST.name)
         } else {
-            appServerProcess.add('INFO')
+            appServerProcess.add(Level.INFO.name)
         }
 
         appServerProcess.add(project.name);

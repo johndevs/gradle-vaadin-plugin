@@ -63,6 +63,11 @@ class RunTaskTest extends IntegrationTest {
         assertFalse output, output.contains('The defined classesDir does not contain any classes')
     }
 
+    @Test void 'Run with debug flag'() {
+        def output = runWithArguments('--debug', CreateProjectTask.NAME, RunTask.NAME, '--stopAfterStart')
+        assertServerRunning output
+    }
+
     private void assertServerRunning(String output){
         assertTrue output, output.contains('Application running on ')
     }
