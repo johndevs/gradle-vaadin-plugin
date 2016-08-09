@@ -214,15 +214,21 @@ abstract class ApplicationServer {
 
         makeClassPathFile(buildDir)
 
-        executeServer(appServerProcess, firstStart)
-
-        monitorLog(firstStart, stopAfterStart)
+        if(executeServer(appServerProcess, firstStart)) {
+            monitorLog(firstStart, stopAfterStart)
+        }
     }
 
     @PackageScope
-    def executeServer(List appServerProcess, boolean firstStart=false) {
+    def boolean executeServer(List appServerProcess, boolean firstStart=false) {
         project.logger.debug("Running server with the command: "+appServerProcess)
         process = appServerProcess.execute()
+
+        if(!process.alive) {
+            // Something is avery, warn user and return
+            project.logger.log(LogLevel.ERROR, "Server failed to start. Exited with exit code ${process.exitValue()}")
+            return false
+        }
 
         // Watch for changes in classes
         if(configuration.serverRestart) {
@@ -239,6 +245,7 @@ abstract class ApplicationServer {
                 watchThemeDirectoryForChanges(self)
             }
         }
+        true
     }
 
     @PackageScope

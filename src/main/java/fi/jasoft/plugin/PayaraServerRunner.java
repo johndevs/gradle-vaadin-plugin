@@ -28,6 +28,8 @@ import java.util.logging.Logger;
 
 public class PayaraServerRunner {
 
+    private static final Logger LOGGER = Logger.getLogger(PayaraServerRunner.class.getName());
+
     // Usage: 'PayaraServerRunner [port] [webbappdir] [classesdir] [resourcesdir] [LogLevel] [name] [workdir]'
     public static void main(String[] args) throws Exception {
         int port = Integer.parseInt(args[0]);
@@ -40,9 +42,13 @@ public class PayaraServerRunner {
 
         String[] dependencies = new String(Files.readAllBytes(Paths.get(workdir + "/classpath.txt")), StandardCharsets.UTF_8).split(";");
 
+        LOGGER.log(Level.CONFIG, "Configuring logger log levels to "+logLevel);
+
         Logger.getLogger("").getHandlers()[0].setLevel(logLevel);
         Logger.getLogger("javax.enterprise.system.tools.deployment").setLevel(logLevel);
         Logger.getLogger("javax.enterprise.system").setLevel(logLevel);
+
+        LOGGER.log(Level.INFO, "Starting Payara web server...");
 
         try {
 
@@ -52,21 +58,29 @@ public class PayaraServerRunner {
 
             GlassFishProperties glassfishProperties = new GlassFishProperties();
             glassfishProperties.setPort("http-listener", port);
+            LOGGER.log(Level.INFO, "Running on port "+port);
 
             GlassFish glassfish = runtime.newGlassFish(glassfishProperties);
             glassfish.start();
+
+            LOGGER.log(Level.INFO, "Payara started, assembling web application");
 
             Deployer deployer = glassfish.getDeployer();
             ScatteredArchive archive = new ScatteredArchive(
                     name,
                     ScatteredArchive.Type.WAR,
                     new File(webAppDir));
+
             archive.addClassPath(new File(classesDir));
+            LOGGER.log(Level.INFO, "Added "+ classesDir);
+
             archive.addClassPath(new File(resourcesDir));
+            LOGGER.log(Level.INFO, "Added "+ resourcesDir);
 
             for(String dependency : dependencies){
                 archive.addClassPath(new File(dependency));
             }
+            LOGGER.log(Level.INFO, "Added dependencies listed in "+ Paths.get(workdir + "/classpath.txt"));
 
             String tmp = System.getProperty("java.io.tmpdir");
             System.setProperty("java.io.tmpdir", workdir);
@@ -74,10 +88,12 @@ public class PayaraServerRunner {
             System.setProperty("java.io.tmpdir", tmp);
 
             deployer.deploy(archiveURI, "--contextroot=");
-        } catch (Exception ex){
-            Logger.getLogger(PayaraServerRunner.class.getName()).log(Level.SEVERE,
-                    null, ex);
-        }
 
+            LOGGER.log(Level.INFO, "Web application located at "+archiveURI+" deployed.");
+
+        } catch (Exception ex){
+            LOGGER.log(Level.SEVERE, "Failed to start Payara server", ex);
+            throw ex;
+        }
     }
 }

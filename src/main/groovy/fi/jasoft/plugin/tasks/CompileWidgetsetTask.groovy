@@ -279,6 +279,8 @@ class CompileWidgetsetTask extends DefaultTask {
 
         widgetsetCompileProcess += ['-cp',  classpath.asPath]
 
+        widgetsetCompileProcess += ["-Dgwt.persistentunitcachedir=${project.buildDir.canonicalPath}"]
+
         widgetsetCompileProcess += 'com.google.gwt.dev.Compiler'
 
         widgetsetCompileProcess += ['-style', configuration.style]
@@ -286,6 +288,7 @@ class CompileWidgetsetTask extends DefaultTask {
         widgetsetCompileProcess += ['-war', Util.getWidgetsetDirectory(project).canonicalPath]
         widgetsetCompileProcess += ['-logLevel', configuration.logLevel]
         widgetsetCompileProcess += ['-localWorkers', configuration.localWorkers]
+        widgetsetCompileProcess += ['-workDir', project.buildDir.canonicalPath + File.separator + 'tmp']
 
         if (configuration.draftCompile) {
             widgetsetCompileProcess += '-draftCompile'
