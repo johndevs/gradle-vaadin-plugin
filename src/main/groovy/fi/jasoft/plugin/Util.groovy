@@ -17,6 +17,7 @@ package fi.jasoft.plugin
 
 import fi.jasoft.plugin.configuration.VaadinPluginExtension
 import fi.jasoft.plugin.tasks.BuildClassPathJar
+import fi.jasoft.plugin.tasks.UpdateWidgetsetTask
 import groovy.io.FileType
 import groovy.transform.PackageScope
 import org.apache.commons.lang.StringUtils
@@ -862,17 +863,24 @@ class Util {
         String widgetset = project.vaadinCompile.widgetset
 
         // If client side classes exists in project use client side package to determine widgetset
-        def clientPackage = getClientPackage(project)
-        if(clientPackage) {
-            def widgetsetPath = StringUtils.removeEnd(clientPackage, File.separator + CLIENT_PACKAGE_NAME)
-            if(widgetsetPath.size() > 0){
-                widgetsetPath = TemplateUtil.convertFilePathToFQN(widgetsetPath, '') + '.'
+        if(!widgetset) {
+            def clientPackage = getClientPackage(project)
+            if(clientPackage) {
+                def widgetsetPath = StringUtils.removeEnd(clientPackage, File.separator + CLIENT_PACKAGE_NAME)
+                if(widgetsetPath.size() > 0){
+                    widgetsetPath = TemplateUtil.convertFilePathToFQN(widgetsetPath, '') + '.'
+                }
+                widgetset =  widgetsetPath + APP_WIDGETSET
             }
-            widgetset =  widgetsetPath + APP_WIDGETSET
         }
 
         // If addons exists in project but widgetset is not defined, use default one
         if(!widgetset && findAddonsInProject(project).size() > 0){
+            widgetset = APP_WIDGETSET
+        }
+
+        // If dependent projects have widgetsets, use default one
+        if(!widgetset && UpdateWidgetsetTask.findInheritsInDependencies(project).size() > 0) {
             widgetset = APP_WIDGETSET
         }
 

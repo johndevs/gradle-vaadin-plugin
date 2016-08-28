@@ -19,6 +19,7 @@ import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
 import fi.jasoft.plugin.configuration.CompileWidgetsetConfiguration
 import groovy.transform.PackageScope
+import groovy.util.logging.Log
 import org.apache.commons.lang.StringUtils
 
 import org.gradle.api.DefaultTask
@@ -38,6 +39,7 @@ import java.util.jar.JarInputStream
  *
  * @author John Ahlroos
  */
+@Log
 class UpdateWidgetsetTask extends DefaultTask {
 
     public static final String NAME = 'vaadinUpdateWidgetset'
@@ -82,7 +84,6 @@ class UpdateWidgetsetTask extends DefaultTask {
         widgetsetFile
     }
 
-
     @PackageScope
     static updateWidgetset(File widgetsetFile, String widgetsetFQN, Project project) {
         def configuration = project.vaadinCompile as CompileWidgetsetConfiguration
@@ -105,6 +106,72 @@ class UpdateWidgetsetTask extends DefaultTask {
         TemplateUtil.writeTemplate('Widgetset.xml', widgetsetFile.parentFile, widgetsetFile.name, substitutions, true)
     }
 
+    /**
+     * Scans the child projects of the given project for GWT inherits
+     * @param project
+     *      The root project to scan, inherits from this project will *NOT* be included
+     * @param scannedProjects
+     *      the scanned projects, includes the root project
+     * @return
+     */
+    @PackageScope
+    static Set<String> findInheritsInDependencies(Project project, List<Project> scannedProjects = []) {
+        Set<String> inherits = []
+
+        // Scan child projects for their source inherits
+        if(scannedProjects.size() > 0) {
+            inherits.addAll(findInheritsInProject(project))
+        }
+
+        scannedProjects << project
+
+        // Scan child projects for their addon inherits
+        def attribute = new Attributes.Name('Vaadin-Widgetsets')
+        project.configurations.all.each { Configuration conf ->
+            conf.allDependencies.each { Dependency dependency ->
+                if(dependency in ProjectDependency) {
+                    Project dependentProject = ((ProjectDependency) dependency).dependencyProject
+                    if(!(dependentProject in scannedProjects)) {
+                        inherits.addAll(findInheritsInDependencies(dependentProject, scannedProjects))
+                    }
+                } else {
+                    conf.files(dependency).each { File file ->
+                        if(file.file && file.name.endsWith('.jar')){
+                            file.withInputStream { InputStream stream ->
+                                def jarStream = new JarInputStream(stream)
+                                jarStream.with {
+                                    def mf = jarStream.getManifest()
+                                    def attributes = mf?.mainAttributes
+                                    def widgetsetsValue = attributes?.getValue(attribute)
+                                    if (widgetsetsValue && !dependency.name.startsWith('vaadin-client')) {
+                                        List<String> widgetsets = widgetsetsValue?.split(',')?.collect { it.trim() }
+                                        widgetsets?.each { String widgetset ->
+                                            if(widgetset != DEFAULT_WIDGETSET && widgetset != DEFAULT_LEGACY_WIDGETSET){
+                                                inherits.add(widgetset)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        log.info("Found ${inherits.size()} total widgetsets in $project.name")
+        inherits
+    }
+
+    /**
+     * Scans the project sources sets and searches for GWT module XML files and converts their paths
+     * into inherit statements
+     *
+     * @param project
+     *  the project to scan
+     * @return
+     *      a list of inherit statements
+     */
     private static Set<String> findInheritsInProject(Project project) {
         Set<String> inherits = []
 
@@ -129,47 +196,8 @@ class UpdateWidgetsetTask extends DefaultTask {
                 inherits.add(widgetset)
             }
         }
-        inherits
-    }
 
-    private static Set<String> findInheritsInDependencies(Project project, List<Project> scannedProjects = []) {
-        Set<String> inherits = []
-        scannedProjects << project
-
-        def attribute = new Attributes.Name('Vaadin-Widgetsets')
-        project.configurations.all.each { Configuration conf ->
-            conf.allDependencies.each { Dependency dependency ->
-                if(dependency in ProjectDependency) {
-                    Project dependentProject = ((ProjectDependency) dependency).dependencyProject
-                    if(!(dependentProject in scannedProjects)) {
-                        inherits.addAll(findInheritsInDependencies(dependentProject, scannedProjects))
-                    }
-                } else{
-                    conf.files(dependency).each { File file ->
-                        if(file.file && file.name.endsWith('.jar')){
-                            file.withInputStream { InputStream stream ->
-                                def jarStream = new JarInputStream(stream)
-                                jarStream.with {
-                                    def mf = jarStream.getManifest()
-                                    def attributes = mf?.mainAttributes
-                                    def widgetsetsValue = attributes?.getValue(attribute)
-
-                                    if (widgetsetsValue && !dependency.name.startsWith('vaadin-client')) {
-                                        List<String> widgetsets = widgetsetsValue?.split(',')?.collect { it.trim() }
-                                        widgetsets?.each { String widgetset ->
-                                            if(widgetset != DEFAULT_WIDGETSET && widgetset != DEFAULT_LEGACY_WIDGETSET){
-                                                inherits.add(widgetset)
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
+        log.info("Found ${inherits.size()} source widgetsets in $project.name")
         inherits
     }
 
@@ -201,18 +229,6 @@ class UpdateWidgetsetTask extends DefaultTask {
 
     private static Set<String> getInherits(Project project, CompileWidgetsetConfiguration configuration) {
         Set<String> inherits = [DEFAULT_WIDGETSET]
-
-        // Scan dependent projects and inherit their widgetsets
-        Configuration compileConf = project.configurations.compile
-        compileConf.allDependencies.each { Dependency dependency ->
-            if(dependency in ProjectDependency){
-                def depProject = dependency.dependencyProject
-                if(depProject.hasProperty('vaadin')){
-                    // A vaadin submodule
-                    inherits.addAll(findInheritsInProject(depProject))
-                }
-            }
-        }
 
         // Scan classpath for Vaadin addons and inherit their widgetsets
         inherits.addAll(findInheritsInDependencies(project))
