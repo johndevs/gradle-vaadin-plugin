@@ -32,7 +32,7 @@ class TestBenchConfiguration {
     /**
      * What version of testbench should be used
      */
-    String version = "4.+"
+    String version = "4.1.0"
 
     /**
      * Should the application be run before tests are run

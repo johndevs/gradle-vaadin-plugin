@@ -1,0 +1,49 @@
+plugins {
+    // Use the maven plugin to generate to addon pom.xml for the Vaadin Directory
+    id "maven"
+
+    // Use the Vaadin plugin to build the addon
+    id "fi.jasoft.plugin.vaadin" version "${pluginVersion}"
+}
+
+// Specify a version for the addon, this can also be done in the
+// parent build.gradle if you want the version to be the same for all projects
+version = '1.0-SNAPSHOT'
+
+// Build for Java 7+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+// We are only interested in the addon jar
+artifacts {
+    archives jar
+}
+
+// Vaadin configuration
+vaadin {
+    // Addon metadata for the Vaadin Directory
+    addon {
+      author '${author}'
+      license '${license}'
+      title '${title}'
+    }
+}
+
+// Creates the addon POM for the directory
+task createAddonPom {
+    pom { artifactId = '${artifactId}' }.writeTo(
+        "\${sourceSets.main.output.resourcesDir}/META-INF/maven/${rootPackagePath}/pom.xml"
+    )
+}
+
+jar {
+    // Addon artifact name
+    baseName = '${artifactId}'
+
+    // Include the addon pom.xml for the Vaadin Directory
+    dependsOn createAddonPom
+
+    // Usually it is a good idea to include the sources of the addon so the
+    // addon user can compile their widgetset
+    sourceSets.main.java.srcDirs.each {from it }
+}

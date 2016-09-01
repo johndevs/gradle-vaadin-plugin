@@ -39,14 +39,14 @@ import java.nio.file.Paths
  */
 class TaskListener implements TaskExecutionListener {
 
-    public static final String VAADIN_EXTENSION_NAME = 'vaadin'
+    static final String VAADIN_EXTENSION_NAME = 'vaadin'
+
     def TestbenchHub testbenchHub
-
     def TestbenchNode testbenchNode
+    def ApplicationServer testbenchAppServer
 
-    ApplicationServer testbenchAppServer
-
-    public void beforeExecute(Task task) {
+    @Override
+    void beforeExecute(Task task) {
         if (!task.project.hasProperty(VAADIN_EXTENSION_NAME)) {
             return
         }
@@ -73,19 +73,14 @@ class TaskListener implements TaskExecutionListener {
         }
     }
 
-    public void afterExecute(Task task, TaskState state) {
+    @Override
+    void afterExecute(Task task, TaskState state) {
         if (!task.project.hasProperty(VAADIN_EXTENSION_NAME)) {
             return
         }
 
         if (task.name == 'test') {
             terminateTestbench(this)
-        }
-
-        // Notify users that sources are not present in the jar
-        if (task.name == 'jar' && !state.getSkipped()) {
-            task.getLogger().warn("Please note that the jar archive will NOT by default include the source files.\n" +
-                    "You can add them to the jar by adding jar{ from sourceSets.main.allJava } to build.gradle.")
         }
     }
 

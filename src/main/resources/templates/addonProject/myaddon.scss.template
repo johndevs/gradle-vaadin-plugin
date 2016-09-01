@@ -1,0 +1,7 @@
+@mixin ${themeName} {
+
+    // Make our custom addon red
+    .${themeName.toLowerCase()} {
+        color: red;
+    }
+}
