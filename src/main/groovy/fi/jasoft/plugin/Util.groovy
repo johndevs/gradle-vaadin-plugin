@@ -712,7 +712,7 @@ class Util {
      *      version as a string
      */
     static String getVaadinVersion(Project project) {
-        project.vaadin.version ?: '7.6.+'
+        project.vaadin.version ?: '7.7.+'
     }
 
     /**
