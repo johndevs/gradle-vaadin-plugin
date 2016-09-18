@@ -2,3 +2,6 @@ language: groovy
 jdk:
   - oraclejdk8
 script: ./gradlew --stacktrace check
+branches:
+  only:
+    - "master"
