@@ -1,0 +1,13 @@
+package ${applicationPackage};
+
+import com.vaadin.server.VaadinRequest;
+import com.vaadin.ui.UI;
+<% imports.each { pkg -> println "import $pkg;" } %>
+<% annotations.each { annotation -> println "@${annotation}" } %>public class ${applicationName}UI extends UI{
+	
+	@Override
+	protected void init(VaadinRequest request){
+		${addonComponentType} addon = new ${addonComponentType}();
+		setContent(addon);
+	}
+}

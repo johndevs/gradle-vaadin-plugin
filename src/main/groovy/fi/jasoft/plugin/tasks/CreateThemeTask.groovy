@@ -17,6 +17,7 @@ package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
+import fi.jasoft.plugin.creators.ThemeCreator
 import groovy.transform.PackageScope
 import org.gradle.api.DefaultTask
 import org.gradle.api.internal.tasks.options.Option
@@ -34,8 +35,6 @@ import java.nio.file.StandardCopyOption
 class CreateThemeTask extends DefaultTask {
 
     static final String NAME = 'vaadinCreateTheme'
-    static final String STYLES_SCSS_FILE = 'styles.scss'
-    public static final String FAVICON_FILENAME = 'favicon.ico'
 
     @Option(option = 'name', description = 'Theme name')
     def String themeName
@@ -46,34 +45,15 @@ class CreateThemeTask extends DefaultTask {
 
     @TaskAction
     def run() {
+
         if(!themeName){
             themeName = project.getName()
         }
-        makeTheme(themeName)
-    }
 
-    @PackageScope
-    def makeTheme(String themeName) {
-        def themeDir = new File(Util.getThemesDirectory(project), themeName)
-        themeDir.mkdirs()
-
-        def substitutions = [:]
-        substitutions['themeName'] = themeName
-        substitutions['theme'] = themeName.toLowerCase()
-
-        String themeScssFile = themeName.toLowerCase() + '.scss'
-        substitutions['themeImport'] = themeScssFile
-
-        VersionNumber version = VersionNumber.parse(Util.getVaadinVersion(project))
-        substitutions['basetheme'] = version.minor < 3 ? 'reindeer' : 'valo'
-
-        TemplateUtil.writeTemplate(STYLES_SCSS_FILE, themeDir, STYLES_SCSS_FILE, substitutions)
-        TemplateUtil.writeTemplate('MyTheme.scss', themeDir, themeScssFile, substitutions)
-
-        def favicon = CreateThemeTask.class.getClassLoader().getResource(FAVICON_FILENAME)
-        def faviconFile = new File(themeDir, FAVICON_FILENAME)
-
-        Files.copy(favicon.openStream(), faviconFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
+        new ThemeCreator(themeName: themeName,
+                themesDirectory: Util.getThemesDirectory(project),
+                vaadinVersion: Util.getVaadinVersion(project)
+        ).run()
 
         project.tasks[UpdateAddonStylesTask.NAME].run()
     }

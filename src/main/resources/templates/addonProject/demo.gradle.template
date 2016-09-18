@@ -1,0 +1,9 @@
+plugins {
+    // Use the Vaadin plugin to build the demo
+    id "fi.jasoft.plugin.vaadin" version "${pluginVersion}"
+}
+
+// Demo depends on the addon
+dependencies {
+    compile project(':addon')
+}

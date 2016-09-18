@@ -15,12 +15,12 @@
 */
 package fi.jasoft.plugin.tasks
 
-import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
 import fi.jasoft.plugin.configuration.CompileWidgetsetConfiguration
+import fi.jasoft.plugin.creators.ProjectCreator
+import fi.jasoft.plugin.creators.ThemeCreator
 import groovy.transform.PackageScope
 import org.gradle.api.DefaultTask
-import org.gradle.api.Project
 import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
 
@@ -31,12 +31,9 @@ import org.gradle.api.tasks.TaskAction
  */
 class CreateProjectTask extends DefaultTask {
 
-    public static final NAME = 'vaadinCreateProject'
+    static final NAME = 'vaadinCreateProject'
 
-    private static final String DOT = '.'
-    private static final String APPLICATION_NAME_KEY = 'applicationName'
-    private static final String APPLICATION_PACKAGE_KEY = 'applicationPackage'
-    private static final String WIDGETSET_KEY = 'widgetset'
+    static final String DOT = '.'
 
     @Option(option = 'name', description = 'Application name')
     def String applicationName
@@ -55,133 +52,56 @@ class CreateProjectTask extends DefaultTask {
     def run() {
         def configuration = project.vaadinCompile as CompileWidgetsetConfiguration
 
-        if(!applicationName){
-            applicationName = project.name.capitalize()
-        }
-
-        // Ensure name is Java compatible
-        applicationName = Util.makeStringJavaCompatible(applicationName)
-
-        if(!applicationPackage){
-            int endSlashSize = 2
-            if(widgetsetFQN?.contains(DOT)){
-                String widgetsetName = widgetsetFQN.tokenize(DOT).last()
-                applicationPackage = widgetsetFQN[0..(-widgetsetName.size() - endSlashSize)]
-            } else if (configuration.widgetset?.contains(DOT)) {
-                String widgetsetName = configuration.widgetset.tokenize(DOT).last()
-                applicationPackage = configuration.widgetset[0..(-widgetsetName.size() - endSlashSize)]
-            } else {
-                applicationPackage = "com.example.${applicationName.toLowerCase()}"
-            }
-        }
-
-        makeUIClass()
-
-        makeServletClass()
-
-        makeBeansXML()
+        new ProjectCreator(applicationName: resolveApplicationName(),
+                applicationPackage: resolveApplicationPackage(),
+                widgetsetConfiguration: configuration,
+                widgetsetFQN: widgetsetFQN,
+                pushSupported: Util.isPushSupportedAndEnabled(project),
+                addonStylesSupported: Util.isAddonStylesSupported(project),
+                javaDir: Util.getMainSourceSet(project).srcDirs.first(),
+                resourceDir: project.sourceSets.main.resources.srcDirs.iterator().next(),
+                templateDir: 'simpleProject'
+        ).run()
 
         if (Util.isAddonStylesSupported(project)) {
-            project.tasks[CreateThemeTask.NAME].makeTheme(applicationName)
+
+            new ThemeCreator(themeName: resolveApplicationName(),
+                    themesDirectory: Util.getThemesDirectory(project),
+                    vaadinVersion: Util.getVaadinVersion(project)
+            ).run()
+
+            project.tasks[UpdateAddonStylesTask.NAME].run()
         }
 
         UpdateWidgetsetTask.ensureWidgetPresent(project, widgetsetFQN)
     }
 
     @PackageScope
-    def makeUIClass() {
+    String resolveApplicationName() {
 
-        def substitutions = [:]
-        substitutions[APPLICATION_NAME_KEY] = applicationName
-        substitutions[APPLICATION_PACKAGE_KEY] = applicationPackage
-
-        // Imports
-        def imports = []
-        if (Util.isPushSupportedAndEnabled(project)) {
-            imports.add('com.vaadin.annotations.Push')
+        // Use capitalized project name if no application name is given
+        if(!applicationName){
+            applicationName = project.name.capitalize()
         }
 
-        if (Util.isAddonStylesSupported(project)) {
-            imports.add('com.vaadin.annotations.Theme')
-        }
-
-        substitutions['imports'] = imports
-
-        // Annotations
-        def annotations = []
-        if (Util.isPushSupportedAndEnabled(project)) {
-            annotations.add('Push')
-        }
-
-        if (Util.isAddonStylesSupported(project)) {
-            if(Util.isGroovyProject(project)){
-                annotations.add("Theme('${applicationName}')")
-            } else {
-                annotations.add("Theme(\"${applicationName}\")")
-            }
-        }
-
-        substitutions['annotations'] = annotations
-
-        if(Util.isGroovyProject(project)){
-            TemplateUtil.writeTemplate('MyUI.groovy', UIDir, applicationName + "UI.groovy", substitutions)
-        } else {
-            TemplateUtil.writeTemplate('MyUI.java', UIDir, applicationName + "UI.java", substitutions)
-        }
+        // Ensure name is Java compatible
+        Util.makeStringJavaCompatible(applicationName)
     }
 
     @PackageScope
-    def makeServletClass() {
+    String resolveApplicationPackage() {
         def configuration = project.vaadinCompile as CompileWidgetsetConfiguration
-
-        def substitutions = [:]
-
-        substitutions[APPLICATION_NAME_KEY] = applicationName
-        substitutions[APPLICATION_PACKAGE_KEY] = applicationPackage
-        substitutions['asyncEnabled'] = Util.isPushSupportedAndEnabled(project)
-
-        //#######################################################################
-
-        def initParams = ['ui': "$applicationPackage.${applicationName}UI"]
-
-        if (widgetsetFQN) {
-            if(configuration.widgetsetCDN){
-                initParams.put(WIDGETSET_KEY, "${widgetsetFQN.replaceAll("[^a-zA-Z0-9]+","")}")
+        if(!applicationPackage){
+            int endSlashSize = 2
+            if(widgetsetFQN?.contains(DOT)){
+                String widgetsetName = widgetsetFQN.tokenize(DOT).last()
+                widgetsetFQN[0..(-widgetsetName.size() - endSlashSize)]
+            } else if (configuration.widgetset?.contains(DOT)) {
+                String widgetsetName = configuration.widgetset.tokenize(DOT).last()
+                configuration.widgetset[0..(-widgetsetName.size() - endSlashSize)]
             } else {
-                initParams.put(WIDGETSET_KEY, "$widgetsetFQN")
+                "com.example.${applicationName.toLowerCase()}"
             }
         }
-
-        substitutions['initParams'] = initParams
-
-        //#######################################################################
-
-        if(Util.isGroovyProject(project)){
-            TemplateUtil.writeTemplate("MyServlet.groovy", UIDir, applicationName + "Servlet.groovy", substitutions)
-        } else {
-            TemplateUtil.writeTemplate("MyServlet.java", UIDir, applicationName + "Servlet.java", substitutions)
-        }
-    }
-
-    @PackageScope
-    def File makeBeansXML() {
-        TemplateUtil.writeTemplate('beans.xml', metaInfDir)
-    }
-
-    @PackageScope
-    def File getUIDir(){
-        def javaDir = Util.getMainSourceSet(project).srcDirs.first()
-        def uidir = new File(javaDir, TemplateUtil.convertFQNToFilePath(applicationPackage))
-        uidir.mkdirs()
-        uidir
-    }
-
-    @PackageScope
-    def File getMetaInfDir() {
-        def resourceDir = project.sourceSets.main.resources.srcDirs.iterator().next()
-        def metaInf = new File(resourceDir, 'META-INF')
-        metaInf.mkdirs()
-        metaInf
     }
 }
-

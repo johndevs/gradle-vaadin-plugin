@@ -27,6 +27,7 @@ import fi.jasoft.plugin.tasks.BuildJavadocJarTask
 import fi.jasoft.plugin.tasks.BuildSourcesJarTask
 import fi.jasoft.plugin.tasks.CompileThemeTask
 import fi.jasoft.plugin.tasks.CompileWidgetsetTask
+import fi.jasoft.plugin.tasks.CreateAddonProjectTask
 import fi.jasoft.plugin.tasks.CreateAddonThemeTask
 import fi.jasoft.plugin.tasks.CreateComponentTask
 import fi.jasoft.plugin.tasks.CreateCompositeTask
@@ -62,7 +63,6 @@ import org.gradle.api.plugins.WarPlugin
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.bundling.War
-import org.gradle.language.base.internal.plugins.CleanRule
 import org.gradle.language.jvm.tasks.ProcessResources
 import org.gradle.tooling.UnsupportedVersionException
 import org.gradle.util.VersionNumber
@@ -122,12 +122,13 @@ class GradleVaadinPlugin implements Plugin<Project> {
         PLUGINS_IN_PROJECT == 1
     }
 
+    @Override
     void apply(Project project) {
 
         Gradle gradle = project.gradle
         VersionNumber version = VersionNumber.parse(gradle.gradleVersion)
         VersionNumber requiredVersion = new VersionNumber(2, 12, 0, null)
-        if(version.baseVersion < requiredVersion) {
+        if (version.baseVersion < requiredVersion) {
             throw new UnsupportedVersionException("Your gradle version ($version) is too old. " +
                     "Plugin requires Gradle $requiredVersion+")
         }
@@ -196,14 +197,14 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
         project.afterEvaluate { Project p ->
             String v = Util.getVaadinVersion(p)
-            if(v !=null && v.startsWith("6")){
-                p.logger.error("Plugin no longer supports Vaadin 6, to use Vaadin 6 " +
-                        "apply an older version of the plugin.")
-                throw new InvalidUserDataException("Unsupported Vaadin version.")
+            if (v?.startsWith('6')) {
+                p.logger.error('Plugin no longer supports Vaadin 6, to use Vaadin 6 ' +
+                        'apply an older version of the plugin.')
+                throw new InvalidUserDataException('Unsupported Vaadin version.')
             }
 
             // Remove configurations if the plugin shouldn't manage them
-            if(!p.vaadin.manageDependencies){
+            if (!p.vaadin.manageDependencies) {
                 p.configurations.removeAll({ Configuration conf ->
                    conf.name.startsWith('vaadin-')
                 })
@@ -219,7 +220,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
     static void applyRepositories(Project project) {
         project.afterEvaluate { Project p ->
-            if(!p.vaadin.manageRepositories) {
+            if (!p.vaadin.manageRepositories) {
                 return
             }
 
@@ -254,7 +255,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
             }
 
             // Add plugin development repository if specified
-            if((debugDir as File)?.exists()
+            if ((debugDir as File)?.exists()
                     && !repositories.findByName(PLUGIN_DEVELOPMENTTIME_REPOSITORY_NAME)) {
                 if (GradleVaadinPlugin.firstPlugin) {
                     project.logger.lifecycle("Using development libs found at " + debugDir)
@@ -500,6 +501,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
     static void applyVaadinTasks(Project project){
         TaskContainer tasks = project.tasks
         tasks.create(name: CreateProjectTask.NAME, type: CreateProjectTask, group: VAADIN_TASK_GROUP)
+        tasks.create(name: CreateAddonProjectTask.NAME, type: CreateAddonProjectTask, group: VAADIN_TASK_GROUP)
         tasks.create(name: CreateComponentTask.NAME, type: CreateComponentTask, group: VAADIN_TASK_GROUP)
         tasks.create(name: CreateCompositeTask.NAME, type: CreateCompositeTask, group: VAADIN_TASK_GROUP)
         tasks.create(name: CreateThemeTask.NAME, type: CreateThemeTask, group: VAADIN_TASK_GROUP)

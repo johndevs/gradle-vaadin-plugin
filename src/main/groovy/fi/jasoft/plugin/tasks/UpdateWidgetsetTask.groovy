@@ -29,6 +29,7 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.Task
 
 import java.util.jar.Attributes
 import java.util.jar.JarInputStream
@@ -55,7 +56,9 @@ class UpdateWidgetsetTask extends DefaultTask {
 
     public UpdateWidgetsetTask() {
         description = "Updates the widgetset xml file"
-        onlyIf { project.vaadinCompile.manageWidgetset && Util.getWidgetset(project) }
+        onlyIf { Task task ->
+            task.project.vaadinCompile.manageWidgetset && Util.getWidgetset(task.project)
+        }
     }
 
     @TaskAction
@@ -159,7 +162,6 @@ class UpdateWidgetsetTask extends DefaultTask {
             }
         }
 
-        log.info("Found ${inherits.size()} total widgetsets in $project.name")
         inherits
     }
 
@@ -175,29 +177,24 @@ class UpdateWidgetsetTask extends DefaultTask {
     private static Set<String> findInheritsInProject(Project project) {
         Set<String> inherits = []
 
-        // Scan in source folder
-        Util.getMainSourceSet(project).srcDirs.each { File srcDir ->
-            project.fileTree(srcDir.absolutePath)
-                    .include("**/*/*$GWT_MODULE_XML_POSTFIX")
-                    .each { File file ->
-                def path = file.absolutePath.substring(srcDir.absolutePath.size()+1)
-                def widgetset = TemplateUtil.convertFilePathToFQN(path, GWT_MODULE_XML_POSTFIX)
-                inherits.add(widgetset)
+        def scan = { File srcDir ->
+            if(srcDir.exists()){
+                project.fileTree(srcDir.absolutePath)
+                        .include("**/*/*$GWT_MODULE_XML_POSTFIX")
+                        .each { File file ->
+                    if(file.exists() && file.isFile()){
+                        def path = file.absolutePath.substring(srcDir.absolutePath.size()+1)
+                        def widgetset = TemplateUtil.convertFilePathToFQN(path, GWT_MODULE_XML_POSTFIX)
+                        inherits.add(widgetset)
+                    }
+                }
             }
         }
 
-        // Scan in resource folders
-        project.sourceSets.main.resources.srcDirs.each { File srcDir ->
-            project.fileTree(srcDir.absolutePath)
-                    .include("**/*/*$GWT_MODULE_XML_POSTFIX")
-                    .each { File file ->
-                def path = file.absolutePath.substring(srcDir.absolutePath.size()+1)
-                def widgetset = TemplateUtil.convertFilePathToFQN(path, GWT_MODULE_XML_POSTFIX)
-                inherits.add(widgetset)
-            }
-        }
+        Util.getMainSourceSet(project).srcDirs.each(scan)
 
-        log.info("Found ${inherits.size()} source widgetsets in $project.name")
+        project.sourceSets.main.resources.srcDirs.each(scan)
+
         inherits
     }
 
