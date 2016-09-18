@@ -2,9 +2,12 @@ plugins {
     // Use the maven plugin to generate to addon pom.xml for the Vaadin Directory
     id "maven"
 
-    // Use the Vaadin plugin to build the addon
-    id "fi.jasoft.plugin.vaadin" version "${pluginVersion}"
+    // Uncomment this if Vaadin plugin is not applied in the parent module
+    // id "fi.jasoft.plugin.vaadin" version "${pluginVersion}"
 }
+
+// Apply the Vaadin plugin
+apply plugin: 'fi.jasoft.plugin.vaadin'
 
 // Specify a version for the addon, this can also be done in the
 // parent build.gradle if you want the version to be the same for all projects
