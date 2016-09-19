@@ -175,6 +175,10 @@ class UpdateWidgetsetTask extends DefaultTask {
      *      a list of inherit statements
      */
     private static Set<String> findInheritsInProject(Project project) {
+        if (!project.hasProperty('vaadin')) {
+            return []
+        }
+
         Set<String> inherits = []
 
         def scan = { File srcDir ->
