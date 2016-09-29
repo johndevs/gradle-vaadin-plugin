@@ -41,6 +41,8 @@ class CreateThemeTask extends DefaultTask {
 
     public CreateThemeTask() {
         description = "Creates a new Vaadin Theme"
+        dependsOn(BuildClassPathJar.NAME)
+        finalizedBy(UpdateAddonStylesTask.NAME)
     }
 
     @TaskAction
@@ -54,7 +56,5 @@ class CreateThemeTask extends DefaultTask {
                 themesDirectory: Util.getThemesDirectory(project),
                 vaadinVersion: Util.getVaadinVersion(project)
         ).run()
-
-        project.tasks[UpdateAddonStylesTask.NAME].run()
     }
 }
