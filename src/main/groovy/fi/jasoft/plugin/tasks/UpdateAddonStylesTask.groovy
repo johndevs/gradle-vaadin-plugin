@@ -30,6 +30,8 @@ class UpdateAddonStylesTask extends DefaultTask {
 
     static final String NAME = 'vaadinUpdateAddonStyles'
 
+    static final String ADDONS_SCSS_FILE = 'addons.scss'
+
     UpdateAddonStylesTask() {
         dependsOn('classes', BuildClassPathJar.NAME)
         description = 'Updates the addons.scss file with addon styles.'
@@ -40,8 +42,8 @@ class UpdateAddonStylesTask extends DefaultTask {
             def themesDir = Util.getThemesDirectory(project)
             if(themesDir && themesDir.exists()){
                 themesDir.eachDir {
-                    inputs.dir it.canonicalPath
-                    outputs.file "${it.canonicalPath}/addons.scss"
+                    inputs.dir it
+                    outputs.file new File(it, ADDONS_SCSS_FILE)
                 }
             }
 
@@ -59,10 +61,13 @@ class UpdateAddonStylesTask extends DefaultTask {
             return
         }
 
-        def themesDir = Util.getThemesDirectory(project)
+        File themesDir = Util.getThemesDirectory(project)
         themesDir.mkdirs()
         themesDir.eachDir {
-            project.logger.info("Updating ${it.canonicalPath}/addons.scss")
+
+            File addonsScss = new File(it, ADDONS_SCSS_FILE)
+
+            project.logger.info("Updating $addonsScss")
 
             // Get compile classpath
             FileCollection classpath = Util.getCompileClassPathOrJar(project)
@@ -76,16 +81,19 @@ class UpdateAddonStylesTask extends DefaultTask {
                 }
             }
 
-            def importer = [Util.getJavaBinary(project)]
+            List<String> importer = [Util.getJavaBinary(project)]
             importer.add('-cp')
             importer.add(classpath.asPath)
             importer.add('com.vaadin.server.themeutils.SASSAddonImportFileCreator')
             importer.add(it.canonicalPath)
 
-            importer = importer.execute()
+            Process process = importer.execute()
 
-            if (importer.waitFor() != 0) {
-                project.logger.error("Failed to update ${it.canonicalPath}/addons.scss")
+            Util.logProcessToConsole(project, process)
+
+            int result = process.waitFor()
+            if (result != 0) {
+                project.logger.error("Failed to update $addonsScss. SASS importer returned error code $result")
             }
         }
     }
