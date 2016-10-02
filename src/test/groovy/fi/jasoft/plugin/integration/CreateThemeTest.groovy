@@ -57,13 +57,26 @@ class CreateThemeTest extends IntegrationTest {
     @Test void 'Compile with Compass compiler'() {
         buildFile << "vaadinThemeCompile.compiler = 'compass'"
 
-        runWithArguments(CreateThemeTask.NAME)
+        runWithArguments(CreateThemeTask.NAME, '--name=CompassTheme')
 
         def themesDir = Paths.get(projectDir.root.canonicalPath, 'src', 'main', 'webapp', 'VAADIN', 'themes').toFile()
-        assertThemeInDirectory(themesDir, projectDir.root.getName())
+        assertThemeInDirectory(themesDir, 'CompassTheme')
 
         runWithArguments(CompileThemeTask.NAME)
-        assertCompiledThemeInDirectory(themesDir, projectDir.root.getName())
+        assertCompiledThemeInDirectory(themesDir, 'CompassTheme')
+    }
+
+    @Test void 'Compile with libSass compiler'() {
+        buildFile << "vaadinThemeCompile.compiler = 'libsass'"
+
+        runWithArguments(CreateThemeTask.NAME, '--name=LibsassTheme')
+
+        def themesDir = Paths.get(projectDir.root.canonicalPath, 'src', 'main', 'webapp', 'VAADIN', 'themes').toFile()
+        assertThemeInDirectory(themesDir, 'LibsassTheme')
+
+        runWithArguments(CompileThemeTask.NAME)
+
+        assertCompiledThemeInDirectory(themesDir, 'LibsassTheme')
     }
 
     private void assertThemeInDirectory(File directory, String themeName){
@@ -89,6 +102,7 @@ class CreateThemeTest extends IntegrationTest {
         assertTrue "$themeDir does not exist", themeDir.exists()
 
         def stylesCompiled = Paths.get(themeDir.canonicalPath, 'styles.css').toFile()
-        assertTrue themeDir.list().toArrayString(), stylesCompiled.exists()
+        assertTrue "styles.css does not exist in theme dir, theme dir only contains "+themeDir.list().toArrayString(),
+                stylesCompiled.exists()
     }
 }

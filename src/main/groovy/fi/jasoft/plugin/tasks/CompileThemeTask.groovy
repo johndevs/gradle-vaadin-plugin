@@ -39,9 +39,13 @@ class CompileThemeTask extends DefaultTask {
     static final String NAME = 'vaadinThemeCompile'
 
     static final String STYLES_SCSS_PATTERN = '**/styles.scss'
-    static final String STYLES_CSS_FILE = 'styles.css'
+    static final String STYLES_CSS_FILE = STYLES_CSS
     static final String CLASSPATH_SWITCH = '-cp'
     static final String RUBY_MAIN_CLASS = 'org.jruby.Main'
+    static final String COMPASS_COMPILER = 'compass'
+    static final String LIBSASS_COMPILER = 'libsass'
+    static final String STYLES_CSS = 'styles.css'
+    static final String STYLES_SCSS = 'styles.scss'
 
     private CompileThemeConfiguration configuration
 
@@ -89,9 +93,12 @@ class CompileThemeTask extends DefaultTask {
         project.logger.info("Found ${themes.files.size() } themes.")
 
         File gemsDir
-        File unpackedThemesDir
-        if (project.vaadinThemeCompile.compiler == 'compass'){
+        if (project.vaadinThemeCompile.compiler in [COMPASS_COMPILER]){
             gemsDir = installCompassGem(project)
+        }
+
+        File unpackedThemesDir
+        if (project.vaadinThemeCompile.compiler in [COMPASS_COMPILER, LIBSASS_COMPILER]){
             unpackedThemesDir = unpackThemes(project)
         }
 
@@ -112,8 +119,11 @@ class CompileThemeTask extends DefaultTask {
                     process = executeVaadinSassCompiler(project, theme.canonicalPath,
                             new File(dir, STYLES_CSS_FILE).canonicalPath)
                     break
-                case 'compass':
+                case COMPASS_COMPILER:
                     process = executeCompassSassCompiler(project, gemsDir, unpackedThemesDir, dir)
+                    break
+                case LIBSASS_COMPILER:
+                    process = executeLibSassCompiler(project, dir, unpackedThemesDir)
                     break
                 default:
                     throw new BuildActionFailureException(
@@ -286,6 +296,7 @@ class CompileThemeTask extends DefaultTask {
         compassCompile += '--relative-assets'
 
         project.logger.info("Compiling $themePath with compass compiler")
+
         def compileProcess = [Util.getJavaBinary(project)]
         compileProcess += [CLASSPATH_SWITCH,  Util.getCompileClassPathOrJar(project).asPath]
         compileProcess += RUBY_MAIN_CLASS
@@ -296,5 +307,22 @@ class CompileThemeTask extends DefaultTask {
                 "GEM_PATH=${gemsDir.canonicalPath}",
                 "PATH=${gemsDir.canonicalPath}/bin"
         ], null)
+    }
+
+    static Process executeLibSassCompiler(Project project, File themeDir, File unpackedThemesDir) {
+
+        File stylesScss = new File(themeDir, STYLES_SCSS)
+        File stylesCss = new File(themeDir, STYLES_CSS)
+
+        project.logger.info("Compiling $themeDir with libsass compiler")
+
+        def compileProcess = [Util.getJavaBinary(project)]
+        compileProcess += [CLASSPATH_SWITCH,  Util.getCompileClassPathOrJar(project).asPath]
+        compileProcess += 'fi.jasoft.plugin.LibSassCompiler'
+        compileProcess += [stylesScss, stylesCss, unpackedThemesDir]
+
+        project.logger.debug(compileProcess.toString())
+
+        compileProcess.execute()
     }
 }
