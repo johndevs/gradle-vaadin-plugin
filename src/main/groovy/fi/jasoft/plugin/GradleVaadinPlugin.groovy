@@ -88,6 +88,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
     static final String DEFAULT_WIDGETSET = 'com.vaadin.DefaultWidgetSet'
     static final String CONFIGURATION_RUN_SERVER = 'vaadin-run-server'
     static final String CONFIGURATION_SUPERDEVMODE = 'vaadin-superdevmode'
+    static final String CONFIGURATION_THEME = 'vaadin-theme-compiler'
     static final String VAADIN_TASK_GROUP = 'Vaadin'
     static final String VAADIN_UTIL_TASK_GROUP = 'Vaadin Utility'
     static final String VAADIN_TESTBENCH_TASK_GROUP = 'Vaadin Testbench'
@@ -288,32 +289,6 @@ class GradleVaadinPlugin implements Plugin<Project> {
                 dependencies.add(vaadinThemes)
 
                 applyServletApi(projectDependencies, dependencies)
-
-                File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-                FileTree themes = project.fileTree(
-                        dir: webAppDir.canonicalPath + '/VAADIN/themes',
-                        include: '**/styles.scss')
-
-                if (!themes.isEmpty()) {
-                    switch (project.vaadinThemeCompile.compiler){
-                        case 'vaadin':
-                            if(Util.getVaadinVersion(project).startsWith('7.0')
-                                    || Util.getVaadinVersion(project).startsWith('7.1')){
-                                // In Vaadin 7.0 and 7.1 the compiler was shipped as a non-transitive dependency
-                                def themeCompiler = projectDependencies.create(
-                                        "com.vaadin:vaadin-theme-compiler:${Util.getVaadinVersion(project)}")
-                                dependencies.add(themeCompiler)
-                            }
-                            break
-                        case 'compass':
-                            def jruby = projectDependencies.create('org.jruby:jruby-complete:1.7.3')
-                            dependencies.add(jruby)
-                            break
-                        default:
-                            throw new GradleException(
-                                    "Selected theme compiler \"${project.vaadinThemeCompile.compiler}\" is not valid")
-                    }
-                }
             }
 
             sources.compileClasspath += conf
@@ -448,6 +423,51 @@ class GradleVaadinPlugin implements Plugin<Project> {
                 Dependency jsp = projectDependencies.create('javax.servlet.jsp:jsp-api:2.2')
                 dependencies.add(jsp)
             }
+        })
+
+        configurations.create(CONFIGURATION_THEME, { conf ->
+            conf.description = 'Libraries needed for SASS theme compilation'
+            conf.defaultDependencies {
+                File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
+                FileTree themes = project.fileTree(
+                        dir: webAppDir.canonicalPath + '/VAADIN/themes',
+                        include: '**/styles.scss')
+
+                if (!themes.isEmpty()) {
+                    switch (project.vaadinThemeCompile.compiler){
+                        case 'vaadin':
+                            if(Util.getVaadinVersion(project).startsWith('7.0')
+                                    || Util.getVaadinVersion(project).startsWith('7.1')){
+                                // In Vaadin 7.0 and 7.1 the compiler was shipped as a non-transitive dependency
+                                Dependency themeCompiler = projectDependencies.create(
+                                        "com.vaadin:vaadin-theme-compiler:${Util.getVaadinVersion(project)}")
+                                dependencies.add(themeCompiler)
+                            }
+                            break
+                        case 'compass':
+                            Dependency jruby = projectDependencies.create('org.jruby:jruby-complete:1.7.3')
+                            dependencies.add(jruby)
+                            break
+                        case 'libsass':
+                            Dependency libsass = projectDependencies.create('io.bit3:jsass:5.3.0')
+                            dependencies.add(libsass)
+
+                            Dependency plugin = projectDependencies.create(
+                                    "fi.jasoft.plugin:gradle-vaadin-plugin:${GradleVaadinPlugin.version}")
+                            dependencies.add(plugin)
+                            break
+                        default:
+                            throw new GradleException(
+                                    "Selected theme compiler \"${project.vaadinThemeCompile.compiler}\" is not valid")
+                    }
+                }
+            }
+
+            sources.compileClasspath += conf
+            testSources.compileClasspath += conf
+
+            IDEAUtil.addConfigurationToProject(project, CONFIGURATION_THEME)
+            EclipseUtil.addConfigurationToProject(project, CONFIGURATION_THEME)
         })
 
         // Ensure vaadin version is correct across configurations
