@@ -54,6 +54,18 @@ class CreateThemeTest extends IntegrationTest {
         assertCompiledThemeInDirectory(themesDir, projectDir.root.getName())
     }
 
+    @Test void 'Compile with Compass compiler'() {
+        buildFile << "vaadinThemeCompile.compiler = 'compass'"
+
+        runWithArguments(CreateThemeTask.NAME)
+
+        def themesDir = Paths.get(projectDir.root.canonicalPath, 'src', 'main', 'webapp', 'VAADIN', 'themes').toFile()
+        assertThemeInDirectory(themesDir, projectDir.root.getName())
+
+        runWithArguments(CompileThemeTask.NAME)
+        assertCompiledThemeInDirectory(themesDir, projectDir.root.getName())
+    }
+
     private void assertThemeInDirectory(File directory, String themeName){
         assertTrue "$directory does not exist", directory.exists()
 
