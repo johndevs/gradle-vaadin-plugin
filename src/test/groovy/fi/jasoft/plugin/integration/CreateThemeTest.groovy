@@ -2,6 +2,7 @@ package fi.jasoft.plugin.integration
 
 import fi.jasoft.plugin.tasks.CompileThemeTask
 import fi.jasoft.plugin.tasks.CreateThemeTask
+import org.junit.Before
 import org.junit.Test
 
 import java.nio.file.Paths
@@ -13,34 +14,16 @@ import static org.junit.Assert.assertTrue
 class CreateThemeTest extends IntegrationTest {
 
     @Test void 'Create default theme'() {
-        runWithArguments(CreateThemeTask.NAME)
-
-        def themesDir = Paths.get(projectDir.root.canonicalPath, 'src', 'main', 'webapp', 'VAADIN', 'themes').toFile()
-        assertThemeInDirectory(themesDir, projectDir.root.getName())
-
-        runWithArguments(CompileThemeTask.NAME)
-        assertCompiledThemeInDirectory(themesDir, projectDir.root.getName())
+        assertThemeCreatedAndCompiled()
     }
 
     @Test void 'Create default theme with classpath jar'() {
         buildFile << "vaadin.useClassPathJar = true"
-        runWithArguments(CreateThemeTask.NAME)
-
-        def themesDir = Paths.get(projectDir.root.canonicalPath, 'src', 'main', 'webapp', 'VAADIN', 'themes').toFile()
-        assertThemeInDirectory(themesDir, projectDir.root.getName())
-
-        runWithArguments(CompileThemeTask.NAME)
-        assertCompiledThemeInDirectory(themesDir, projectDir.root.getName())
+        assertThemeCreatedAndCompiled()
     }
 
     @Test void 'Create theme with name'() {
-        runWithArguments(CreateThemeTask.NAME, '--name=TestingTheme')
-
-        def themesDir = Paths.get(projectDir.root.canonicalPath, 'src', 'main', 'webapp', 'VAADIN', 'themes').toFile()
-        assertThemeInDirectory(themesDir, 'TestingTheme')
-
-        runWithArguments(CompileThemeTask.NAME)
-        assertCompiledThemeInDirectory(themesDir, 'TestingTheme')
+        assertThemeCreatedAndCompiled('TestingTheme')
     }
 
     @Test void 'Create theme in custom theme directory'() {
@@ -48,35 +31,36 @@ class CreateThemeTest extends IntegrationTest {
         runWithArguments(CreateThemeTask.NAME)
 
         def themesDir = Paths.get(projectDir.root.canonicalPath, 'build', 'mythemedir').toFile()
-        assertThemeInDirectory(themesDir, projectDir.root.getName())
+        assertThemeInDirectory(themesDir, projectDir.root.name)
 
         runWithArguments(CompileThemeTask.NAME)
-        assertCompiledThemeInDirectory(themesDir, projectDir.root.getName())
+        assertCompiledThemeInDirectory(themesDir, projectDir.root.name)
     }
 
     @Test void 'Compile with Compass compiler'() {
         buildFile << "vaadinThemeCompile.compiler = 'compass'"
 
-        runWithArguments(CreateThemeTask.NAME, '--name=CompassTheme')
-
-        def themesDir = Paths.get(projectDir.root.canonicalPath, 'src', 'main', 'webapp', 'VAADIN', 'themes').toFile()
-        assertThemeInDirectory(themesDir, 'CompassTheme')
-
-        runWithArguments(CompileThemeTask.NAME)
-        assertCompiledThemeInDirectory(themesDir, 'CompassTheme')
+        assertThemeCreatedAndCompiled('CompassTheme')
     }
 
     @Test void 'Compile with libSass compiler'() {
         buildFile << "vaadinThemeCompile.compiler = 'libsass'"
 
-        runWithArguments(CreateThemeTask.NAME, '--name=LibsassTheme')
+        assertThemeCreatedAndCompiled('LibsassTheme')
+    }
 
-        def themesDir = Paths.get(projectDir.root.canonicalPath, 'src', 'main', 'webapp', 'VAADIN', 'themes').toFile()
-        assertThemeInDirectory(themesDir, 'LibsassTheme')
+    private void assertThemeCreatedAndCompiled(String themeName) {
+        if(themeName){
+            runWithArguments(CreateThemeTask.NAME, "--name=$themeName")
+        } else {
+            runWithArguments(CreateThemeTask.NAME)
+            themeName = projectDir.root.name
+        }
+
+        assertThemeInDirectory(themesDir, themeName)
 
         runWithArguments(CompileThemeTask.NAME)
-
-        assertCompiledThemeInDirectory(themesDir, 'LibsassTheme')
+        assertCompiledThemeInDirectory(themesDir, themeName)
     }
 
     private void assertThemeInDirectory(File directory, String themeName){
@@ -104,5 +88,9 @@ class CreateThemeTest extends IntegrationTest {
         def stylesCompiled = Paths.get(themeDir.canonicalPath, 'styles.css').toFile()
         assertTrue "styles.css does not exist in theme dir, theme dir only contains "+themeDir.list().toArrayString(),
                 stylesCompiled.exists()
+    }
+
+    private File getThemesDir() {
+        Paths.get(projectDir.root.canonicalPath, 'src', 'main', 'webapp', 'VAADIN', 'themes').toFile()
     }
 }
