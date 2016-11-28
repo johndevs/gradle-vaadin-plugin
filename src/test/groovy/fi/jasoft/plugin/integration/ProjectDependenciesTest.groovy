@@ -61,7 +61,6 @@ class ProjectDependenciesTest extends IntegrationTest {
                 def repositories = [
                     'Vaadin addons',
                     'Vaadin snapshots',
-                    'Jasoft.fi Maven repository',
                     'Bintray.com Maven repository'
                 ]
 
