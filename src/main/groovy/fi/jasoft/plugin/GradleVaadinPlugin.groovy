@@ -246,11 +246,6 @@ class GradleVaadinPlugin implements Plugin<Project> {
             }
 
             repositories.maven { repository ->
-                repository.name = JASOFT_SNAPSHOT_REPOSITORY_NAME
-                repository.url = 'http://mvn.jasoft.fi/maven2'
-            }
-
-            repositories.maven { repository ->
                 repository.name = BINTRAY_REPOSITORY_NAME
                 repository.url = 'http://dl.bintray.com/johndevs/maven'
             }
