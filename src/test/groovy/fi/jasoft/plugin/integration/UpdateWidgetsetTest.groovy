@@ -70,8 +70,7 @@ class UpdateWidgetsetTest extends IntegrationTest {
         """
 
         // Setup settings.gradle
-        File buildSettings = projectDir.newFile("settings.gradle")
-        buildSettings << """
+        settingsFile << """
             include 'project1'
             include 'project2'
         """
@@ -120,8 +119,7 @@ class UpdateWidgetsetTest extends IntegrationTest {
         """
 
         // Setup settings.gradle
-        File buildSettings = projectDir.newFile("settings.gradle")
-        buildSettings << """
+        settingsFile << """
             include 'project1'
             include 'project2'
         """

@@ -27,6 +27,7 @@ import groovy.transform.PackageScope
 import groovy.xml.MarkupBuilder
 import org.gradle.api.Task
 import org.gradle.api.execution.TaskExecutionListener
+import org.gradle.api.plugins.PluginManager
 import org.gradle.api.tasks.TaskState
 import org.gradle.api.tasks.bundling.War
 
@@ -47,7 +48,7 @@ class TaskListener implements TaskExecutionListener {
 
     @Override
     void beforeExecute(Task task) {
-        if (!task.project.hasProperty(VAADIN_EXTENSION_NAME)) {
+        if(!isApplicable(task)){
             return
         }
 
@@ -75,13 +76,20 @@ class TaskListener implements TaskExecutionListener {
 
     @Override
     void afterExecute(Task task, TaskState state) {
-        if (!task.project.hasProperty(VAADIN_EXTENSION_NAME)) {
+        if(!isApplicable(task)){
             return
         }
 
         if (task.name == 'test') {
             terminateTestbench(this)
         }
+    }
+
+    @PackageScope
+    static boolean isApplicable(Task task) {
+        PluginManager pluginManager = task.project.pluginManager
+        pluginManager.hasPlugin(GradleVaadinPlugin.getPluginId()) || pluginManager
+                .hasPlugin(GradleVaadinGroovyPlugin.getPluginId())
     }
 
     @PackageScope

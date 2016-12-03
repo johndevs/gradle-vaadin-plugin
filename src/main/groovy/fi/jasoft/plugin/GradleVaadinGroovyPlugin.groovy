@@ -31,6 +31,11 @@ class GradleVaadinGroovyPlugin extends GradleVaadinPlugin {
     static String EXTENSION_NAME = 'vaadinGroovy'
 
     @Override
+    static String getPluginId() {
+        'fi.jasoft.plugin.vaadin.groovy'
+    }
+
+    @Override
     void apply(Project project) {
         super.apply(project)
 

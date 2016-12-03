@@ -22,7 +22,6 @@ import org.junit.Test
  */
 class PluginExtensionConfigurationTest extends MultiProjectIntegrationTest {
 
-
     @Test void 'Extension configurations are applied to sub projects'() {
         makeProject('project1')
         makeProject('project2')
