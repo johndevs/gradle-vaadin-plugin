@@ -5,6 +5,7 @@ import org.junit.Ignore
 import org.junit.Test
 
 import static org.junit.Assert.assertTrue
+import static org.junit.Assert.assertFalse
 
 /**
  * Created by john on 1/6/15.
@@ -299,6 +300,22 @@ class TaskConfigurationsTest extends IntegrationTest {
         assertTrue result, result.contains('Implementation-Version 1.2.3')
         assertTrue result, result.contains('Implementation-Vendor test-author')
         assertTrue result, result.contains('Vaadin-License-Title my-license')
+    }
 
+    @Test void 'Plugin task configurations are not applied on non-vaadin sub-projects'() {
+        File projectDir = projectDir.newFolder('noVaadinSubProject')
+        settingsFile << "include 'noVaadinSubProject'\n"
+
+        buildFile << """
+            project(':noVaadinSubProject') {
+                apply plugin: 'java'
+                // No vaadin dependencies, only plain java
+            }
+        """
+
+        // Vaadin jar configurations are not applied to subproject
+        def result = runWithArguments(':noVaadinSubProject:jar')
+        assertFalse result, result.contains('No vaadin.addon.title has been specified')
+        assertFalse result, result.contains('No version specified for the project')
     }
 }

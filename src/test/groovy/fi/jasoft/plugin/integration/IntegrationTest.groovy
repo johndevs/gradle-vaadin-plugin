@@ -33,9 +33,12 @@ class IntegrationTest {
 
     protected File buildFile
 
+    protected File settingsFile
+
     @Before
     void setup() {
         buildFile = makeBuildFile(projectDir.root)
+        settingsFile = projectDir.newFile("settings.gradle")
     }
 
     protected String getPluginDir() {

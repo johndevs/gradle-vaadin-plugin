@@ -74,9 +74,9 @@ import org.gradle.util.VersionNumber
  */
 class GradleVaadinPlugin implements Plugin<Project> {
 
-    static final PLUGIN_VERSION
-    static final PLUGIN_PROPERTIES
-    static final PLUGIN_DEBUG_DIR
+    static final String PLUGIN_VERSION
+    static final Properties PLUGIN_PROPERTIES
+    static final String PLUGIN_DEBUG_DIR
 
     static int PLUGINS_IN_PROJECT = 0
 
@@ -121,6 +121,10 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
     static boolean isFirstPlugin() {
         PLUGINS_IN_PROJECT == 1
+    }
+
+    static String getPluginId() {
+         'fi.jasoft.plugin.vaadin'
     }
 
     @Override
@@ -272,7 +276,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
         def sources = project.sourceSets.main
         def testSources = project.sourceSets.test
 
-        configurations.create(CONFIGURATION_SERVER, { conf ->
+        configurations.create(CONFIGURATION_SERVER) { conf ->
             conf.description = 'Libraries needed by Vaadin server side applications.'
             conf.defaultDependencies { dependencies ->
                 Dependency vaadinServer = projectDependencies.create(
@@ -291,9 +295,9 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
             IDEAUtil.addConfigurationToProject(project, CONFIGURATION_SERVER)
             EclipseUtil.addConfigurationToProject(project, CONFIGURATION_SERVER)
-        })
+        }
 
-        configurations.create(CONFIGURATION_CLIENT, { conf ->
+        configurations.create(CONFIGURATION_CLIENT) { conf ->
             conf.description = 'Libraries needed for compiling the widgetset.'
             conf.defaultDependencies { dependencies ->
                 if(!project.vaadinCompile.widgetsetCDN) {
@@ -324,9 +328,9 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
             IDEAUtil.addConfigurationToProject(project, CONFIGURATION_CLIENT)
             EclipseUtil.addConfigurationToProject(project, CONFIGURATION_CLIENT)
-        })
+        }
 
-        configurations.create(CONFIGURATION_JAVADOC, { conf ->
+        configurations.create(CONFIGURATION_JAVADOC) { conf ->
             conf.description = 'Libraries for compiling JavaDoc for a Vaadin project.'
             conf.defaultDependencies { dependencies ->
                 Dependency portletAPI = projectDependencies.create('javax.portlet:portlet-api:2.0')
@@ -340,9 +344,9 @@ class GradleVaadinPlugin implements Plugin<Project> {
                     dependencies.add(push)
                 }
             }
-        })
+        }
 
-        configurations.create(CONFIGURATION_RUN_SERVER, { conf ->
+        configurations.create(CONFIGURATION_RUN_SERVER) { conf ->
             conf.description = 'Libraries for running the embedded server'
             conf.defaultDependencies { dependencies ->
 
@@ -357,9 +361,9 @@ class GradleVaadinPlugin implements Plugin<Project> {
                 // Add server dependencies
                 ApplicationServer.get(project).defineDependecies(projectDependencies, dependencies)
             }
-        }).extendsFrom(configurations.providedRuntime)
+        }.extendsFrom(configurations.providedRuntime)
 
-        configurations.create(CONFIGURATION_PUSH, { conf ->
+        configurations.create(CONFIGURATION_PUSH) { conf ->
             conf.description = 'Libraries needed for using Vaadin Push features.'
             conf.defaultDependencies { dependencies ->
                 if(Util.isPushSupportedAndEnabled(project)) {
@@ -376,10 +380,9 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
             IDEAUtil.addConfigurationToProject(project, CONFIGURATION_PUSH)
             EclipseUtil.addConfigurationToProject(project, CONFIGURATION_PUSH)
-        })
+        }
 
-
-        configurations.create(CONFIGURATION_TESTBENCH, { conf ->
+        configurations.create(CONFIGURATION_TESTBENCH) { conf ->
             conf.description = 'Libraries needed by Vaadin Testbench.'
             conf.defaultDependencies { dependencies ->
                 if(project.vaadinTestbench.enabled) {
@@ -394,10 +397,9 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
             IDEAUtil.addConfigurationToProject(project, CONFIGURATION_TESTBENCH, true)
             EclipseUtil.addConfigurationToProject(project, CONFIGURATION_TESTBENCH)
-        })
+        }
 
-
-        configurations.create(CONFIGURATION_SUPERDEVMODE, { conf ->
+        configurations.create(CONFIGURATION_SUPERDEVMODE) { conf ->
             conf.description = 'Libraries needed by Vaadin Superdevmode.'
             conf.defaultDependencies { dependencies ->
 
@@ -418,9 +420,9 @@ class GradleVaadinPlugin implements Plugin<Project> {
                 Dependency jsp = projectDependencies.create('javax.servlet.jsp:jsp-api:2.2')
                 dependencies.add(jsp)
             }
-        })
+        }
 
-        configurations.create(CONFIGURATION_THEME, { conf ->
+        configurations.create(CONFIGURATION_THEME) { conf ->
             conf.description = 'Libraries needed for SASS theme compilation'
             conf.defaultDependencies {
                 File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
@@ -463,7 +465,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
             IDEAUtil.addConfigurationToProject(project, CONFIGURATION_THEME)
             EclipseUtil.addConfigurationToProject(project, CONFIGURATION_THEME)
-        })
+        }
 
         // Ensure vaadin version is correct across configurations
         project.configurations.all { config ->

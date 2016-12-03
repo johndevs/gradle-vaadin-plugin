@@ -20,12 +20,11 @@ package fi.jasoft.plugin.integration
  */
 class MultiProjectIntegrationTest extends IntegrationTest {
 
-    File settingsFile
-
     @Override
     void setup() {
         // Create root build file without vaadin plugin
         buildFile = makeBuildFile(projectDir.root, false)
+        settingsFile = projectDir.newFile("settings.gradle")
 
         def escapedDir = getPluginDir()
 
@@ -43,9 +42,6 @@ class MultiProjectIntegrationTest extends IntegrationTest {
                 vaadin.logToConsole = true
             }
         """
-
-        // Create settings file
-        settingsFile = projectDir.newFile("settings.gradle")
     }
 
     protected File makeProject(String name) {
