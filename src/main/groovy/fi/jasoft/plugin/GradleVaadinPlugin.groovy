@@ -327,7 +327,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
             testSources.runtimeClasspath += conf
 
             IDEAUtil.addConfigurationToProject(project, CONFIGURATION_CLIENT)
-            EclipseUtil.addConfigurationToProject(project, CONFIGURATION_CLIENT)
+            EclipseUtil.addConfigurationToProject(project, CONFIGURATION_CLIENT, false)
         }
 
         configurations.create(CONFIGURATION_JAVADOC) { conf ->
