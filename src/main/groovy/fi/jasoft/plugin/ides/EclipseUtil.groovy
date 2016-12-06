@@ -88,8 +88,10 @@ class EclipseUtil {
      *      the project to add the configuration to
      * @param conf
      *      the configuration name (must exist in project.configurations)
+     * @param deploy
+     *      also add to wtp deployment assembly
      */
-    static void addConfigurationToProject(Project project, String conf){
+    static void addConfigurationToProject(Project project, String conf, boolean deploy=true){
         project.afterEvaluate { Project p ->
             PluginContainer plugins = p.plugins
             if(p.hasProperty(ECLIPSE_PROPERTY)){
@@ -98,7 +100,7 @@ class EclipseUtil {
                 cp.plusConfigurations += [p.configurations[conf]]
             }
 
-            if(plugins.findPlugin(ECLIPSE_WTP_PLUGIN)) {
+            if(deploy && plugins.findPlugin(ECLIPSE_WTP_PLUGIN)) {
                 EclipseModel eclipse = p.eclipse as EclipseModel
                 EclipseWtp wtp = eclipse.wtp as EclipseWtp
                 wtp.component.plusConfigurations += [p.configurations[conf]]
