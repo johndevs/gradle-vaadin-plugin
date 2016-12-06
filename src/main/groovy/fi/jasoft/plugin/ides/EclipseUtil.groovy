@@ -15,12 +15,14 @@
 */
 package fi.jasoft.plugin.ides
 
+import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.plugins.PluginContainer
 import org.gradle.plugins.ide.eclipse.model.EclipseClasspath
 import org.gradle.plugins.ide.eclipse.model.EclipseModel
 import org.gradle.plugins.ide.eclipse.model.EclipseWtp
 import org.gradle.plugins.ide.eclipse.model.EclipseWtpFacet
+import org.gradle.plugins.ide.eclipse.model.Facet
 
 /**
  * Eclipse related utility methods
@@ -29,8 +31,10 @@ import org.gradle.plugins.ide.eclipse.model.EclipseWtpFacet
  */
 class EclipseUtil {
 
-    public static final String ECLIPSE_PROPERTY = 'eclipse'
-    public static final String ECLIPSE_WTP_PLUGIN = 'eclipse-wtp'
+    static final String ECLIPSE_PROPERTY = 'eclipse'
+    static final String ECLIPSE_WTP_PLUGIN = 'eclipse-wtp'
+
+    private static final String JAVA_1_8 = '1.8'
 
     /**
      * Configures the eclipse plugin
@@ -40,7 +44,7 @@ class EclipseUtil {
      */
     static configureEclipsePlugin(Project project) {
         project.afterEvaluate { Project p ->
-            if(p.hasProperty(ECLIPSE_PROPERTY)){
+            if(p.hasProperty(ECLIPSE_PROPERTY)) {
                 EclipseModel eclipse = p.eclipse as EclipseModel
                 eclipse.project.comment = 'Vaadin Project'
 
@@ -59,23 +63,17 @@ class EclipseUtil {
                 def natures = eclipse.project.natures
                 natures.add(0, 'org.springsource.ide.eclipse.gradle.core.nature')
                 natures.add(1, 'org.eclipse.buildship.core.gradleprojectnature')
-                //natures.add(2, 'com.vaadin.integration.eclipse.widgetsetNature')
 
                 // Configure build commands
                 eclipse.project.buildCommand('org.eclipse.buildship.core.gradleprojectbuilder')
-                //eclipse.project.buildCommand('com.vaadin.integration.eclipse.addonStylesBuilder')
-                //eclipse.project.buildCommand('com.vaadin.integration.eclipse.widgetsetBuilder')
 
                 // Configure facets
                 PluginContainer plugins = p.plugins
                 if (plugins.findPlugin(ECLIPSE_WTP_PLUGIN)) {
                     EclipseWtp wtp = eclipse.wtp
-                    EclipseWtpFacet facet = wtp.facet
-                    facet.facets = []
-                    facet.facet(name: 'jst.web', version: '3.0')
-                    facet.facet(name: 'jst.java', version: p.sourceCompatibility)
-                    //facet.facet(name: 'com.vaadin.integration.eclipse.core', version: '7.0')
-                    facet.facet(name: 'java', version: p.sourceCompatibility)
+                    setOrAddFacet(p, wtp, 'jst.web', '3.0')
+                    setOrAddFacet(p, wtp, 'jst.java', JAVA_1_8)
+                    setOrAddFacet(p, wtp, 'java', JAVA_1_8)
                 }
             }
         }
@@ -104,5 +102,28 @@ class EclipseUtil {
                 wtp.component.plusConfigurations += [p.configurations[conf]]
             }
         }
+    }
+
+    /**
+     * Adds a facet or updates an existing facet
+     *
+     * @param facets
+     *      the facets
+     * @param name
+     *      the name of the facet
+     * @param version
+     *      the version of the facet
+     */
+    static void setOrAddFacet(Project project, EclipseWtp wtp, String name, String version) {
+        EclipseWtpFacet facetContainer = wtp.facet
+        List<Facet> facets = facetContainer.facets
+        Facet facet = facets.find { it.name == name && it.type == Facet.FacetType.installed }
+        if(facet) {
+            facet.version = version
+            project.logger.info("Updated facet $facet.name to version $facet.version")
+        } else {
+            facets.add(new Facet(name, version))
+        }
+        facetContainer.facets = facets
     }
 }
