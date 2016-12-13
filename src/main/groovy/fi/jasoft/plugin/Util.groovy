@@ -19,6 +19,7 @@ import fi.jasoft.plugin.configuration.VaadinPluginExtension
 import fi.jasoft.plugin.tasks.BuildClassPathJar
 import fi.jasoft.plugin.tasks.UpdateWidgetsetTask
 import groovy.io.FileType
+import groovy.transform.Memoized
 import groovy.transform.PackageScope
 import org.apache.commons.lang.StringUtils
 import org.gradle.api.GradleException
@@ -27,6 +28,8 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
 
 import org.gradle.api.artifacts.ProjectDependency
+import org.gradle.api.artifacts.ResolvedArtifact
+import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.FileVisitDetails
@@ -70,7 +73,7 @@ class Util {
     private static final String CLIENT_PACKAGE_NAME = 'client'
     
     public static final String APP_WIDGETSET = 'AppWidgetset'
-
+    public static final String VAADIN_SERVER_ARTIFACT = 'vaadin-server'
 
     /**
      * Get the compile time classpath of a project
@@ -606,19 +609,23 @@ class Util {
      * Returns the resolved Vaadin version.
      *
      * For example, if the version has been defined as 7.x and the real latest Vaadin 7
-     * version that is releases is 7.3.10 then this method will return 7.3.10.     *
+     * version that is releases is 7.3.10 then this method will return 7.3.10.
      *
      * @param project
      *      The project to get the Vadin version for
      * @return
      *      The resolved Vaadin version
      */
+    @Memoized
     static String getResolvedVaadinVersion(Project project) {
-        def version = project.vaadin.version
-        project.configurations.all.each { Configuration conf ->
+        String version = project.vaadin.version
+        project.configurations.each { Configuration conf ->
             conf.allDependencies.each { Dependency dependency ->
-                if( dependency.name.startsWith('vaadin-server')){
-                    version = dependency.version
+                if( dependency.name.startsWith(VAADIN_SERVER_ARTIFACT)){
+                    version = conf.resolvedConfiguration
+                            .resolvedArtifacts
+                            .find { it.name == VAADIN_SERVER_ARTIFACT }
+                            .moduleVersion.id.version
                 }
             }
         }
@@ -633,6 +640,7 @@ class Util {
      * @return
      *      a set of addon dependencies
      */
+    @Memoized
     static Set findAddonsInProject(Project project,
                                    String byAttribute='Vaadin-Widgetsets',
                                    Boolean includeFile=false,
@@ -735,7 +743,7 @@ class Util {
         classpath += project.configurations[GradleVaadinPlugin.CONFIGURATION_SERVER]
 
         // Include client if no widgetset to provide pre-compiled widgetset
-        if(!getWidgetset(project)){
+        if(!project.vaadinCompile.widgetsetCDN && !getWidgetset(project)){
             classpath += project.configurations[GradleVaadinPlugin.CONFIGURATION_CLIENT]
         }
 
@@ -823,7 +831,12 @@ class Util {
     /**
      * Resolves the first available widgetset from Project
      */
+    @Memoized
     static String getWidgetset(Project project) {
+        if(project.vaadinCompile.widgetsetCDN){
+            throw new GradleException("Cannot retrieve widgetset name from a project that is using the widgetset CDN.")
+        }
+
         if(project.vaadinCompile.widgetset){
             return project.vaadinCompile.widgetset
         }
@@ -884,7 +897,7 @@ class Util {
             widgetset = APP_WIDGETSET
         }
 
-        if(widgetset){
+        if(widgetset && !project.vaadinCompile.widgetsetCDN){
             // No widgetset file detected, create one
             File resourceDir = project.sourceSets.main.resources.srcDirs.first()
             def widgetsetFile = new File(resourceDir,
