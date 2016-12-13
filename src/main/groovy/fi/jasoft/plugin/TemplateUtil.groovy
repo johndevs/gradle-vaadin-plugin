@@ -26,6 +26,8 @@ import org.gradle.api.Project
  */
 class TemplateUtil {
 
+    static final String DOT = '.'
+
     /**
      * Write a template based file to a directory
      *
@@ -45,9 +47,6 @@ class TemplateUtil {
      *      Should resulting blank lines be removed. By default false.
      *
      */
-
-    public static final String DOT = '.'
-
     static writeTemplate(String templateFileName, File targetDir, String targetFileName = templateFileName,
                          Map substitutions = [:], removeBlankLines = false) {
         def templateUrl = TemplateUtil.class.getClassLoader().getResource("templates/${templateFileName}.template")
