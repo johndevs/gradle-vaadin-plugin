@@ -60,4 +60,32 @@ class CompileWidgetsetTest extends IntegrationTest {
         assertTrue "Widgetset file $widgetsetFile did not exist", widgetsetFile.exists()
     }
 
+    @Test void 'Compile with Vaadin CDN'() {
+        buildFile << """
+            dependencies {
+                compile 'org.vaadin.addons:qrcode:2.0.1'
+            }
+
+            vaadinCompile {
+                widgetsetCDN true
+            }
+        """
+
+        runWithArguments(CreateProjectTask.NAME)
+
+        String result = runWithArguments('--info', CompileWidgetsetTask.NAME)
+        assertTrue result, result.contains('Querying widgetset for')
+        assertTrue result, result.contains('Widgetset is available, downloading...')
+        assertTrue result, result.contains('Extracting widgetset')
+        assertTrue result, result.contains('Generating AppWidgetset.java')
+
+        File appWidgetset = Paths.get(projectDir.root.canonicalPath, 'src', 'main', 'java', 'AppWidgetset.java').toFile()
+        assertTrue 'AppWidgetset.java was not created', appWidgetset.exists()
+
+        File widgetsetFolder = Paths.get(projectDir.root.canonicalPath, 'src', 'main', 'webapp', 'VAADIN', 'widgetsets').toFile()
+        assertTrue 'Widgetsets folder did not exist', widgetsetFolder.exists()
+        assertTrue 'Widgetsets folder did not contain widgetset', widgetsetFolder.listFiles().size() == 1
+
+    }
+
 }
