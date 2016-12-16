@@ -57,7 +57,9 @@ class UpdateWidgetsetTask extends DefaultTask {
     public UpdateWidgetsetTask() {
         description = "Updates the widgetset xml file"
         onlyIf { Task task ->
-            task.project.vaadinCompile.manageWidgetset && Util.getWidgetset(task.project)
+            task.project.vaadinCompile.manageWidgetset &&
+                    !task.project.vaadinCompile.widgetsetCDN &&
+                    Util.getWidgetset(task.project)
         }
     }
 
@@ -68,7 +70,9 @@ class UpdateWidgetsetTask extends DefaultTask {
 
     @PackageScope
     static File ensureWidgetPresent(Project project, String widgetsetFQN=Util.getWidgetset(project)) {
-        if (!project.vaadinCompile.manageWidgetset || !widgetsetFQN) {
+        if (!project.vaadinCompile.manageWidgetset ||
+                project.vaadinCompile.widgetsetCDN ||
+                !widgetsetFQN) {
             return null
         }
 

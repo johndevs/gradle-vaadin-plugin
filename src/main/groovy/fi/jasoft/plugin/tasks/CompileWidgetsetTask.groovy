@@ -15,19 +15,26 @@
 */
 package fi.jasoft.plugin.tasks
 
+import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
 import fi.jasoft.plugin.configuration.CompileWidgetsetConfiguration
 import fi.jasoft.plugin.configuration.VaadinPluginExtension
 import groovy.transform.PackageScope
 import groovyx.net.http.ContentType
+import groovyx.net.http.HttpResponseDecorator
 import groovyx.net.http.RESTClient
+import org.apache.commons.codec.digest.DigestUtils
+import org.apache.tools.ant.taskdefs.Pack
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.TaskAction
 
+import javax.validation.constraints.NotNull
+import java.security.MessageDigest
 import java.util.jar.Attributes
 import java.util.jar.JarFile
+import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
 /**
@@ -39,9 +46,10 @@ class CompileWidgetsetTask extends DefaultTask {
 
     static final NAME = 'vaadinCompile'
 
-    static final WIDGETSET_CDN_URL = 'https://wscdn.vaadin.com'
+    static final WIDGETSET_CDN_URL = 'https://wsc.vaadin.com/'
     static final String PUBLIC_FOLDER_PATTERN = '**/*/public/**/*.*'
     static final String GWT_MODULE_XML_PATTERN = '**/*/*.gwt.xml'
+    static final String APPWIDGETSET_JAVA_FILE = 'AppWidgetset.java'
 
     def CompileWidgetsetConfiguration configuration
 
@@ -53,7 +61,7 @@ class CompileWidgetsetTask extends DefaultTask {
         [
             path: '/api/compiler/compile',
             query: [
-                    'compile.async' : true
+                    'compile.async' : true,
             ],
             body: [
                     vaadinVersion: version,
@@ -86,29 +94,43 @@ class CompileWidgetsetTask extends DefaultTask {
      * Called by the downloadWidgetsetRequest once the response with the zipped contents arrive
      */
     @PackageScope
-    def writeWidgetsetToFileSystem = { request, zipStream ->
-        String widgetsetName = configuration.widgetset.replaceAll("[^a-zA-Z0-9]+","")
+    def writeWidgetsetToFileSystem = { HttpResponseDecorator response, ZipInputStream zipStream ->
 
-        if(widgetsetName != configuration.widgetset){
-            logger.warn("Widgetset name cannot contain special characters when using CDN. " +
-                    "Illegal characters removed, please update your @Widgetset annotation or web.xml accordingly.")
+        // Check for redirect
+        if(response.status == 307) {
+            String newUrl = response.headers['Location'].value
+            project.logger.info("Widgetset download was redirected to $newUrl")
+            downloadWidgetsetZip(newUrl)
+            return
         }
 
-        def widgetsetDirectory = new File(Util.getWidgetsetDirectory(project), widgetsetName)
+        def generatedWidgetSetName = response.headers['x-amz-meta-wsid']?.value
+        if (!generatedWidgetSetName) {
+            generatedWidgetSetName = response.headers['wsId'].value
+        }
+
+        def widgetsetDirectory = new File(Util.getWidgetsetDirectory(project), generatedWidgetSetName)
+        if(widgetsetDirectory.exists()) {
+            widgetsetDirectory.deleteDir()
+        }
         widgetsetDirectory.mkdirs()
 
-        def generatedWidgetSetName = request.headers.wsId as String
-        def ze
+        Objects.requireNonNull(zipStream, "Response stream cannot be null")
+
+        project.logger.info("Extracting widgetset $generatedWidgetSetName into $widgetsetDirectory")
+
+        ZipEntry ze
         while ((ze = zipStream.nextEntry) != null) {
             def fileName = ze.name as String
+            File outfile = new File(widgetsetDirectory, fileName)
 
-            // Replace the generated widgetset filename with the real one
-            File outfile = new File(widgetsetDirectory,
-                    fileName.replace(generatedWidgetSetName, widgetsetName));
+            if(ze.directory){
+                outfile.mkdirs()
+                continue
+            }
 
-            // Create directories and file
-            outfile.parentFile.mkdirs();
-            outfile.createNewFile();
+            outfile.parentFile.mkdirs()
+            outfile.createNewFile()
 
             // Create file byte by byte
             FileOutputStream fout = new FileOutputStream(outfile);
@@ -117,20 +139,29 @@ class CompileWidgetsetTask extends DefaultTask {
             }
             zipStream.closeEntry();
             fout.close();
-
-            // Replace all mentions of generated widgetset name with real one inside the files as well
-            def contents = outfile.text
-            outfile.text = contents.replaceAll(generatedWidgetSetName, widgetsetName)
         }
         zipStream.close();
+
+        project.logger.info("Generating AppWidgetset.java")
+
+        def substitutions = [:]
+        substitutions['widgetsetName'] = generatedWidgetSetName
+        File sourceDir = Util.getMainSourceSet(project).srcDirs.first()
+        TemplateUtil.writeTemplate(APPWIDGETSET_JAVA_FILE, sourceDir, APPWIDGETSET_JAVA_FILE,  substitutions)
     }
 
     CompileWidgetsetTask() {
-        dependsOn('classes', UpdateWidgetsetTask.NAME, BuildClassPathJar.NAME)
         description = "Compiles Vaadin Addons and components into Javascript."
         configuration = project.extensions.create(NAME, CompileWidgetsetConfiguration)
 
         project.afterEvaluate {
+
+            // Set task dependencies
+            if(configuration.widgetsetCDN){
+                dependsOn 'processResources'
+            } else {
+                dependsOn('classes', UpdateWidgetsetTask.NAME, BuildClassPathJar.NAME)
+            }
 
             /* Monitor changes in dependencies since upgrading a
             * dependency should also trigger a recompile of the widgetset
@@ -167,17 +198,15 @@ class CompileWidgetsetTask extends DefaultTask {
 
     @TaskAction
     def run() {
-        if(configuration.widgetset){
-            if(configuration.widgetsetCDN){
-                compileRemotely()
-            } else {
-                compileLocally()
-            }
-        } else {
-            def widgetset = Util.getWidgetset(project)
-            if(widgetset){
-                compileLocally(widgetset)
-            }
+        if(configuration.widgetsetCDN) {
+            compileRemotely()
+            return
+        }
+
+        String widgetset = Util.getWidgetset(project)
+        if(widgetset) {
+            compileLocally(widgetset)
+            return
         }
     }
 
@@ -186,45 +215,39 @@ class CompileWidgetsetTask extends DefaultTask {
      */
     @PackageScope
     def compileRemotely() {
-        if(configuration.widgetset ==~ /[A-Za-z0-9]+/){
 
-            // Ensure widgetset directory exists
-            Util.getWidgetsetDirectory(project).mkdirs()
+        // Ensure widgetset directory exists
+        Util.getWidgetsetDirectory(project).mkdirs()
 
-            def timeout = 60000 * 3 // 3 minutes
+        def timeout = 60000 * 3 // 3 minutes
 
-            while(true){
-                def widgetsetInfo = queryRemoteWidgetset()
-                logger.info(widgetsetInfo.toString())
-                def status = widgetsetInfo.status as String
-                switch(status){
-                    case 'NOT_FOUND':
-                    case 'UNKNOWN':
-                    case 'ERROR':
-                        throw new GradleException("Failed to compile widgetset with CDN with the status $status")
-                    case 'QUEUED':
-                    case 'COMPILING':
-                    case 'COMPILED':
-                        logger.info("Widgetset is compiling with status $status. " +
-                                "Waiting 10 seconds and querying again.")
-                        int timeoutIntervall = 10000
-                        if(timeout > 0){
-                            sleep(timeoutIntervall)
-                            timeout -= timeoutIntervall
-                        } else {
-                            throw new GradleException('Waiting for widgetset to compile timed out. ' +
-                                    'Please try again at a later time.')
-                        }
-                        break
-                    case 'AVAILABLE':
-                        logger.info('Widgetset is available, downloading...')
-                        downloadWidgetset()
-                        return
-                }
+        while(true){
+            def widgetsetInfo = queryRemoteWidgetset()
+            def status = widgetsetInfo.status as String
+            switch(status){
+                case 'NOT_FOUND':
+                case 'UNKNOWN':
+                case 'ERROR':
+                    throw new GradleException("Failed to compile widgetset with CDN with the status $status")
+                case 'QUEUED':
+                case 'COMPILING':
+                case 'COMPILED':
+                    logger.info("Widgetset is compiling with status $status. " +
+                            "Waiting 10 seconds and querying again.")
+                    int timeoutIntervall = 10000
+                    if(timeout > 0){
+                        sleep(timeoutIntervall)
+                        timeout -= timeoutIntervall
+                    } else {
+                        throw new GradleException('Waiting for widgetset to compile timed out. ' +
+                                'Please try again at a later time.')
+                    }
+                    break
+                case 'AVAILABLE':
+                    logger.info('Widgetset is available, downloading...')
+                    downloadWidgetset()
+                    return
             }
-        } else {
-            throw new GradleException('Widgetset name can only contain ' +
-                    'alphanumeric characters (A-Z,a-z,0-9) when using CDN.')
         }
     }
 
@@ -232,7 +255,7 @@ class CompileWidgetsetTask extends DefaultTask {
      * Compiles the widgetset locally
      */
     @PackageScope
-    def compileLocally(String widgetset = configuration.widgetset) {
+    def compileLocally(String widgetset = Util.getWidgetset(project)) {
         def vaadin = project.vaadin as VaadinPluginExtension
 
         // Re-create directory
@@ -337,13 +360,8 @@ class CompileWidgetsetTask extends DefaultTask {
     def queryRemoteWidgetset(){
         logger.info("Querying widgetset for Vaadin "+Util.getResolvedVaadinVersion(project))
         def client = new RESTClient(WIDGETSET_CDN_URL)
-
         def request = queryWidgetsetRequest(Util.getResolvedVaadinVersion(project), configuration.style)
-        logger.info(request.toString())
-
         def response = client.post(request)
-        logger.info(response.toString())
-
         response.data
     }
 
@@ -355,16 +373,54 @@ class CompileWidgetsetTask extends DefaultTask {
      */
     @PackageScope
     def ZipInputStream downloadWidgetset() {
-        def client = new RESTClient(WIDGETSET_CDN_URL)
-        client.headers['User-Agent'] = 'VWSCDN-1.3.0 ( / / ; / ; )'
+        makeClient(WIDGETSET_CDN_URL).post(downloadWidgetsetRequest(
+            Util.getResolvedVaadinVersion(project),
+            configuration.style
+        ), writeWidgetsetToFileSystem)
+    }
+
+    /**
+     * Uses a GET request to download the zip
+     * @param url
+     *      the full URL of the zip archive
+     * @return
+     */
+    @PackageScope
+    def ZipInputStream downloadWidgetsetZip(String url) {
+        makeClient(url).get([:], writeWidgetsetToFileSystem)
+    }
+
+    /**
+     * Creates a new Rest client
+     * @param url
+     *      the base url of the client
+     * @return
+     *      the client
+     */
+    @PackageScope
+    def RESTClient makeClient(String url) {
+        def client = new RESTClient(url)
+        client.headers['User-Agent'] = getUA()
         client.headers['Accept'] = 'application/x-zip'
         client.parser.'application/x-zip' = { response ->
             new ZipInputStream(response.entity.content)
         }
+        client.parser.'application/zip' = { response ->
+            new ZipInputStream(response.entity.content)
+        }
+        client
+    }
 
-        client.post(downloadWidgetsetRequest(
-            Util.getResolvedVaadinVersion(project),
-            configuration.style
-        ), writeWidgetsetToFileSystem)
+    private static String getUA() {
+        StringBuilder ua = new StringBuilder('VWSCDN-1.0.gradle (')
+        ua.append(
+                System.properties
+                .subMap(['os.name', 'os.arch', 'os.version', 'java.runtime.name', 'java.version'])
+                .values()
+                .join('/')
+        )
+        ua.append(';')
+        ua.append(DigestUtils.md5Hex(System.properties['user.name']))
+        ua.toString()
     }
 }
