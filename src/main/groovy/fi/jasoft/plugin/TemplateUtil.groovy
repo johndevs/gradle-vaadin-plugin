@@ -108,10 +108,30 @@ class TemplateUtil {
         .files
     }
 
+    /**
+     * Converts a fully qualified class name (com.example.MyClass) to a path (com/example/MyClass) and adds a optional
+     * postfix (using ".java" postfix the path becomes com/example/MyClass.java).
+     *
+     * @param fqn
+     *      the fully qualified classname
+     * @param postfix
+     *      the optional postfix
+     * @return
+     *      the path statement
+     */
     static String convertFQNToFilePath(String fqn, String postfix=''){
         fqn.replace(DOT, File.separator) + postfix
     }
 
+    /**
+     * Converts a path statement (com/example/MyClass.java) to a fully qualified class name (com.example.MyClass)
+     * @param path
+     *      The path statement
+     * @param postfix
+     *      the postfix (.java for example)
+     * @return
+     *      the fully qualified class name
+     */
     static String convertFilePathToFQN(String path, String postfix){
         StringUtils.removeEnd(path, postfix).replace(File.separator, DOT)
     }

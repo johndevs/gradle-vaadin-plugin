@@ -40,8 +40,6 @@ import java.nio.file.Paths
  */
 class TaskListener implements TaskExecutionListener {
 
-    static final String VAADIN_EXTENSION_NAME = 'vaadin'
-
     def TestbenchHub testbenchHub
     def TestbenchNode testbenchNode
     def ApplicationServer testbenchAppServer
