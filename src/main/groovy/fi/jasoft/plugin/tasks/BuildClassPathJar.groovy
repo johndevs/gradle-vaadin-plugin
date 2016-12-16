@@ -51,7 +51,7 @@ class BuildClassPathJar extends Jar {
 
             inputs.files(files)
 
-            manifest.attributes('Class-Path': files.collect { File file ->
+            manifest.attributes('Class-Path':files.collect { File file ->
                 file.toURI().toString()
             }.join(' '))
         }

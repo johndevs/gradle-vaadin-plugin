@@ -44,7 +44,7 @@ class EclipseUtil {
      */
     static configureEclipsePlugin(Project project) {
         project.afterEvaluate { Project p ->
-            if(p.hasProperty(ECLIPSE_PROPERTY)) {
+            if (  p.hasProperty(ECLIPSE_PROPERTY) ) {
                 EclipseModel eclipse = p.eclipse as EclipseModel
                 eclipse.project.comment = 'Vaadin Project'
 
@@ -53,7 +53,7 @@ class EclipseUtil {
                 cp.downloadSources = true
 
                 // Set Eclipse's class output dir
-                if (p.vaadinRun.classesDir == null) {
+                if (  p.vaadinRun.classesDir == null ) {
                     cp.defaultOutputDir = p.sourceSets.main.output.classesDir
                 } else {
                     cp.defaultOutputDir = p.file(p.vaadinRun.classesDir)
@@ -69,7 +69,7 @@ class EclipseUtil {
 
                 // Configure facets
                 PluginContainer plugins = p.plugins
-                if (plugins.findPlugin(ECLIPSE_WTP_PLUGIN)) {
+                if (  plugins.findPlugin(ECLIPSE_WTP_PLUGIN) ) {
                     EclipseWtp wtp = eclipse.wtp
                     setOrAddFacet(p, wtp, 'jst.web', '3.0')
                     setOrAddFacet(p, wtp, 'jst.java', JAVA_1_8)
@@ -89,16 +89,16 @@ class EclipseUtil {
      * @param deploy
      *      also add to wtp deployment assembly
      */
-    static void addConfigurationToProject(Project project, String conf, boolean deploy=true){
+    static void addConfigurationToProject(Project project, String conf, boolean deploy=true) {
         project.afterEvaluate { Project p ->
             PluginContainer plugins = p.plugins
-            if(p.hasProperty(ECLIPSE_PROPERTY)){
+            if (  p.hasProperty(ECLIPSE_PROPERTY) ) {
                 EclipseModel eclipse = p.eclipse as EclipseModel
                 EclipseClasspath cp = eclipse.classpath
                 cp.plusConfigurations += [p.configurations[conf]]
             }
 
-            if(deploy && plugins.findPlugin(ECLIPSE_WTP_PLUGIN)) {
+            if (  deploy && plugins.findPlugin(ECLIPSE_WTP_PLUGIN) ) {
                 EclipseModel eclipse = p.eclipse as EclipseModel
                 EclipseWtp wtp = eclipse.wtp as EclipseWtp
                 wtp.component.plusConfigurations += [p.configurations[conf]]
@@ -120,7 +120,7 @@ class EclipseUtil {
         EclipseWtpFacet facetContainer = wtp.facet
         List<Facet> facets = facetContainer.facets
         Facet facet = facets.find { it.name == name && it.type == Facet.FacetType.installed }
-        if(facet) {
+        if (  facet ) {
             facet.version = version
             project.logger.info("Updated facet $facet.name to version $facet.version")
         } else {

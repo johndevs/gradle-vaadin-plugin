@@ -95,7 +95,7 @@ class WARArchiveTest extends IntegrationTest {
         assertFilesInFolder(warFile, WIDGETSET_FILES, 'VAADIN/widgetsets/com.example.Widgetset', true)
     }
 
-    @Test void 'Provided and runtime dependencies not included'(){
+    @Test void 'Provided and runtime dependencies not included'() {
         buildFile << """
         dependencies {
             runtime 'commons-lang:commons-lang:2.6'
@@ -109,7 +109,7 @@ class WARArchiveTest extends IntegrationTest {
         'Project with no dependencies'()
     }
 
-    private static List<ZipEntry> getFilesInFolder(ZipFile archive, String folder){
+    private static List<ZipEntry> getFilesInFolder(ZipFile archive, String folder) {
         archive.entries().findAll { ZipEntry entry ->
             !entry.directory && entry.name.startsWith(folder)
         }
@@ -125,7 +125,7 @@ class WARArchiveTest extends IntegrationTest {
         def webInfLib = getFilesInFolder(archive, folder)
 
         // Check for extra files
-        if(!ignoreExtraFiles){
+        if ( !ignoreExtraFiles ) {
             webInfLib.each { ZipEntry entry ->
                 Assert.assertTrue(
                         "Archive contained extra file $entry.name",
@@ -138,7 +138,7 @@ class WARArchiveTest extends IntegrationTest {
             ZipEntry file = webInfLib.find { ZipEntry entry ->
                 entry.name == "$folder/$fileName".toString()
             }
-            Assert.assertNotNull("File $folder/$fileName was missing from archive", file);
+            Assert.assertNotNull("File $folder/$fileName was missing from archive", file)
         }
     }
 }

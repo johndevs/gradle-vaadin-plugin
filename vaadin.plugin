@@ -14,7 +14,7 @@ buildscript {
         def repositoryName = 'Bintray Repository'
         def repositoryUrl = 'http://dl.bintray.com/johndevs/maven'
 
-        if(version.minor < 9 && version.major == 1){
+        if (version.minor < 9 && version.major == 1){
             mavenRepo(
                 name: repositoryName,
                 url: repositoryUrl

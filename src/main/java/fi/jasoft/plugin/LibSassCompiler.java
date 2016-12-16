@@ -41,7 +41,7 @@ public class LibSassCompiler {
     public static void main(String[] args) throws Exception {
         File inputFile = new File(args[0]);
         File outputFile = new File(args[1]);
-        if(!outputFile.exists()) {
+        if (!outputFile.exists()) {
             outputFile.createNewFile();
         }
 

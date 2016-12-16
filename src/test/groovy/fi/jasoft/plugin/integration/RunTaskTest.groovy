@@ -15,19 +15,19 @@ import static org.junit.Assert.assertTrue
  */
 class RunTaskTest extends IntegrationTest {
 
-    @Test void 'Run default server'(){
+    @Test void 'Run default server'() {
         def output = runWithArguments(CreateProjectTask.NAME, RunTask.NAME, '--stopAfterStart')
         assertServerRunning output
     }
 
-    @Test void 'Run Jetty server'(){
+    @Test void 'Run Jetty server'() {
         buildFile << "vaadinRun.server = '${JettyApplicationServer.NAME}'"
         def output = runWithArguments('--info', CreateProjectTask.NAME, RunTask.NAME, '--stopAfterStart')
         assertTrue output, output.contains('Starting '+JettyApplicationServer.NAME)
         assertServerRunning output
     }
 
-    @Test void 'Run Payara server'(){
+    @Test void 'Run Payara server'() {
         buildFile << "vaadinRun.server = '${PayaraApplicationServer.NAME}'"
         def output = runWithArguments('--info', CreateProjectTask.NAME, RunTask.NAME, '--stopAfterStart')
         assertTrue output, output.contains('Starting '+PayaraApplicationServer.NAME)
@@ -68,7 +68,7 @@ class RunTaskTest extends IntegrationTest {
         assertServerRunning output
     }
 
-    private void assertServerRunning(String output){
+    private void assertServerRunning(String output) {
         assertTrue output, output.contains('Application running on ')
     }
 }

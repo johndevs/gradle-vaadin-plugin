@@ -46,7 +46,7 @@ class GradleVaadinGroovyPlugin extends GradleVaadinPlugin {
         project.extensions.create(EXTENSION_NAME, VaadinPluginGroovyExtension)
 
         // Dependencies
-        if (project.vaadin.manageDependencies) {
+        if (  project.vaadin.manageDependencies ) {
             ConfigurationContainer configurations = project.configurations
             Configuration compileConfiguration = configurations.findByName('compile')
             DependencyHandler projectDependencies = project.dependencies

@@ -45,15 +45,15 @@ class CreateComponentTask extends DefaultTask {
     public void run() {
 
         def widgetset = Util.getWidgetset(project)
-        if(!widgetset) {
+        if ( !widgetset ) {
             // Project does not yet have a client package, addons or widgetset. use AppWidgetset
             widgetset = Util.APP_WIDGETSET
         }
 
         new ComponentCreator(
-                widgetset: widgetset,
-                javaDir: Util.getMainSourceSet(project, true).srcDirs.first(),
-                componentName: componentName
+                widgetset:widgetset,
+                javaDir:Util.getMainSourceSet(project, true).srcDirs.first(),
+                componentName:componentName
         ).run()
     }
 }

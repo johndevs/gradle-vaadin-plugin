@@ -31,7 +31,7 @@ class DevelopmentModeConfiguration {
     transient Project project
 
     @Deprecated
-    DevelopmentModeConfiguration(Project project){
+    DevelopmentModeConfiguration(Project project) {
         this.project = project
     }
 
@@ -39,17 +39,17 @@ class DevelopmentModeConfiguration {
      * Should the internal server be used.
      */
     @Deprecated
-    void noserver(boolean noserver){
+    void noserver(boolean noserver) {
         project.vaadinSuperDevMode.noserver = noserver
         getNoserver()
     }
     @Deprecated
-    void setNoserver(boolean noserver){
+    void setNoserver(boolean noserver) {
         project.vaadinSuperDevMode.noserver = noserver
         getNoserver()
     }
     @Deprecated
-    boolean getNoserver(){
+    boolean getNoserver() {
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.devmode.noserver',
                 'This property has been replaced by vaadinSuperDevMode.noserver.')
         project.vaadinSuperDevMode.noserver
@@ -61,17 +61,17 @@ class DevelopmentModeConfiguration {
      * @deprecated
      */
     @Deprecated
-    void setSuperDevMode(boolean sdm){
+    void setSuperDevMode(boolean sdm) {
         assert sdm
         isSuperDevMode()
     }
     @Deprecated
-    void superDevMode(boolean sdm){
+    void superDevMode(boolean sdm) {
         assert sdm
        isSuperDevMode()
     }
     @Deprecated
-    boolean isSuperDevMode(){
+    boolean isSuperDevMode() {
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.devmode.superDevMode',
                 'This property has been removed and will always be true.')
         true
@@ -81,17 +81,17 @@ class DevelopmentModeConfiguration {
      * To what host or ip should development mode bind itself to. By default localhost.
      */
     @Deprecated
-    void bindAddress(String address){
+    void bindAddress(String address) {
         project.vaadinSuperDevMode.bindAddress = address
         getBindAddress()
     }
     @Deprecated
-    void setBindAddress(String address){
+    void setBindAddress(String address) {
         project.vaadinSuperDevMode.bindAddress = address
         getBindAddress()
     }
     @Deprecated
-    String getBindAddress(){
+    String getBindAddress() {
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.devmode.bindAddress',
                 'This property has been replaced by vaadinSuperDevMode.bindAddress.')
         project.vaadinSuperDevMode.bindAddress
@@ -101,17 +101,17 @@ class DevelopmentModeConfiguration {
      * To what port should development mode bind itself to.
      */
     @Deprecated
-    void codeServerPort(Integer port){
+    void codeServerPort(Integer port) {
         project.vaadinSuperDevMode.codeServerPort = port
         getCodeServerPort()
     }
     @Deprecated
-    void setCodeServerPort(Integer port){
+    void setCodeServerPort(Integer port) {
         project.vaadinSuperDevMode.codeServerPort = port
         getCodeServerPort()
     }
     @Deprecated
-    Integer getCodeServerPort(){
+    Integer getCodeServerPort() {
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.devmode.codeServerPort',
                 'This property has been replaced by vaadinSuperDevMode.codeServerPort.')
         project.vaadinSuperDevMode.codeServerPort
@@ -121,17 +121,17 @@ class DevelopmentModeConfiguration {
      * Extra arguments passed to the code server
      */
     @Deprecated
-    void extraArgs(String[] args){
+    void extraArgs(String[] args) {
         project.vaadinSuperDevMode.extraArgs = args
         getExtraArgs()
     }
     @Deprecated
-    void setExtraArgs(boolean args){
+    void setExtraArgs(boolean args) {
         project.vaadinSuperDevMode.extraArgs = args
         getExtraArgs()
     }
     @Deprecated
-    String[] getExtraArgs(){
+    String[] getExtraArgs() {
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.devmode.extraArgs',
                 'This property has been replaced by vaadinSuperDevMode.extraArgs.')
         project.vaadinSuperDevMode.extraArgs

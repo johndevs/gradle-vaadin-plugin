@@ -93,7 +93,7 @@ class TaskConfigurationsTest extends IntegrationTest {
         buildFile << """
             apply plugin: 'eclipse-wtp'
 
-            task verifyWTP(dependsOn: eclipseWtpComponent) << {
+            task verifyWTP(dependsOn:eclipseWtpComponent) << {
                 def confs = project.configurations
                 println 'Server in components ' +
                     (confs.getByName('vaadin-server') in project.eclipse.wtp.component.plusConfigurations)
@@ -111,7 +111,7 @@ class TaskConfigurationsTest extends IntegrationTest {
         buildFile << """
             apply plugin: 'eclipse-wtp'
 
-            task verifyWTP(dependsOn: eclipseWtpFacet) << {
+            task verifyWTP(dependsOn:eclipseWtpFacet) << {
                 def facets = project.eclipse.wtp.facet.facets
                 def JavaVersion javaVersion = project.sourceCompatibility
                 println 'Vaadin Facet version ' + (facets.find {

@@ -48,13 +48,13 @@ class CreateThemeTask extends DefaultTask {
     @TaskAction
     def run() {
 
-        if(!themeName){
+        if ( !themeName ) {
             themeName = project.getName()
         }
 
-        new ThemeCreator(themeName: themeName,
-                themesDirectory: Util.getThemesDirectory(project),
-                vaadinVersion: Util.getVaadinVersion(project)
+        new ThemeCreator(themeName:themeName,
+                themesDirectory:Util.getThemesDirectory(project),
+                vaadinVersion:Util.getVaadinVersion(project)
         ).run()
     }
 }

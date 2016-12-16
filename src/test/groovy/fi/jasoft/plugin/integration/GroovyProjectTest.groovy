@@ -13,7 +13,7 @@ class GroovyProjectTest extends IntegrationTest{
 
     @Override
     protected void applyPlugin(File buildFile) {
-        buildFile << "apply plugin: fi.jasoft.plugin.GradleVaadinGroovyPlugin\n"
+        buildFile << "apply plugin:fi.jasoft.plugin.GradleVaadinGroovyPlugin\n"
     }
 
     @Test void 'Run Groovy Project'() {
@@ -21,7 +21,7 @@ class GroovyProjectTest extends IntegrationTest{
         assertServerRunning output
     }
 
-    private void assertServerRunning(String output){
+    private void assertServerRunning(String output) {
         assertTrue output, output.contains('Application running on ')
     }
 

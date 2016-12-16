@@ -41,17 +41,17 @@ class DevModeTask extends DefaultTask {
     def SuperDevModeConfiguration configuration
 
     def cleanupThread = new Thread({
-        if(devModeProcess) {
+        if (  devModeProcess ) {
             devModeProcess.destroy()
             devModeProcess = null
         }
-        if(server) {
+        if (  server ) {
             server.terminate()
             server = null
         }
         try {
             Runtime.getRuntime().removeShutdownHook(cleanupThread)
-        } catch(IllegalStateException e){
+        } catch (IllegalStateException e) {
             // Shutdown of the JVM in progress already, we don't need to remove the hook it will be removed by the JVM
             project.logger.debug('Shutdownhook could not be removed. This can be ignored.', e)
         }
@@ -66,13 +66,13 @@ class DevModeTask extends DefaultTask {
 
     @TaskAction
     public void run() {
-        if(!Util.getWidgetset(project)) {
+        if ( !Util.getWidgetset(project) ) {
             throw new GradleException("No widgetset found in project.")
         }
 
         runDevelopmentMode()
 
-        if (!configuration.noserver) {
+        if ( !configuration.noserver ) {
             server = ApplicationServer.get(
                     project,
                     ["gwt.codesvr=${configuration.bindAddress}:${configuration.codeServerPort}"]
@@ -115,7 +115,7 @@ class DevModeTask extends DefaultTask {
         devmodeProcess += ['-codeServerPort', configuration.codeServerPort]
         devmodeProcess += ['-bindAddress', configuration.bindAddress]
 
-        if (configuration.extraArgs) {
+        if (  configuration.extraArgs ) {
             devmodeProcess += configuration.extraArgs as List
         }
 

@@ -89,7 +89,7 @@ class TemplateUtilTest extends PluginTestBase {
         assertEquals 'This is a css file', files.find { it.name == 'file.css'}.text
     }
 
-    private void generateFilesInPublicFolder(File publicFolder){
+    private void generateFilesInPublicFolder(File publicFolder) {
 
         // Create public folder if it does not exist
         publicFolder.mkdirs()

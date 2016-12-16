@@ -52,22 +52,22 @@ class CreateProjectTask extends DefaultTask {
     def run() {
         def configuration = project.vaadinCompile as CompileWidgetsetConfiguration
 
-        new ProjectCreator(applicationName: resolveApplicationName(),
-                applicationPackage: resolveApplicationPackage(),
-                widgetsetConfiguration: configuration,
-                widgetsetFQN: widgetsetFQN,
-                pushSupported: Util.isPushSupportedAndEnabled(project),
-                addonStylesSupported: Util.isAddonStylesSupported(project),
-                javaDir: Util.getMainSourceSet(project).srcDirs.first(),
-                resourceDir: project.sourceSets.main.resources.srcDirs.iterator().next(),
+        new ProjectCreator(applicationName:resolveApplicationName(),
+                applicationPackage:resolveApplicationPackage(),
+                widgetsetConfiguration:configuration,
+                widgetsetFQN:widgetsetFQN,
+                pushSupported:Util.isPushSupportedAndEnabled(project),
+                addonStylesSupported:Util.isAddonStylesSupported(project),
+                javaDir:Util.getMainSourceSet(project).srcDirs.first(),
+                resourceDir:project.sourceSets.main.resources.srcDirs.iterator().next(),
                 templateDir: 'simpleProject'
         ).run()
 
-        if (Util.isAddonStylesSupported(project)) {
+        if (  Util.isAddonStylesSupported(project) ) {
 
-            new ThemeCreator(themeName: resolveApplicationName(),
-                    themesDirectory: Util.getThemesDirectory(project),
-                    vaadinVersion: Util.getVaadinVersion(project)
+            new ThemeCreator(themeName:resolveApplicationName(),
+                    themesDirectory:Util.getThemesDirectory(project),
+                    vaadinVersion:Util.getVaadinVersion(project)
             ).run()
 
             project.tasks[UpdateAddonStylesTask.NAME].run()
@@ -80,7 +80,7 @@ class CreateProjectTask extends DefaultTask {
     String resolveApplicationName() {
 
         // Use capitalized project name if no application name is given
-        if(!applicationName){
+        if ( !applicationName ) {
             applicationName = project.name.capitalize()
         }
 
@@ -91,12 +91,12 @@ class CreateProjectTask extends DefaultTask {
     @PackageScope
     String resolveApplicationPackage() {
         def configuration = project.vaadinCompile as CompileWidgetsetConfiguration
-        if(!applicationPackage){
+        if ( !applicationPackage ) {
             int endSlashSize = 2
-            if(widgetsetFQN?.contains(DOT)){
+            if (  widgetsetFQN?.contains(DOT) ) {
                 String widgetsetName = widgetsetFQN.tokenize(DOT).last()
                 widgetsetFQN[0..(-widgetsetName.size() - endSlashSize)]
-            } else if (configuration.widgetset?.contains(DOT)) {
+            } else if (  configuration.widgetset?.contains(DOT) ) {
                 String widgetsetName = configuration.widgetset.tokenize(DOT).last()
                 configuration.widgetset[0..(-widgetsetName.size() - endSlashSize)]
             } else {

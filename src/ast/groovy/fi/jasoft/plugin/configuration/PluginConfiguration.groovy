@@ -100,15 +100,15 @@ class PluginConfigurationTransformation implements ASTTransformation {
 
     @Override
     void visit(ASTNode[] astNodes, SourceUnit sourceUnit) {
-        if (!astNodes) {
+        if ( !astNodes ) {
             return
         }
 
         ClassNode clazz = astNodes[1] as ClassNode
 
-        for (FieldNode field : clazz.fields) {
+        for( FieldNode field:clazz.fields) {
             MethodNode method
-            if (field.final) {
+            if (  field.final ) {
                 method = makeClosureSetterMethod(field)
             } else {
                 method = makeValueSetterMethod(field)

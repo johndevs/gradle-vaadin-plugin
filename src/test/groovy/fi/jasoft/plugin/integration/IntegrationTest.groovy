@@ -61,7 +61,7 @@ class IntegrationTest {
                 repositories {
                     mavenLocal()
                     mavenCentral()
-                    flatDir dirs: file('$escapedDir')
+                    flatDir dirs:file('$escapedDir')
                 }
 
                 dependencies {
@@ -72,7 +72,7 @@ class IntegrationTest {
 
         """
 
-        if(applyPluginToFile){
+        if (  applyPluginToFile ) {
             applyRepositories(buildFile)
             applyPlugin(buildFile)
             buildFile << "vaadin.logToConsole = true\n"
@@ -85,13 +85,13 @@ class IntegrationTest {
         String escapedDir = getPluginDir()
         buildFile << """
             repositories {
-                flatDir dirs: file('$escapedDir')
+                flatDir dirs:file('$escapedDir')
             }
         """
     }
 
     protected void applyPlugin(File buildFile) {
-        buildFile << "apply plugin: fi.jasoft.plugin.GradleVaadinPlugin\n"
+        buildFile << "apply plugin:fi.jasoft.plugin.GradleVaadinPlugin\n"
     }
 
     protected String runWithArgumentsOnProject(File projectDir, String... args) {

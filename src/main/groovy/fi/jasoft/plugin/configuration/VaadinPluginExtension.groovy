@@ -101,7 +101,7 @@ class VaadinPluginExtension {
     final Project project
 
     @Deprecated
-    VaadinPluginExtension(Project project){
+    VaadinPluginExtension(Project project) {
         this.project = project
         plugin = new VaadinPluginConfiguration(project)
         devmode = new DevelopmentModeConfiguration(project)
@@ -112,17 +112,17 @@ class VaadinPluginExtension {
      * Should application be run in debug mode. When running in production set this to true
      */
     @Deprecated
-    void debug(boolean debug){
+    void debug(boolean debug) {
         project.vaadinRun.debug = debug
         isDebug()
     }
     @Deprecated
-    void setDebug(boolean debug){
+    void setDebug(boolean debug) {
         project.vaadinRun.debug = debug
         isDebug()
     }
     @Deprecated
-    void isDebug(){
+    void isDebug() {
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.debug',
                 'This property has been replaced by vaadinRun.debug.')
         project.vaadinRun.debug
@@ -132,17 +132,17 @@ class VaadinPluginExtension {
      * The port the debugger listens to
      */
     @Deprecated
-    void debugPort(int port){
+    void debugPort(int port) {
         project.vaadinRun.debugPort = port
         isDebugPort()
     }
     @Deprecated
-    void setDebugPort(int port){
+    void setDebugPort(int port) {
         project.vaadinRun.debugPort = port
         isDebugPort()
     }
     @Deprecated
-    boolean isDebugPort(){
+    boolean isDebugPort() {
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.debugPort',
                 'This property has been replaced by vaadinRun.debugPort.')
         project.vaadinRun.debugPort
@@ -152,17 +152,17 @@ class VaadinPluginExtension {
      * The port the vaadin application should run on
      */
     @Deprecated
-    void serverPort(int port){
+    void serverPort(int port) {
         project.vaadinRun.serverPort = port
         getServerPort()
     }
     @Deprecated
-    void setServerPort(int port){
+    void setServerPort(int port) {
         project.vaadinRun.serverPort = port
         getServerPort()
     }
     @Deprecated
-    int getServerPort(){
+    int getServerPort() {
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.serverPort',
                 'This property has been replaced by vaadinRun.serverPort.')
         project.vaadinRun.serverPort
@@ -172,17 +172,17 @@ class VaadinPluginExtension {
      * Extra jvm args passed to the JVM running the Vaadin application
      */
     @Deprecated
-    void jvmArgs(String[] args){
+    void jvmArgs(String[] args) {
         project.vaadinRun.jvmArgs = args
         getJvmArgs()
     }
     @Deprecated
-    void setJvmArgs(String[] args){
+    void setJvmArgs(String[] args) {
         project.vaadinRun.jvmArgs = args
         getJvmArgs()
     }
     @Deprecated
-    String[] getJvmArgs(){
+    String[] getJvmArgs() {
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.jvmArgs',
                 'This property has been replaced by vaadinRun.jvmArgs.')
         project.vaadinRun.jvmArgs
@@ -192,17 +192,17 @@ class VaadinPluginExtension {
      * Extra jvm args passed to the JVM running the Vaadin application
      */
     @Deprecated
-    void widgetsetCDN(Boolean enabled){
+    void widgetsetCDN(Boolean enabled) {
         project.vaadinCompile.widgetsetCDN = enabled
         getWidgetsetCDN()
     }
     @Deprecated
-    void setWidgetsetCDN(Boolean enabled){
+    void setWidgetsetCDN(Boolean enabled) {
         project.vaadinCompile.widgetsetCDN = enabled
         getWidgetsetCDN()
     }
     @Deprecated
-    Boolean getWidgetsetCDN(){
+    Boolean getWidgetsetCDN() {
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.widgetsetCDN',
                 'This property has been replaced by vaadinCompile.widgetsetCDN.')
         project.vaadinCompile.widgetsetCDN
@@ -212,17 +212,17 @@ class VaadinPluginExtension {
      * Should the Vaadin client side profiler be used
      */
     @Deprecated
-    void profiler(Boolean enabled){
+    void profiler(Boolean enabled) {
         project.vaadinCompile.profiler = enabled
         isProfiler()
     }
     @Deprecated
-    void setProfiler(Boolean enabled){
+    void setProfiler(Boolean enabled) {
         project.vaadinCompile.profiler = enabled
         isProfiler()
     }
     @Deprecated
-    Boolean isProfiler(){
+    Boolean isProfiler() {
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.profiler',
                 'This property has been replaced by vaadinCompile.profiler.')
         project.vaadinCompile.profiler
@@ -233,17 +233,17 @@ class VaadinPluginExtension {
      * Should the plugin manage the widgetset (gwt.xml file)
      */
     @Deprecated
-    void manageWidgetset(Boolean enabled){
+    void manageWidgetset(Boolean enabled) {
         project.vaadinCompile.manageWidgetset = enabled
         isManageWidgetset()
     }
     @Deprecated
-    void setManageWidgetset(Boolean enabled){
+    void setManageWidgetset(Boolean enabled) {
         project.vaadinCompile.manageWidgetset = enabled
         isManageWidgetset()
     }
     @Deprecated
-    Boolean isManageWidgetset(){
+    Boolean isManageWidgetset() {
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.manageWidgetset',
                 'This property has been replaced by vaadinCompile.manageWidgetset.')
         project.vaadinCompile.manageWidgetset
@@ -253,17 +253,17 @@ class VaadinPluginExtension {
      * The widgetset to use for the project. Leave emptu for a pure server side project
      */
     @Deprecated
-    void widgetset(String widgetset){
+    void widgetset(String widgetset) {
         project.vaadinCompile.widgetset = widgetset
         getWidgetset()
     }
     @Deprecated
-    void setWidgetset(String widgetset){
+    void setWidgetset(String widgetset) {
         project.vaadinCompile.widgetset = widgetset
         getWidgetset()
     }
     @Deprecated
-    String getWidgetset(){
+    String getWidgetset() {
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.widgetset',
                 'This property has been replaced by automatic widgetset detection. ' +
                         'You should be able to remove this property definition completely. ' +
@@ -275,17 +275,17 @@ class VaadinPluginExtension {
      * The widgetset generator to use
      */
     @Deprecated
-    void widgetsetGenerator(String widgetsetGenerator){
+    void widgetsetGenerator(String widgetsetGenerator) {
         project.vaadinCompile.widgetsetGenerator = widgetsetGenerator
         getWidgetsetGenerator()
     }
     @Deprecated
-    void setWidgetsetGenerator(String widgetsetGenerator){
+    void setWidgetsetGenerator(String widgetsetGenerator) {
         project.vaadinCompile.widgetsetGenerator = widgetsetGenerator
         getWidgetsetGenerator()
     }
     @Deprecated
-    String getWidgetsetGenerator(){
+    String getWidgetsetGenerator() {
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.widgetsetGenerator',
                 'This property has been replaced by vaadinCompile.widgetsetGenerator.')
         project.vaadinCompile.widgetsetGenerator
@@ -295,7 +295,7 @@ class VaadinPluginExtension {
      * Configuration options for TestBench
      */
     @Deprecated
-    TestBenchConfiguration getTestbench(){
+    TestBenchConfiguration getTestbench() {
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.testbench',
                 'This property has been replaced by vaadinTestbench')
         project.vaadinTestbench

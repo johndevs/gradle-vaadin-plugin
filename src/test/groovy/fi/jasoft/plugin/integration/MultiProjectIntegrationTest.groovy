@@ -35,9 +35,9 @@ class MultiProjectIntegrationTest extends IntegrationTest {
             }
 
             subprojects {
-                apply plugin: fi.jasoft.plugin.GradleVaadinPlugin
+                apply plugin:fi.jasoft.plugin.GradleVaadinPlugin
                 repositories {
-                    flatDir dirs: file('$escapedDir')
+                    flatDir dirs:file('$escapedDir')
                 }
                 vaadin.logToConsole = true
             }

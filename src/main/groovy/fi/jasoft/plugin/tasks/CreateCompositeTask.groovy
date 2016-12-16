@@ -47,10 +47,10 @@ class CreateCompositeTask extends DefaultTask {
     @TaskAction
     public void run() {
         def configuration = project.vaadinCompile as CompileWidgetsetConfiguration
-        if(!componentPackage && configuration.widgetset){
+        if ( !componentPackage && configuration.widgetset ) {
             String widgetsetClass = configuration.widgetset
             String widgetsetPackage = widgetsetClass.substring(0, widgetsetClass.lastIndexOf(DOT))
-            componentPackage = widgetsetPackage + DOT + componentName.toLowerCase();
+            componentPackage = widgetsetPackage + DOT + componentName.toLowerCase()
         }
 
         makeCompositeClass()
@@ -67,7 +67,7 @@ class CreateCompositeTask extends DefaultTask {
         substitutions['componentPackage'] = componentPackage
         substitutions['componentName'] = componentName
 
-        if(Util.isGroovyProject(project)){
+        if (  Util.isGroovyProject(project) ) {
             TemplateUtil.writeTemplate("MyComposite.groovy", componentDir, componentName + ".groovy", substitutions)
         } else {
             TemplateUtil.writeTemplate("MyComposite.java", componentDir, componentName + ".java", substitutions)

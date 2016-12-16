@@ -41,10 +41,10 @@ public class ${className} extends
         if (eagerComponents.contains(componentClass)) {
             return LoadStyle.EAGER;
 
-        } else if(deferredComponents.contains(componentClass)) {
+        } else if (deferredComponents.contains(componentClass)) {
             return LoadStyle.DEFERRED;
 
-        } else if(lazyComponents.contains(componentClass)) {
+        } else if (lazyComponents.contains(componentClass)) {
             return LoadStyle.LAZY;
         } 
 

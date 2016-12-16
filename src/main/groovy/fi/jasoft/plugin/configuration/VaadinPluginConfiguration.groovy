@@ -31,7 +31,7 @@ class VaadinPluginConfiguration {
     transient Project project
 
     @Deprecated
-    VaadinPluginConfiguration(Project project){
+    VaadinPluginConfiguration(Project project) {
         this.project = project
     }
 
@@ -39,17 +39,17 @@ class VaadinPluginConfiguration {
      * Should the application be opened in a browser when it has been launched
      */
     @Deprecated
-    void openInBrowser(boolean open){
+    void openInBrowser(boolean open) {
         project.vaadinRun.openInBrowser = open
         isOpenInBrowser()
     }
     @Deprecated
-    void setOpenInBrowser(boolean open){
+    void setOpenInBrowser(boolean open) {
         project.vaadinRun.openInBrowser = open
         isOpenInBrowser()
     }
     @Deprecated
-    boolean isOpenInBrowser(){
+    boolean isOpenInBrowser() {
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.plugin.openInBrowser',
                 'This property has been replaced by vaadinRun.openInBrowser.')
         project.vaadinRun.openInBrowser
@@ -59,17 +59,17 @@ class VaadinPluginConfiguration {
      * Should theme be recompiled when SCSS file is changes.
      */
     @Deprecated
-    void themeAutoRecompile(boolean recompile){
+    void themeAutoRecompile(boolean recompile) {
         project.vaadinRun.themeAutoRecompile = recompile
         isThemeAutoRecompile()
     }
     @Deprecated
-    void setThemeAutoRecompile(boolean recompile){
+    void setThemeAutoRecompile(boolean recompile) {
         project.vaadinRun.themeAutoRecompile = recompile
         isThemeAutoRecompile()
     }
     @Deprecated
-    boolean isThemeAutoRecompile(){
+    boolean isThemeAutoRecompile() {
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.plugin.themeAutoRecompile',
                 'This property has been replaced by vaadinRun.themeAutoRecompile.')
         project.vaadinRun.themeAutoRecompile
@@ -81,17 +81,17 @@ class VaadinPluginConfiguration {
      * @deprecated
      */
     @Deprecated
-    void jettyAutoRefresh(boolean refresh){
+    void jettyAutoRefresh(boolean refresh) {
         project.vaadinRun.serverRestart = refresh
         isJettyAutoRefresh()
     }
     @Deprecated
-    void setJettyAutoRefresh(boolean refresh){
+    void setJettyAutoRefresh(boolean refresh) {
         project.vaadinRun.serverRestart = refresh
         isJettyAutoRefresh()
     }
     @Deprecated
-    boolean isJettyAutoRefresh(){
+    boolean isJettyAutoRefresh() {
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.plugin.jettyAutoRefresh',
                 'This property has been replaced by vaadinRun.serverRestart.')
         project.vaadinRun.serverRestart
@@ -103,17 +103,17 @@ class VaadinPluginConfiguration {
      * @deprecated
      */
     @Deprecated
-    void themesDirectory(String directory){
+    void themesDirectory(String directory) {
         project.vaadinThemeCompile.themesDirectory = directory
         getThemesDirectory()
     }
     @Deprecated
-    void setThemesDirectory(String directory){
+    void setThemesDirectory(String directory) {
         project.vaadinThemeCompile.themesDirectory = directory
         getThemesDirectory()
     }
     @Deprecated
-    String getThemesDirectory(){
+    String getThemesDirectory() {
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.plugin.themesDirectory',
                 'This property has been replaced by vaadinThemeCompile.themesDirectory.')
         project.vaadinThemeCompile.themesDirectory
@@ -129,17 +129,17 @@ class VaadinPluginConfiguration {
      *     </ul>
      */
     @Deprecated
-    void themeCompiler(String directory){
+    void themeCompiler(String directory) {
         project.vaadinThemeCompile.themeCompiler = directory
         getThemeCompiler()
     }
     @Deprecated
-    void setThemeCompiler(String directory){
+    void setThemeCompiler(String directory) {
         project.vaadinThemeCompile.themeCompiler = directory
         getThemeCompiler()
     }
     @Deprecated
-    String getThemeCompiler(){
+    String getThemeCompiler() {
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.plugin.themeCompiler',
                 'This property has been replaced by vaadinThemeCompile.compiler.')
         project.vaadinThemeCompile.themeCompiler
@@ -149,17 +149,17 @@ class VaadinPluginConfiguration {
      * The directory where Eclipse will output its compiled classes.
      */
     @Deprecated
-    void eclipseOutputDir(String directory){
+    void eclipseOutputDir(String directory) {
         project.vaadinRun.classesDir = directory
         getEclipseOutputDir()
     }
     @Deprecated
-    void setEclipseOutputDir(String directory){
+    void setEclipseOutputDir(String directory) {
         project.vaadinRun.classesDir = directory
         getEclipseOutputDir()
     }
     @Deprecated
-    String getEclipseOutputDir(){
+    String getEclipseOutputDir() {
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.plugin.eclipseOutputDir',
                 'This property has been replaced by vaadinRun.classesDir.')
         project.vaadinRun.classesDir
@@ -169,17 +169,17 @@ class VaadinPluginConfiguration {
      * Should all logs output by the task be redirected to the console (if false output is redirected to file)
      */
     @Deprecated
-    void logToConsole(boolean logToConsole){
+    void logToConsole(boolean logToConsole) {
         project.vaadin.logToConsole = logToConsole
         isLogToConsole()
     }
     @Deprecated
-    void setLogToConsole(boolean logToConsole){
+    void setLogToConsole(boolean logToConsole) {
         project.vaadin.logToConsole = logToConsole
         isLogToConsole()
     }
     @Deprecated
-    boolean isLogToConsole(){
+    boolean isLogToConsole() {
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.plugin.logToConsole',
                 'This property has been replaced by vaadin.logToConsole.')
         project.vaadin.logToConsole
@@ -189,17 +189,17 @@ class VaadinPluginConfiguration {
      * Should a classpath Jar be used to shorten the classpath.
      */
     @Deprecated
-    void useClassPathJar(boolean useClassPathJar){
+    void useClassPathJar(boolean useClassPathJar) {
         project.vaadin.useClassPathJar = useClassPathJar
         isUseClassPathJar()
     }
     @Deprecated
-    void setUseClassPathJar(boolean useClassPathJar){
+    void setUseClassPathJar(boolean useClassPathJar) {
         project.vaadin.useClassPathJar = useClassPathJar
         isUseClassPathJar()
     }
     @Deprecated
-    boolean isUseClassPathJar(){
+    boolean isUseClassPathJar() {
         MessageLogger.nagUserOfDiscontinuedProperty('vaadin.plugin.useClassPathJar',
                 'This property has been replaced by vaadin.useClassPathJar.')
         project.vaadin.useClassPathJar

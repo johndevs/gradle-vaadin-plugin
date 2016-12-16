@@ -41,7 +41,7 @@ class CreateWidgetsetGeneratorTask extends DefaultTask {
 
     @TaskAction
     def run() {
-        if (!project.vaadinCompile.widgetset) {
+        if ( !project.vaadinCompile.widgetset ) {
             throw new GradleException("No widgetset found. Please define a widgetset " +
                     "using the vaadinCompile.widgetset property.")
         }
@@ -55,7 +55,7 @@ class CreateWidgetsetGeneratorTask extends DefaultTask {
         def widgetsetGenerator = project.vaadinCompile.widgetsetGenerator as String
 
         String name, pkg, filename
-        if (!widgetsetGenerator) {
+        if ( !widgetsetGenerator ) {
             name = widgetset.tokenize(DOT).last()
             pkg = widgetset.replaceAll(DOT + name, '') + '.client.ui'
             filename = name + "Generator.java"

@@ -26,7 +26,7 @@ import static org.junit.Assert.assertTrue
 class PluginConfigurationTest extends PluginTestBase{
 
     @Test
-    void areDependantPluginsIncluded(){
+    void areDependantPluginsIncluded() {
         assertTrue project.plugins.hasPlugin(WarPlugin)
     }
 

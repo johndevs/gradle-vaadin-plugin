@@ -42,16 +42,16 @@ class CreateAddonThemeTask extends DefaultTask {
     def run() {
 
         // Build theme name from addon title
-        if(!themeName && project.vaadin.addon.title){
-              def title = project.vaadin.addon.title as String;
-              themeName = title.toLowerCase().replaceAll(/[_ ](\w)?/){ wholeMatch, firstLetter ->
+        if ( !themeName && project.vaadin.addon.title ) {
+              def title = project.vaadin.addon.title as String
+              themeName = title.toLowerCase().replaceAll(/[_ ](\w)?/) { wholeMatch, firstLetter ->
                   firstLetter?.toUpperCase() ?: ""
               }.capitalize()
         }
 
         new AddonThemeCreator(
-                resourceDir: project.sourceSets.main.resources.srcDirs.first(),
-                themeName: themeName,
+                resourceDir:project.sourceSets.main.resources.srcDirs.first(),
+                themeName:themeName,
         ).run()
     }
 }

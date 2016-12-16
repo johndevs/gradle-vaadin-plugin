@@ -26,9 +26,9 @@ import org.gradle.api.file.FileCollection
  */
 class TestbenchHub {
 
-    private final Project project;
+    private final Project project
 
-    private process;
+    private process
 
     TestbenchHub(Project project) {
         this.project = project
@@ -62,7 +62,7 @@ class TestbenchHub {
         // Execute server
         process = process.execute()
 
-        if (project.vaadin.logToConsole) {
+        if (  project.vaadin.logToConsole ) {
             process.consumeProcessOutput(System.out, System.out)
         } else {
             File log = new File(logDir.canonicalPath + '/testbench-hub.log')
@@ -80,7 +80,7 @@ class TestbenchHub {
         process.out.close()
         process.err.close()
         process.destroy()
-        process = null;
+        process = null
 
         project.logger.lifecycle("Testbench hub terminated")
     }
