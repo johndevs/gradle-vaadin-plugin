@@ -31,16 +31,16 @@ class PluginTestBase {
     protected GradleVaadinPlugin plugin
 
     @Before
-    void setUp(){
+    void setUp() {
         project = ProjectBuilder.builder().withProjectDir(testDir).build()
         plugin = new GradleVaadinPlugin().apply(project)
     }
 
     @After
-    void tearDown(){
+    void tearDown() {
         plugin = null
         project = null
-        if(testDir.exists()){
+        if (  testDir.exists() ) {
             testDir.deleteDir()
         }
     }

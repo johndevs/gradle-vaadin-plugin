@@ -132,14 +132,14 @@ class GradleVaadinPlugin implements Plugin<Project> {
         Gradle gradle = project.gradle
         VersionNumber version = VersionNumber.parse(gradle.gradleVersion)
         VersionNumber requiredVersion = new VersionNumber(3, 0, 0, null)
-        if (version.baseVersion < requiredVersion) {
+        if (  version.baseVersion < requiredVersion ) {
             throw new UnsupportedVersionException("Your gradle version ($version) is too old. " +
                     "Plugin requires Gradle $requiredVersion+")
         }
 
         PLUGINS_IN_PROJECT++
 
-        if (firstPlugin) {
+        if (  firstPlugin ) {
             project.logger.quiet("Using Gradle Vaadin Plugin $PLUGIN_VERSION")
         }
 
@@ -201,14 +201,14 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
         project.afterEvaluate { Project p ->
             String v = Util.getVaadinVersion(p)
-            if (v?.startsWith('6')) {
+            if (  v?.startsWith('6') ) {
                 p.logger.error('Plugin no longer supports Vaadin 6, to use Vaadin 6 ' +
                         'apply an older version of the plugin.')
                 throw new InvalidUserDataException('Unsupported Vaadin version.')
             }
 
             // Remove configurations if the plugin shouldn't manage them
-            if (!p.vaadin.manageDependencies) {
+            if ( !p.vaadin.manageDependencies ) {
                 p.configurations.removeAll({ Configuration conf ->
                    conf.name.startsWith('vaadin-')
                 })
@@ -224,7 +224,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
     static void applyRepositories(Project project) {
         project.afterEvaluate { Project p ->
-            if (!p.vaadin.manageRepositories) {
+            if ( !p.vaadin.manageRepositories ) {
                 return
             }
 
@@ -254,17 +254,17 @@ class GradleVaadinPlugin implements Plugin<Project> {
             }
 
             // Add plugin development repository if specified
-            if ((debugDir as File)?.exists()
+            if ( (debugDir as File)?.exists( )
                     && !repositories.findByName(PLUGIN_DEVELOPMENTTIME_REPOSITORY_NAME)) {
-                if (GradleVaadinPlugin.firstPlugin) {
+                if (  GradleVaadinPlugin.firstPlugin ) {
                     project.logger.lifecycle("Using development libs found at " + debugDir)
                 }
-                repositories.flatDir(name: PLUGIN_DEVELOPMENTTIME_REPOSITORY_NAME, dirs: debugDir)
+                repositories.flatDir(name:PLUGIN_DEVELOPMENTTIME_REPOSITORY_NAME, dirs:debugDir)
             }
         }
     }
 
-    static void applyServletApi(DependencyHandler projectDependencies, DependencySet dependencies){
+    static void applyServletApi(DependencyHandler projectDependencies, DependencySet dependencies) {
         Dependency servletAPI = projectDependencies.create('javax.servlet:javax.servlet-api:3.1.0')
         dependencies.add(servletAPI)
     }
@@ -299,8 +299,8 @@ class GradleVaadinPlugin implements Plugin<Project> {
         configurations.create(CONFIGURATION_CLIENT) { conf ->
             conf.description = 'Libraries needed for compiling the widgetset.'
             conf.defaultDependencies { dependencies ->
-                if(!project.vaadinCompile.widgetsetCDN) {
-                    if (!Util.getWidgetset(project)) {
+                if ( !project.vaadinCompile.widgetsetCDN ) {
+                    if ( !Util.getWidgetset(project) ) {
                         Dependency widgetsetCompiled = projectDependencies.create(
                                 "com.vaadin:vaadin-client-compiled:${Util.getVaadinVersion(project)}")
                         dependencies.add(widgetsetCompiled)
@@ -337,7 +337,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
                 applyServletApi(projectDependencies, dependencies)
 
-                if(Util.isPushSupported(project)){
+                if (  Util.isPushSupported(project) ) {
                     Dependency push = projectDependencies.create(
                             "com.vaadin:vaadin-push:${Util.getVaadinVersion(project)}")
                     dependencies.add(push)
@@ -365,7 +365,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
         configurations.create(CONFIGURATION_PUSH) { conf ->
             conf.description = 'Libraries needed for using Vaadin Push features.'
             conf.defaultDependencies { dependencies ->
-                if(Util.isPushSupportedAndEnabled(project)) {
+                if (  Util.isPushSupportedAndEnabled(project) ) {
                     Dependency push = projectDependencies.create(
                             "com.vaadin:vaadin-push:${Util.getVaadinVersion(project)}")
                     dependencies.add(push)
@@ -384,7 +384,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
         configurations.create(CONFIGURATION_TESTBENCH) { conf ->
             conf.description = 'Libraries needed by Vaadin Testbench.'
             conf.defaultDependencies { dependencies ->
-                if(project.vaadinTestbench.enabled) {
+                if (  project.vaadinTestbench.enabled ) {
                     Dependency testbench = projectDependencies.create(
                             "com.vaadin:vaadin-testbench:${project.vaadinTestbench.version}")
                     dependencies.add(testbench)
@@ -423,17 +423,17 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
         configurations.create(CONFIGURATION_THEME) { conf ->
             conf.description = 'Libraries needed for SASS theme compilation'
-            conf.defaultDependencies {
+            conf.defaultDependencies { dependencies ->
                 File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
                 FileTree themes = project.fileTree(
-                        dir: webAppDir.canonicalPath + '/VAADIN/themes',
+                        dir:webAppDir.canonicalPath + '/VAADIN/themes',
                         include: '**/styles.scss')
 
-                if (!themes.isEmpty()) {
-                    switch (project.vaadinThemeCompile.compiler){
+                if ( !themes.isEmpty() ) {
+                    switch (project.vaadinThemeCompile.compiler) {
                         case 'vaadin':
-                            if(Util.getVaadinVersion(project).startsWith('7.0')
-                                    || Util.getVaadinVersion(project).startsWith('7.1')){
+                            if (  Util.getVaadinVersion(project).startsWith('7.0' )
+                                    || Util.getVaadinVersion(project).startsWith('7.1')) {
                                 // In Vaadin 7.0 and 7.1 the compiler was shipped as a non-transitive dependency
                                 Dependency themeCompiler = projectDependencies.create(
                                         "com.vaadin:vaadin-theme-compiler:${Util.getVaadinVersion(project)}")
@@ -499,12 +499,12 @@ class GradleVaadinPlugin implements Plugin<Project> {
                 String group = dependency.group
                 String name = dependency.name
 
-                if("$group:$name".toString() in whitelist){
+                if ( "$group:$name".toString() in whitelist ) {
                     details.useVersion Util.getVaadinVersion(project)
                 }
 
-                if(config.name == 'vaadin-client') {
-                    if(group == 'javax.validation' && name == 'validation-api'){
+                if (  config.name == 'vaadin-client' ) {
+                    if (  group == 'javax.validation' && name == 'validation-api' ) {
                         // GWT only supports this version, do not upgrade it
                         details.useVersion '1.0.0.GA'
                     }
@@ -514,46 +514,46 @@ class GradleVaadinPlugin implements Plugin<Project> {
     }
 
 
-    static void applyVaadinTasks(Project project){
+    static void applyVaadinTasks(Project project) {
         TaskContainer tasks = project.tasks
-        tasks.create(name: CreateProjectTask.NAME, type: CreateProjectTask, group: VAADIN_TASK_GROUP)
-        tasks.create(name: CreateAddonProjectTask.NAME, type: CreateAddonProjectTask, group: VAADIN_TASK_GROUP)
-        tasks.create(name: CreateComponentTask.NAME, type: CreateComponentTask, group: VAADIN_TASK_GROUP)
-        tasks.create(name: CreateCompositeTask.NAME, type: CreateCompositeTask, group: VAADIN_TASK_GROUP)
-        tasks.create(name: CreateThemeTask.NAME, type: CreateThemeTask, group: VAADIN_TASK_GROUP)
-        tasks.create(name: CreateWidgetsetGeneratorTask.NAME, type: CreateWidgetsetGeneratorTask,
-                group: VAADIN_TASK_GROUP)
-        tasks.create(name: CreateDesignTask.NAME, type: CreateDesignTask, group: VAADIN_TASK_GROUP)
+        tasks.create(name:CreateProjectTask.NAME, type:CreateProjectTask, group:VAADIN_TASK_GROUP)
+        tasks.create(name:CreateAddonProjectTask.NAME, type:CreateAddonProjectTask, group:VAADIN_TASK_GROUP)
+        tasks.create(name:CreateComponentTask.NAME, type:CreateComponentTask, group:VAADIN_TASK_GROUP)
+        tasks.create(name:CreateCompositeTask.NAME, type:CreateCompositeTask, group:VAADIN_TASK_GROUP)
+        tasks.create(name:CreateThemeTask.NAME, type:CreateThemeTask, group:VAADIN_TASK_GROUP)
+        tasks.create(name:CreateWidgetsetGeneratorTask.NAME, type:CreateWidgetsetGeneratorTask,
+                group:VAADIN_TASK_GROUP)
+        tasks.create(name:CreateDesignTask.NAME, type:CreateDesignTask, group:VAADIN_TASK_GROUP)
 
-        tasks.create(name: CompileWidgetsetTask.NAME, type: CompileWidgetsetTask, group: VAADIN_TASK_GROUP)
-        tasks.create(name: DevModeTask.NAME, type: DevModeTask, group: VAADIN_TASK_GROUP)
-        tasks.create(name: SuperDevModeTask.NAME, type: SuperDevModeTask, group: VAADIN_TASK_GROUP)
-        tasks.create(name: CompileThemeTask.NAME, type: CompileThemeTask, group: VAADIN_TASK_GROUP)
-        tasks.create(name: RunTask.NAME, type: RunTask, group: VAADIN_TASK_GROUP)
-        tasks.create(name: UpdateWidgetsetTask.NAME, type: UpdateWidgetsetTask, group: VAADIN_TASK_GROUP)
+        tasks.create(name:CompileWidgetsetTask.NAME, type:CompileWidgetsetTask, group:VAADIN_TASK_GROUP)
+        tasks.create(name:DevModeTask.NAME, type:DevModeTask, group:VAADIN_TASK_GROUP)
+        tasks.create(name:SuperDevModeTask.NAME, type:SuperDevModeTask, group:VAADIN_TASK_GROUP)
+        tasks.create(name:CompileThemeTask.NAME, type:CompileThemeTask, group:VAADIN_TASK_GROUP)
+        tasks.create(name:RunTask.NAME, type:RunTask, group:VAADIN_TASK_GROUP)
+        tasks.create(name:UpdateWidgetsetTask.NAME, type:UpdateWidgetsetTask, group:VAADIN_TASK_GROUP)
 
-        tasks.create(name: UpdateAddonStylesTask.NAME, type: UpdateAddonStylesTask, group: VAADIN_TASK_GROUP)
-        tasks.create(name: CreateAddonThemeTask.NAME, type: CreateAddonThemeTask, group: VAADIN_TASK_GROUP)
+        tasks.create(name:UpdateAddonStylesTask.NAME, type:UpdateAddonStylesTask, group:VAADIN_TASK_GROUP)
+        tasks.create(name:CreateAddonThemeTask.NAME, type:CreateAddonThemeTask, group:VAADIN_TASK_GROUP)
     }
 
     static void applyVaadinUtilityTasks(Project project) {
         TaskContainer tasks = project.tasks
-        tasks.create(name: BuildSourcesJarTask.NAME, type: BuildSourcesJarTask, group: VAADIN_UTIL_TASK_GROUP)
-        tasks.create(name: BuildJavadocJarTask.NAME, type: BuildJavadocJarTask, group: VAADIN_UTIL_TASK_GROUP)
-        tasks.create(name: BuildClassPathJar.NAME, type: BuildClassPathJar, group: VAADIN_UTIL_TASK_GROUP)
+        tasks.create(name:BuildSourcesJarTask.NAME, type:BuildSourcesJarTask, group:VAADIN_UTIL_TASK_GROUP)
+        tasks.create(name:BuildJavadocJarTask.NAME, type:BuildJavadocJarTask, group:VAADIN_UTIL_TASK_GROUP)
+        tasks.create(name:BuildClassPathJar.NAME, type:BuildClassPathJar, group:VAADIN_UTIL_TASK_GROUP)
     }
 
     static void applyVaadinTestbenchTasks(Project project) {
         TaskContainer tasks = project.tasks
-        tasks.create(name: CreateTestbenchTestTask.NAME, type: CreateTestbenchTestTask,
-                group: VAADIN_TESTBENCH_TASK_GROUP)
+        tasks.create(name:CreateTestbenchTestTask.NAME, type:CreateTestbenchTestTask,
+                group:VAADIN_TESTBENCH_TASK_GROUP)
     }
 
     static void applyVaadinDirectoryTasks(Project project) {
         TaskContainer tasks = project.tasks
-        tasks.create(name: DirectorySearchTask.NAME, type: DirectorySearchTask,
-                group: VAADIN_DIRECTORY_TASK_GROUP)
-        tasks.create(name: CreateDirectoryZipTask.NAME, type: CreateDirectoryZipTask,
-                group: VAADIN_DIRECTORY_TASK_GROUP)
+        tasks.create(name:DirectorySearchTask.NAME, type:DirectorySearchTask,
+                group:VAADIN_DIRECTORY_TASK_GROUP)
+        tasks.create(name:CreateDirectoryZipTask.NAME, type:CreateDirectoryZipTask,
+                group:VAADIN_DIRECTORY_TASK_GROUP)
     }
 }

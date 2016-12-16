@@ -16,6 +16,8 @@
 package fi.jasoft.plugin
 
 import groovy.text.SimpleTemplateEngine
+import groovy.text.Template
+import groovy.text.TemplateEngine
 import org.apache.commons.lang.StringUtils
 import org.gradle.api.Project
 
@@ -49,16 +51,15 @@ class TemplateUtil {
      */
     static writeTemplate(String templateFileName, File targetDir, String targetFileName = templateFileName,
                          Map substitutions = [:], removeBlankLines = false) {
-        def templateUrl = TemplateUtil.class.getClassLoader().getResource("templates/${templateFileName}.template")
-        if (templateUrl == null) {
+        URL templateUrl = TemplateUtil.getClassLoader().getResource("templates/${templateFileName}.template")
+        if ( !templateUrl ) {
             throw new FileNotFoundException("Could not find template 'templates/${templateFileName}.template'")
         }
 
-        def engine = new SimpleTemplateEngine()
-        def template = engine.createTemplate(templateUrl).make(substitutions.withDefault { null })
-        def content = template.toString()
+        TemplateEngine engine = new SimpleTemplateEngine()
+        String content = engine.createTemplate(templateUrl).make(substitutions.withDefault { null })
 
-        if (removeBlankLines) {
+        if (  removeBlankLines ) {
             content = content.replaceAll("(?m)^[ \t]*\r?\n", "")
         }
 
@@ -77,13 +78,13 @@ class TemplateUtil {
      */
     static writeTemplateFromString(String templateContent, File targetDir, String targetFileName) {
         File targetFile = new File(targetDir, targetFileName)
-        if (!targetFile.exists()) {
+        if ( !targetFile.exists() ) {
             targetFile.parentFile.mkdirs()
             targetFile.createNewFile()
         }
 
-        if (!targetFile.canWrite()) {
-            throw new FileNotFoundException("Could not write to target file " + targetFile.canonicalPath)
+        if ( !targetFile.canWrite() ) {
+            throw new FileNotFoundException("Could not write to target file $targetFile.canonicalPath")
         }
 
         targetFile.write(templateContent)
@@ -102,9 +103,9 @@ class TemplateUtil {
      */
     static File[] getFilesFromPublicFolder(Project project, String postfix='*') {
         Util.getMainSourceSet(project).srcDirTrees
-        .collect {project.fileTree(it.dir)}
-        .inject(project.sourceSets.main.resources){a, b -> a + b}
-        .matching {include "**/*/public/**/*.$postfix"}
+        .collect { project.fileTree(it.dir)}
+        .inject(project.sourceSets.main.resources) {a, b -> a + b}
+        .matching { include "**/*/public/**/*.$postfix"}
         .files
     }
 
@@ -119,7 +120,7 @@ class TemplateUtil {
      * @return
      *      the path statement
      */
-    static String convertFQNToFilePath(String fqn, String postfix=''){
+    static String convertFQNToFilePath(String fqn, String postfix='') {
         fqn.replace(DOT, File.separator) + postfix
     }
 
@@ -132,7 +133,7 @@ class TemplateUtil {
      * @return
      *      the fully qualified class name
      */
-    static String convertFilePathToFQN(String path, String postfix){
+    static String convertFilePathToFQN(String path, String postfix) {
         StringUtils.removeEnd(path, postfix).replace(File.separator, DOT)
     }
 }

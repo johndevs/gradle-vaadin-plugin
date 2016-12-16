@@ -44,7 +44,7 @@ class CreateTestbenchTestTask extends DefaultTask {
 
     @TaskAction
     def run() {
-        if(!project.vaadinTestbench.enabled) {
+        if ( !project.vaadinTestbench.enabled ) {
             throw new GradleException('Please enable Testbench by setting vaadinTestbench.enabled=true before ' +
                     'creating a test')
         }
@@ -62,7 +62,7 @@ class CreateTestbenchTestTask extends DefaultTask {
         substitutions['testName'] = testName
         substitutions['appUrl'] = "http://localhost:${project.vaadinRun.serverPort}"
 
-        if(Util.isGroovyProject(project)){
+        if (  Util.isGroovyProject(project) ) {
             TemplateUtil.writeTemplate("MyTest.groovy", packageDir, testName + ".groovy", substitutions)
         } else {
             TemplateUtil.writeTemplate("MyTest.java", packageDir, testName + ".java", substitutions)

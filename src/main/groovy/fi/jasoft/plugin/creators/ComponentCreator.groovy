@@ -24,7 +24,7 @@ class ComponentCreator implements Runnable {
 
         String widgetsetPackagePath
         String widgetsetPackage
-        if(widgetset.contains(DOT)){
+        if (  widgetset.contains(DOT) ) {
             def widgetsetPackageFQN = widgetset.substring(0, widgetset.lastIndexOf(DOT))
             widgetsetPackagePath = TemplateUtil.convertFQNToFilePath(widgetsetPackageFQN)
             def widgetsetName = widgetset.tokenize(DOT).last()
@@ -42,9 +42,9 @@ class ComponentCreator implements Runnable {
         widgetDir.mkdirs()
 
         Map<String,String> substitutions = [:]
-        substitutions['componentServerPackage'] = "${widgetsetPackage ? widgetsetPackage + DOT : StringUtils.EMPTY}" +
+        substitutions['componentServerPackage'] = "${widgetsetPackage ? widgetsetPackage + DOT:StringUtils.EMPTY}" +
                 "$SERVER_PACKAGE.${componentName.toLowerCase()}"
-        substitutions['componentClientPackage'] = "${widgetsetPackage ? widgetsetPackage + DOT : StringUtils.EMPTY}" +
+        substitutions['componentClientPackage'] = "${widgetsetPackage ? widgetsetPackage + DOT:StringUtils.EMPTY}" +
                 "$CLIENT_PACKAGE.${componentName.toLowerCase()}"
         substitutions['componentName'] = componentName
         substitutions['componentStylename'] = componentName.toLowerCase()

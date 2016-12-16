@@ -30,13 +30,13 @@ import org.junit.Test
 class PluginExtensionTest extends PluginTestBase {
 
     @Test
-    void isVaadinExtensionPresent(){
+    void isVaadinExtensionPresent() {
         assert project.extensions.vaadin instanceof VaadinPluginExtension
     }
 
     @Test
-    void areVaadinPropertiesConfigured(){
-        VaadinPluginExtension vaadin = project.extensions.vaadin;
+    void areVaadinPropertiesConfigured() {
+        VaadinPluginExtension vaadin = project.extensions.vaadin
         assert vaadin.version == null
         assert vaadin.manageDependencies == true
         assert vaadin.manageRepositories == true
@@ -49,7 +49,7 @@ class PluginExtensionTest extends PluginTestBase {
     }
 
     @Test
-    void testVaadinClosure(){
+    void testVaadinClosure() {
         project.vaadin{
             widgetset 'com.example.Widgetset'
             widgetsetGenerator 'com.example.generator'
@@ -63,7 +63,7 @@ class PluginExtensionTest extends PluginTestBase {
     }
 
     @Test
-    void areGWTPropertiesConfigured(){
+    void areGWTPropertiesConfigured() {
         CompileWidgetsetConfiguration conf = project.vaadinCompile
         assert conf instanceof CompileWidgetsetConfiguration
         assert conf.style == "OBF"
@@ -81,7 +81,7 @@ class PluginExtensionTest extends PluginTestBase {
     }
 
     @Test
-    void testGWTClosure(){
+    void testGWTClosure() {
         project.vaadinCompile {
                 style "PRETTY"
                 optimize 0
@@ -99,7 +99,7 @@ class PluginExtensionTest extends PluginTestBase {
     }
 
     @Test
-    void areDevModePropertiesConfigured(){
+    void areDevModePropertiesConfigured() {
         SuperDevModeConfiguration conf = project.vaadinSuperDevMode
         assert conf instanceof SuperDevModeConfiguration
         assert conf.noserver == false
@@ -108,7 +108,7 @@ class PluginExtensionTest extends PluginTestBase {
     }
 
     @Test
-    void testDevModeClosure(){
+    void testDevModeClosure() {
         project.vaadinDevMode {
             noserver false
             bindAddress '0.0.0.0'
@@ -118,14 +118,14 @@ class PluginExtensionTest extends PluginTestBase {
     }
 
     @Test
-    void areVaadinPluginConfigurationPropertiesConfigured(){
+    void areVaadinPluginConfigurationPropertiesConfigured() {
         VaadinPluginExtension vaadin = project.extensions.vaadin
         assert vaadin.plugin instanceof VaadinPluginConfiguration
         assert vaadin.logToConsole == false
     }
 
     @Test
-    void testPluginConfigurationClosure(){
+    void testPluginConfigurationClosure() {
         assert project.extensions.vaadin.logToConsole == false
         project.vaadin.plugin {
             logToConsole true
@@ -134,7 +134,7 @@ class PluginExtensionTest extends PluginTestBase {
     }
 
     @Test
-    void areAddonPropertiesConfigured(){
+    void areAddonPropertiesConfigured() {
         VaadinPluginExtension vaadin = project.extensions.vaadin
         assert vaadin.addon instanceof AddonConfiguration
         assert vaadin.addon.author == ''
@@ -143,7 +143,7 @@ class PluginExtensionTest extends PluginTestBase {
     }
 
     @Test
-    void testAddonClosure(){
+    void testAddonClosure() {
         project.vaadin.addon {
             author 'Testing person'
             license ''

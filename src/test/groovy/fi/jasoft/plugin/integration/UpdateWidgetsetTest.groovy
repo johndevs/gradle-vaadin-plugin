@@ -15,7 +15,7 @@ import static org.junit.Assert.assertFalse
  */
 class UpdateWidgetsetTest extends IntegrationTest {
 
-    @Test void 'No Widgetset generated without property'(){
+    @Test void 'No Widgetset generated without property'() {
         runWithArguments(UpdateWidgetsetTask.NAME)
         assertFalse widgetsetFile.exists()
     }
@@ -27,7 +27,7 @@ class UpdateWidgetsetTest extends IntegrationTest {
         assertFalse widgetsetFile.exists()
     }
 
-    @Test void 'Widgetset generated into resource folder'(){
+    @Test void 'Widgetset generated into resource folder'() {
         buildFile << "vaadinCompile.widgetset = 'com.example.MyWidgetset'"
         runWithArguments(UpdateWidgetsetTask.NAME)
         assertTrue widgetsetFile.exists()

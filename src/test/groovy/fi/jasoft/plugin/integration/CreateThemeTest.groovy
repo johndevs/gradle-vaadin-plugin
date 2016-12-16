@@ -50,7 +50,7 @@ class CreateThemeTest extends IntegrationTest {
     }
 
     private void assertThemeCreatedAndCompiled(String themeName) {
-        if(themeName){
+        if (  themeName ) {
             runWithArguments(CreateThemeTask.NAME, "--name=$themeName")
         } else {
             runWithArguments(CreateThemeTask.NAME)
@@ -63,7 +63,7 @@ class CreateThemeTest extends IntegrationTest {
         assertCompiledThemeInDirectory(themesDir, themeName)
     }
 
-    private void assertThemeInDirectory(File directory, String themeName){
+    private void assertThemeInDirectory(File directory, String themeName) {
         assertTrue "$directory does not exist", directory.exists()
 
         def themeDir = Paths.get(directory.canonicalPath, themeName).toFile()

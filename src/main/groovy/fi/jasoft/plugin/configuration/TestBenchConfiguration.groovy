@@ -43,7 +43,7 @@ class TestBenchConfiguration {
     transient Project project
 
     @Deprecated
-    TestBenchConfiguration(Project project){
+    TestBenchConfiguration(Project project) {
         this.project = project
     }
 

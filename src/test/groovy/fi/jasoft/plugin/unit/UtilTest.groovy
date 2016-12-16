@@ -31,7 +31,7 @@ class UtilTest {
     public TemporaryFolder testFolder = new TemporaryFolder()
 
     @Before
-    void setup(){
+    void setup() {
         testFolder.newFolder('public')
         testFolder.newFile('public' + File.separator + 'foo.css')
 

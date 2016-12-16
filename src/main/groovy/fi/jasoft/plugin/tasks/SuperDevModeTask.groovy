@@ -39,19 +39,19 @@ class SuperDevModeTask extends DefaultTask {
     def SuperDevModeConfiguration configuration
 
     def cleanupThread = new Thread({
-        if(codeserverProcess){
+        if (  codeserverProcess ) {
             codeserverProcess.destroy()
             codeserverProcess = null
         }
 
-        if(server) {
+        if (  server ) {
             server.terminate()
             server = null
         }
 
         try {
             Runtime.getRuntime().removeShutdownHook(cleanupThread)
-        } catch(IllegalStateException e){
+        } catch (IllegalStateException e) {
             // Shutdown of the JVM in progress already, we don't need to remove the hook it will be removed by the JVM
             project.logger.debug('Shutdownhook could not be removed. This can be ignored.', e)
         }
@@ -66,7 +66,7 @@ class SuperDevModeTask extends DefaultTask {
 
     @TaskAction
     def run() {
-        if(!Util.getWidgetset(project)) {
+        if ( !Util.getWidgetset(project) ) {
             throw new GradleException("No widgetset found in project.")
         }
 
@@ -74,7 +74,7 @@ class SuperDevModeTask extends DefaultTask {
 
             server = ApplicationServer.get(project, ['superdevmode'])
 
-            server.startAndBlock();
+            server.startAndBlock()
 
             codeserverProcess.waitForOrKill(1)
         })
@@ -85,7 +85,7 @@ class SuperDevModeTask extends DefaultTask {
         def widgetsetsDir = Util.getWidgetsetDirectory(project)
         widgetsetsDir.mkdirs()
 
-        def sdmClassPath = project.configurations['vaadin-superdevmode'];
+        def sdmClassPath = project.configurations['vaadin-superdevmode']
         def classpath = sdmClassPath + Util.getClientCompilerClassPath(project)
 
         def superdevmodeProcess = [Util.getJavaBinary(project)]
@@ -98,7 +98,7 @@ class SuperDevModeTask extends DefaultTask {
         superdevmodeProcess += ['-logLevel', configuration.logLevel]
         superdevmodeProcess += ['-noprecompile']
 
-        if (configuration.extraArgs) {
+        if (  configuration.extraArgs ) {
             superdevmodeProcess += configuration.extraArgs as List
         }
 
@@ -107,7 +107,7 @@ class SuperDevModeTask extends DefaultTask {
         codeserverProcess = superdevmodeProcess.execute()
 
         Util.logProcess(project, codeserverProcess, 'superdevmode.log', { line ->
-            if(line.contains('The code server is ready')){
+            if (  line.contains('The code server is ready') ) {
                 readyClosure.call()
             }
         })

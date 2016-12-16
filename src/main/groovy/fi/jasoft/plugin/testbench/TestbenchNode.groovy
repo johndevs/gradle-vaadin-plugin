@@ -29,7 +29,7 @@ class TestbenchNode {
 
     private final Project project
 
-    private process;
+    private process
 
     private TestBenchNodeConfiguration configuration
 
@@ -68,7 +68,7 @@ class TestbenchNode {
         process.add('-port')
         process.add(port.toString())
 
-        for (browser in browsers) {
+        for ( browser in browsers ) {
             process.add('-browser')
             process.add(browser.inject([]) { result, entry ->
                 result << "${entry.key}=${entry.value}"
@@ -78,7 +78,7 @@ class TestbenchNode {
         // Execute server
         process = process.execute()
 
-        if (project.vaadin.logToConsole) {
+        if (  project.vaadin.logToConsole ) {
             process.consumeProcessOutput(System.out, System.out)
         } else {
             File log = new File(logDir.canonicalPath + '/testbench-node.log')
@@ -97,7 +97,7 @@ class TestbenchNode {
         process.out.close()
         process.err.close()
         process.destroy()
-        process = null;
+        process = null
 
         project.logger.lifecycle("Testbench node terminated.")
     }

@@ -39,10 +39,10 @@ public class JettyServerRunner {
         String logLevel = args[4];
 
         List<String> resources = new ArrayList<>();
-        if(new File(webAppDir).exists()){
+        if (new File(webAppDir).exists()){
             resources.add(webAppDir);
         }
-        if(new File(resourcesDir).exists()){
+        if (new File(resourcesDir).exists()){
             resources.add(resourcesDir);
         }
 

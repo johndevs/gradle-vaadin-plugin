@@ -15,13 +15,13 @@ import static org.junit.Assert.assertTrue
  */
 class CompileWidgetsetTest extends IntegrationTest {
 
-    @Test void 'No widgetset, no compile'(){
+    @Test void 'No widgetset, no compile'() {
         def result = runWithArguments(CreateProjectTask.NAME, CompileWidgetsetTask.NAME, '--info')
         assertFalse result, result.contains('Detected widgetset')
         assertFalse result, result.contains('Compiling module')
     }
 
-    @Test void 'No widgetset defined, automatic widgetset detected and compiled'(){
+    @Test void 'No widgetset defined, automatic widgetset detected and compiled'() {
         runWithArguments(CreateProjectTask.NAME, '--widgetset=com.example.MyWidgetset')
         def result = runWithArguments('--info', CompileWidgetsetTask.NAME)
         assertTrue result, result.contains('Detected widgetset com.example.MyWidgetset')
@@ -29,7 +29,7 @@ class CompileWidgetsetTest extends IntegrationTest {
         assertTrue result, result.contains('Linking succeeded')
     }
 
-    @Test void 'Widgetset defined, manual widgetset detected and compiled'(){
+    @Test void 'Widgetset defined, manual widgetset detected and compiled'() {
         buildFile << """
             vaadinCompile.widgetset = 'com.example.MyWidgetset'
         """

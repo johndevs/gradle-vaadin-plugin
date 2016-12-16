@@ -57,14 +57,14 @@ class CreateAddonProjectTask extends DefaultTask {
         TemplateUtil.writeTemplate('addonProject/addon.gradle', addonDir, BUILD_FILE, substitutions)
 
         new ComponentCreator(
-                javaDir: new File(addonDir, MAIN_SOURCE_FOLDER),
-                componentName: componentName
+                javaDir:new File(addonDir, MAIN_SOURCE_FOLDER),
+                componentName:componentName
         ).run()
 
         new AddonThemeCreator(
-                resourceDir: new File(addonDir, 'src/main/resources'),
-                themeName: componentName,
-                templateDir: TEMPLATE_DIRECTORY
+                resourceDir:new File(addonDir, 'src/main/resources'),
+                themeName:componentName,
+                templateDir:TEMPLATE_DIRECTORY
         ).run()
 
         def widgetsetDir = new File(addonDir, 'src/main/resources/client')
@@ -82,22 +82,22 @@ class CreateAddonProjectTask extends DefaultTask {
         TemplateUtil.writeTemplate('addonProject/demo.gradle', demoDir, BUILD_FILE, substitutions)
 
         new ProjectCreator(
-                applicationName: DEMO_APPLICATION_NAME,
+                applicationName:DEMO_APPLICATION_NAME,
                 applicationPackage: 'com.example.demo',
-                widgetsetConfiguration: project.vaadinCompile as CompileWidgetsetConfiguration,
-                javaDir: new File(demoDir, MAIN_SOURCE_FOLDER),
-                resourceDir: new File(demoDir, 'src/main/resources/'),
-                templateDir: TEMPLATE_DIRECTORY,
+                widgetsetConfiguration:project.vaadinCompile as CompileWidgetsetConfiguration,
+                javaDir:new File(demoDir, MAIN_SOURCE_FOLDER),
+                resourceDir:new File(demoDir, 'src/main/resources/'),
+                templateDir:TEMPLATE_DIRECTORY,
                 uiImports: ["server.${componentName.toLowerCase()}.$componentName"],
                 uiSubstitutions: ['addonComponentType' : componentName],
-                pushSupported: Util.isPushSupportedAndEnabled(project),
-                addonStylesSupported: Util.isAddonStylesSupported(project)
+                pushSupported:Util.isPushSupportedAndEnabled(project),
+                addonStylesSupported:Util.isAddonStylesSupported(project)
         ).run()
 
         new ThemeCreator(
-                themeName: DEMO_APPLICATION_NAME,
-                themesDirectory: new File(demoDir, 'src/main/webapp/VAADIN/themes'),
-                vaadinVersion: Util.getVaadinVersion(project)
+                themeName:DEMO_APPLICATION_NAME,
+                themesDirectory:new File(demoDir, 'src/main/webapp/VAADIN/themes'),
+                vaadinVersion:Util.getVaadinVersion(project)
         ).run()
     }
 

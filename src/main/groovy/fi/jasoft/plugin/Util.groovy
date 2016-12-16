@@ -20,18 +20,13 @@ import fi.jasoft.plugin.tasks.BuildClassPathJar
 import fi.jasoft.plugin.tasks.UpdateWidgetsetTask
 import groovy.io.FileType
 import groovy.transform.Memoized
-import groovy.transform.PackageScope
 import org.apache.commons.lang.StringUtils
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
-
 import org.gradle.api.artifacts.ProjectDependency
-import org.gradle.api.artifacts.ResolvedArtifact
-import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.api.file.FileCollection
-import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.FileVisitDetails
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.logging.LogLevel
@@ -58,7 +53,6 @@ class Util {
 
     private static final String PLUS = '+'
     private static final String SPACE = ' '
-    private static final String VAADIN_PROPERTY = 'vaadin'
     private static final String WARNING_LOG_MARKER = '[WARN]'
     private static final String ERROR_LOG_MARKER = '[ERROR]'
     private static final String INFO_LOG_MARKER = '[INFO]'
@@ -71,9 +65,9 @@ class Util {
     private static final String JAVA_BIN_NAME = 'java'
     private static final String GWT_MODULE_POSTFIX = '.gwt.xml'
     private static final String CLIENT_PACKAGE_NAME = 'client'
-    
     public static final String APP_WIDGETSET = 'AppWidgetset'
     public static final String VAADIN_SERVER_ARTIFACT = 'vaadin-server'
+    public static final int VAADIN_SEVEN_MAJOR_VERSION = 7
 
     /**
      * Get the compile time classpath of a project
@@ -99,9 +93,9 @@ class Util {
      */
     @Memoized
     static FileCollection getCompileClassPathOrJar(Project project) {
-        def vaadin = project.vaadin as VaadinPluginExtension
+        VaadinPluginExtension vaadin = project.vaadin as VaadinPluginExtension
         FileCollection classpath
-        if(vaadin.useClassPathJar) {
+        if (  vaadin.useClassPathJar ) {
             // Add dependencies using the classpath jar
             BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
             classpath = project.files(pathJarTask.archivePath)
@@ -132,7 +126,7 @@ class Util {
             collection += project.files(dir)
         }
 
-        if(project.vaadinCompile.gwtSdkFirstInClasspath){
+        if (  project.vaadinCompile.gwtSdkFirstInClasspath ) {
             collection = moveGwtSdkFirstInClasspath(project, collection)
         }
 
@@ -151,11 +145,11 @@ class Util {
      *      a new collection with the GWT SDK libs listed first
      */
     @Memoized
-    static FileCollection moveGwtSdkFirstInClasspath(Project project , FileCollection collection){
-        if(project.vaadin.manageDependencies){
-            FileCollection gwtCompilerClasspath = project.configurations[GradleVaadinPlugin.CONFIGURATION_CLIENT];
-            return gwtCompilerClasspath + (collection - gwtCompilerClasspath);
-        } else if(project.vaadinCompile.gwtSdkFirstInClasspath){
+    static FileCollection moveGwtSdkFirstInClasspath(Project project , FileCollection collection) {
+        if (  project.vaadin.manageDependencies ) {
+            FileCollection gwtCompilerClasspath = project.configurations[GradleVaadinPlugin.CONFIGURATION_CLIENT]
+            return gwtCompilerClasspath + (collection - gwtCompilerClasspath)
+        } else if (  project.vaadinCompile.gwtSdkFirstInClasspath ) {
             project.logger.log(LogLevel.WARN, "Cannot move GWT SDK first in classpath since plugin does not manage " +
                     "dependencies. You can set vaadinCompile.gwtSdkFirstInClasspath=false and " +
                     "arrange the dependencies yourself if you need to.")
@@ -175,9 +169,9 @@ class Util {
      */
     @Memoized
     static SourceDirectorySet getMainSourceSet(Project project, boolean forceDefaultJavaSourceset=false) {
-        if(project.vaadin.mainSourceSet) {
+        if (  project.vaadin.mainSourceSet ) {
             project.vaadin.mainSourceSet
-        } else if(isGroovyProject(project) && !forceDefaultJavaSourceset) {
+        } else if (  isGroovyProject(project) && !forceDefaultJavaSourceset ) {
             project.sourceSets.main.groovy
         } else {
             project.sourceSets.main.java
@@ -196,9 +190,9 @@ class Util {
      */
     @Memoized
     static SourceDirectorySet getMainTestSourceSet(Project project, forceDefaultJavaSourceset=false) {
-        if(project.vaadin.mainTestSourceSet) {
+        if (  project.vaadin.mainTestSourceSet ) {
             project.vaadin.mainTestSourceSet
-        } else if(isGroovyProject(project) && !forceDefaultJavaSourceset) {
+        } else if (  isGroovyProject(project) && !forceDefaultJavaSourceset ) {
             project.sourceSets.test.groovy
         } else {
             project.sourceSets.test.java
@@ -215,7 +209,7 @@ class Util {
     @Memoized
     static isPushSupported(Project project) {
         VersionNumber version = VersionNumber.parse(getResolvedVaadinVersion(project))
-        version.major >= 7 && version.minor > 0
+        version.major >= VAADIN_SEVEN_MAJOR_VERSION && version.minor > 0
     }
 
     /**
@@ -253,13 +247,13 @@ class Util {
      *      the URL to open
      */
     static void openBrowser(Project project, String url) {
-        if (project.vaadinRun.openInBrowser
-                && java.awt.Desktop.isDesktopSupported()
-                && java.awt.Desktop.desktop.isSupported(Desktop.Action.BROWSE)) {
+        if ( project.vaadinRun.openInBrowser
+                && Desktop.isDesktopSupported()
+                && Desktop.desktop.isSupported(Desktop.Action.BROWSE)) {
             Thread.startDaemon {
-                java.awt.Desktop.desktop.browse url.toURI()
+                Desktop.desktop.browse url.toURI()
             }
-        } else if(project.vaadinRun.openInBrowser) {
+        } else if (  project.vaadinRun.openInBrowser ) {
             project.logger.info('Failed to open browser, AWT Desktop or Desktop.browse() is not supported on ' +
                     'current platform.')
         }
@@ -276,7 +270,7 @@ class Util {
      */
     @Memoized
     static boolean isIE10UserAgentSupported(Project project) {
-        if (getVaadinVersion(project) == PLUS) {
+        if (  getVaadinVersion(project) == PLUS ) {
             return true
         }
         VersionNumber version = VersionNumber.parse(getVaadinVersion(project))
@@ -295,7 +289,7 @@ class Util {
     @Memoized
     static boolean isOperaUserAgentSupported(Project project) {
         VersionNumber version = VersionNumber.parse(getResolvedVaadinVersion(project))
-        version.major == 7 && version.minor < 4
+        version.major == VAADIN_SEVEN_MAJOR_VERSION && version.minor < 4
     }
 
     /**
@@ -314,11 +308,11 @@ class Util {
 
         def paths = []
 
-        if(addonsDir.exists()){
-            addonsDir.traverse(type: FileType.DIRECTORIES) {
+        if (  addonsDir.exists() ) {
+            addonsDir.traverse(type:FileType.DIRECTORIES) {
                 def themeName = it.getName()
                 def fileNameRegExp = ~/$themeName\.s?css/
-                it.traverse(type: FileType.FILES, nameFilter : fileNameRegExp) {
+                it.traverse(type:FileType.FILES, nameFilter:fileNameRegExp) {
                     paths += ["VAADIN/addons/$themeName/"+it.getName()]
                 }
             }
@@ -337,7 +331,7 @@ class Util {
      *      <code>true</code> if project is a groovy project
      */
     @Memoized
-    static boolean isGroovyProject(Project project){
+    static boolean isGroovyProject(Project project) {
         project.plugins.findPlugin(fi.jasoft.plugin.GradleVaadinGroovyPlugin)
     }
 
@@ -354,7 +348,7 @@ class Util {
      *      Optional additional monitor closure for processing output
      */
     static void logProcess(final Project project, final Process process, final String filename, Closure monitor={}) {
-        if(project.vaadin.logToConsole){
+        if (  project.vaadin.logToConsole ) {
             logProcessToConsole(project,process,monitor)
         } else {
             logProcessToFile(project, process, filename, monitor)
@@ -388,16 +382,16 @@ class Util {
 
                     process.inputStream.eachLine { output ->
                         monitor.call(output)
-                        if (output.contains(WARNING_LOG_MARKER)) {
+                        if (  output.contains(WARNING_LOG_MARKER) ) {
                             out.println WARNING_LOG_MARKER + SPACE + output.replace(WARNING_LOG_MARKER, '').trim()
-                        } else if(output.contains(ERROR_LOG_MARKER)){
+                        } else if (  output.contains(ERROR_LOG_MARKER) ) {
                             errorOccurred = true
                             out.println ERROR_LOG_MARKER + SPACE + output.replace(ERROR_LOG_MARKER,'').trim()
                         } else {
                             out.println INFO_LOG_MARKER + SPACE + output.trim()
                         }
                         out.flush()
-                        if(errorOccurred){
+                        if (  errorOccurred ) {
                             // An error has occurred, dump everything to console
                             project.logger.error(output.replace(ERROR_LOG_MARKER,'').trim())
                         }
@@ -443,19 +437,19 @@ class Util {
                 def errorOccurred = false
                 process.inputStream.eachLine { output ->
                     monitor.call(output)
-                    if (output.contains(WARNING_LOG_MARKER)) {
+                    if (  output.contains(WARNING_LOG_MARKER) ) {
                         project.logger.warn(output.replace(WARNING_LOG_MARKER, '').trim())
-                    } else if(output.contains(ERROR_LOG_MARKER)){
+                    } else if (  output.contains(ERROR_LOG_MARKER) ) {
                         errorOccurred = true
                     } else {
                         project.logger.info(output.trim())
                     }
-                    if(errorOccurred){
+                    if (  errorOccurred ) {
                         // An error has occurred, dump everything to console
                         project.logger.error(output.replace(ERROR_LOG_MARKER, '').trim())
                     }
                 }
-            } catch(IOException e){
+            } catch (IOException e) {
                 // Stream might be closed
                 project.logger.debug(STREAM_CLOSED_LOG_MESSAGE, e)
             }
@@ -467,7 +461,7 @@ class Util {
                     monitor.call(output)
                     project.logger.error(output.replace(ERROR_LOG_MARKER, '').trim())
                 }
-            } catch(IOException e){
+            } catch (IOException e) {
                 // Stream might be closed
                 project.logger.debug(STREAM_CLOSED_LOG_MESSAGE, e)
             }
@@ -491,8 +485,8 @@ class Util {
         Files.walkFileTree path, new SimpleFileVisitor<Path>() {
 
             @Override
-            public FileVisitResult preVisitDirectory(Path p, BasicFileAttributes attrs){
-                if(p.toFile().exists()){
+            public FileVisitResult preVisitDirectory(Path p, BasicFileAttributes attrs) {
+                if (  p.toFile().exists() ) {
                     p.register(watchService,
                             StandardWatchEventKinds.ENTRY_CREATE,
                             StandardWatchEventKinds.ENTRY_DELETE,
@@ -512,11 +506,11 @@ class Util {
             sleep(1000)
 
             key.pollEvents().each { WatchEvent event ->
-                if (!stop && event.kind() != StandardWatchEventKinds.OVERFLOW) {
+                if ( !stop && event.kind() != StandardWatchEventKinds.OVERFLOW ) {
                     stop = !closure.call(key, event)
                 }
             }
-            if(!key.reset() || stop){
+            if ( !key.reset() || stop ) {
                 break
             }
         }
@@ -534,7 +528,7 @@ class Util {
      */
     @Memoized
     static File getThemesDirectory(Project project) {
-        if(project.vaadinThemeCompile.themesDirectory){
+        if (  project.vaadinThemeCompile.themesDirectory ) {
             project.file(project.vaadinThemeCompile.themesDirectory)
         } else {
             def webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
@@ -594,7 +588,7 @@ class Util {
         String version = project.vaadin.version
         project.configurations.each { Configuration conf ->
             conf.allDependencies.each { Dependency dependency ->
-                if( dependency.name.startsWith(VAADIN_SERVER_ARTIFACT)){
+                if (  dependency.name.startsWith(VAADIN_SERVER_ARTIFACT) ) {
                     version = conf.resolvedConfiguration
                             .resolvedArtifacts
                             .find { it.name == VAADIN_SERVER_ARTIFACT }
@@ -623,31 +617,31 @@ class Util {
         def attribute = new Attributes.Name(byAttribute)
         project.configurations.all.each { Configuration conf ->
             conf.allDependencies.each { Dependency dependency ->
-                if(dependency in ProjectDependency) {
+                if (  dependency in ProjectDependency ) {
                     Project dependentProject = ((ProjectDependency) dependency).dependencyProject
-                    if(!(dependentProject in scannedProjects)){
+                    if ( !(dependentProject in scannedProjects) ) {
                         addons.addAll(findAddonsInProject(dependentProject, byAttribute, includeFile, scannedProjects))
                     }
                 } else {
                     conf.files(dependency).each { File file ->
-                        if(file.file && file.name.endsWith('.jar')) {
+                        if (  file.file && file.name.endsWith('.jar') ) {
                             file.withInputStream { InputStream stream ->
                                 def jarStream = new JarInputStream(stream)
                                 def mf = jarStream.getManifest()
                                 def attributes = mf?.mainAttributes
-                                if (attributes?.getValue(attribute)) {
-                                    if (!dependency.name.startsWith('vaadin-client')) {
-                                        if (includeFile) {
+                                if (  attributes?.getValue(attribute) ) {
+                                    if ( !dependency.name.startsWith('vaadin-client') ) {
+                                        if (  includeFile ) {
                                             addons << [
                                                     groupId   : dependency.group,
-                                                    artifactId: dependency.name,
+                                                    artifactId:dependency.name,
                                                     version   : dependency.version,
                                                     file      : file
                                             ]
                                         } else {
                                             addons << [
                                                     groupId   : dependency.group,
-                                                    artifactId: dependency.name,
+                                                    artifactId:dependency.name,
                                                     version   : dependency.version,
                                             ]
                                         }
@@ -675,7 +669,7 @@ class Util {
         def clientPackage
         getMainSourceSet(project).srcDirs.each { File srcDir ->
              project.fileTree(srcDir).visit { FileVisitDetails details ->
-                if(details.name == CLIENT_PACKAGE_NAME && details.directory) {
+                if (  details.name == CLIENT_PACKAGE_NAME && details.directory ) {
                     details.stopVisiting()
                     clientPackage = details.file.canonicalPath - srcDir.canonicalPath
                     project.logger.info "Found client package $clientPackage"
@@ -719,7 +713,7 @@ class Util {
         classpath += project.configurations[GradleVaadinPlugin.CONFIGURATION_SERVER]
 
         // Include client if no widgetset to provide pre-compiled widgetset
-        if(!project.vaadinCompile.widgetsetCDN && !getWidgetset(project)){
+        if ( !project.vaadinCompile.widgetsetCDN && !getWidgetset(project) ) {
             classpath += project.configurations[GradleVaadinPlugin.CONFIGURATION_CLIENT]
         }
 
@@ -727,7 +721,7 @@ class Util {
         classpath += project.configurations.runtime
 
         // Include push dependencies if enabled
-        if(isPushSupportedAndEnabled(project)) {
+        if (  isPushSupportedAndEnabled(project) ) {
             classpath += project.configurations[GradleVaadinPlugin.CONFIGURATION_PUSH]
         }
 
@@ -758,9 +752,9 @@ class Util {
      *      the relative path
      */
     @Memoized
-    static String getRelativePathForFile(String parentFolderName, File file){
+    static String getRelativePathForFile(String parentFolderName, File file) {
         def parentFolder = file.parentFile
-        while(parentFolder.name != parentFolderName){
+        while(parentFolder.name != parentFolderName) {
             parentFolder = parentFolder.parentFile
         }
         file.canonicalPath.substring(parentFolder.canonicalPath.length() + 1)
@@ -788,15 +782,15 @@ class Util {
      * @return
      */
     @Memoized
-    static String getJavaBinary(Project project){
+    static String getJavaBinary(Project project) {
         String javaHome
-        if(project.hasProperty(GRADLE_HOME)){
+        if (  project.hasProperty(GRADLE_HOME) ) {
             javaHome = project.properties[GRADLE_HOME]
-        } else if(System.getProperty(JAVA_HOME)){
+        } else if (  System.getProperty(JAVA_HOME) ) {
             javaHome = System.getProperty(JAVA_HOME)
         }
 
-        if(javaHome){
+        if (  javaHome ) {
             def javaBin =  new File(javaHome, 'bin')
             def java = new File(javaBin, JAVA_BIN_NAME)
             return java.canonicalPath
@@ -811,22 +805,22 @@ class Util {
      */
     @Memoized
     static String getWidgetset(Project project) {
-        if(project.vaadinCompile.widgetsetCDN){
+        if (  project.vaadinCompile.widgetsetCDN ) {
             throw new GradleException("Cannot retrieve widgetset name from a project that is using the widgetset CDN.")
         }
 
-        if(project.vaadinCompile.widgetset){
+        if (  project.vaadinCompile.widgetset ) {
             return project.vaadinCompile.widgetset
         }
 
         // Search for widgetset
         def widgetsetFile = resolveWidgetsetFile(project)
-        if(widgetsetFile){
+        if (  widgetsetFile ) {
             def sourceDirs = project.sourceSets.main.allSource
             def File rootDir = sourceDirs.srcDirs.find { File directory ->
                 project.fileTree(directory.absolutePath).contains(widgetsetFile)
             }
-            if(rootDir){
+            if (  rootDir ) {
                 def relativePath= new File( rootDir.toURI().relativize( widgetsetFile.toURI() ).toString() )
                 def widgetset = TemplateUtil.convertFilePathToFQN(relativePath.path, GWT_MODULE_POSTFIX)
                 project.logger.info "Detected widgetset $widgetset from project"
@@ -847,7 +841,7 @@ class Util {
         sourceDirs.srcDirs.each {
             modules.addAll(project.fileTree(it.absolutePath).include('**/*/*.gwt.xml'))
         }
-        if(!modules.isEmpty()){
+        if ( !modules.isEmpty() ) {
             return modules.first()
         }
 
@@ -855,11 +849,11 @@ class Util {
         String widgetset = project.vaadinCompile.widgetset
 
         // If client side classes exists in project use client side package to determine widgetset
-        if(!widgetset) {
+        if ( !widgetset ) {
             def clientPackage = getClientPackage(project)
-            if(clientPackage) {
+            if (  clientPackage ) {
                 def widgetsetPath = StringUtils.removeEnd(clientPackage, File.separator + CLIENT_PACKAGE_NAME)
-                if(widgetsetPath.size() > 0){
+                if (  widgetsetPath.size() > 0 ) {
                     widgetsetPath = TemplateUtil.convertFilePathToFQN(widgetsetPath, '') + '.'
                 }
                 widgetset =  widgetsetPath + APP_WIDGETSET
@@ -867,16 +861,16 @@ class Util {
         }
 
         // If addons exists in project but widgetset is not defined, use default one
-        if(!widgetset && findAddonsInProject(project).size() > 0){
+        if ( !widgetset && findAddonsInProject(project).size() > 0 ) {
             widgetset = APP_WIDGETSET
         }
 
         // If dependent projects have widgetsets, use default one
-        if(!widgetset && UpdateWidgetsetTask.findInheritsInDependencies(project).size() > 0) {
+        if ( !widgetset && UpdateWidgetsetTask.findInheritsInDependencies(project).size() > 0 ) {
             widgetset = APP_WIDGETSET
         }
 
-        if(widgetset && !project.vaadinCompile.widgetsetCDN){
+        if (  widgetset && !project.vaadinCompile.widgetsetCDN ) {
             // No widgetset file detected, create one
             File resourceDir = project.sourceSets.main.resources.srcDirs.first()
             def widgetsetFile = new File(resourceDir,
@@ -898,11 +892,11 @@ class Util {
         boolean capitilizeNextCharacter = false
         string.chars.collect { char c ->
             String result = ''
-            if(isFirstCharacter && Character.isJavaIdentifierStart(c)){
+            if (  isFirstCharacter && Character.isJavaIdentifierStart(c) ) {
                 isFirstCharacter = false
                 result = capitilizeNextCharacter ? c.toUpperCase() : c
                 capitilizeNextCharacter = false
-            } else if(Character.isJavaIdentifierPart(c)){
+            } else if (  Character.isJavaIdentifierPart(c) ) {
                 result = capitilizeNextCharacter ? c.toUpperCase() : c
                 capitilizeNextCharacter = false
             } else {

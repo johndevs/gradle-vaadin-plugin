@@ -57,13 +57,13 @@ class CreateDesignTask extends DefaultTask{
     @Option(option = 'template', description = "The selected tempalte to use. Must be included in --templates")
     def String template = null
 
-    public CreateDesignTask(){
+    public CreateDesignTask() {
         description = 'Creates a new design file'
     }
 
     @TaskAction
-    def run(){
-        if(listTemplates){
+    def run() {
+        if (  listTemplates ) {
             project.logger.lifecycle("Available templates:")
             templates.each { String name, File file ->
                 project.logger.printf("%-30.30s  %-30.30s%n", name, "($file.name)")
@@ -73,14 +73,14 @@ class CreateDesignTask extends DefaultTask{
 
         makeDesignFile()
 
-        if(!template){
+        if ( !template ) {
             // TODO add support for generating companion files for any template
 
-            if(createCompanionFile){
+            if (  createCompanionFile ) {
                 makeDesignCompanionFile()
             }
 
-            if(createImplementationFile){
+            if (  createImplementationFile ) {
                 makeDesignImplementationFile()
             }
         }
@@ -92,8 +92,8 @@ class CreateDesignTask extends DefaultTask{
         File designDir = new File(resourcesDir, TemplateUtil.convertFQNToFilePath(designPackage))
         designDir.mkdirs()
 
-        if(template){
-            if(!templates.containsKey(template)){
+        if (  template ) {
+            if ( !templates.containsKey(template) ) {
                 throw new GradleException("Template with name $template could not be found.")
             }
             TemplateUtil.writeTemplateFromString(templates[template].text, designDir, designName + DESIGN_HTML_FILE)
@@ -133,7 +133,7 @@ class CreateDesignTask extends DefaultTask{
         def templatesDir = Paths.get(System.getProperty("user.home"), '.vaadin', 'designer', 'templates').toFile()
         def templateMap = [:]
         templatesDir.eachFile { File file ->
-            if(!file.isDirectory() && file.name.toLowerCase().endsWith('.html')){
+            if ( !file.isDirectory() && file.name.toLowerCase().endsWith('.html') ) {
                 def templateName = file.name.take(file.name.lastIndexOf('.'))
                 templateMap[templateName] = file
             }

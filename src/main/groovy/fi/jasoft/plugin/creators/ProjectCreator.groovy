@@ -47,23 +47,23 @@ class ProjectCreator implements Runnable {
         uiSubstitutions[APPLICATION_PACKAGE_KEY] = applicationPackage
 
         // Imports
-        if (pushSupported) {
+        if (  pushSupported ) {
             uiImports.add('com.vaadin.annotations.Push')
         }
 
-        if (addonStylesSupported) {
+        if (  addonStylesSupported ) {
             uiImports.add('com.vaadin.annotations.Theme')
         }
 
         uiSubstitutions['imports'] = uiImports
 
         // Annotations
-        if (pushSupported) {
+        if (  pushSupported ) {
             uiAnnotations.add('Push')
         }
 
-        if (addonStylesSupported) {
-            if (groovyProject) {
+        if (  addonStylesSupported ) {
+            if (  groovyProject ) {
                 uiAnnotations.add("Theme('${applicationName}')")
             } else {
                 uiAnnotations.add("Theme(\"${applicationName}\")")
@@ -72,7 +72,7 @@ class ProjectCreator implements Runnable {
 
         uiSubstitutions['annotations'] = uiAnnotations
 
-        if (groovyProject) {
+        if (  groovyProject ) {
             TemplateUtil.writeTemplate("$templateDir/MyUI.groovy",
                     UIDir, "${applicationName}UI.groovy", uiSubstitutions)
         } else {
@@ -90,8 +90,8 @@ class ProjectCreator implements Runnable {
 
         Map<String,String> initParams = ['ui' : "$applicationPackage.${applicationName}UI"]
 
-        if (widgetsetFQN) {
-            if (widgetsetConfiguration.widgetsetCDN) {
+        if (  widgetsetFQN ) {
+            if (  widgetsetConfiguration.widgetsetCDN ) {
                 initParams.put(WIDGETSET_KEY, "${widgetsetFQN.replaceAll('[^a-zA-Z0-9]+','')}")
             } else {
                 initParams.put(WIDGETSET_KEY, "$widgetsetFQN")
@@ -100,7 +100,7 @@ class ProjectCreator implements Runnable {
 
         servletSubstitutions['initParams'] = initParams
 
-        if (groovyProject) {
+        if (  groovyProject ) {
             TemplateUtil.writeTemplate("$templateDir/MyServlet.groovy",
                     UIDir, applicationName + 'Servlet.groovy', servletSubstitutions)
         } else {
@@ -115,7 +115,7 @@ class ProjectCreator implements Runnable {
     }
 
     @PackageScope
-    File getUIDir(){
+    File getUIDir() {
         File uidir = new File(javaDir, TemplateUtil.convertFQNToFilePath(applicationPackage))
         uidir.mkdirs()
         uidir

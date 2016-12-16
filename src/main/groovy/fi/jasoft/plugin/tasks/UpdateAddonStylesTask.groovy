@@ -40,7 +40,7 @@ class UpdateAddonStylesTask extends DefaultTask {
 
             // Themes dirs
             def themesDir = Util.getThemesDirectory(project)
-            if(themesDir && themesDir.exists()){
+            if (  themesDir && themesDir.exists() ) {
                 themesDir.eachDir {
                     inputs.dir it
                     outputs.file new File(it, ADDONS_SCSS_FILE)
@@ -48,7 +48,7 @@ class UpdateAddonStylesTask extends DefaultTask {
             }
 
             // Add classpath jar
-            if(project.vaadin.useClassPathJar) {
+            if (  project.vaadin.useClassPathJar ) {
                 BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
                 inputs.file(pathJarTask.archivePath)
             }
@@ -57,7 +57,7 @@ class UpdateAddonStylesTask extends DefaultTask {
 
     @TaskAction
     public void run() {
-        if (!Util.isAddonStylesSupported(project)) {
+        if ( !Util.isAddonStylesSupported(project) ) {
             return
         }
 
@@ -75,7 +75,7 @@ class UpdateAddonStylesTask extends DefaultTask {
             // SASSAddonImportFileCreator cannot handle classpath jar, so if
             // that is used we need to manually add the addons to the classpath
             // even though they are listen inside the classpath jar
-            if(project.vaadin.useClassPathJar){
+            if (  project.vaadin.useClassPathJar ) {
                 Util.findAddonsInProject(project, 'Vaadin-Stylesheets', true).each {
                     classpath += project.files(it.file)
                 }
@@ -92,7 +92,7 @@ class UpdateAddonStylesTask extends DefaultTask {
             Util.logProcessToConsole(project, process)
 
             int result = process.waitFor()
-            if (result != 0) {
+            if (  result != 0 ) {
                 project.logger.error("Failed to update $addonsScss. SASS importer returned error code $result")
             }
         }
