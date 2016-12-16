@@ -25,7 +25,7 @@ import org.gradle.util.SingleMessageLogger
 class MessageLogger {
 
     static String getDeprecationMessage() {
-        'has been deprecated and is scheduled to be removed in Gradle Vaadin Plugin 0.12'
+        'has been deprecated and is scheduled to be removed in Gradle Vaadin Plugin 2.0'
     }
 
     /**

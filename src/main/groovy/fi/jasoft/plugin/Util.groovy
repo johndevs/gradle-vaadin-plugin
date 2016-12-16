@@ -84,6 +84,7 @@ class Util {
      * @return
      *      the classpath as a collection of files
      */
+    @Memoized
     static FileCollection getCompileClassPath(Project project) {
         project.sourceSets.main.compileClasspath
     }
@@ -96,6 +97,7 @@ class Util {
      * @return
      *      the classpath as a collection of files
      */
+    @Memoized
     static FileCollection getCompileClassPathOrJar(Project project) {
         def vaadin = project.vaadin as VaadinPluginExtension
         FileCollection classpath
@@ -117,6 +119,7 @@ class Util {
      * @return
      *      The classpath for the GWT compiler
      */
+    @Memoized
     static FileCollection getClientCompilerClassPath(Project project) {
         FileCollection collection = project.sourceSets.main.runtimeClasspath
         collection += project.sourceSets.main.compileClasspath
@@ -147,6 +150,7 @@ class Util {
      * @return
      *      a new collection with the GWT SDK libs listed first
      */
+    @Memoized
     static FileCollection moveGwtSdkFirstInClasspath(Project project , FileCollection collection){
         if(project.vaadin.manageDependencies){
             FileCollection gwtCompilerClasspath = project.configurations[GradleVaadinPlugin.CONFIGURATION_CLIENT];
@@ -169,6 +173,7 @@ class Util {
      * @return
      *      The source set
      */
+    @Memoized
     static SourceDirectorySet getMainSourceSet(Project project, boolean forceDefaultJavaSourceset=false) {
         if(project.vaadin.mainSourceSet) {
             project.vaadin.mainSourceSet
@@ -189,6 +194,7 @@ class Util {
      * @return
      *      The source set
      */
+    @Memoized
     static SourceDirectorySet getMainTestSourceSet(Project project, forceDefaultJavaSourceset=false) {
         if(project.vaadin.mainTestSourceSet) {
             project.vaadin.mainTestSourceSet
@@ -206,6 +212,7 @@ class Util {
      *      The project to check
      * @return true if push is supported
      */
+    @Memoized
     static isPushSupported(Project project) {
         VersionNumber version = VersionNumber.parse(getResolvedVaadinVersion(project))
         version.major >= 7 && version.minor > 0
@@ -218,6 +225,7 @@ class Util {
      *      The project to check
      * @return  true if push is supported and enabled
      */
+    @Memoized
     static isPushSupportedAndEnabled(Project project) {
         isPushSupported(project) && project.vaadin.push
     }
@@ -230,6 +238,7 @@ class Util {
      * @return
      *      <code>true</code> if addon styles are supported
      */
+    @Memoized
     static boolean isAddonStylesSupported(Project project) {
         VersionNumber version = VersionNumber.parse(getResolvedVaadinVersion(project))
         version.minor > 0
@@ -265,6 +274,7 @@ class Util {
      * @return
      *      <code>true</code> if the IE10 user agent is supported
      */
+    @Memoized
     static boolean isIE10UserAgentSupported(Project project) {
         if (getVaadinVersion(project) == PLUS) {
             return true
@@ -282,52 +292,10 @@ class Util {
      * @return
      *      <code>true</code> if the Opera user agent is supported
      */
+    @Memoized
     static boolean isOperaUserAgentSupported(Project project) {
         VersionNumber version = VersionNumber.parse(getResolvedVaadinVersion(project))
-        version.minor < 4
-    }
-
-    /**
-     * Does the Vaadin project support the Servlet 3 specification.
-     *
-     * @param project
-     *      the project to check support for
-     * @return
-     *      <code>true</code> if Servlet 3 is supported
-     */
-    static boolean isServlet3Project(Project project) {
-        if (getVaadinVersion(project) == PLUS) {
-            return true
-        }
-        VersionNumber version = VersionNumber.parse(getResolvedVaadinVersion(project))
-        version.minor > 0
-    }
-
-    /**
-     * Is the project the root project in a multimodule project
-     *
-     * @param project
-     *      the project to check
-     * @return
-     *      <code>true</code> if the project is the root project
-     */
-    static boolean isRootProject(Project project) {
-
-        // Check if project is the root project
-        if (project.hasProperty(VAADIN_PROPERTY) && project == project.rootProject) {
-            return true
-        }
-
-        // If not traverse upwards and see if there are any other vaadin projects in the hierarchy
-        while (project != project.rootProject) {
-            project = project.rootProject
-            if (project.hasProperty(VAADIN_PROPERTY)) {
-                return false
-            }
-        }
-
-        // no other vaadin projects found upwards, this is the root project
-        true
+        version.major == 7 && version.minor < 4
     }
 
     /**
@@ -339,6 +307,7 @@ class Util {
      * @return
      *      a list of paths to the scss files
      */
+    @Memoized
     static List findAddonSassStylesInProject(Project project) {
         File resourceDir = project.sourceSets.main.resources.srcDirs.iterator().next()
         File addonsDir = project.file(resourceDir.canonicalPath+'/VAADIN/addons')
@@ -367,6 +336,7 @@ class Util {
      * @return
      *      <code>true</code> if project is a groovy project
      */
+    @Memoized
     static boolean isGroovyProject(Project project){
         project.plugins.findPlugin(fi.jasoft.plugin.GradleVaadinGroovyPlugin)
     }
@@ -562,6 +532,7 @@ class Util {
      * @return
      *      The themes directory
      */
+    @Memoized
     static File getThemesDirectory(Project project) {
         if(project.vaadinThemeCompile.themesDirectory){
             project.file(project.vaadinThemeCompile.themesDirectory)
@@ -581,6 +552,7 @@ class Util {
      * @return
      *      The widgetset directory
      */
+    @Memoized
     static File getWidgetsetDirectory(Project project) {
         def webAppDir = project.vaadinCompile.outputDirectory ?:
                 project.convention.getPlugin(WarPluginConvention).webAppDir
@@ -597,6 +569,7 @@ class Util {
      * @return
      *      The widgetset directory
      */
+    @Memoized
     static File getWidgetsetCacheDirectory(Project project) {
         def webAppDir = project.vaadinCompile.outputDirectory ?:
                 project.convention.getPlugin(WarPluginConvention).webAppDir
@@ -697,6 +670,7 @@ class Util {
      * @return
      *
      */
+    @Memoized
     static String getClientPackage(Project project) {
         def clientPackage
         getMainSourceSet(project).srcDirs.each { File srcDir ->
@@ -719,6 +693,7 @@ class Util {
      * @return
      *      version as a string
      */
+    @Memoized
     static String getVaadinVersion(Project project) {
         project.vaadin.version ?: '7.7.+'
     }
@@ -731,6 +706,7 @@ class Util {
      * @return
      *      classpath of WAR
      */
+    @Memoized
     static FileCollection getWarClasspath(Project project) {
 
         // Include project classes and resources
@@ -781,6 +757,7 @@ class Util {
      * @return
      *      the relative path
      */
+    @Memoized
     static String getRelativePathForFile(String parentFolderName, File file){
         def parentFolder = file.parentFile
         while(parentFolder.name != parentFolderName){
@@ -810,6 +787,7 @@ class Util {
      *
      * @return
      */
+    @Memoized
     static String getJavaBinary(Project project){
         String javaHome
         if(project.hasProperty(GRADLE_HOME)){
@@ -860,6 +838,7 @@ class Util {
     /**
      * Resolves the widgetset file automatically from sources
      */
+    @Memoized
     static File resolveWidgetsetFile(Project project) {
 
         // Search for module XML in sources
@@ -913,6 +892,7 @@ class Util {
     /**
      * Ensures that the string can be used as a Java Class Name
      */
+    @Memoized
     static String makeStringJavaCompatible(String string) {
         boolean isFirstCharacter = true
         boolean capitilizeNextCharacter = false

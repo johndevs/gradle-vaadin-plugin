@@ -95,7 +95,6 @@ class GradleVaadinPlugin implements Plugin<Project> {
     static final String VAADIN_DIRECTORY_TASK_GROUP = 'Vaadin Directory'
     static final String ADDON_REPOSITORY_NAME = 'Vaadin addons'
     static final String VAADIN_SNAPSHOT_REPOSITORY_NAME = 'Vaadin snapshots'
-    static final String JASOFT_SNAPSHOT_REPOSITORY_NAME = 'Jasoft.fi Maven repository'
     static final String BINTRAY_REPOSITORY_NAME = 'Bintray.com Maven repository'
     static final String PLUGIN_DEVELOPMENTTIME_REPOSITORY_NAME = 'Gradle Vaadin plugin development repository'
     static final String VAADIN_PRERELEASE_REPOSITORY_NAME = 'Vaadin Pre-releases'
