@@ -208,7 +208,7 @@ class Util {
      */
     static isPushSupported(Project project) {
         VersionNumber version = VersionNumber.parse(getResolvedVaadinVersion(project))
-        version.major >= 7 && version.minor > 0
+        version.major > 7 || (version.major == 7 && version.minor > 0)
     }
 
     /**
@@ -232,7 +232,7 @@ class Util {
      */
     static boolean isAddonStylesSupported(Project project) {
         VersionNumber version = VersionNumber.parse(getResolvedVaadinVersion(project))
-        version.minor > 0
+        version.major > 7 || (version.major == 7 && version.minor > 0)
     }
 
     /**
@@ -270,7 +270,7 @@ class Util {
             return true
         }
         VersionNumber version = VersionNumber.parse(getVaadinVersion(project))
-        version.minor > 0
+        version.major > 7 || (version.major == 7 && version.minor > 0)
     }
 
     /**
@@ -284,7 +284,7 @@ class Util {
      */
     static boolean isOperaUserAgentSupported(Project project) {
         VersionNumber version = VersionNumber.parse(getResolvedVaadinVersion(project))
-        version.minor < 4
+        version.major == 7 && version.minor < 4
     }
 
     /**
@@ -300,7 +300,7 @@ class Util {
             return true
         }
         VersionNumber version = VersionNumber.parse(getResolvedVaadinVersion(project))
-        version.minor > 0
+        version.major > 7 || (version.major == 7 && version.minor > 0)
     }
 
     /**
