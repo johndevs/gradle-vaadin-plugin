@@ -44,7 +44,7 @@ class CompileWidgetsetTest extends IntegrationTest {
     @Test void 'No Widgetset defined, but addons exist in project'() {
         buildFile << """
             dependencies {
-                compile 'org.vaadin.addons:qrcode:2.0.1'
+                compile 'org.vaadin.addons:qrcode:+'
             }
         """
 
@@ -63,7 +63,7 @@ class CompileWidgetsetTest extends IntegrationTest {
     @Test void 'Compile with Vaadin CDN'() {
         buildFile << """
             dependencies {
-                compile 'org.vaadin.addons:qrcode:2.0.1'
+                compile 'org.vaadin.addons:qrcode:+'
             }
 
             vaadinCompile {

@@ -432,12 +432,17 @@ class GradleVaadinPlugin implements Plugin<Project> {
                 if ( !themes.isEmpty() ) {
                     switch (project.vaadinThemeCompile.compiler) {
                         case 'vaadin':
-                            if (  Util.getVaadinVersion(project).startsWith('7.0' )
-                                    || Util.getVaadinVersion(project).startsWith('7.1')) {
-                                // In Vaadin 7.0 and 7.1 the compiler was shipped as a non-transitive dependency
-                                Dependency themeCompiler = projectDependencies.create(
-                                        "com.vaadin:vaadin-theme-compiler:${Util.getVaadinVersion(project)}")
-                                dependencies.add(themeCompiler)
+                            if(Util.isThemeDependencyNeeded(project)) {
+                                VersionNumber version = VersionNumber.parse(Util.getResolvedVaadinVersion(project))
+                                if(version.major == 7) {
+                                    Dependency themeCompiler = projectDependencies.create(
+                                            "com.vaadin:vaadin-theme-compiler:${Util.getVaadinVersion(project)}")
+                                    dependencies.add(themeCompiler)
+                                } else {
+                                    Dependency themeCompiler = projectDependencies.create(
+                                            "com.vaadin:vaadin-sass-compiler:+")
+                                    dependencies.add(themeCompiler)
+                                }
                             }
                             break
                         case 'compass':

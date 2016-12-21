@@ -37,7 +37,7 @@ class UpdateWidgetsetTest extends IntegrationTest {
         buildFile << "vaadinCompile.widgetset = 'com.example.MyWidgetset'\n"
         buildFile << """
             dependencies {
-                compile 'org.vaadin.addons:qrcode:2.0.1'
+                compile 'org.vaadin.addons:qrcode:+'
             }
         """
 
@@ -54,7 +54,7 @@ class UpdateWidgetsetTest extends IntegrationTest {
         File buildFile1 = makeBuildFile(project1Dir)
         buildFile1 << """
             dependencies {
-                compile 'org.vaadin.addons:qrcode:2.0.1'
+                compile 'org.vaadin.addons:qrcode:+'
             }
         """
 
@@ -82,7 +82,7 @@ class UpdateWidgetsetTest extends IntegrationTest {
     @Test void 'AppWidgetset created when project contains addon dependencies'() {
         buildFile << """
             dependencies {
-                compile 'org.vaadin.addons:qrcode:2.0.1'
+                compile 'org.vaadin.addons:qrcode:+'
             }
         """
         runWithArguments(UpdateWidgetsetTask.NAME)
