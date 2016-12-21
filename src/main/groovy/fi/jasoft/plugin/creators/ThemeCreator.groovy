@@ -36,7 +36,7 @@ class ThemeCreator implements Runnable {
         substitutions['themeImport'] = themeScssFile
 
         VersionNumber version = VersionNumber.parse(vaadinVersion)
-        substitutions['basetheme'] = version.minor < 3 ? 'reindeer' : 'valo'
+        substitutions['basetheme'] = (version.major < 8 && version.minor < 3) ? 'reindeer' : 'valo'
 
         TemplateUtil.writeTemplate(STYLES_SCSS_FILE, themeDir, STYLES_SCSS_FILE, substitutions)
         TemplateUtil.writeTemplate('MyTheme.scss', themeDir, themeScssFile, substitutions)

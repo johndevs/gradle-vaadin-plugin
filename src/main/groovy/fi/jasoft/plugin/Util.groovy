@@ -241,6 +241,26 @@ class Util {
     }
 
     /**
+     * Is the theme dependency needed for the project themes to compile
+     *
+     * @param project
+     *      the project to check
+     * @return
+     *      <code>true</code> if theme dependency is needed
+     */
+    @Memoized
+    static boolean isThemeDependencyNeeded(Project project) {
+        VersionNumber version = VersionNumber.parse(getResolvedVaadinVersion(project))
+        if(version.major == VAADIN_SEVEN_MAJOR_VERSION && version.minor in [0,1]){
+            // In Vaadin 7.0 and 7.1 the compiler was shipped as a non-transitive dependency
+            return true
+        }
+
+        // Since Vaadin 8 the theme compiler is by default not included
+        version.major >= 8
+    }
+
+    /**
      * Opens a URL in the default system browser
      *
      * @param project
@@ -692,7 +712,7 @@ class Util {
      */
     @Memoized
     static String getVaadinVersion(Project project) {
-        project.vaadin.version ?: '7.7.+'
+        project.vaadin.version ?: '8.0.+'
     }
 
     /**
