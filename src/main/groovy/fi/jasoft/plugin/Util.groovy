@@ -209,7 +209,8 @@ class Util {
     @Memoized
     static isPushSupported(Project project) {
         VersionNumber version = VersionNumber.parse(getResolvedVaadinVersion(project))
-        version.major >= VAADIN_SEVEN_MAJOR_VERSION && version.minor > 0
+        version.major > VAADIN_SEVEN_MAJOR_VERSION ||
+                (version.major == VAADIN_SEVEN_MAJOR_VERSION && version.minor > 0)
     }
 
     /**
@@ -235,7 +236,8 @@ class Util {
     @Memoized
     static boolean isAddonStylesSupported(Project project) {
         VersionNumber version = VersionNumber.parse(getResolvedVaadinVersion(project))
-        version.minor > 0
+        version.major > VAADIN_SEVEN_MAJOR_VERSION ||
+                (version.major == VAADIN_SEVEN_MAJOR_VERSION && version.minor > 0)
     }
 
     /**
@@ -274,7 +276,8 @@ class Util {
             return true
         }
         VersionNumber version = VersionNumber.parse(getVaadinVersion(project))
-        version.minor > 0
+        version.major > VAADIN_SEVEN_MAJOR_VERSION ||
+                (version.major == VAADIN_SEVEN_MAJOR_VERSION && version.minor > 0)
     }
 
     /**
