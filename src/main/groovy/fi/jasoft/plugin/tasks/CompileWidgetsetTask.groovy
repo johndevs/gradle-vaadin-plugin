@@ -32,6 +32,7 @@ import org.gradle.api.tasks.TaskAction
 
 import javax.validation.constraints.NotNull
 import java.security.MessageDigest
+import java.util.concurrent.TimeUnit
 import java.util.jar.Attributes
 import java.util.jar.JarFile
 import java.util.zip.ZipEntry
@@ -58,6 +59,9 @@ class CompileWidgetsetTask extends DefaultTask {
      */
     @PackageScope
     def queryWidgetsetRequest = { version, style ->
+        Set addons = Util.findAddonsInProject(project)
+        project.logger.info("Querying widgetset with addons $addons")
+
         [
             path: '/api/compiler/compile',
             query: [
@@ -66,7 +70,7 @@ class CompileWidgetsetTask extends DefaultTask {
             body: [
                     vaadinVersion:version,
                     eager: [],
-                    addons:Util.findAddonsInProject(project),
+                    addons:addons,
                     compileStyle:style
             ],
             requestContentType:ContentType.JSON
@@ -219,7 +223,7 @@ class CompileWidgetsetTask extends DefaultTask {
         // Ensure widgetset directory exists
         Util.getWidgetsetDirectory(project).mkdirs()
 
-        def timeout = 60000 * 3 // 3 minutes
+        def timeout = TimeUnit.MINUTES.toMillis(5)
 
         while(true) {
             def widgetsetInfo = queryRemoteWidgetset()
@@ -234,10 +238,10 @@ class CompileWidgetsetTask extends DefaultTask {
                 case 'COMPILED':
                     logger.info("Widgetset is compiling with status $status. " +
                             "Waiting 10 seconds and querying again.")
-                    int timeoutIntervall = 10000
+                    int timeoutInterval = TimeUnit.SECONDS.toMillis(10)
                     if (  timeout > 0 ) {
-                        sleep(timeoutIntervall)
-                        timeout -= timeoutIntervall
+                        sleep(timeoutInterval)
+                        timeout -= timeoutInterval
                     } else {
                         throw new GradleException('Waiting for widgetset to compile timed out. ' +
                                 'Please try again at a later time.')

@@ -608,13 +608,30 @@ class Util {
      */
     @Memoized
     static String getResolvedVaadinVersion(Project project) {
-        String version = project.vaadin.version
+        getResolvedArtifactVersion(project, VAADIN_SERVER_ARTIFACT, project.vaadin.version)
+    }
+
+    /**
+     * Resolves the real artifact version from a meta version (for example 1.2.+)
+     *
+     * @param project
+     *      the projecct
+     * @param artifactName
+     *      the artifact name
+     * @param defaultVersion
+     *      the fallback version if the artifact cannot be found
+     * @return
+     *      returns the resolved version or if the artifact could not be found, the default version
+     */
+    @Memoized
+    static String getResolvedArtifactVersion(Project project, String artifactName, String defaultVersion=null) {
+        String version = defaultVersion
         project.configurations.each { Configuration conf ->
             conf.allDependencies.each { Dependency dependency ->
-                if (  dependency.name.startsWith(VAADIN_SERVER_ARTIFACT) ) {
+                if (dependency.name.startsWith(artifactName)) {
                     version = conf.resolvedConfiguration
                             .resolvedArtifacts
-                            .find { it.name == VAADIN_SERVER_ARTIFACT }
+                            .find { it.name == artifactName }
                             .moduleVersion.id.version
                 }
             }
@@ -638,34 +655,37 @@ class Util {
         def addons = []
         scannedProjects << project
         def attribute = new Attributes.Name(byAttribute)
+
         project.configurations.all.each { Configuration conf ->
             conf.allDependencies.each { Dependency dependency ->
-                if (  dependency in ProjectDependency ) {
+                if (dependency in ProjectDependency) {
                     Project dependentProject = ((ProjectDependency) dependency).dependencyProject
-                    if ( !(dependentProject in scannedProjects) ) {
+                    if (!(dependentProject in scannedProjects)) {
                         addons.addAll(findAddonsInProject(dependentProject, byAttribute, includeFile, scannedProjects))
                     }
                 } else {
                     conf.files(dependency).each { File file ->
-                        if (  file.file && file.name.endsWith('.jar') ) {
+                        if (file.file && file.name.endsWith('.jar')) {
                             file.withInputStream { InputStream stream ->
                                 def jarStream = new JarInputStream(stream)
                                 def mf = jarStream.getManifest()
                                 def attributes = mf?.mainAttributes
-                                if (  attributes?.getValue(attribute) ) {
-                                    if ( !dependency.name.startsWith('vaadin-client') ) {
-                                        if (  includeFile ) {
+                                if (attributes?.getValue(attribute)) {
+                                    if (!dependency.name.startsWith('vaadin-client')) {
+                                        if (includeFile) {
                                             addons << [
                                                     groupId   : dependency.group,
-                                                    artifactId:dependency.name,
-                                                    version   : dependency.version,
+                                                    artifactId: dependency.name,
+                                                    version   : getResolvedArtifactVersion(project,
+                                                            dependency.name, dependency.version),
                                                     file      : file
                                             ]
                                         } else {
                                             addons << [
                                                     groupId   : dependency.group,
-                                                    artifactId:dependency.name,
-                                                    version   : dependency.version,
+                                                    artifactId: dependency.name,
+                                                    version   : getResolvedArtifactVersion(project,
+                                                            dependency.name, dependency.version)
                                             ]
                                         }
                                     }
