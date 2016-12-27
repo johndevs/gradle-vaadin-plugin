@@ -60,8 +60,7 @@ class ProjectDependenciesTest extends IntegrationTest {
             task testRepositories << {
                 def repositories = [
                     'Vaadin addons',
-                    'Vaadin snapshots',
-                    'Bintray.com Maven repository'
+                    'Vaadin snapshots'
                 ]
 
                 repositories.each {
