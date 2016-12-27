@@ -95,7 +95,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
     static final String VAADIN_DIRECTORY_TASK_GROUP = 'Vaadin Directory'
     static final String ADDON_REPOSITORY_NAME = 'Vaadin addons'
     static final String VAADIN_SNAPSHOT_REPOSITORY_NAME = 'Vaadin snapshots'
-    static final String BINTRAY_REPOSITORY_NAME = 'Bintray.com Maven repository'
+    static final String GRADLE_PORTAL_PLUGIN_REPOSITORY_NAME = 'Bintray.com Maven repository'
     static final String PLUGIN_DEVELOPMENTTIME_REPOSITORY_NAME = 'Gradle Vaadin plugin development repository'
     static final String VAADIN_PRERELEASE_REPOSITORY_NAME = 'Vaadin Pre-releases'
 
@@ -246,6 +246,11 @@ class GradleVaadinPlugin implements Plugin<Project> {
             repositories.maven { repository ->
                 repository.name = VAADIN_PRERELEASE_REPOSITORY_NAME
                 repository.url = 'https://maven.vaadin.com/vaadin-prereleases'
+            }
+
+            repositories.maven { repository ->
+                repository.name = GRADLE_PORTAL_PLUGIN_REPOSITORY_NAME
+                repository.url = 'https://plugins.gradle.org/m2'
             }
 
             // Add plugin development repository if specified
