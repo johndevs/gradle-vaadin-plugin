@@ -248,11 +248,6 @@ class GradleVaadinPlugin implements Plugin<Project> {
                 repository.url = 'https://maven.vaadin.com/vaadin-prereleases'
             }
 
-            repositories.maven { repository ->
-                repository.name = BINTRAY_REPOSITORY_NAME
-                repository.url = 'http://dl.bintray.com/johndevs/maven'
-            }
-
             // Add plugin development repository if specified
             if ( (debugDir as File)?.exists( )
                     && !repositories.findByName(PLUGIN_DEVELOPMENTTIME_REPOSITORY_NAME)) {
