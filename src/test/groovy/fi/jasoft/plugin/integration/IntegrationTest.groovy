@@ -37,6 +37,7 @@ class IntegrationTest {
 
     @Before
     void setup() {
+        println "Running test in $projectDir.root"
         buildFile = makeBuildFile(projectDir.root)
         settingsFile = projectDir.newFile("settings.gradle")
     }

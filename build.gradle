@@ -221,6 +221,7 @@ task integrationTest(type:Test, dependsOn:['test','jar']) {
     classpath += files(sourceSets.ast.output.classesDir)
     testLogging {
         exceptionFormat "full"
+        showStandardStreams = true
     }
     include '**/integration/**'
     systemProperty 'integrationTestProjectVersion', version
