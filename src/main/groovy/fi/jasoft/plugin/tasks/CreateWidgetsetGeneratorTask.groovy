@@ -57,13 +57,22 @@ class CreateWidgetsetGeneratorTask extends DefaultTask {
         String name, pkg, filename
         if ( !widgetsetGenerator ) {
             name = widgetset.tokenize(DOT).last()
-            pkg = widgetset.replaceAll(DOT + name, '') + '.client.ui'
+            pkg = widgetset.replaceAll(DOT + name, '')
             filename = name + "Generator.java"
 
         } else {
             name = widgetsetGenerator.tokenize(DOT).last()
             pkg = widgetsetGenerator.replaceAll(DOT + name, '')
             filename = name + JAVA_FILE_POSTFIX
+        }
+
+        List<String> sourcePaths = project.vaadinCompile.sourcePaths as List
+        sourcePaths.each { String path ->
+            println path
+            println pkg
+            if(pkg.contains(".${path}.") || pkg.endsWith(".${path}")){
+                throw new GradleException("Widgetset generator cannot be placed inside the client package.")
+            }
         }
 
         def dir = new File(javaDir, TemplateUtil.convertFQNToFilePath(pkg))
