@@ -233,6 +233,32 @@ class TaskConfigurationsTest extends IntegrationTest {
         assertTrue result, result.contains('Generator File was created true')
     }
 
+    @Test void 'Compile with a widgetset generator'() {
+        buildFile << """
+             vaadinCompile {
+                widgetset 'com.example.Widgetset'
+                widgetsetGenerator 'com.example.WidgetsetGenerator'
+             }
+        """.stripIndent()
+
+        runWithArguments('vaadinCreateWidgetsetGenerator')
+
+        String result = runWithArguments('vaadinCompile')
+        assertTrue result, result.contains('BUILD SUCCESSFUL')
+    }
+
+    @Test void 'Fail if widgetset generator in client package'() {
+        buildFile << """
+             vaadinCompile {
+                widgetset 'com.example.Widgetset'
+                widgetsetGenerator 'com.example.client.WidgetsetGenerator'
+             }
+        """.stripIndent()
+
+        String result = runFailureExpected('vaadinCreateWidgetsetGenerator')
+        assertTrue result, result.contains('Widgetset generator cannot be placed inside the client package')
+    }
+
     @Test void 'Addon Jar Metadata'() {
 
         buildFile << """

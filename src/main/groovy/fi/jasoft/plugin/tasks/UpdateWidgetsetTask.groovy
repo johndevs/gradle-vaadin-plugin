@@ -258,9 +258,8 @@ class UpdateWidgetsetTask extends DefaultTask {
                                                 String widgetsetFQN) {
         String name, pkg, filename
         if (  configuration.widgetsetGenerator == null ) {
-
             name = widgetsetFQN.tokenize(DOT).last()
-            pkg = widgetsetFQN.replace(DOT + name, '') + '.client.ui'
+            pkg = widgetsetFQN.replace(DOT + name, '')
             filename = name + "Generator.java"
 
         } else {
