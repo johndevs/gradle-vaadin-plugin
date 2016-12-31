@@ -96,7 +96,10 @@ class IntegrationTest {
     }
 
     protected String runWithArgumentsOnProject(File projectDir, String... args) {
-        setupRunner(projectDir).withArguments((args as List) + ['--stacktrace']).build().output
+        setupRunner(projectDir)
+                .withArguments((args as List) + ['--stacktrace'])
+                .build()
+                .output
     }
 
     protected String runWithArguments(String... args) {
@@ -104,7 +107,17 @@ class IntegrationTest {
     }
 
     protected String runFailureExpected() {
-        setupRunner().buildAndFail().output
+        setupRunner()
+                .withArguments(['--stacktrace'])
+                .buildAndFail()
+                .output
+    }
+
+    protected String runFailureExpected(String... args) {
+        setupRunner()
+                .withArguments((args as List) + ['--stacktrace'])
+                .buildAndFail()
+                .output
     }
 
     protected GradleRunner setupRunner(File projectDir = this.projectDir.root) {
