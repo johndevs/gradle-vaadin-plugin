@@ -74,6 +74,7 @@ class WARArchiveTest extends IntegrationTest {
         def final THEME_FILES = [
             'styles.scss',
             'styles.css',
+            'styles.css.gz',
             "${projectDir.root.name}.scss".toString(),
             'addons.scss',
             'favicon.ico'

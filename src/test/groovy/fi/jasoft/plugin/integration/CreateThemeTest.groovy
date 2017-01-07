@@ -7,6 +7,7 @@ import org.junit.Test
 
 import java.nio.file.Paths
 import static org.junit.Assert.assertTrue
+import static org.junit.Assert.assertFalse
 
 /**
  * Created by john on 18.1.2016.
@@ -39,14 +40,23 @@ class CreateThemeTest extends IntegrationTest {
 
     @Test void 'Compile with Compass compiler'() {
         buildFile << "vaadinThemeCompile.compiler = 'compass'"
-
         assertThemeCreatedAndCompiled('CompassTheme')
     }
 
     @Test void 'Compile with libSass compiler'() {
         buildFile << "vaadinThemeCompile.compiler = 'libsass'"
-
         assertThemeCreatedAndCompiled('LibsassTheme')
+    }
+
+    @Test void 'Theme is compressed by default'() {
+        assertThemeCreatedAndCompiled()
+        assertCompressedThemeInDirectory(themesDir, projectDir.root.name)
+    }
+
+    @Test void 'Theme is not compressed if disabled'() {
+        buildFile << "vaadinThemeCompile.compress = false"
+        assertThemeCreatedAndCompiled()
+        assertNoCompressedThemeInDirectory(themesDir, projectDir.root.name)
     }
 
     private void assertThemeCreatedAndCompiled(String themeName) {
@@ -86,7 +96,32 @@ class CreateThemeTest extends IntegrationTest {
         assertTrue "$themeDir does not exist", themeDir.exists()
 
         def stylesCompiled = Paths.get(themeDir.canonicalPath, 'styles.css').toFile()
-        assertTrue "styles.css does not exist in theme dir, theme dir only contains "+themeDir.list().toArrayString(),
+        assertTrue "styles.css does not exist in theme dir, theme dir only contains " +
+                themeDir.list().toArrayString(),
+                stylesCompiled.exists()
+    }
+
+    private void assertCompressedThemeInDirectory(File directory, String themeName) {
+        assertThemeInDirectory(directory, themeName)
+
+        def themeDir = Paths.get(directory.canonicalPath, themeName).toFile()
+        assertTrue "$themeDir does not exist", themeDir.exists()
+
+        def stylesCompiled = Paths.get(themeDir.canonicalPath, 'styles.css.gz').toFile()
+        assertTrue "styles.css.gz does not exist in theme dir, theme dir only contains " +
+                themeDir.list().toArrayString(),
+                stylesCompiled.exists()
+    }
+
+    private void assertNoCompressedThemeInDirectory(File directory, String themeName) {
+        assertThemeInDirectory(directory, themeName)
+
+        def themeDir = Paths.get(directory.canonicalPath, themeName).toFile()
+        assertTrue "$themeDir does not exist", themeDir.exists()
+
+        def stylesCompiled = Paths.get(themeDir.canonicalPath, 'styles.css.gz').toFile()
+        assertFalse "styles.css.gz should not exist in theme dir, theme dir only contains " +
+                themeDir.list().toArrayString(),
                 stylesCompiled.exists()
     }
 

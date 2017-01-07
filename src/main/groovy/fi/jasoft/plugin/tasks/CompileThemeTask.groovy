@@ -52,7 +52,7 @@ class CompileThemeTask extends DefaultTask {
     CompileThemeTask() {
         dependsOn('classes', BuildClassPathJar.NAME, UpdateAddonStylesTask.NAME)
         description = 'Compiles a Vaadin SASS theme into CSS'
-        configuration = project.extensions.add(NAME, CompileThemeConfiguration)
+        configuration = Util.findOrCreateExtension(project, NAME, CompileThemeConfiguration)
 
         project.afterEvaluate {
             File themesDirectory = Util.getThemesDirectory(project)
@@ -67,6 +67,9 @@ class CompileThemeTask extends DefaultTask {
                 BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
                 inputs.file(pathJarTask.archivePath)
             }
+
+            // Compress if needed
+            finalizedBy project.tasks[CompressCssTask.NAME]
         }
     }
 

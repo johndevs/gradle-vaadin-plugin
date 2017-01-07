@@ -100,7 +100,7 @@ class PluginExtensionTest extends PluginTestBase {
 
     @Test
     void areDevModePropertiesConfigured() {
-        SuperDevModeConfiguration conf = project.vaadinSuperDevMode
+        SuperDevModeConfiguration conf = project.extensions.vaadinSuperDevMode
         assert conf instanceof SuperDevModeConfiguration
         assert conf.noserver == false
         assert conf.bindAddress == '127.0.0.1'

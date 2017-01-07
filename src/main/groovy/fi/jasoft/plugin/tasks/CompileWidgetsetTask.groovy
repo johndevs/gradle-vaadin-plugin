@@ -156,7 +156,7 @@ class CompileWidgetsetTask extends DefaultTask {
 
     CompileWidgetsetTask() {
         description = "Compiles Vaadin Addons and components into Javascript."
-        configuration = project.extensions.create(NAME, CompileWidgetsetConfiguration)
+        configuration = Util.findOrCreateExtension(project, NAME, CompileWidgetsetConfiguration)
 
         project.afterEvaluate {
 

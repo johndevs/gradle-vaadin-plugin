@@ -36,4 +36,9 @@ class CompileThemeConfiguration {
      *     </ul>
      */
     String compiler = 'vaadin'
+
+    /**
+     * Use theme compression
+     */
+    boolean compress = true
 }

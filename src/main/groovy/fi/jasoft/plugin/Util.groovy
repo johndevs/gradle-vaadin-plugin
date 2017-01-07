@@ -948,4 +948,22 @@ class Util {
             result
         }.join('').capitalize()
     }
+
+    /**
+     * Finds a configuration on a project and if it does not exist creates it
+     *
+     * @param project
+     *      the project
+     * @param type
+     *      the type
+     * @return
+     *      the configuration
+     */
+    static <T> T findOrCreateExtension(Project project, String name, Class<T> type, Object... args=[]) {
+        T configuration = project.extensions.findByName(name)
+        if(!configuration){
+            configuration = project.extensions.create(name, type, args)
+        }
+        configuration
+    }
 }
