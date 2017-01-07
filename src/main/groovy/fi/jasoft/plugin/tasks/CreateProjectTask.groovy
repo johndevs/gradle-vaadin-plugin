@@ -63,7 +63,7 @@ class CreateProjectTask extends DefaultTask {
                 templateDir: 'simpleProject'
         ).run()
 
-        if (  Util.isAddonStylesSupported(project) ) {
+        if ( Util.isAddonStylesSupported(project) ) {
 
             new ThemeCreator(themeName:resolveApplicationName(),
                     themesDirectory:Util.getThemesDirectory(project),
@@ -93,10 +93,10 @@ class CreateProjectTask extends DefaultTask {
         def configuration = project.vaadinCompile as CompileWidgetsetConfiguration
         if ( !applicationPackage ) {
             int endSlashSize = 2
-            if (  widgetsetFQN?.contains(DOT) ) {
+            if ( widgetsetFQN?.contains(DOT) ) {
                 String widgetsetName = widgetsetFQN.tokenize(DOT).last()
                 widgetsetFQN[0..(-widgetsetName.size() - endSlashSize)]
-            } else if (  configuration.widgetset?.contains(DOT) ) {
+            } else if ( configuration.widgetset?.contains(DOT) ) {
                 String widgetsetName = configuration.widgetset.tokenize(DOT).last()
                 configuration.widgetset[0..(-widgetsetName.size() - endSlashSize)]
             } else {

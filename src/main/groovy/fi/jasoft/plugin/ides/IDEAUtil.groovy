@@ -34,16 +34,16 @@ class IDEAUtil {
      */
     static void configureIDEAModule(Project project) {
         project.afterEvaluate { Project p ->
-            if (  p.hasProperty(IDEA_PROPERTY) ) {
+            if ( p.hasProperty(IDEA_PROPERTY) ) {
                 def module = p.idea.module
 
                 // Module name is project name
                 module.name = p.name
 
                 // Configure output dirs only if user has not defined it himself
-                if (  module.inheritOutputDirs == null ) {
+                if ( module.inheritOutputDirs == null ) {
                     module.inheritOutputDirs = false
-                    if (  project.vaadinRun.classesDir == null ) {
+                    if ( project.vaadinRun.classesDir == null ) {
                         module.outputDir = project.sourceSets.main.output.classesDir
                         module.testOutputDir = project.sourceSets.test.output.classesDir
                     } else {
@@ -70,9 +70,9 @@ class IDEAUtil {
      */
     static void addConfigurationToProject(Project project, String conf, boolean test=false) {
         project.afterEvaluate { Project p ->
-            if (  p.hasProperty(IDEA_PROPERTY) ) {
+            if ( p.hasProperty(IDEA_PROPERTY) ) {
                 def scopes = p.idea.module.scopes
-                if (  test ) {
+                if ( test ) {
                     scopes.TEST.plus += [p.configurations[conf]]
                 } else {
                     scopes.COMPILE.plus += [p.configurations[conf]]

@@ -59,7 +59,7 @@ class TemplateUtil {
         TemplateEngine engine = new SimpleTemplateEngine()
         String content = engine.createTemplate(templateUrl).make(substitutions.withDefault { null })
 
-        if (  removeBlankLines ) {
+        if ( removeBlankLines ) {
             content = content.replaceAll("(?m)^[ \t]*\r?\n", "")
         }
 

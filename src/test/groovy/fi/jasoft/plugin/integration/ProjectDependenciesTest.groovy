@@ -145,13 +145,13 @@ class ProjectDependenciesTest extends IntegrationTest {
             task verifyVaadinVersion << {
                 def server = project.configurations.getByName('vaadin-server')
                 server.dependencies.each {
-                    if (  it.group.equals('com.vaadin') ) {
+                    if ( it.group.equals('com.vaadin') ) {
                         println 'Vaadin Server ' + it.version
                     }
                 }
                 def client = project.configurations.getByName('vaadin-client')
                 client.dependencies.each {
-                    if (  it.group.equals('com.vaadin') ) {
+                    if ( it.group.equals('com.vaadin') ) {
                         println 'Vaadin Client ' + it.version
                     }
                 }
@@ -197,7 +197,7 @@ class ProjectDependenciesTest extends IntegrationTest {
 
             task evaluateVersionBlacklist << {
                 project.configurations.compile.dependencies.each {
-                    if (  it.version.equals(project.vaadin.version) ) {
+                    if ( it.version.equals(project.vaadin.version) ) {
                         println 'Version blacklist failed for ' + it
                     }
                 }
@@ -214,10 +214,10 @@ class ProjectDependenciesTest extends IntegrationTest {
         buildFile << """
             task testMavenCentralLocal << {
                 def repos = project.repositories
-                if (  repos.hasProperty(ArtifactRepositoryContainer.DEFAULT_MAVEN_CENTRAL_REPO_NAME) ) {
+                if ( repos.hasProperty(ArtifactRepositoryContainer.DEFAULT_MAVEN_CENTRAL_REPO_NAME) ) {
                     println 'Has Maven Central'
                 }
-                if (  repos.hasProperty(ArtifactRepositoryContainer.DEFAULT_MAVEN_LOCAL_REPO_NAME) ) {
+                if ( repos.hasProperty(ArtifactRepositoryContainer.DEFAULT_MAVEN_LOCAL_REPO_NAME) ) {
                     println 'Has Maven Local'
                 }
             }

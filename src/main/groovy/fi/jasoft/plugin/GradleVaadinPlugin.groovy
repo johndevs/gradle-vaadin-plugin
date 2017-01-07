@@ -132,14 +132,14 @@ class GradleVaadinPlugin implements Plugin<Project> {
         Gradle gradle = project.gradle
         VersionNumber version = VersionNumber.parse(gradle.gradleVersion)
         VersionNumber requiredVersion = new VersionNumber(3, 0, 0, null)
-        if (  version.baseVersion < requiredVersion ) {
+        if ( version.baseVersion < requiredVersion ) {
             throw new UnsupportedVersionException("Your gradle version ($version) is too old. " +
                     "Plugin requires Gradle $requiredVersion+")
         }
 
         PLUGINS_IN_PROJECT++
 
-        if (  firstPlugin ) {
+        if ( firstPlugin ) {
             project.logger.quiet("Using Gradle Vaadin Plugin $PLUGIN_VERSION")
         }
 
@@ -201,7 +201,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
         project.afterEvaluate { Project p ->
             String v = Util.getVaadinVersion(p)
-            if (  v?.startsWith('6') ) {
+            if ( v?.startsWith('6') ) {
                 p.logger.error('Plugin no longer supports Vaadin 6, to use Vaadin 6 ' +
                         'apply an older version of the plugin.')
                 throw new InvalidUserDataException('Unsupported Vaadin version.')
@@ -256,7 +256,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
             // Add plugin development repository if specified
             if ( (debugDir as File)?.exists( )
                     && !repositories.findByName(PLUGIN_DEVELOPMENTTIME_REPOSITORY_NAME)) {
-                if (  GradleVaadinPlugin.firstPlugin ) {
+                if ( GradleVaadinPlugin.firstPlugin ) {
                     project.logger.lifecycle("Using development libs found at " + debugDir)
                 }
                 repositories.flatDir(name:PLUGIN_DEVELOPMENTTIME_REPOSITORY_NAME, dirs:debugDir)
@@ -337,7 +337,11 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
                 applyServletApi(projectDependencies, dependencies)
 
-                if (  Util.isPushSupported(project) ) {
+                Dependency widgetsetCompiler = projectDependencies.create(
+                        "com.vaadin:vaadin-client-compiler:${Util.getVaadinVersion(project)}")
+                dependencies.add(widgetsetCompiler)
+
+                if ( Util.isPushSupported(project) ) {
                     Dependency push = projectDependencies.create(
                             "com.vaadin:vaadin-push:${Util.getVaadinVersion(project)}")
                     dependencies.add(push)
@@ -365,7 +369,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
         configurations.create(CONFIGURATION_PUSH) { conf ->
             conf.description = 'Libraries needed for using Vaadin Push features.'
             conf.defaultDependencies { dependencies ->
-                if (  Util.isPushSupportedAndEnabled(project) ) {
+                if ( Util.isPushSupportedAndEnabled(project) ) {
                     Dependency push = projectDependencies.create(
                             "com.vaadin:vaadin-push:${Util.getVaadinVersion(project)}")
                     dependencies.add(push)
@@ -384,7 +388,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
         configurations.create(CONFIGURATION_TESTBENCH) { conf ->
             conf.description = 'Libraries needed by Vaadin Testbench.'
             conf.defaultDependencies { dependencies ->
-                if (  project.vaadinTestbench.enabled ) {
+                if ( project.vaadinTestbench.enabled ) {
                     Dependency testbench = projectDependencies.create(
                             "com.vaadin:vaadin-testbench:${project.vaadinTestbench.version}")
                     dependencies.add(testbench)
@@ -508,8 +512,8 @@ class GradleVaadinPlugin implements Plugin<Project> {
                     details.useVersion Util.getVaadinVersion(project)
                 }
 
-                if (  config.name == 'vaadin-client' ) {
-                    if (  group == 'javax.validation' && name == 'validation-api' ) {
+                if ( config.name == 'vaadin-client' ) {
+                    if ( group == 'javax.validation' && name == 'validation-api' ) {
                         // GWT only supports this version, do not upgrade it
                         details.useVersion '1.0.0.GA'
                     }

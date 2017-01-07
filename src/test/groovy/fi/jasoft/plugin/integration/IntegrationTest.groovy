@@ -73,7 +73,7 @@ class IntegrationTest {
 
         """
 
-        if (  applyPluginToFile ) {
+        if ( applyPluginToFile ) {
             applyRepositories(buildFile)
             applyPlugin(buildFile)
             buildFile << "vaadin.logToConsole = true\n"

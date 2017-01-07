@@ -62,7 +62,7 @@ class DirectorySearchTask extends DefaultTask {
             cachedAddonResponse.createNewFile()
             cachedAddonResponse.write(directoryUrl.toURL().text)
 
-        } else if (  new Date(cachedAddonResponse.lastModified() ).before(
+        } else if ( new Date(cachedAddonResponse.lastModified() ).before(
                 new Date(System.currentTimeMillis() - maxCacheAge))) {
             project.logger.info(fetchingAddonLog)
             cachedAddonResponse.write(directoryUrl.toURL().text)
@@ -96,19 +96,19 @@ class DirectorySearchTask extends DefaultTask {
             }
 
         }.each {
-            if (  verbose ) {
+            if ( verbose ) {
                 println 'Name: ' + it.name
                 println 'Description: ' + it.summary
                 println 'Url: ' + it.linkUrl
                 println 'Rating: ' + it.avgRating
-                if (  it.artifactId != null && it.groupId != null && it.version != null ) {
+                if ( it.artifactId != null && it.groupId != null && it.version != null ) {
                     println("Dependency: \"${it.groupId}:${it.artifactId}:${it.version}\"")
                 }
 
             } else {
                 print DirectorySearchTask.truncate(it.name.toString(), 29).padRight(30)
                 print DirectorySearchTask.truncate(it.summary.toString(), 49).padRight(50)
-                if (  it.artifactId != null && it.groupId != null && it.version != null ) {
+                if ( it.artifactId != null && it.groupId != null && it.version != null ) {
                     print(" \"${it.groupId}:${it.artifactId}:${it.version}\"")
                 }
             }
@@ -117,10 +117,10 @@ class DirectorySearchTask extends DefaultTask {
     }
 
     private static String truncate(String str, Integer maxLength) {
-        if (  str == null ) {
+        if ( str == null ) {
             return ''
         }
-        if (  str.length() > maxLength ) {
+        if ( str.length() > maxLength ) {
             return str[0..(maxLength - 2)] + "\u2026"
         }
         return str

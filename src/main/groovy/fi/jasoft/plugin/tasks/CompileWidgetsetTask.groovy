@@ -101,7 +101,7 @@ class CompileWidgetsetTask extends DefaultTask {
     def writeWidgetsetToFileSystem = { HttpResponseDecorator response, ZipInputStream zipStream ->
 
         // Check for redirect
-        if (  response.status == 307 ) {
+        if ( response.status == 307 ) {
             String newUrl = response.headers['Location'].value
             project.logger.info("Widgetset download was redirected to $newUrl")
             downloadWidgetsetZip(newUrl)
@@ -114,7 +114,7 @@ class CompileWidgetsetTask extends DefaultTask {
         }
 
         def widgetsetDirectory = new File(Util.getWidgetsetDirectory(project), generatedWidgetSetName)
-        if (  widgetsetDirectory.exists() ) {
+        if ( widgetsetDirectory.exists() ) {
             widgetsetDirectory.deleteDir()
         }
         widgetsetDirectory.mkdirs()
@@ -128,7 +128,7 @@ class CompileWidgetsetTask extends DefaultTask {
             def fileName = ze.name as String
             File outfile = new File(widgetsetDirectory, fileName)
 
-            if (  ze.directory ) {
+            if ( ze.directory ) {
                 outfile.mkdirs()
                 continue
             }
@@ -161,7 +161,7 @@ class CompileWidgetsetTask extends DefaultTask {
         project.afterEvaluate {
 
             // Set task dependencies
-            if (  configuration.widgetsetCDN ) {
+            if ( configuration.widgetsetCDN ) {
                 dependsOn 'processResources'
             } else {
                 dependsOn('classes', UpdateWidgetsetTask.NAME, BuildClassPathJar.NAME)
@@ -187,7 +187,7 @@ class CompileWidgetsetTask extends DefaultTask {
             }
 
             // Add classpath jar
-            if (  project.vaadin.useClassPathJar ) {
+            if ( project.vaadin.useClassPathJar ) {
                 BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
                 inputs.file(pathJarTask.archivePath)
             }
@@ -202,13 +202,13 @@ class CompileWidgetsetTask extends DefaultTask {
 
     @TaskAction
     def run() {
-        if (  configuration.widgetsetCDN ) {
+        if ( configuration.widgetsetCDN ) {
             compileRemotely()
             return
         }
 
         String widgetset = Util.getWidgetset(project)
-        if (  widgetset ) {
+        if ( widgetset ) {
             compileLocally(widgetset)
             return
         }
@@ -239,7 +239,7 @@ class CompileWidgetsetTask extends DefaultTask {
                     logger.info("Widgetset is compiling with status $status. " +
                             "Waiting 10 seconds and querying again.")
                     int timeoutInterval = TimeUnit.SECONDS.toMillis(10)
-                    if (  timeout > 0 ) {
+                    if ( timeout > 0 ) {
                         sleep(timeoutInterval)
                         timeout -= timeoutInterval
                     } else {
@@ -266,12 +266,12 @@ class CompileWidgetsetTask extends DefaultTask {
         Util.getWidgetsetDirectory(project).mkdirs()
 
         FileCollection classpath = Util.getCompileClassPathOrJar(project)
-        if (  vaadin.useClassPathJar ) {
+        if ( vaadin.useClassPathJar ) {
             // Add client dependencies missing from the classpath jar
             classpath += Util.getClientCompilerClassPath(project).filter { File file ->
-                if (  file.name.endsWith('.jar') ) {
+                if ( file.name.endsWith('.jar') ) {
                     // Add GWT compiler + deps
-                    if (  file.name.startsWith('vaadin-client' ) ||
+                    if ( file.name.startsWith('vaadin-client' ) ||
                             file.name.startsWith('vaadin-shared') ||
                             file.name.startsWith('validation-api')) {
                         return true
@@ -291,7 +291,7 @@ class CompileWidgetsetTask extends DefaultTask {
             }
 
             // Ensure gwt sdk libs are in the correct order
-            if (  configuration.gwtSdkFirstInClasspath ) {
+            if ( configuration.gwtSdkFirstInClasspath ) {
                 classpath = Util.moveGwtSdkFirstInClasspath(project, classpath)
             }
         } else {
@@ -300,7 +300,7 @@ class CompileWidgetsetTask extends DefaultTask {
 
         def widgetsetCompileProcess = [Util.getJavaBinary(project)]
 
-        if (  configuration.jvmArgs ) {
+        if ( configuration.jvmArgs ) {
             widgetsetCompileProcess += configuration.jvmArgs as List
         }
 
@@ -317,15 +317,15 @@ class CompileWidgetsetTask extends DefaultTask {
         widgetsetCompileProcess += ['-localWorkers', configuration.localWorkers]
         widgetsetCompileProcess += ['-workDir', project.buildDir.canonicalPath + File.separator + 'tmp']
 
-        if (  configuration.draftCompile ) {
+        if ( configuration.draftCompile ) {
             widgetsetCompileProcess += '-draftCompile'
         }
 
-        if (  configuration.strict ) {
+        if ( configuration.strict ) {
             widgetsetCompileProcess += '-strict'
         }
 
-        if (  configuration.extraArgs ) {
+        if ( configuration.extraArgs ) {
             widgetsetCompileProcess += configuration.extraArgs as List
         }
 
@@ -335,7 +335,7 @@ class CompileWidgetsetTask extends DefaultTask {
         def failed = false
         Util.logProcess(project, process, 'widgetset-compile.log', { String output ->
             // Monitor log for errors
-            if (  output.trim().startsWith('[ERROR]') ) {
+            if ( output.trim().startsWith('[ERROR]') ) {
                 failed = true
             }
         })
@@ -348,7 +348,7 @@ class CompileWidgetsetTask extends DefaultTask {
          */
         new File(Util.getWidgetsetDirectory(project), 'WEB-INF').deleteDir()
 
-        if (  failed || result != 0 ) {
+        if ( failed || result != 0 ) {
             // Terminate build
             throw new GradleException('Widgetset failed to compile. See error log.')
         }

@@ -62,7 +62,7 @@ class CreateTestbenchTestTask extends DefaultTask {
         substitutions['testName'] = testName
         substitutions['appUrl'] = "http://localhost:${project.vaadinRun.serverPort}"
 
-        if (  Util.isGroovyProject(project) ) {
+        if ( Util.isGroovyProject(project) ) {
             TemplateUtil.writeTemplate("MyTest.groovy", packageDir, testName + ".groovy", substitutions)
         } else {
             TemplateUtil.writeTemplate("MyTest.java", packageDir, testName + ".java", substitutions)

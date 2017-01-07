@@ -26,7 +26,7 @@ class AddonThemeCreator implements Runnable {
         substitutions['themeName'] = themeName
         substitutions['theme'] = themeName.toLowerCase()
 
-        if (  templateDir ) {
+        if ( templateDir ) {
             TemplateUtil.writeTemplate("${templateDir}/myaddon.scss", themeDir, "${themeName}.scss", substitutions)
         } else {
             TemplateUtil.writeTemplate('myaddon.scss', themeDir, "${themeName}.scss", substitutions)
