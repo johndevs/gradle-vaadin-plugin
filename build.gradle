@@ -83,6 +83,13 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
+idea {
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
+
 /***********************************************************************************************************************
  *
  * Sources
