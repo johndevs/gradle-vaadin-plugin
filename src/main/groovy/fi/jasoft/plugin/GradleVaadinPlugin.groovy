@@ -27,6 +27,7 @@ import fi.jasoft.plugin.tasks.BuildJavadocJarTask
 import fi.jasoft.plugin.tasks.BuildSourcesJarTask
 import fi.jasoft.plugin.tasks.CompileThemeTask
 import fi.jasoft.plugin.tasks.CompileWidgetsetTask
+import fi.jasoft.plugin.tasks.CompressCssTask
 import fi.jasoft.plugin.tasks.CreateAddonProjectTask
 import fi.jasoft.plugin.tasks.CreateAddonThemeTask
 import fi.jasoft.plugin.tasks.CreateComponentTask
@@ -144,10 +145,10 @@ class GradleVaadinPlugin implements Plugin<Project> {
         }
 
         // Extensions
-        project.extensions.create('vaadin', VaadinPluginExtension, project)
-        project.extensions.create('vaadinTestbench', TestBenchConfiguration, project)
-        project.extensions.create('vaadinTestbenchHub', TestBenchHubConfiguration)
-        project.extensions.create('vaadinTestbenchNode', TestBenchNodeConfiguration)
+        Util.findOrCreateExtension(project, 'vaadin', VaadinPluginExtension, project)
+        Util.findOrCreateExtension(project, 'vaadinTestbench', TestBenchConfiguration, project)
+        Util.findOrCreateExtension(project, 'vaadinTestbenchHub', TestBenchHubConfiguration)
+        Util.findOrCreateExtension(project, 'vaadinTestbenchNode', TestBenchNodeConfiguration)
 
         // Dependency resolution
         gradle.taskGraph.addTaskExecutionListener(new TaskListener())
@@ -190,6 +191,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
         clean.dependsOn(tasks[cleanTaskName + CompileWidgetsetTask.NAME.capitalize()])
         clean.dependsOn(tasks[cleanTaskName + RunTask.NAME.capitalize()])
         clean.dependsOn(tasks[cleanTaskName + CompileThemeTask.NAME.capitalize()])
+        clean.dependsOn(tasks[cleanTaskName + CompressCssTask.NAME.capitalize()])
         clean.dependsOn(tasks[cleanTaskName + SuperDevModeTask.NAME.capitalize()])
         clean.dependsOn(tasks[cleanTaskName + DevModeTask.NAME.capitalize()])
 
@@ -534,6 +536,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
         tasks.create(name:DevModeTask.NAME, type:DevModeTask, group:VAADIN_TASK_GROUP)
         tasks.create(name:SuperDevModeTask.NAME, type:SuperDevModeTask, group:VAADIN_TASK_GROUP)
         tasks.create(name:CompileThemeTask.NAME, type:CompileThemeTask, group:VAADIN_TASK_GROUP)
+        tasks.create(name:CompressCssTask.NAME, type:CompressCssTask, group:VAADIN_TASK_GROUP)
         tasks.create(name:RunTask.NAME, type:RunTask, group:VAADIN_TASK_GROUP)
         tasks.create(name:UpdateWidgetsetTask.NAME, type:UpdateWidgetsetTask, group:VAADIN_TASK_GROUP)
 

@@ -61,7 +61,7 @@ class DevModeTask extends DefaultTask {
         dependsOn('classes', UpdateWidgetsetTask.NAME)
         description = "Run Development Mode for easier debugging and development of client widgets."
         Runtime.getRuntime().addShutdownHook(cleanupThread)
-        configuration = project.extensions.create(NAME, SuperDevModeConfiguration)
+        configuration = Util.findOrCreateExtension(project, NAME, SuperDevModeConfiguration)
     }
 
     @TaskAction

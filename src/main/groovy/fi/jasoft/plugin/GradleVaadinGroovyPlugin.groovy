@@ -28,7 +28,7 @@ import org.gradle.api.plugins.GroovyPlugin
  */
 class GradleVaadinGroovyPlugin extends GradleVaadinPlugin {
 
-    static String EXTENSION_NAME = 'vaadinGroovy'
+    static final String NAME = 'vaadinGroovy'
 
     @Override
     static String getPluginId() {
@@ -43,7 +43,7 @@ class GradleVaadinGroovyPlugin extends GradleVaadinPlugin {
         project.plugins.apply(GroovyPlugin)
 
         // Extensions
-        project.extensions.create(EXTENSION_NAME, VaadinPluginGroovyExtension)
+        Util.findOrCreateExtension(project, NAME, VaadinPluginGroovyExtension)
 
         // Dependencies
         if (  project.vaadin.manageDependencies ) {
