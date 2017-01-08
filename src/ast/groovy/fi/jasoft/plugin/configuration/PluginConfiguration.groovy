@@ -108,7 +108,7 @@ class PluginConfigurationTransformation implements ASTTransformation {
 
         for( FieldNode field:clazz.fields) {
             MethodNode method
-            if (  field.final ) {
+            if ( field.final ) {
                 method = makeClosureSetterMethod(field)
             } else {
                 method = makeValueSetterMethod(field)

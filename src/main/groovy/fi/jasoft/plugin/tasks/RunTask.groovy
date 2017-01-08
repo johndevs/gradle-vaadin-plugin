@@ -41,7 +41,7 @@ class RunTask extends DefaultTask {
     def ApplicationServerConfiguration configuration
 
     def cleanupThread = new Thread({
-        if (  server ) {
+        if ( server ) {
             server.terminate()
             server = null
         }
@@ -64,7 +64,7 @@ class RunTask extends DefaultTask {
 
     @TaskAction
     public void run() {
-        if (  nobrowser ) {
+        if ( nobrowser ) {
             configuration.openInBrowser = false
         }
         server = ApplicationServer.get(project, [], configuration)

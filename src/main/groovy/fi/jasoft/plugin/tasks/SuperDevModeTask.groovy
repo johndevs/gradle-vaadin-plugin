@@ -39,12 +39,12 @@ class SuperDevModeTask extends DefaultTask {
     def SuperDevModeConfiguration configuration
 
     def cleanupThread = new Thread({
-        if (  codeserverProcess ) {
+        if ( codeserverProcess ) {
             codeserverProcess.destroy()
             codeserverProcess = null
         }
 
-        if (  server ) {
+        if ( server ) {
             server.terminate()
             server = null
         }
@@ -98,7 +98,7 @@ class SuperDevModeTask extends DefaultTask {
         superdevmodeProcess += ['-logLevel', configuration.logLevel]
         superdevmodeProcess += ['-noprecompile']
 
-        if (  configuration.extraArgs ) {
+        if ( configuration.extraArgs ) {
             superdevmodeProcess += configuration.extraArgs as List
         }
 
@@ -107,7 +107,7 @@ class SuperDevModeTask extends DefaultTask {
         codeserverProcess = superdevmodeProcess.execute()
 
         Util.logProcess(project, codeserverProcess, 'superdevmode.log', { line ->
-            if (  line.contains('The code server is ready') ) {
+            if ( line.contains('The code server is ready') ) {
                 readyClosure.call()
             }
         })

@@ -111,7 +111,7 @@ abstract class ApplicationServer {
 
     def FileCollection getClassPath() {
         FileCollection cp
-        if (  project.vaadin.useClassPathJar ) {
+        if ( project.vaadin.useClassPathJar ) {
             BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
             cp = project.files(pathJarTask.archivePath)
         } else {
@@ -130,7 +130,7 @@ abstract class ApplicationServer {
 
 
     def boolean start(boolean firstStart=false, boolean stopAfterStart=false) {
-        if (  process ) {
+        if ( process ) {
             project.logger.error('Server is already running.')
             return false
         }
@@ -142,20 +142,20 @@ abstract class ApplicationServer {
         def appServerProcess = [Util.getJavaBinary(project)]
 
         // Debug
-        if (  configuration.debug ) {
+        if ( configuration.debug ) {
             appServerProcess.add('-Xdebug')
             appServerProcess.add("-Xrunjdwp:transport=dt_socket,address=${configuration.debugPort},server=y,suspend=n")
         }
 
         // JVM options
-        if (  configuration.debug ) {
+        if ( configuration.debug ) {
             appServerProcess.add('-ea')
         }
 
         appServerProcess.add('-cp')
         appServerProcess.add(classPath.asPath)
 
-        if (  configuration.jvmArgs ) {
+        if ( configuration.jvmArgs ) {
             appServerProcess.addAll(configuration.jvmArgs)
         }
 
@@ -171,7 +171,7 @@ abstract class ApplicationServer {
 
         File classesDir = mainSourceSet.output.classesDir
         File resourcesDir = mainSourceSet.output.resourcesDir
-        if (  configuration.classesDir ) {
+        if ( configuration.classesDir ) {
             // Eclipse might output somewhere else
             classesDir = project.file(configuration.classesDir)
             resourcesDir = project.file(configuration.classesDir)
@@ -179,9 +179,9 @@ abstract class ApplicationServer {
             // Check if directory contains classes, if it does not then the IDE has not
             // compiled any classes here.
             boolean hasClassFiles = false
-            if (  classesDir.exists() ) {
+            if ( classesDir.exists() ) {
                 classesDir.eachFileRecurse(FileType.FILES) { File file ->
-                    if (  file.getName().endsWith(".class") ) {
+                    if ( file.getName().endsWith(".class") ) {
                         hasClassFiles = true
                     }
                 }
@@ -200,7 +200,7 @@ abstract class ApplicationServer {
         appServerProcess.add(classesDir.canonicalPath + File.separator)
         appServerProcess.add(resourcesDir.canonicalPath + File.separator)
 
-        if (  project.logger.debugEnabled ) {
+        if ( project.logger.debugEnabled ) {
             appServerProcess.add(Level.FINEST.name)
         } else {
             appServerProcess.add(Level.INFO.name)
@@ -214,7 +214,7 @@ abstract class ApplicationServer {
 
         makeClassPathFile(buildDir)
 
-        if (  executeServer(appServerProcess, firstStart) ) {
+        if ( executeServer(appServerProcess, firstStart) ) {
             monitorLog(firstStart, stopAfterStart)
         }
     }
@@ -231,7 +231,7 @@ abstract class ApplicationServer {
         }
 
         // Watch for changes in classes
-        if (  configuration.serverRestart ) {
+        if ( configuration.serverRestart ) {
             def self = this
             Thread.start 'Class Directory Watcher', {
                 watchClassDirectoryForChanges(self)
@@ -239,7 +239,7 @@ abstract class ApplicationServer {
         }
 
         // Watch for changes in theme
-        if (  firstStart && configuration.themeAutoRecompile ) {
+        if ( firstStart && configuration.themeAutoRecompile ) {
             def self = this
             Thread.start 'Theme Directory Watcher', {
                 watchThemeDirectoryForChanges(self)
@@ -251,18 +251,18 @@ abstract class ApplicationServer {
     @PackageScope
     def monitorLog(boolean firstStart=false, boolean stopAfterStart=false) {
         Util.logProcess(project, process, "${serverName}.log", { line ->
-            if (  line.contains(successfullyStartedLogToken) ) {
-                if (  firstStart ) {
+            if ( line.contains(successfullyStartedLogToken) ) {
+                if ( firstStart ) {
                     def resultStr = "Application running on http://localhost:${configuration.serverPort} "
-                    if (  configuration.debug ) {
+                    if ( configuration.debug ) {
                         resultStr += "(debugger on ${configuration.debugPort})"
                     }
                     project.logger.lifecycle(resultStr)
                     project.logger.lifecycle('Press [Ctrl+C] to terminate server...')
 
-                    if (  stopAfterStart ) {
+                    if ( stopAfterStart ) {
                         terminate()
-                    } else if (  configuration.openInBrowser ) {
+                    } else if ( configuration.openInBrowser ) {
                         openBrowser()
                     }
                 } else {
@@ -270,7 +270,7 @@ abstract class ApplicationServer {
                 }
             }
 
-            if (  line.contains('ERROR') ) {
+            if ( line.contains('ERROR') ) {
                 // Terminate if server logs an error
                 terminate()
             }
@@ -281,7 +281,7 @@ abstract class ApplicationServer {
     def openBrowser() {
         // Build browser GET parameters
         def paramString = ''
-        if (  configuration.debug ) {
+        if ( configuration.debug ) {
             paramString += '?debug'
             paramString += AMPERSAND + browserParameters.join(AMPERSAND)
         } else if ( !browserParameters.isEmpty() ) {
@@ -301,7 +301,7 @@ abstract class ApplicationServer {
             // Keep main loop running so task does not end. Task
             // shutdownhook will terminate server
 
-            if (  process != null ) {
+            if ( process != null ) {
                 // Process has not been terminated
                 project.logger.warn("Server process was not terminated cleanly before re-loading")
                 break
@@ -345,13 +345,13 @@ abstract class ApplicationServer {
         def project = server.project
 
         def classesDir
-        if (  project.vaadinRun.classesDir && project.file(project.vaadinRun.classesDir).exists() ) {
+        if ( project.vaadinRun.classesDir && project.file(project.vaadinRun.classesDir).exists() ) {
             classesDir = project.file(project.vaadinRun.classesDir)
         } else {
             classesDir = project.sourceSets.main.output.classesDir
         }
 
-        if (  classesDir && classesDir.exists() ) {
+        if ( classesDir && classesDir.exists() ) {
             def executor = Executors.newSingleThreadScheduledExecutor()
             ScheduledFuture currentTask
 
@@ -361,8 +361,8 @@ abstract class ApplicationServer {
 //                Path path =  basePath.resolve(watchEventPath.context())
 //                File file = path.toFile()
 
-                if (  server.configuration.serverRestart && server.process ) {
-                    if (  currentTask ) {
+                if ( server.configuration.serverRestart && server.process ) {
+                    if ( currentTask ) {
                         currentTask.cancel(true)
                     }
                     currentTask = executor.schedule({
@@ -380,13 +380,13 @@ abstract class ApplicationServer {
     static watchThemeDirectoryForChanges(final ApplicationServer server) {
         def project = server.project
         File themesDir = Util.getThemesDirectory(project)
-        if (  themesDir.exists() ) {
+        if ( themesDir.exists() ) {
             def executor = Executors.newSingleThreadScheduledExecutor()
             ScheduledFuture currentTask
 
             Util.watchDirectoryForChanges(project, themesDir, { WatchKey key, WatchEvent event ->
-                if (  event.context().toString().toLowerCase().endsWith(".scss") ) {
-                    if (  currentTask ) {
+                if ( event.context().toString().toLowerCase().endsWith(".scss") ) {
+                    if ( currentTask ) {
                         currentTask.cancel(true)
                     }
                     currentTask = executor.schedule({
@@ -395,7 +395,7 @@ abstract class ApplicationServer {
                         CompileThemeTask.compile(project, true)
 
                         // Restart
-                        if (  server.configuration.serverRestart && server.process ) {
+                        if ( server.configuration.serverRestart && server.process ) {
                             // Force restart of server
                             project.logger.lifecycle(RELOADING_SERVER_MESSAGE)
                             server.reload()

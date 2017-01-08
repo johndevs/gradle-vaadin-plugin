@@ -24,7 +24,7 @@ class ComponentCreator implements Runnable {
 
         String widgetsetPackagePath
         String widgetsetPackage
-        if (  widgetset.contains(DOT) ) {
+        if ( widgetset.contains(DOT) ) {
             def widgetsetPackageFQN = widgetset.substring(0, widgetset.lastIndexOf(DOT))
             widgetsetPackagePath = TemplateUtil.convertFQNToFilePath(widgetsetPackageFQN)
             def widgetsetName = widgetset.tokenize(DOT).last()

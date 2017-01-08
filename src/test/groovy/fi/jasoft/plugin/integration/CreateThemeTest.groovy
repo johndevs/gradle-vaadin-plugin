@@ -50,7 +50,7 @@ class CreateThemeTest extends IntegrationTest {
     }
 
     private void assertThemeCreatedAndCompiled(String themeName) {
-        if (  themeName ) {
+        if ( themeName ) {
             runWithArguments(CreateThemeTask.NAME, "--name=$themeName")
         } else {
             runWithArguments(CreateThemeTask.NAME)

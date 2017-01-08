@@ -41,11 +41,11 @@ class DevModeTask extends DefaultTask {
     def SuperDevModeConfiguration configuration
 
     def cleanupThread = new Thread({
-        if (  devModeProcess ) {
+        if ( devModeProcess ) {
             devModeProcess.destroy()
             devModeProcess = null
         }
-        if (  server ) {
+        if ( server ) {
             server.terminate()
             server = null
         }
@@ -115,7 +115,7 @@ class DevModeTask extends DefaultTask {
         devmodeProcess += ['-codeServerPort', configuration.codeServerPort]
         devmodeProcess += ['-bindAddress', configuration.bindAddress]
 
-        if (  configuration.extraArgs ) {
+        if ( configuration.extraArgs ) {
             devmodeProcess += configuration.extraArgs as List
         }
 

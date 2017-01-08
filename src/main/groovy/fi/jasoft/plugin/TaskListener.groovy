@@ -78,7 +78,7 @@ class TaskListener implements TaskExecutionListener {
             return
         }
 
-        if (  task.name == 'test' ) {
+        if ( task.name == 'test' ) {
             terminateTestbench(this)
         }
     }
@@ -93,7 +93,7 @@ class TaskListener implements TaskExecutionListener {
     @PackageScope
     static ensureWidgetsetGeneratorExists(Task task) {
         def generator = task.project.vaadinCompile.widgetsetGenerator
-        if (  generator != null ) {
+        if ( generator != null ) {
             String name = generator.tokenize('.').last()
             String pkg = generator.replaceAll(".$name", '')
             String filename = name + ".java"
@@ -128,33 +128,33 @@ class TaskListener implements TaskExecutionListener {
 
         // Resolve widgetset
         def widgetset = project.vaadinCompile.widgetset
-        if (  widgetset == null ) {
+        if ( widgetset == null ) {
             widgetset = GradleVaadinPlugin.DEFAULT_WIDGETSET
         }
 
         // Scan for existing manifest in source folder and reuse if possible
         File manifest = getManifest(task)
-        if (  manifest != null ) {
+        if ( manifest != null ) {
             project.logger.warn("Manifest found in project, possibly overwriting existing values.")
             task.manifest.from(manifest)
         }
 
         //Validate values
-        if (  project.vaadin.addon.title == '' ) {
+        if ( project.vaadin.addon.title == '' ) {
             project.logger.warn("No vaadin.addon.title has been specified, " +
                     "jar not compatible with Vaadin Directory.")
         }
 
-        if (  project.version == 'unspecified' ) {
+        if ( project.version == 'unspecified' ) {
             project.logger.warn("No version specified for the project, jar not " +
                     "compatible with Vaadin Directory.")
         }
 
         // Get stylesheets
         def styles = Util.findAddonSassStylesInProject(project)
-        if (  project.vaadin.addon.styles != null ) {
+        if ( project.vaadin.addon.styles != null ) {
             project.vaadin.addon.styles.each({ path ->
-                if (  path.endsWith('scss') || path.endsWith('.css') ) {
+                if ( path.endsWith('scss') || path.endsWith('.css') ) {
                     styles.add(path)
                 } else {
                     project.logger.warn("Could not add '"+path+"' to jar manifest. " +
@@ -168,19 +168,19 @@ class TaskListener implements TaskExecutionListener {
         attributes['Vaadin-Package-Version'] = 1
         attributes['Implementation-Version'] = project.version
         attributes['Built-By'] = "Gradle Vaadin Plugin ${GradleVaadinPlugin.PLUGIN_VERSION}"
-        if (  widgetset ) {
+        if ( widgetset ) {
             attributes['Vaadin-Widgetsets'] = widgetset
         }
-        if (  styles ) {
+        if ( styles ) {
            attributes['Vaadin-Stylesheets'] = styles.join(',')
         }
-        if (  project.vaadin.addon.license ) {
+        if ( project.vaadin.addon.license ) {
             attributes['Vaadin-License-Title'] = project.vaadin.addon.license
         }
-        if (  project.vaadin.addon.title ) {
+        if ( project.vaadin.addon.title ) {
             attributes['Implementation-Title'] = project.vaadin.addon.title
         }
-        if (  project.vaadin.addon.author ) {
+        if ( project.vaadin.addon.author ) {
             attributes['Implementation-Vendor'] = project.vaadin.addon.author
         }
         task.manifest.attributes(attributes)
@@ -215,7 +215,7 @@ class TaskListener implements TaskExecutionListener {
         assert task in War
         War war = (War) task
         war.exclude('VAADIN/gwt-unitCache/**')
-        if (  task.project.vaadin.manageDependencies ) {
+        if ( task.project.vaadin.manageDependencies ) {
             war.classpath = Util.getWarClasspath(task.project).files
         }
     }
@@ -226,18 +226,18 @@ class TaskListener implements TaskExecutionListener {
         def tb = project.vaadinTestbench as TestBenchConfiguration
         def tbHub = project.vaadinTestbenchHub as TestBenchHubConfiguration
         def tbNode = project.vaadinTestbenchNode as TestBenchNodeConfiguration
-        if (  tb.enabled ) {
-            if (  tbHub.enabled ) {
+        if ( tb.enabled ) {
+            if ( tbHub.enabled ) {
                 listener.testbenchHub = new TestbenchHub(project)
                 listener.testbenchHub.start()
             }
 
-            if (  tbNode.enabled ) {
+            if ( tbNode.enabled ) {
                 listener.testbenchNode = new TestbenchNode(project)
                 listener.testbenchNode.start()
             }
 
-            if (  tb.runApplication ) {
+            if ( tb.runApplication ) {
                 listener.testbenchAppServer = ApplicationServer.get(project)
                 listener.testbenchAppServer.start()
 
@@ -249,17 +249,17 @@ class TaskListener implements TaskExecutionListener {
 
     @PackageScope
     static terminateTestbench(TaskListener listener) {
-        if (  listener.testbenchAppServer ) {
+        if ( listener.testbenchAppServer ) {
             listener.testbenchAppServer.terminate()
             listener.testbenchAppServer = null
         }
 
-        if (  listener.testbenchNode ) {
+        if ( listener.testbenchNode ) {
             listener.testbenchNode.terminate()
             listener.testbenchNode = null
         }
 
-        if (  listener.testbenchHub ) {
+        if ( listener.testbenchHub ) {
             listener.testbenchHub.terminate()
             listener.testbenchHub = null
         }
@@ -269,13 +269,12 @@ class TaskListener implements TaskExecutionListener {
     static configureJavadoc(Task task) {
         def project = task.project
         task.source = Util.getMainSourceSet(project)
-        if (  project.configurations.findByName(GradleVaadinPlugin.CONFIGURATION_JAVADOC) ) {
+        if ( project.configurations.findByName(GradleVaadinPlugin.CONFIGURATION_JAVADOC) ) {
             task.classpath = task.classpath + (project.configurations[GradleVaadinPlugin.CONFIGURATION_JAVADOC])
         }
-        if (  project.configurations.findByName(GradleVaadinPlugin.CONFIGURATION_SERVER) ) {
+        if ( project.configurations.findByName(GradleVaadinPlugin.CONFIGURATION_SERVER) ) {
             task.classpath = task.classpath + (project.configurations[GradleVaadinPlugin.CONFIGURATION_SERVER])
         }
-        task.failOnError = false
         task.options.addStringOption("sourcepath", "")
     }
 }

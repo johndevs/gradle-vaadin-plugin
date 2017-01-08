@@ -63,7 +63,7 @@ class CreateDesignTask extends DefaultTask{
 
     @TaskAction
     def run() {
-        if (  listTemplates ) {
+        if ( listTemplates ) {
             project.logger.lifecycle("Available templates:")
             templates.each { String name, File file ->
                 project.logger.printf("%-30.30s  %-30.30s%n", name, "($file.name)")
@@ -76,11 +76,11 @@ class CreateDesignTask extends DefaultTask{
         if ( !template ) {
             // TODO add support for generating companion files for any template
 
-            if (  createCompanionFile ) {
+            if ( createCompanionFile ) {
                 makeDesignCompanionFile()
             }
 
-            if (  createImplementationFile ) {
+            if ( createImplementationFile ) {
                 makeDesignImplementationFile()
             }
         }
@@ -92,7 +92,7 @@ class CreateDesignTask extends DefaultTask{
         File designDir = new File(resourcesDir, TemplateUtil.convertFQNToFilePath(designPackage))
         designDir.mkdirs()
 
-        if (  template ) {
+        if ( template ) {
             if ( !templates.containsKey(template) ) {
                 throw new GradleException("Template with name $template could not be found.")
             }

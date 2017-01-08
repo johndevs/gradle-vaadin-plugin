@@ -62,7 +62,7 @@ class TestbenchHub {
         // Execute server
         process = process.execute()
 
-        if (  project.vaadin.logToConsole ) {
+        if ( project.vaadin.logToConsole ) {
             process.consumeProcessOutput(System.out, System.out)
         } else {
             File log = new File(logDir.canonicalPath + '/testbench-hub.log')

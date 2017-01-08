@@ -105,7 +105,7 @@ class UpdateWidgetsetTask extends DefaultTask {
         substitutions['collapsePermutations'] = configuration.collapsePermutations
 
         String widgetsetGenerator = getWidgetsetGenerator(project, configuration, widgetsetFQN)
-        if (  widgetsetGenerator ) {
+        if ( widgetsetGenerator ) {
             substitutions['widgetsetGenerator'] = widgetsetGenerator
         }
 
@@ -126,7 +126,7 @@ class UpdateWidgetsetTask extends DefaultTask {
         Set<String> inherits = []
 
         // Scan child projects for their source inherits
-        if (  scannedProjects.size() > 0 ) {
+        if ( scannedProjects.size() > 0 ) {
             inherits.addAll(findInheritsInProject(project))
         }
 
@@ -136,21 +136,21 @@ class UpdateWidgetsetTask extends DefaultTask {
         def attribute = new Attributes.Name('Vaadin-Widgetsets')
         project.configurations.all.each { Configuration conf ->
             conf.allDependencies.each { Dependency dependency ->
-                if (  dependency in ProjectDependency ) {
+                if ( dependency in ProjectDependency ) {
                     Project dependentProject = ((ProjectDependency) dependency).dependencyProject
                     if ( !(dependentProject in scannedProjects) ) {
                         inherits.addAll(findInheritsInDependencies(dependentProject, scannedProjects))
                     }
                 } else {
                     conf.files(dependency).each { File file ->
-                        if (  file.file && file.name.endsWith('.jar') ) {
+                        if ( file.file && file.name.endsWith('.jar') ) {
                             file.withInputStream { InputStream stream ->
                                 def jarStream = new JarInputStream(stream)
                                 jarStream.with {
                                     def mf = jarStream.getManifest()
                                     def attributes = mf?.mainAttributes
                                     def widgetsetsValue = attributes?.getValue(attribute)
-                                    if (  widgetsetsValue && !dependency.name.startsWith('vaadin-client') ) {
+                                    if ( widgetsetsValue && !dependency.name.startsWith('vaadin-client') ) {
                                         List<String> widgetsets = widgetsetsValue?.split(',')?.collect { it.trim() }
                                         widgetsets?.each { String widgetset ->
                                             if ( widgetset != DEFAULT_WIDGETSET &&
@@ -187,11 +187,11 @@ class UpdateWidgetsetTask extends DefaultTask {
         Set<String> inherits = []
 
         def scan = { File srcDir ->
-            if (  srcDir.exists() ) {
+            if ( srcDir.exists() ) {
                 project.fileTree(srcDir.absolutePath)
                         .include("**/*/*$GWT_MODULE_XML_POSTFIX")
                         .each { File file ->
-                    if (  file.exists() && file.isFile() ) {
+                    if ( file.exists() && file.isFile() ) {
                         def path = file.absolutePath.substring(srcDir.absolutePath.size()+1)
                         def widgetset = TemplateUtil.convertFilePathToFQN(path, GWT_MODULE_XML_POSTFIX)
                         inherits.add(widgetset)
@@ -212,10 +212,10 @@ class UpdateWidgetsetTask extends DefaultTask {
 
         def ua = 'ie8,ie9,gecko1_8,safari'
         if ( !configuration.userAgent ) {
-            if (  Util.isOperaUserAgentSupported(project) ) {
+            if ( Util.isOperaUserAgentSupported(project) ) {
                 ua += ',opera'
             }
-            if (  Util.isIE10UserAgentSupported(project) ) {
+            if ( Util.isIE10UserAgentSupported(project) ) {
                 ua += ',ie10'
             }
         } else {
@@ -223,7 +223,7 @@ class UpdateWidgetsetTask extends DefaultTask {
         }
         properties.put('user.agent', ua)
 
-        if (  configuration.profiler ) {
+        if ( configuration.profiler ) {
             properties.put('vaadin.profiler', true)
         }
 
@@ -240,7 +240,7 @@ class UpdateWidgetsetTask extends DefaultTask {
         inherits.addAll(findInheritsInDependencies(project))
 
         // Custom inherits
-        if (  configuration.extraInherits ) {
+        if ( configuration.extraInherits ) {
             inherits.addAll(configuration.extraInherits)
         }
 
@@ -257,7 +257,7 @@ class UpdateWidgetsetTask extends DefaultTask {
                                                 CompileWidgetsetConfiguration configuration,
                                                 String widgetsetFQN) {
         String name, pkg, filename
-        if (  configuration.widgetsetGenerator == null ) {
+        if ( configuration.widgetsetGenerator == null ) {
             name = widgetsetFQN.tokenize(DOT).last()
             pkg = widgetsetFQN.replace(DOT + name, '')
             filename = name + "Generator.java"
@@ -268,13 +268,13 @@ class UpdateWidgetsetTask extends DefaultTask {
             filename = name + JAVA_FILE_POSTFIX
         }
 
-        if (  Util.getMainSourceSet(project).srcDirs.isEmpty() ) {
+        if ( Util.getMainSourceSet(project).srcDirs.isEmpty() ) {
             throw new GradleException('No source sets was found.')
         }
 
         File javaDir = Util.getMainSourceSet(project).srcDirs.first()
         File f = new File(new File(javaDir, TemplateUtil.convertFQNToFilePath(pkg)), filename)
-        if (  f.exists() || configuration.widgetsetGenerator != null ) {
+        if ( f.exists() || configuration.widgetsetGenerator != null ) {
             return  "${pkg}.${StringUtils.removeEnd(filename, JAVA_FILE_POSTFIX)}"
         }
         null
@@ -284,7 +284,7 @@ class UpdateWidgetsetTask extends DefaultTask {
         Map<String, Object> linkers = [:]
 
         File[] clientSCSS = TemplateUtil.getFilesFromPublicFolder(project, SCSS_FILE_POSTFIX)
-        if (  clientSCSS.length > 0 ) {
+        if ( clientSCSS.length > 0 ) {
             linkers.put('scssintegration', 'com.vaadin.sass.linker.SassLinker')
         }
         linkers
