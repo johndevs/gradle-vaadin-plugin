@@ -16,6 +16,7 @@
 package fi.jasoft.plugin.integration
 
 import org.gradle.testkit.runner.GradleRunner
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
@@ -35,11 +36,19 @@ class IntegrationTest {
 
     protected File settingsFile
 
+    protected long startTime
+
     @Before
     void setup() {
+        startTime = System.currentTimeMillis()
         println "Running test in $projectDir.root"
         buildFile = makeBuildFile(projectDir.root)
         settingsFile = projectDir.newFile("settings.gradle")
+    }
+
+    @After
+    void tearDown() {
+        println "Test took ${(System.currentTimeMillis() - startTime)/1000L} seconds."
     }
 
     protected String getPluginDir() {
@@ -71,7 +80,7 @@ class IntegrationTest {
                 }
             }
 
-        """
+        """.stripIndent()
 
         if ( applyPluginToFile ) {
             applyRepositories(buildFile)
