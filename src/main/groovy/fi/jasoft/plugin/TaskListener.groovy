@@ -25,6 +25,7 @@ import fi.jasoft.plugin.testbench.TestbenchHub
 import fi.jasoft.plugin.testbench.TestbenchNode
 import groovy.transform.PackageScope
 import groovy.xml.MarkupBuilder
+import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.execution.TaskExecutionListener
 import org.gradle.api.plugins.PluginManager
@@ -47,8 +48,11 @@ class TaskListener implements TaskExecutionListener {
     @Override
     void beforeExecute(Task task) {
         if ( !isApplicable(task) ) {
+            task.project.logger.warn("Tried to run task listener on non-applicable project $task.project.name")
             return
         }
+
+        task.project.logger.info "Running task listener for task \"$task.name\" on project \"$task.project.name\""
 
         switch (task.name) {
             case 'compileJava':
@@ -222,16 +226,20 @@ class TaskListener implements TaskExecutionListener {
 
     @PackageScope
     static configureTest(Task task, TaskListener listener) {
-        def project = task.project
-        def tb = project.vaadinTestbench as TestBenchConfiguration
-        def tbHub = project.vaadinTestbenchHub as TestBenchHubConfiguration
-        def tbNode = project.vaadinTestbenchNode as TestBenchNodeConfiguration
+        Project project = task.project
+        TestBenchConfiguration tb = Util.findOrCreateExtension(project, 'vaadinTestbench',
+                TestBenchConfiguration, project)
+
         if ( tb.enabled ) {
+            TestBenchHubConfiguration tbHub = Util.findOrCreateExtension(project, 'vaadinTestbenchHub',
+                    TestBenchHubConfiguration)
             if ( tbHub.enabled ) {
                 listener.testbenchHub = new TestbenchHub(project)
                 listener.testbenchHub.start()
             }
 
+            TestBenchNodeConfiguration tbNode = Util.findOrCreateExtension(project, 'vaadinTestbenchNode',
+                    TestBenchNodeConfiguration)
             if ( tbNode.enabled ) {
                 listener.testbenchNode = new TestbenchNode(project)
                 listener.testbenchNode.start()
