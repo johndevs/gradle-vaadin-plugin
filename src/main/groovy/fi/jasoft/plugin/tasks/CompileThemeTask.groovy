@@ -26,6 +26,7 @@ import org.gradle.api.file.FileTree
 import org.gradle.api.tasks.TaskAction
 import org.gradle.tooling.BuildActionFailureException
 
+import java.nio.file.Paths
 import java.util.jar.Attributes
 import java.util.jar.JarInputStream
 
@@ -183,7 +184,7 @@ class CompileThemeTask extends DefaultTask {
      *      the directory where the gem was installed
      */
     static File installCompassGem(Project project) {
-        def gemsDir = project.file("$project.buildDir/jruby/gems")
+        File gemsDir = Paths.get(project.buildDir.canonicalPath, 'jruby', 'gems').toFile()
         if ( !gemsDir.exists() ) {
             gemsDir.mkdirs()
 

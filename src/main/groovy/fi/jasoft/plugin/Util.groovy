@@ -31,6 +31,7 @@ import org.gradle.api.file.FileVisitDetails
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.plugins.WarPluginConvention
+import org.gradle.tooling.model.build.GradleEnvironment
 import org.gradle.util.VersionNumber
 
 import java.awt.Desktop
@@ -61,7 +62,7 @@ class Util {
     private static final String STREAM_CLOSED_LOG_MESSAGE = 'Stream was closed'
     private static final String VAADIN = 'VAADIN'
     private static final String GRADLE_HOME = 'org.gradle.java.home'
-    private static final String JAVA_HOME = 'JAVA_HOME'
+    private static final String JAVA_HOME = 'java.home'
     private static final String JAVA_BIN_NAME = 'java'
     private static final String GWT_MODULE_POSTFIX = '.gwt.xml'
     private static final String CLIENT_PACKAGE_NAME = 'client'
@@ -834,13 +835,14 @@ class Util {
         }
 
         if ( javaHome ) {
-            def javaBin =  new File(javaHome, 'bin')
-            def java = new File(javaBin, JAVA_BIN_NAME)
+            File javaBin = new File(javaHome, 'bin')
+            File java = new File(javaBin, JAVA_BIN_NAME)
             return java.canonicalPath
-        }else {
-            // Fallback to Java on PATH
-            return JAVA_BIN_NAME
         }
+
+        // Fallback to Java on PATH with a warning§
+        project.logger.warn('Could not determine where the Java JRE is located, is JAVA_HOME set?')
+        JAVA_BIN_NAME
     }
 
     /**

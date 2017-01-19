@@ -15,6 +15,8 @@
 */
 package fi.jasoft.plugin.integration
 
+import org.junit.Test
+
 /**
  * Base for integration tests which has modules with vaadin projects
  */
@@ -22,6 +24,9 @@ class MultiProjectIntegrationTest extends IntegrationTest {
 
     @Override
     void setup() {
+        startTime = System.currentTimeMillis()
+        println "Running test in $projectDir.root"
+
         // Create root build file without vaadin plugin
         buildFile = makeBuildFile(projectDir.root, false)
         settingsFile = projectDir.newFile("settings.gradle")
