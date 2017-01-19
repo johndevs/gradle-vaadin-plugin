@@ -19,19 +19,17 @@ import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
 import fi.jasoft.plugin.configuration.CompileWidgetsetConfiguration
 import fi.jasoft.plugin.configuration.VaadinPluginExtension
+import fi.jasoft.plugin.configuration.WidgetsetCDNConfiguration
 import groovy.transform.PackageScope
 import groovyx.net.http.ContentType
 import groovyx.net.http.HttpResponseDecorator
 import groovyx.net.http.RESTClient
 import org.apache.commons.codec.digest.DigestUtils
-import org.apache.tools.ant.taskdefs.Pack
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.TaskAction
 
-import javax.validation.constraints.NotNull
-import java.security.MessageDigest
 import java.util.concurrent.TimeUnit
 import java.util.jar.Attributes
 import java.util.jar.JarFile
@@ -217,8 +215,7 @@ class CompileWidgetsetTask extends DefaultTask {
     /**
      * Compiles the widgetset on the remote CDN
      */
-    @PackageScope
-    def compileRemotely() {
+    @PackageScope compileRemotely() {
 
         // Ensure widgetset directory exists
         Util.getWidgetsetDirectory(project).mkdirs()
@@ -258,8 +255,7 @@ class CompileWidgetsetTask extends DefaultTask {
     /**
      * Compiles the widgetset locally
      */
-    @PackageScope
-    def compileLocally(String widgetset = Util.getWidgetset(project)) {
+    @PackageScope compileLocally(String widgetset = Util.getWidgetset(project)) {
         def vaadin = project.vaadin as VaadinPluginExtension
 
         // Re-create directory
@@ -360,10 +356,11 @@ class CompileWidgetsetTask extends DefaultTask {
      * @return
      *      Returns the status json
      */
-    @PackageScope
-    def queryRemoteWidgetset() {
+    @PackageScope queryRemoteWidgetset() {
         logger.info("Querying widgetset for Vaadin "+Util.getResolvedVaadinVersion(project))
         def client = new RESTClient(WIDGETSET_CDN_URL)
+        configureClient(client)
+
         def request = queryWidgetsetRequest(Util.getResolvedVaadinVersion(project), configuration.style)
         def response = client.post(request)
         response.data
@@ -375,8 +372,7 @@ class CompileWidgetsetTask extends DefaultTask {
      * @return
      *      Returns a stream with the widgetset files
      */
-    @PackageScope
-    def ZipInputStream downloadWidgetset() {
+    @PackageScope ZipInputStream downloadWidgetset() {
         makeClient(WIDGETSET_CDN_URL).post(downloadWidgetsetRequest(
             Util.getResolvedVaadinVersion(project),
             configuration.style
@@ -389,8 +385,7 @@ class CompileWidgetsetTask extends DefaultTask {
      *      the full URL of the zip archive
      * @return
      */
-    @PackageScope
-    def ZipInputStream downloadWidgetsetZip(String url) {
+    @PackageScope ZipInputStream downloadWidgetsetZip(String url) {
         makeClient(url).get([:], writeWidgetsetToFileSystem)
     }
 
@@ -401,9 +396,8 @@ class CompileWidgetsetTask extends DefaultTask {
      * @return
      *      the client
      */
-    @PackageScope
-    def RESTClient makeClient(String url) {
-        def client = new RESTClient(url)
+    @PackageScope RESTClient makeClient(String url) {
+        RESTClient client = new RESTClient(url)
         client.headers['User-Agent'] = getUA()
         client.headers['Accept'] = 'application/x-zip'
         client.parser.'application/x-zip' = { response ->
@@ -412,10 +406,28 @@ class CompileWidgetsetTask extends DefaultTask {
         client.parser.'application/zip' = { response ->
             new ZipInputStream(response.entity.content)
         }
+        configureClient(client)
         client
     }
 
-    private static String getUA() {
+    @PackageScope configureClient(RESTClient client) {
+
+        // Proxy support
+        WidgetsetCDNConfiguration widgetsetCDNConfig = configuration.widgetsetCDNConfig
+        if(widgetsetCDNConfig.proxyEnabled) {
+            client.ignoreSSLIssues()
+            client.setProxy(
+                    widgetsetCDNConfig.proxyHost,
+                    widgetsetCDNConfig.proxyPort,
+                    widgetsetCDNConfig.proxyScheme
+            )
+            if(widgetsetCDNConfig.proxyAuth) {
+                client.setAuthConfig(widgetsetCDNConfig.proxyAuth)
+            }
+        }
+    }
+
+    @PackageScope static String getUA() {
         StringBuilder ua = new StringBuilder('VWSCDN-1.0.gradle (')
         ua.append(
                 System.properties

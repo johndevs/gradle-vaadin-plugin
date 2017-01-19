@@ -54,6 +54,7 @@ repositories{
 
 configurations {
     deploy
+    proxyTest
 }
 
 dependencies {
@@ -81,6 +82,12 @@ dependencies {
 
     testCompile gradleTestKit()
     testCompile 'junit:junit:4.12'
+
+    // ProxyTest needs its own special configuration to avoid conflicts
+    proxyTest ('org.mock-server:mockserver-netty:3.10.4') {
+        exclude group:'ch.qos.logback'
+    }
+    project.configurations.proxyTest.exclude group: 'fish.payara.extras'
 }
 
 idea {
@@ -138,6 +145,7 @@ compileGroovy {
 compileTestGroovy {
     dependsOn compileGroovyAstTransforms
     classpath += files(sourceSets.ast.output.classesDir)
+    classpath += configurations.proxyTest
 }
 
 /**
@@ -231,9 +239,28 @@ task integrationTest(type:Test, dependsOn:['test','jar']) {
         showStandardStreams = true
     }
     include '**/integration/**'
+    exclude '**/integration/*ProxyTest*'
     systemProperty 'integrationTestProjectVersion', version
 }
 check.dependsOn 'integrationTest'
+
+/**
+ * Runs proxy integration test that needs special configuration
+ */
+task proxyTest(type:Test, dependsOn: ['test','jar']) {
+    def oldClassPath = classpath
+    classpath = configurations.proxyTest
+    classpath += oldClassPath
+    classpath += files(sourceSets.ast.output.classesDir)
+    testLogging {
+        exceptionFormat "full"
+        showStandardStreams = true
+    }
+    include  '**/integration/*ProxyTest*'
+    systemProperty 'integrationTestProjectVersion', version
+}
+check.dependsOn 'proxyTest'
+
 
 /**
  * Code formatting configurations with Codenarc
