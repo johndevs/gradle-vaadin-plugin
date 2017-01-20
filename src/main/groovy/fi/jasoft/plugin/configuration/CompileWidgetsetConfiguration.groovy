@@ -87,6 +87,11 @@ class CompileWidgetsetConfiguration {
     boolean widgetsetCDN = false
 
     /**
+     * Proxy settings for widgetset cdn compilation
+     */
+    final WidgetsetCDNConfiguration widgetsetCDNConfig = new WidgetsetCDNConfiguration()
+
+    /**
      * Should the Vaadin client side profiler be used
      */
     boolean profiler = false
