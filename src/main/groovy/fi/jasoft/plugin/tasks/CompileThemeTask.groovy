@@ -104,6 +104,9 @@ class CompileThemeTask extends DefaultTask {
         File unpackedThemesDir
         if ( project.vaadinThemeCompile.compiler in [COMPASS_COMPILER, LIBSASS_COMPILER] ) {
             unpackedThemesDir = unpackThemes(project)
+        } else if(project.vaadinThemeCompile.themesDirectory) {
+            // Must unpack themes for Valo to work when using custom directory
+            unpackedThemesDir = unpackThemes(project)
         }
 
         themes.each { File theme ->
@@ -142,10 +145,10 @@ class CompileThemeTask extends DefaultTask {
                 }
             })
 
-            process.waitFor()
+            int result = process.waitFor()
 
             long time = (System.currentTimeMillis()-start)/1000
-            if ( failed ) {
+            if (result != 0 || failed ) {
                 throw new BuildActionFailureException('Theme compilation failed. See error log for details.', null)
             } else if ( isRecompile ) {
                 project.logger.lifecycle("Theme was recompiled in $time seconds")
@@ -221,7 +224,13 @@ class CompileThemeTask extends DefaultTask {
     static File unpackThemes(Project project) {
 
         // Unpack Vaadin and addon themes
-        def unpackedThemesDir = project.file("$project.buildDir/themes")
+        def unpackedThemesDir
+        if(project.vaadinThemeCompile.themesDirectory) {
+            unpackedThemesDir = new File(project.vaadinThemeCompile.themesDirectory)
+        } else {
+            unpackedThemesDir = project.file("$project.buildDir/themes")
+        }
+
         unpackedThemesDir.mkdirs()
 
         project.logger.info("Unpacking themes to $unpackedThemesDir")
