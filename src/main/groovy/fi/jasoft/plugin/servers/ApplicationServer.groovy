@@ -128,43 +128,39 @@ abstract class ApplicationServer {
                 .join(";")
     }
 
-
-    def boolean start(boolean firstStart=false, boolean stopAfterStart=false) {
-        if ( process ) {
-            project.logger.error('Server is already running.')
-            return false
-        }
-
-        project.logger.info("Starting $serverName...")
-
-        File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
-
-        def appServerProcess = [Util.getJavaBinary(project)]
-
+    /**
+     * Override to to configure the server process before execution. This is the best place for example
+     * to add system properties.
+     *
+     * @param parameters
+     *      the command line parameters
+     */
+    def configureProcess(List<String> parameters) {
         // Debug
         if ( configuration.debug ) {
-            appServerProcess.add('-Xdebug')
-            appServerProcess.add("-Xrunjdwp:transport=dt_socket,address=${configuration.debugPort},server=y,suspend=n")
+            parameters.add('-Xdebug')
+            parameters.add("-Xrunjdwp:transport=dt_socket,address=${configuration.debugPort},server=y,suspend=n")
         }
 
         // JVM options
         if ( configuration.debug ) {
-            appServerProcess.add('-ea')
+            parameters.add('-ea')
         }
 
-        appServerProcess.add('-cp')
-        appServerProcess.add(classPath.asPath)
+        parameters.add('-cp')
+        parameters.add(classPath.asPath)
 
         if ( configuration.jvmArgs ) {
-            appServerProcess.addAll(configuration.jvmArgs)
+            parameters.addAll(configuration.jvmArgs)
         }
 
         // Program args
-        appServerProcess.add(serverRunner)
+        parameters.add(serverRunner)
 
-        appServerProcess.add(configuration.serverPort.toString())
+        parameters.add(configuration.serverPort.toString())
 
-        appServerProcess.add(webAppDir.canonicalPath + File.separator)
+        File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
+        parameters.add(webAppDir.canonicalPath + File.separator)
 
         SourceSetContainer sourceSets = project.sourceSets
         SourceSet mainSourceSet = sourceSets.main
@@ -197,21 +193,35 @@ abstract class ApplicationServer {
             }
         }
 
-        appServerProcess.add(classesDir.canonicalPath + File.separator)
-        appServerProcess.add(resourcesDir.canonicalPath + File.separator)
+        parameters.add(classesDir.canonicalPath + File.separator)
+        parameters.add(resourcesDir.canonicalPath + File.separator)
 
         if ( project.logger.debugEnabled ) {
-            appServerProcess.add(Level.FINEST.name)
+            parameters.add(Level.FINEST.name)
         } else {
-            appServerProcess.add(Level.INFO.name)
+            parameters.add(Level.INFO.name)
         }
 
-        appServerProcess.add(project.name)
+        parameters.add(project.name)
 
         def buildDir = new File(project.buildDir, serverName)
         buildDir.mkdirs()
-        appServerProcess.add(buildDir.absolutePath)
+        parameters.add(buildDir.absolutePath)
+    }
 
+    def boolean start(boolean firstStart=false, boolean stopAfterStart=false) {
+        if ( process ) {
+            project.logger.error('Server is already running.')
+            return false
+        }
+
+        project.logger.info("Starting $serverName...")
+
+        def appServerProcess = [Util.getJavaBinary(project)]
+
+        configureProcess(appServerProcess)
+
+        def buildDir = new File(project.buildDir, serverName)
         makeClassPathFile(buildDir)
 
         if ( executeServer(appServerProcess, firstStart) ) {

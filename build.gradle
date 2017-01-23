@@ -62,15 +62,13 @@ dependencies {
     compile localGroovy()
 
     // Jetty application server
-    def jettyVersion = '9.3.6.v20151106'
-    compile "org.eclipse.jetty.aggregate:jetty-all:$jettyVersion"
-    compile "org.eclipse.jetty:jetty-annotations:$jettyVersion"
-    compile "org.eclipse.jetty:jetty-plus:$jettyVersion"
-    compile "org.eclipse.jetty:jetty-deploy:$jettyVersion"
+    compile "org.eclipse.jetty.aggregate:jetty-all:${project.property('jetty.version')}"
+    compile "org.eclipse.jetty:jetty-annotations:${project.property('jetty.version')}"
+    compile "org.eclipse.jetty:jetty-plus:${project.property('jetty.version')}"
+    compile "org.eclipse.jetty:jetty-deploy:${project.property('jetty.version')}"
 
     //Payara application server
-    def payaraVersion = '4.1.153'
-    compile "fish.payara.extras:payara-embedded-web:$payaraVersion"
+    compile "fish.payara.extras:payara-embedded-web:${project.property('payara.version')}"
 
     // For GET requests
     compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
@@ -192,6 +190,7 @@ jar {
                 'Implementation-Vendor': 'John Ahlroos',
         )
     }
+    from 'gradle.properties'
 }
 
 /**
