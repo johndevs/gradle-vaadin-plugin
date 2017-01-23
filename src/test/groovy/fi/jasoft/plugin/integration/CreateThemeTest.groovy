@@ -59,6 +59,21 @@ class CreateThemeTest extends IntegrationTest {
         assertNoCompressedThemeInDirectory(themesDir, projectDir.root.name)
     }
 
+    @Test void 'Build fails if compilation fails'() {
+
+        runWithArguments(CreateThemeTask.NAME)
+
+        def stylesSCSS = new File(themesDir, 'styles.scss')
+
+        // Add garbage so compilation fails
+        stylesSCSS << "@mixin ic_img(\$name) {.}"
+
+        runFailureExpected(CompileThemeTask.NAME)
+
+        def stylesCSS = new File(themesDir, 'styles.css')
+        assertFalse 'Compiled theme should not exist', stylesCSS.exists()
+    }
+
     private void assertThemeCreatedAndCompiled(String themeName) {
         if ( themeName ) {
             runWithArguments(CreateThemeTask.NAME, "--name=$themeName")
