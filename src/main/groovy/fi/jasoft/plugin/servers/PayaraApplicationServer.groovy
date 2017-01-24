@@ -27,8 +27,6 @@ class PayaraApplicationServer extends ApplicationServer {
 
     public static final String NAME = 'payara'
 
-    def payaraVersion = '4.1.153'
-
     PayaraApplicationServer(Project project, List browserParameters, ApplicationServerConfiguration configuration) {
         super(project, browserParameters, configuration)
     }
@@ -49,8 +47,20 @@ class PayaraApplicationServer extends ApplicationServer {
     }
 
     @Override
+    def configureProcess(List<String> parameters) {
+        super.configureProcess(parameters)
+
+        // Override internal Payara classes. See https://payara.gitbooks.io/payara-server/content/documentation/
+        // extended-documentation/classloading.html#41-globally-override-payara-included-libraries
+        parameters.add("-Dfish.payara.classloading.delegate=false")
+    }
+
+    @Override
     def defineDependecies(DependencyHandler projectDependencies, DependencySet dependencies) {
-        def payaraWebProfile = projectDependencies.create("fish.payara.extras:payara-embedded-web:$payaraVersion")
+        Properties properties = new Properties()
+        properties.load(PayaraApplicationServer.class.getResourceAsStream('/gradle.properties') as InputStream)
+        def payaraWebProfile = projectDependencies.create(
+                "fish.payara.extras:payara-embedded-web:${properties.getProperty('payara.version')}")
         dependencies.add(payaraWebProfile)
     }
 }

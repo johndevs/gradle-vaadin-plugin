@@ -26,8 +26,7 @@ import org.gradle.api.artifacts.dsl.DependencyHandler
 class JettyApplicationServer extends ApplicationServer {
 
     public static final String NAME = 'jetty'
-
-    def jettyVersion = '9.3.6.v20151106'
+    public static final String JETTY_VERSION_PROPERTY = 'jetty.version'
 
     JettyApplicationServer(Project project, List browserParameters, ApplicationServerConfiguration configuration) {
         super(project, browserParameters, configuration)
@@ -50,16 +49,23 @@ class JettyApplicationServer extends ApplicationServer {
 
     @Override
     def defineDependecies(DependencyHandler projectDependencies, DependencySet dependencies) {
-        def jettyAll =  projectDependencies.create("org.eclipse.jetty.aggregate:jetty-all:$jettyVersion")
+        Properties properties = new Properties()
+        properties.load(PayaraApplicationServer.class.getResourceAsStream('/gradle.properties') as InputStream)
+
+        def jettyAll =  projectDependencies.create(
+                "org.eclipse.jetty.aggregate:jetty-all:${properties.getProperty(JETTY_VERSION_PROPERTY)}")
         dependencies.add(jettyAll)
 
-        def jettyAnnotations = projectDependencies.create("org.eclipse.jetty:jetty-annotations:$jettyVersion")
+        def jettyAnnotations = projectDependencies.create("org.eclipse.jetty:jetty-annotations:" +
+                "${properties.getProperty(JETTY_VERSION_PROPERTY)}")
         dependencies.add(jettyAnnotations)
 
-        def jettyPlus = projectDependencies.create("org.eclipse.jetty:jetty-plus:$jettyVersion")
+        def jettyPlus = projectDependencies.create(
+                "org.eclipse.jetty:jetty-plus:${properties.getProperty(JETTY_VERSION_PROPERTY)}")
         dependencies.add(jettyPlus)
 
-        def jettyDeploy = projectDependencies.create("org.eclipse.jetty:jetty-deploy:$jettyVersion")
+        def jettyDeploy = projectDependencies.create(
+                "org.eclipse.jetty:jetty-deploy:${properties.getProperty(JETTY_VERSION_PROPERTY)}")
         dependencies.add(jettyDeploy)
 
         def slf4j = projectDependencies.create('org.slf4j:slf4j-simple:1.7.12')
