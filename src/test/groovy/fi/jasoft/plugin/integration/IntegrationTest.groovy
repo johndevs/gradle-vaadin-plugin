@@ -15,13 +15,17 @@
 */
 package fi.jasoft.plugin.integration
 
+import org.apache.commons.lang.mutable.MutableObject
 import org.gradle.testkit.runner.GradleRunner
+import org.gradle.testkit.runner.UnexpectedBuildFailure
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 
+import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
+import java.util.concurrent.TimeUnit
 import java.util.logging.Logger
 
 /**
@@ -82,6 +86,8 @@ class IntegrationTest {
 
         """.stripIndent()
 
+        applyThirdPartyPlugins(buildFile)
+
         if ( applyPluginToFile ) {
             applyRepositories(buildFile)
             applyPlugin(buildFile)
@@ -89,6 +95,10 @@ class IntegrationTest {
         }
 
         buildFile
+    }
+
+    protected void applyThirdPartyPlugins(File buildFile) {
+        // Override to apply
     }
 
     protected void applyRepositories(File buildFile) {
@@ -120,6 +130,40 @@ class IntegrationTest {
                 .withArguments(['--stacktrace'])
                 .buildAndFail()
                 .output
+    }
+
+    protected String runWithArgumentsTimeout(final long timeout,
+                                             final Closure beforeTermination={},
+                                             final String... args) {
+        final IntegrationTest self = this
+        final MutableObject exception = new MutableObject()
+        ByteArrayOutputStream stream = new ByteArrayOutputStream()
+        new BufferedOutputStream(stream).withWriter { output ->
+            final Thread thread = Thread.start {
+                try {
+                    self.setupRunner()
+                            .withArguments((args as List) + ['--stacktrace'])
+                            .forwardStdError(output)
+                            .forwardStdOutput(output)
+                            .build()
+                } catch (UnexpectedBuildFailure ubf) {
+                    exception.value = ubf
+                }
+            }
+            Thread killThread = Thread.start {
+                TimeUnit.MILLISECONDS.sleep(timeout)
+                if (thread.alive) {
+                    beforeTermination.call()
+                    thread.stop()
+                }
+            }.join()
+        }
+
+        if (exception.value) {
+            throw exception.value
+        }
+
+        new String(stream.toByteArray(), StandardCharsets.UTF_8.name())
     }
 
     protected String runFailureExpected(String... args) {

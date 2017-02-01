@@ -1,0 +1,18 @@
+package com.example.sprintboottest;
+
+import com.vaadin.server.VaadinRequest;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.Label;
+import com.vaadin.spring.annotation.SpringUI;
+import com.vaadin.annotations.Theme;
+
+@SpringUI
+@Theme("MyApp")
+public class MyAppUI extends UI{
+
+	@Override
+	protected void init(VaadinRequest request){
+		Label lbl = new Label("Hello vaadin");
+		setContent(lbl);
+	}
+}

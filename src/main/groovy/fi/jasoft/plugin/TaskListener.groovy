@@ -19,6 +19,8 @@ import fi.jasoft.plugin.configuration.TestBenchConfiguration
 import fi.jasoft.plugin.configuration.TestBenchHubConfiguration
 import fi.jasoft.plugin.configuration.TestBenchNodeConfiguration
 import fi.jasoft.plugin.servers.ApplicationServer
+import fi.jasoft.plugin.tasks.CompileThemeTask
+import fi.jasoft.plugin.tasks.CompileWidgetsetTask
 import fi.jasoft.plugin.tasks.CreateDirectoryZipTask
 import fi.jasoft.plugin.tasks.CreateWidgetsetGeneratorTask
 import fi.jasoft.plugin.testbench.TestbenchHub
@@ -73,6 +75,9 @@ class TaskListener implements TaskExecutionListener {
             case CreateDirectoryZipTask.NAME:
                 configureAddonZipMetadata(task)
                 break
+            case 'bootRun':
+                configureBootRun(task)
+                break;
         }
     }
 
@@ -284,5 +289,16 @@ class TaskListener implements TaskExecutionListener {
             task.classpath = task.classpath + (project.configurations[GradleVaadinPlugin.CONFIGURATION_SERVER])
         }
         task.options.addStringOption("sourcepath", "")
+    }
+
+    @PackageScope
+    static configureBootRun(Task task) {
+        def project = task.project
+        task.classpath = task.classpath + (project.configurations[GradleVaadinPlugin.CONFIGURATION_SPRING_BOOT])
+        task.classpath = task.classpath + (project.configurations[GradleVaadinPlugin.CONFIGURATION_SERVER])
+        task.classpath = task.classpath + (project.configurations[GradleVaadinPlugin.CONFIGURATION_CLIENT])
+        task.classpath = task.classpath + (project.configurations[GradleVaadinPlugin.CONFIGURATION_PUSH])
+
+        task.dependsOn CompileWidgetsetTask.NAME, CompileThemeTask.NAME
     }
 }
