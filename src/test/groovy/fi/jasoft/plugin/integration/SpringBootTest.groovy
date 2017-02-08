@@ -119,6 +119,10 @@ class SpringBootTest extends IntegrationTest {
 
         TemplateUtil.writeTemplate('SpringBootApplication.java', appPackage)
 
+        // Pre-compile so the timeout does not take the compilation into account
+        // (which might make the test unstable on Travis)
+        runWithArguments('vaadinCompile')
+
         String result = runWithArgumentsTimeout(TimeUnit.SECONDS.toMillis(60), {
             def page = "http://localhost:$port".toURL().text
             assertTrue 'Vaadin application was not loaded', page.contains(
