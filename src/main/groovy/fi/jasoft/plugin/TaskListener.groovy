@@ -48,7 +48,7 @@ class TaskListener implements TaskExecutionListener {
     @Override
     void beforeExecute(Task task) {
         if ( !isApplicable(task) ) {
-            task.project.logger.warn("Tried to run task listener on non-applicable project $task.project.name")
+            // Don't run the task listener on projects that does not have the Vaadin plugin
             return
         }
 
