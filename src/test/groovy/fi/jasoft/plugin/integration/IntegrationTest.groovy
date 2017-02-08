@@ -98,7 +98,9 @@ class IntegrationTest {
     }
 
     protected void applyThirdPartyPlugins(File buildFile) {
-        // Override to apply
+        if(!buildFile || !buildFile.exists()){
+            throw new IllegalArgumentException("$buildFile does not exist or is null")
+        }
     }
 
     protected void applyRepositories(File buildFile) {
@@ -135,32 +137,32 @@ class IntegrationTest {
     protected String runWithArgumentsTimeout(final long timeout,
                                              final Closure beforeTermination={},
                                              final String... args) {
-        final IntegrationTest self = this
-        final MutableObject exception = new MutableObject()
+        final IntegrationTest INSTANCE = this
+        final MutableObject EXCEPTION = new MutableObject()
         ByteArrayOutputStream stream = new ByteArrayOutputStream()
         new BufferedOutputStream(stream).withWriter { output ->
-            final Thread thread = Thread.start {
+            final Thread RUN_THREAD = Thread.start {
                 try {
-                    self.setupRunner()
+                    INSTANCE.setupRunner()
                             .withArguments((args as List) + ['--stacktrace'])
                             .forwardStdError(output)
                             .forwardStdOutput(output)
-                            .build()g
+                            .build()
                 } catch (UnexpectedBuildFailure ubf) {
-                    exception.value = ubf
+                    EXCEPTION.value = ubf
                 }
             }
-            Thread killThread = Thread.start {
+            Thread.start {
                 TimeUnit.MILLISECONDS.sleep(timeout)
-                if (thread.alive) {
+                if (RUN_THREAD.alive) {
                     beforeTermination.call()
-                    thread.stop()
+                    RUN_THREAD.stop()
                 }
             }.join()
         }
 
-        if (exception.value) {
-            throw exception.value
+        if (EXCEPTION.value) {
+            throw EXCEPTION.value
         }
 
         new String(stream.toByteArray(), StandardCharsets.UTF_8.name())

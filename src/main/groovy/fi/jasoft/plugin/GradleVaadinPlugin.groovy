@@ -100,6 +100,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
     static final String GRADLE_PORTAL_PLUGIN_REPOSITORY_NAME = 'Bintray.com Maven repository'
     static final String PLUGIN_DEVELOPMENTTIME_REPOSITORY_NAME = 'Gradle Vaadin plugin development repository'
     static final String VAADIN_PRERELEASE_REPOSITORY_NAME = 'Vaadin Pre-releases'
+    static final String SPRING_BOOT_PLUGIN = 'org.springframework.boot'
 
     static {
         PLUGIN_PROPERTIES = new Properties()
@@ -218,7 +219,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
             }
 
             // bootRun should build the widgetset and theme
-            if(p.pluginManager.hasPlugin('org.springframework.boot')) {
+            if(p.pluginManager.hasPlugin(SPRING_BOOT_PLUGIN)) {
                 p.bootRun.dependsOn(CompileWidgetsetTask.NAME)
                 p.bootRun.dependsOn(CompileThemeTask.NAME)
             }
@@ -487,7 +488,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
         configurations.create(CONFIGURATION_SPRING_BOOT) { conf ->
             conf.description = 'Libraries needed when running with Spring Boot'
             conf.defaultDependencies { dependencies ->
-                if(project.pluginManager.hasPlugin('org.springframework.boot')){
+                if(project.pluginManager.hasPlugin(SPRING_BOOT_PLUGIN)){
                     Dependency springBootStarter = projectDependencies.create(
                             'com.vaadin:vaadin-spring-boot-starter:2.0-SNAPSHOT')
                     dependencies.add(springBootStarter)
