@@ -5,6 +5,9 @@ import groovy.util.logging.Log
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
+import org.junit.runners.Parameterized.Parameters
 
 import java.nio.file.Paths
 import java.util.concurrent.TimeUnit
@@ -14,9 +17,21 @@ import static org.junit.Assert.assertTrue
 /**
  * Created by john on 2/1/17.
  */
+@RunWith(Parameterized)
 class SpringBootTest extends IntegrationTest {
 
     int port
+
+    final String springBootVersion
+
+    SpringBootTest(String springBootVersion) {
+        this.springBootVersion = springBootVersion
+    }
+
+    @Parameters
+    static Collection<String> getSpringBootVersions() {
+        ['1.4.4.RELEASE', '1.5.1.RELEASE']
+    }
 
     @Override
     void setup() {
@@ -24,6 +39,7 @@ class SpringBootTest extends IntegrationTest {
 
         port = resolvePort()
         println "Running on port $port"
+        println "Using Spring Boot $springBootVersion"
 
         buildFile << """
             springBoot {
@@ -118,7 +134,7 @@ class SpringBootTest extends IntegrationTest {
     protected void applyThirdPartyPlugins(File buildFile) {
         buildFile << """
             plugins {
-                id 'org.springframework.boot' version '1.4.4.RELEASE'
+                id 'org.springframework.boot' version '$springBootVersion'
             }
         """
     }
