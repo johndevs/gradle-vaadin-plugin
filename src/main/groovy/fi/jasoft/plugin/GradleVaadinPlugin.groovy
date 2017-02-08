@@ -216,6 +216,12 @@ class GradleVaadinPlugin implements Plugin<Project> {
                    conf.name.startsWith('vaadin-')
                 })
             }
+
+            // bootRun should build the widgetset and theme
+            if(p.pluginManager.hasPlugin('org.springframework.boot')) {
+                p.bootRun.dependsOn(CompileWidgetsetTask.NAME)
+                p.bootRun.dependsOn(CompileThemeTask.NAME)
+            }
         }
 
         // Configure IDEA

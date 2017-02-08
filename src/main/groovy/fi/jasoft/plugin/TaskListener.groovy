@@ -294,11 +294,7 @@ class TaskListener implements TaskExecutionListener {
     @PackageScope
     static configureBootRun(Task task) {
         def project = task.project
+        task.classpath = Util.getWarClasspath(project)
         task.classpath = task.classpath + (project.configurations[GradleVaadinPlugin.CONFIGURATION_SPRING_BOOT])
-        task.classpath = task.classpath + (project.configurations[GradleVaadinPlugin.CONFIGURATION_SERVER])
-        task.classpath = task.classpath + (project.configurations[GradleVaadinPlugin.CONFIGURATION_CLIENT])
-        task.classpath = task.classpath + (project.configurations[GradleVaadinPlugin.CONFIGURATION_PUSH])
-
-        task.dependsOn CompileWidgetsetTask.NAME, CompileThemeTask.NAME
     }
 }

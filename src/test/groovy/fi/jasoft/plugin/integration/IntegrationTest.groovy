@@ -145,7 +145,7 @@ class IntegrationTest {
                             .withArguments((args as List) + ['--stacktrace'])
                             .forwardStdError(output)
                             .forwardStdOutput(output)
-                            .build()
+                            .build()g
                 } catch (UnexpectedBuildFailure ubf) {
                     exception.value = ubf
                 }
