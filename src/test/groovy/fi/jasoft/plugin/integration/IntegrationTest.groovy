@@ -15,13 +15,17 @@
 */
 package fi.jasoft.plugin.integration
 
+import org.apache.commons.lang.mutable.MutableObject
 import org.gradle.testkit.runner.GradleRunner
+import org.gradle.testkit.runner.UnexpectedBuildFailure
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 
+import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
+import java.util.concurrent.TimeUnit
 import java.util.logging.Logger
 
 /**
@@ -82,6 +86,8 @@ class IntegrationTest {
 
         """.stripIndent()
 
+        applyThirdPartyPlugins(buildFile)
+
         if ( applyPluginToFile ) {
             applyRepositories(buildFile)
             applyPlugin(buildFile)
@@ -89,6 +95,12 @@ class IntegrationTest {
         }
 
         buildFile
+    }
+
+    protected void applyThirdPartyPlugins(File buildFile) {
+        if(!buildFile || !buildFile.exists()){
+            throw new IllegalArgumentException("$buildFile does not exist or is null")
+        }
     }
 
     protected void applyRepositories(File buildFile) {
@@ -120,6 +132,40 @@ class IntegrationTest {
                 .withArguments(['--stacktrace'])
                 .buildAndFail()
                 .output
+    }
+
+    protected String runWithArgumentsTimeout(final long timeout,
+                                             final Closure beforeTermination={},
+                                             final String... args) {
+        final IntegrationTest INSTANCE = this
+        final MutableObject EXCEPTION = new MutableObject()
+        ByteArrayOutputStream stream = new ByteArrayOutputStream()
+        new BufferedOutputStream(stream).withWriter { output ->
+            final Thread RUN_THREAD = Thread.start {
+                try {
+                    INSTANCE.setupRunner()
+                            .withArguments((args as List) + ['--stacktrace'])
+                            .forwardStdError(output)
+                            .forwardStdOutput(output)
+                            .build()
+                } catch (UnexpectedBuildFailure ubf) {
+                    EXCEPTION.value = ubf
+                }
+            }
+            Thread.start {
+                TimeUnit.MILLISECONDS.sleep(timeout)
+                if (RUN_THREAD.alive) {
+                    beforeTermination.call()
+                    RUN_THREAD.stop()
+                }
+            }.join()
+        }
+
+        if (EXCEPTION.value) {
+            throw EXCEPTION.value
+        }
+
+        new String(stream.toByteArray(), StandardCharsets.UTF_8.name())
     }
 
     protected String runFailureExpected(String... args) {

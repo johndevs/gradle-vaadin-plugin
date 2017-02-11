@@ -86,6 +86,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
     static final String CONFIGURATION_TESTBENCH = 'vaadin-testbench'
     static final String CONFIGURATION_PUSH = 'vaadin-push'
     static final String CONFIGURATION_JAVADOC = 'vaadin-javadoc'
+    static final String CONFIGURATION_SPRING_BOOT = 'vaadin-spring-boot'
     static final String DEFAULT_WIDGETSET = 'com.vaadin.DefaultWidgetSet'
     static final String CONFIGURATION_RUN_SERVER = 'vaadin-run-server'
     static final String CONFIGURATION_SUPERDEVMODE = 'vaadin-superdevmode'
@@ -99,6 +100,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
     static final String GRADLE_PORTAL_PLUGIN_REPOSITORY_NAME = 'Bintray.com Maven repository'
     static final String PLUGIN_DEVELOPMENTTIME_REPOSITORY_NAME = 'Gradle Vaadin plugin development repository'
     static final String VAADIN_PRERELEASE_REPOSITORY_NAME = 'Vaadin Pre-releases'
+    static final String SPRING_BOOT_PLUGIN = 'org.springframework.boot'
 
     static {
         PLUGIN_PROPERTIES = new Properties()
@@ -214,6 +216,12 @@ class GradleVaadinPlugin implements Plugin<Project> {
                 p.configurations.removeAll({ Configuration conf ->
                    conf.name.startsWith('vaadin-')
                 })
+            }
+
+            // bootRun should build the widgetset and theme
+            if(p.pluginManager.hasPlugin(SPRING_BOOT_PLUGIN)) {
+                p.bootRun.dependsOn(CompileWidgetsetTask.NAME)
+                p.bootRun.dependsOn(CompileThemeTask.NAME)
             }
         }
 
@@ -475,6 +483,23 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
             IDEAUtil.addConfigurationToProject(project, CONFIGURATION_THEME)
             EclipseUtil.addConfigurationToProject(project, CONFIGURATION_THEME)
+        }
+
+        configurations.create(CONFIGURATION_SPRING_BOOT) { conf ->
+            conf.description = 'Libraries needed when running with Spring Boot'
+            conf.defaultDependencies { dependencies ->
+                if(project.pluginManager.hasPlugin(SPRING_BOOT_PLUGIN)){
+                    Dependency springBootStarter = projectDependencies.create(
+                            'com.vaadin:vaadin-spring-boot-starter:2.0-SNAPSHOT')
+                    dependencies.add(springBootStarter)
+                }
+            }
+
+            sources.compileClasspath += conf
+            testSources.compileClasspath += conf
+
+            IDEAUtil.addConfigurationToProject(project, CONFIGURATION_SPRING_BOOT)
+            EclipseUtil.addConfigurationToProject(project, CONFIGURATION_SPRING_BOOT)
         }
 
         // Ensure vaadin version is correct across configurations

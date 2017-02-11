@@ -95,13 +95,14 @@ class CreateProjectTask extends DefaultTask {
             int endSlashSize = 2
             if ( widgetsetFQN?.contains(DOT) ) {
                 String widgetsetName = widgetsetFQN.tokenize(DOT).last()
-                widgetsetFQN[0..(-widgetsetName.size() - endSlashSize)]
+                return widgetsetFQN[0..(-widgetsetName.size() - endSlashSize)]
             } else if ( configuration.widgetset?.contains(DOT) ) {
                 String widgetsetName = configuration.widgetset.tokenize(DOT).last()
-                configuration.widgetset[0..(-widgetsetName.size() - endSlashSize)]
+                return configuration.widgetset[0..(-widgetsetName.size() - endSlashSize)]
             } else {
-                "com.example.${applicationName.toLowerCase()}"
+                return "com.example.${applicationName.toLowerCase()}"
             }
         }
+        applicationPackage
     }
 }
