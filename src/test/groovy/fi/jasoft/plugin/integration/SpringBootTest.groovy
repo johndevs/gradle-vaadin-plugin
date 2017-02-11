@@ -28,7 +28,7 @@ class SpringBootTest extends IntegrationTest {
         this.springBootVersion = springBootVersion
     }
 
-    @Parameters
+    @Parameters(name = "Spring Boot {0}")
     static Collection<String> getSpringBootVersions() {
         ['1.4.4.RELEASE', '1.5.1.RELEASE']
     }
