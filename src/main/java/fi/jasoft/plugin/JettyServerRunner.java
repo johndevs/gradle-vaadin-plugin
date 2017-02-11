@@ -20,6 +20,7 @@ import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.plus.webapp.EnvConfiguration;
 import org.eclipse.jetty.plus.webapp.PlusConfiguration;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.resource.ResourceCollection;
 import org.eclipse.jetty.webapp.*;
 
@@ -42,9 +43,6 @@ public class JettyServerRunner {
         if (new File(webAppDir).exists()){
             resources.add(webAppDir);
         }
-        if (new File(resourcesDir).exists()){
-            resources.add(resourcesDir);
-        }
 
         System.setProperty("org.eclipse.jetty.LEVEL", logLevel);
 
@@ -59,9 +57,9 @@ public class JettyServerRunner {
         server.setHandler(handler);
 
         handler.setContextPath("/");
-        handler.setBaseResource(new ResourceCollection(resources.toArray(new String[resources.size()])));
+        handler.setBaseResource(Resource.newResource(webAppDir));
         handler.setParentLoaderPriority(true);
-        handler.setExtraClasspath(classesDir);
+        handler.setExtraClasspath(classesDir+";"+resourcesDir);
         handler.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern", ".*/build/classes/.*");
         handler.setConfigurations(new Configuration[]{
                 new WebXmlConfiguration(),
