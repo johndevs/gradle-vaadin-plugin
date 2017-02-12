@@ -16,6 +16,8 @@
 package fi.jasoft.plugin.integration
 
 import org.apache.commons.lang.mutable.MutableObject
+import org.gradle.BuildResult
+import org.gradle.internal.UncheckedException
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.UnexpectedBuildFailure
 import org.junit.After
@@ -141,22 +143,33 @@ class IntegrationTest {
         final MutableObject EXCEPTION = new MutableObject()
         ByteArrayOutputStream stream = new ByteArrayOutputStream()
         new BufferedOutputStream(stream).withWriter { output ->
+
             final Thread RUN_THREAD = Thread.start {
                 try {
-                    INSTANCE.setupRunner()
+                    BuildResult result = INSTANCE.setupRunner()
                             .withArguments((args as List) + ['--stacktrace'])
                             .forwardStdError(output)
                             .forwardStdOutput(output)
                             .build()
-                } catch (UnexpectedBuildFailure ubf) {
-                    EXCEPTION.value = ubf
+                    EXCEPTION.value = result.failure
+                } catch (UncheckedException | InterruptedException e){
+                    // Timeout
+                    println 'Gradle build timed out with an exception.'
+                } catch (UnexpectedBuildFailure fail) {
+                    EXCEPTION.value = fail
                 }
             }
+
             Thread.start {
-                TimeUnit.MILLISECONDS.sleep(timeout)
-                if (RUN_THREAD.alive) {
-                    beforeTermination.call()
-                    RUN_THREAD.stop()
+                try {
+                    TimeUnit.MILLISECONDS.sleep(timeout)
+                } catch(InterruptedException e){
+                    println "Sleep was interrupted with message $e.message"
+                } finally {
+                    if (RUN_THREAD.alive) {
+                        beforeTermination.call()
+                        RUN_THREAD.stop()
+                    }
                 }
             }.join()
         }

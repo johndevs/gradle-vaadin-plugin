@@ -39,7 +39,7 @@ class JettyApplicationServer extends ApplicationServer {
 
     @Override
     String getServerName() {
-        'jetty'
+        NAME
     }
 
     @Override

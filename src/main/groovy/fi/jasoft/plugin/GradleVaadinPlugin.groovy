@@ -362,6 +362,10 @@ class GradleVaadinPlugin implements Plugin<Project> {
         configurations.create(CONFIGURATION_RUN_SERVER) { conf ->
             conf.description = 'Libraries for running the embedded server'
             conf.defaultDependencies { dependencies ->
+                if( project.pluginManager.hasPlugin(SPRING_BOOT_PLUGIN)) {
+                    // No server runner is needed, spring boot will run the project
+                    return
+                }
 
                 // Needed for server runners
                 Dependency plugin = projectDependencies.create(

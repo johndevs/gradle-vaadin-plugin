@@ -1,9 +1,6 @@
 package fi.jasoft.plugin.integration
 
 import fi.jasoft.plugin.TemplateUtil
-import groovy.util.logging.Log
-import org.junit.Assert
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -13,6 +10,7 @@ import java.nio.file.Paths
 import java.util.concurrent.TimeUnit
 
 import static org.junit.Assert.assertTrue
+import static org.junit.Assert.fail
 
 /**
  * Created by john on 2/1/17.
@@ -39,7 +37,6 @@ class SpringBootTest extends IntegrationTest {
 
         port = resolvePort()
         println "Running on port $port"
-        println "Using Spring Boot $springBootVersion"
 
         buildFile << """
             springBoot {
@@ -66,31 +63,9 @@ class SpringBootTest extends IntegrationTest {
 
     @Test void 'Spring boot project with server only dependencies'() {
 
-        runWithArguments('vaadinCreateProject', '--package=com.example.sprintboottest', '--name=MyApp')
+        makeSpringBootProject()
 
-        File appPackage = Paths.get(projectDir.root.canonicalPath,
-                'src', 'main', 'java', 'com', 'example', 'sprintboottest').toFile()
-        assertTrue 'App package exists', appPackage.exists()
-
-        File servlet = new File(appPackage, 'MyAppServlet.java')
-        assertTrue 'Servlet could not be removed', servlet.delete()
-
-        File ui = new File(appPackage, 'MyAppUI.java')
-        assertTrue 'UI could not be removed', ui.delete()
-
-        TemplateUtil.writeTemplate('SpringBootUI.java', appPackage, 'MyAppUI.java')
-
-        TemplateUtil.writeTemplate('SpringBootApplication.java', appPackage)
-
-        String result = runWithArgumentsTimeout(TimeUnit.SECONDS.toMillis(60), {
-            def page = "http://localhost:$port".toURL().text
-            assertTrue 'Vaadin application was not loaded', page.contains(
-                    'class="v-app MyApp myappui">')
-        }, 'bootRun')
-
-        assertTrue result, result.contains('Started SpringBootApplication in')
-        assertTrue result, result.contains('Vaadin is running')
-        assertTrue result, result.contains('Found Vaadin UI [com.example.sprintboottest.MyAppUI]')
+        assertSpringBootProjectWasRunning()
     }
 
     @Test void 'Spring boot project with client dependencies'() {
@@ -101,9 +76,35 @@ class SpringBootTest extends IntegrationTest {
             }
         """.stripIndent()
 
-        runWithArguments('vaadinCreateProject', '--package=com.example.sprintboottest', '--name=MyApp')
+        makeSpringBootProject()
 
         runWithArguments('vaadinCreateComponent', '--name=MyLabel')
+
+        // Pre-compile so the timeout does not take the compilation into account
+        // (which might make the test unstable on Travis)
+        runWithArguments('vaadinCompile')
+
+        assertSpringBootProjectWasRunning()
+    }
+
+    @Test void 'Run boot project with vaadinRun'() {
+
+        makeSpringBootProject()
+
+        assertSpringBootProjectWasRunning('vaadinRun')
+    }
+
+    @Override
+    protected void applyThirdPartyPlugins(File buildFile) {
+        buildFile << """
+            plugins {
+                id 'org.springframework.boot' version '$springBootVersion'
+            }
+        """
+    }
+
+    private makeSpringBootProject() {
+        runWithArguments('vaadinCreateProject', '--package=com.example.sprintboottest', '--name=MyApp')
 
         File appPackage = Paths.get(projectDir.root.canonicalPath,
                 'src', 'main', 'java', 'com', 'example', 'sprintboottest').toFile()
@@ -118,28 +119,17 @@ class SpringBootTest extends IntegrationTest {
         TemplateUtil.writeTemplate('SpringBootUI.java', appPackage, 'MyAppUI.java')
 
         TemplateUtil.writeTemplate('SpringBootApplication.java', appPackage)
+    }
 
-        // Pre-compile so the timeout does not take the compilation into account
-        // (which might make the test unstable on Travis)
-        runWithArguments('vaadinCompile')
-
+    private void assertSpringBootProjectWasRunning(String taskName = 'bootRun') {
         String result = runWithArgumentsTimeout(TimeUnit.SECONDS.toMillis(60), {
             def page = "http://localhost:$port".toURL().text
             assertTrue 'Vaadin application was not loaded', page.contains(
                     'class="v-app MyApp myappui">')
-        }, 'bootRun')
+        }, taskName)
 
         assertTrue result, result.contains('Started SpringBootApplication in')
         assertTrue result, result.contains('Vaadin is running')
         assertTrue result, result.contains('Found Vaadin UI [com.example.sprintboottest.MyAppUI]')
-    }
-
-    @Override
-    protected void applyThirdPartyPlugins(File buildFile) {
-        buildFile << """
-            plugins {
-                id 'org.springframework.boot' version '$springBootVersion'
-            }
-        """
     }
 }
