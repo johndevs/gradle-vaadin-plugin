@@ -15,20 +15,13 @@
 */
 package fi.jasoft.plugin.integration
 
-import org.apache.commons.lang.mutable.MutableObject
-import org.gradle.BuildResult
-import org.gradle.internal.UncheckedException
 import org.gradle.testkit.runner.GradleRunner
-import org.gradle.testkit.runner.UnexpectedBuildFailure
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 
-import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
-import java.util.concurrent.TimeUnit
-import java.util.logging.Logger
 
 /**
  * Base class for integration tests
@@ -134,51 +127,6 @@ class IntegrationTest {
                 .withArguments(['--stacktrace'])
                 .buildAndFail()
                 .output
-    }
-
-    protected String runWithArgumentsTimeout(final long timeout,
-                                             final Closure beforeTermination={},
-                                             final String... args) {
-        final IntegrationTest INSTANCE = this
-        final MutableObject EXCEPTION = new MutableObject()
-        ByteArrayOutputStream stream = new ByteArrayOutputStream()
-        new BufferedOutputStream(stream).withWriter { output ->
-
-            final Thread RUN_THREAD = Thread.start {
-                try {
-                    BuildResult result = INSTANCE.setupRunner()
-                            .withArguments((args as List) + ['--stacktrace'])
-                            .forwardStdError(output)
-                            .forwardStdOutput(output)
-                            .build()
-                    EXCEPTION.value = result.failure
-                } catch (UncheckedException | InterruptedException e){
-                    // Timeout
-                    println 'Gradle build timed out with an exception.'
-                } catch (UnexpectedBuildFailure fail) {
-                    EXCEPTION.value = fail
-                }
-            }
-
-            Thread.start {
-                try {
-                    TimeUnit.MILLISECONDS.sleep(timeout)
-                } catch(InterruptedException e){
-                    println "Sleep was interrupted with message $e.message"
-                } finally {
-                    if (RUN_THREAD.alive) {
-                        beforeTermination.call()
-                        RUN_THREAD.stop()
-                    }
-                }
-            }.join()
-        }
-
-        if (EXCEPTION.value) {
-            throw EXCEPTION.value
-        }
-
-        new String(stream.toByteArray(), StandardCharsets.UTF_8.name())
     }
 
     protected String runFailureExpected(String... args) {
