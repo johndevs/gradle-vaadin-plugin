@@ -50,7 +50,8 @@ class UpdateWidgetsetTask extends DefaultTask {
     static final String SCSS_FILE_POSTFIX = 'scss'
     static final String GWT_MODULE_XML_POSTFIX = '.gwt.xml'
     static final String DEFAULT_WIDGETSET = 'com.vaadin.DefaultWidgetSet'
-    static final String DEFAULT_LEGACY_WIDGETSET = 'com.vaadin.terminal.gwt.DefaultWidgetSet'
+    static final String DEFAULT_LEGACY_V6_WIDGETSET = 'com.vaadin.terminal.gwt.DefaultWidgetSet'
+    static final String DEFAULT_LEGACY_V7_WIDGETSET = 'com.vaadin.v7.Vaadin7WidgetSet'
     static final String DOT = '.'
     static final String JAVA_FILE_POSTFIX = ".java"
 
@@ -154,7 +155,8 @@ class UpdateWidgetsetTask extends DefaultTask {
                                         List<String> widgetsets = widgetsetsValue?.split(',')?.collect { it.trim() }
                                         widgetsets?.each { String widgetset ->
                                             if ( widgetset != DEFAULT_WIDGETSET &&
-                                                    widgetset != DEFAULT_LEGACY_WIDGETSET) {
+                                                    widgetset != DEFAULT_LEGACY_V6_WIDGETSET &&
+                                                    widgetset != DEFAULT_LEGACY_V7_WIDGETSET) {
                                                 inherits.add(widgetset)
                                             }
                                         }
@@ -234,7 +236,12 @@ class UpdateWidgetsetTask extends DefaultTask {
     }
 
     private static Set<String> getInherits(Project project, CompileWidgetsetConfiguration configuration) {
-        Set<String> inherits = [DEFAULT_WIDGETSET]
+        Set<String> inherits
+        if(Util.isLegacyVaadin8Project(project)) {
+            inherits = [DEFAULT_LEGACY_V7_WIDGETSET]
+        } else {
+            inherits = [DEFAULT_WIDGETSET]
+        }
 
         // Scan classpath for Vaadin addons and inherit their widgetsets
         inherits.addAll(findInheritsInDependencies(project))

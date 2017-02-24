@@ -91,4 +91,22 @@ class CompileWidgetsetTest extends IntegrationTest {
 
     }
 
+    @Test void 'Compile with legacy dependencies'(){
+        buildFile << """
+            dependencies {
+                compile("com.vaadin:vaadin-compatibility-server:8.0.0")
+                compile("com.vaadin:vaadin-compatibility-client:8.0.0")
+                compile("com.vaadin:vaadin-compatibility-shared:8.0.0")
+            }
+            vaadinCompile.widgetset = 'com.example.MyWidgetset'
+        """
+
+        runWithArguments(CreateProjectTask.NAME)
+
+        def result = runWithArguments('--info', CompileWidgetsetTask.NAME)
+        assertFalse result, result.contains('Detected widgetset com.example.MyWidgetset')
+        assertTrue result, result.contains('Compiling module com.example.MyWidgetset')
+        assertTrue result, result.contains('Linking succeeded')
+    }
+
 }
