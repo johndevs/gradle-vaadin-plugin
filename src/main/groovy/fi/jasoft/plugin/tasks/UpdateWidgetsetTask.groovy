@@ -141,7 +141,7 @@ class UpdateWidgetsetTask extends DefaultTask {
                     if ( !(dependentProject in scannedProjects) ) {
                         inherits.addAll(findInheritsInDependencies(dependentProject, scannedProjects))
                     }
-                } else {
+                } else if (Util.isResolvable(project, conf)) {
                     conf.files(dependency).each { File file ->
                         if ( file.file && file.name.endsWith('.jar') ) {
                             file.withInputStream { InputStream stream ->
