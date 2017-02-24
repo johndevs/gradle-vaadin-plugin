@@ -246,7 +246,7 @@ class CompileThemeTask extends DefaultTask {
                             into unpackedThemesDir
                         }
                     }
-                } else {
+                } else if (Util.isResolvable(project, conf)) {
                     conf.files(dependency).each { File file ->
                         file.withInputStream { InputStream stream ->
                             def jarStream = new JarInputStream(stream)

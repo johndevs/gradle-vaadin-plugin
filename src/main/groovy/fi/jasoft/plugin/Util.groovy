@@ -674,9 +674,9 @@ class Util {
                                    String byAttribute='Vaadin-Widgetsets',
                                    Boolean includeFile=false,
                                    List<Project> scannedProjects = []) {
-        def addons = []
+        Set addons = []
         scannedProjects << project
-        def attribute = new Attributes.Name(byAttribute)
+        Attributes.Name attribute = new Attributes.Name(byAttribute)
 
         project.configurations.all.each { Configuration conf ->
             conf.allDependencies.each { Dependency dependency ->
@@ -685,7 +685,8 @@ class Util {
                     if (!(dependentProject in scannedProjects)) {
                         addons.addAll(findAddonsInProject(dependentProject, byAttribute, includeFile, scannedProjects))
                     }
-                } else {
+
+                } else if (isResolvable(project, conf)){
                     conf.files(dependency).each { File file ->
                         if (file.file && file.name.endsWith('.jar')) {
                             file.withInputStream { InputStream stream ->
@@ -988,5 +989,39 @@ class Util {
             configuration = project.extensions.create(name, type, args)
         }
         configuration
+    }
+
+    /**
+     * Indicates if project can have non-resolvable configurations
+     *
+     * https://docs.gradle.org/3.4/release-notes.html#configurations-can-be-unresolvable
+     *
+     * @param project
+     *      the project to check
+     * @return
+     *      true if project can have non-resolvable dependencies
+     */
+    @Memoized
+    static boolean hasNonResolvableConfigurations(Project project) {
+        VersionNumber gradleVersion = VersionNumber.parse(project.gradle.gradleVersion)
+        VersionNumber gradleVersionWithUnresolvableDeps = new VersionNumber(3, 3, 0, null)
+        gradleVersion.compareTo(gradleVersionWithUnresolvableDeps) >= 0;
+    }
+
+    /**
+     * Is the project and configuration resolvable
+     *
+     * https://docs.gradle.org/3.4/release-notes.html#configurations-can-be-unresolvable
+     *
+     * @param project
+     *      the project to check
+     * @param configuration
+     *      the configuration to check
+     * @return
+     *      true if configuration can be resolved
+     */
+    @Memoized
+    static boolean isResolvable(Project project, Configuration configuration) {
+        hasNonResolvableConfigurations(project) ? configuration.isCanBeResolved() : true
     }
 }
