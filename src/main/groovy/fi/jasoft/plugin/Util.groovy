@@ -980,11 +980,12 @@ class Util {
      * @return
      *      true if project can have non-resolvable dependencies
      */
+    @SuppressWarnings("DuplicateNumberLiteral")
     @Memoized
     static boolean hasNonResolvableConfigurations(Project project) {
         VersionNumber gradleVersion = VersionNumber.parse(project.gradle.gradleVersion)
         VersionNumber gradleVersionWithUnresolvableDeps = new VersionNumber(3, 3, 0, null)
-        gradleVersion.compareTo(gradleVersionWithUnresolvableDeps) >= 0;
+        gradleVersion >= gradleVersionWithUnresolvableDeps;
     }
 
     /**
