@@ -641,6 +641,27 @@ class Util {
     }
 
     /**
+     * Is the project a legacy vaadin 8 project (the project has the legacy jars on its classpath)
+     *
+     * @param project
+     *      the project
+     * @return
+     *      true if it legacy
+     */
+    @Memoized
+    static boolean isLegacyVaadin8Project(Project project) {
+        boolean isLegacyProject = false
+        project.configurations.all.each { Configuration conf ->
+            conf.allDependencies.each { Dependency dependency ->
+                if(dependency.group == 'com.vaadin' && dependency.name == 'vaadin-compatibility-client'){
+                    isLegacyProject = true
+                }
+            }
+        }
+        isLegacyProject
+    }
+
+    /**
      * Returns all addon jars in the project
      *
      * @param project

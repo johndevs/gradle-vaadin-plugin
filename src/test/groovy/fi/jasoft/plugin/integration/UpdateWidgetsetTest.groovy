@@ -128,6 +128,22 @@ class UpdateWidgetsetTest extends IntegrationTest {
         assertTrue getAppWidgetsetFile(project2Dir).text.contains('<inherits name="com.example.MyWidgetset" />')
     }
 
+    @Test void 'If legacy mode, use compatibility widgetset'() {
+        buildFile << "vaadinCompile.widgetset = 'com.example.MyWidgetset'\n"
+        buildFile << """
+            dependencies {
+                compile("com.vaadin:vaadin-compatibility-server:8.0.0")
+                compile("com.vaadin:vaadin-compatibility-client:8.0.0")
+                compile("com.vaadin:vaadin-compatibility-shared:8.0.0")
+                compile 'org.vaadin.addons:qrcode:+'
+            }
+        """
+
+        runWithArguments(UpdateWidgetsetTask.NAME)
+        assertTrue widgetsetFile.text.contains('<inherits name="com.vaadin.v7.Vaadin7WidgetSet" />')
+        assertFalse widgetsetFile.text.contains('<inherits name="com.vaadin.DefaultWidgetSet" />')
+    }
+
     private File getWidgetsetFile(File projectDir = this.projectDir.root, String fileName='MyWidgetset') {
         Paths.get(projectDir.canonicalPath,
                 'src', 'main', 'resources', 'com', 'example', "${fileName}.gwt.xml").toFile()
