@@ -532,7 +532,12 @@ class GradleVaadinPlugin implements Plugin<Project> {
                         'com.vaadin:vaadin-server',
                         'com.vaadin:vaadin-shared',
                         'com.vaadin:vaadin-themes',
-                        'com.vaadin:vaadin-push'
+                        'com.vaadin:vaadin-push',
+                        'com.vaadin:vaadin-compatibility-client',
+                        'com.vaadin:vaadin-compatibility-client-compiled',
+                        'com.vaadin:vaadin-compatibility-server',
+                        'com.vaadin:vaadin-compatibility-shared',
+                        'com.vaadin:vaadin-compatibility-themes'
                 ]
 
                 ModuleVersionSelector dependency = details.requested
