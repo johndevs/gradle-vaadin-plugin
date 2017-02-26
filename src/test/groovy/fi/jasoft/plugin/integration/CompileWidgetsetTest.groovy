@@ -6,6 +6,7 @@ import fi.jasoft.plugin.tasks.UpdateWidgetsetTask
 import org.junit.Test
 
 import java.nio.file.Paths
+import java.util.concurrent.TimeUnit
 
 import static org.junit.Assert.assertFalse
 import static org.junit.Assert.assertTrue
@@ -104,6 +105,27 @@ class CompileWidgetsetTest extends IntegrationTest {
         runWithArguments(CreateProjectTask.NAME)
 
         def result = runWithArguments('--info', CompileWidgetsetTask.NAME)
+        assertFalse result, result.contains('Detected widgetset com.example.MyWidgetset')
+        assertTrue result, result.contains('Compiling module com.example.MyWidgetset')
+        assertTrue result, result.contains('Linking succeeded')
+    }
+
+    @Test void 'Compile with legacy dependencies and classpath jar'(){
+        buildFile << """
+            dependencies {
+                compile("com.vaadin:vaadin-compatibility-server:8.0.0")
+                compile("com.vaadin:vaadin-compatibility-client:8.0.0")
+                compile("com.vaadin:vaadin-compatibility-shared:8.0.0")
+            }
+            vaadinCompile.widgetset = 'com.example.MyWidgetset'
+            vaadin.useClassPathJar = true
+
+        """
+
+        runWithArguments(CreateProjectTask.NAME)
+
+        def result = runWithArguments('--info', CompileWidgetsetTask.NAME)
+
         assertFalse result, result.contains('Detected widgetset com.example.MyWidgetset')
         assertTrue result, result.contains('Compiling module com.example.MyWidgetset')
         assertTrue result, result.contains('Linking succeeded')

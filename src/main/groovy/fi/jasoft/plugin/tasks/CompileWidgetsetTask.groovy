@@ -269,6 +269,8 @@ class CompileWidgetsetTask extends DefaultTask {
                     // Add GWT compiler + deps
                     if ( file.name.startsWith('vaadin-client' ) ||
                             file.name.startsWith('vaadin-shared') ||
+                            file.name.startsWith('vaadin-compatibility-client') ||
+                            file.name.startsWith('vaadin-compatibility-shared') ||
                             file.name.startsWith('validation-api')) {
                         return true
                     }
