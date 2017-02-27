@@ -628,12 +628,14 @@ class Util {
     static String getResolvedArtifactVersion(Project project, String artifactName, String defaultVersion=null) {
         String version = defaultVersion
         project.configurations.each { Configuration conf ->
-            conf.allDependencies.each { Dependency dependency ->
-                if (dependency.name.startsWith(artifactName)) {
-                    version = conf.resolvedConfiguration
-                            .resolvedArtifacts
-                            .find { it.name == artifactName }
-                            .moduleVersion.id.version
+            if(isResolvable(project, conf)){
+                conf.allDependencies.each { Dependency dependency ->
+                    if (dependency.name.startsWith(artifactName)) {
+                        version = conf.resolvedConfiguration
+                                .resolvedArtifacts
+                                .find { it.name == artifactName }
+                                .moduleVersion.id.version
+                    }
                 }
             }
         }
