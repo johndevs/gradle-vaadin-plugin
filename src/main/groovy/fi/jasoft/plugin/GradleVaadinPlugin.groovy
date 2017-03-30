@@ -144,6 +144,12 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
         if ( firstPlugin ) {
             project.logger.quiet("Using Gradle Vaadin Plugin $PLUGIN_VERSION")
+            VersionNumber latestReleasePluginVersion = Util.getLatestReleaseVersion()
+            VersionNumber pluginVersion = VersionNumber.parse(PLUGIN_VERSION)
+            if(latestReleasePluginVersion > pluginVersion){
+                project.logger.warn "!! A newer version of the Gradle Vaadin plugin is available, " +
+                        "please upgrade to $latestReleasePluginVersion !!"
+            }
         }
 
         // Extensions

@@ -20,6 +20,7 @@ import fi.jasoft.plugin.tasks.BuildClassPathJar
 import fi.jasoft.plugin.tasks.UpdateWidgetsetTask
 import groovy.io.FileType
 import groovy.transform.Memoized
+import groovyx.net.http.HTTPBuilder
 import org.apache.commons.lang.StringUtils
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -31,7 +32,6 @@ import org.gradle.api.file.FileVisitDetails
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.plugins.WarPluginConvention
-import org.gradle.tooling.model.build.GradleEnvironment
 import org.gradle.util.VersionNumber
 
 import java.awt.Desktop
@@ -1026,5 +1026,23 @@ class Util {
     @Memoized
     static boolean isResolvable(Project project, Configuration configuration) {
         hasNonResolvableConfigurations(project) ? configuration.isCanBeResolved() : true
+    }
+
+    /**
+     * Gets the latest released Gradle plugin version
+     *
+     * @return
+     *      the latest released version number
+     */
+    @Memoized
+    static VersionNumber getLatestReleaseVersion() {
+        try {
+            def http = new HTTPBuilder('https://plugins.gradle.org/plugin/fi.jasoft.plugin.vaadin')
+            def html = http.get([:])
+            def versionNode = html."**".find { it.text().startsWith('Version') }
+            VersionNumber.parse((versionNode.text() as String).split()[1])
+        } catch (Exception e){
+            VersionNumber.UNKNOWN
+        }
     }
 }
