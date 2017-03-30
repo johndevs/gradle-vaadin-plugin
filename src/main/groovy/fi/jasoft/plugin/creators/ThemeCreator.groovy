@@ -40,10 +40,10 @@ class ThemeCreator implements Runnable {
 
         themeName = themeName ?: project.name
 
-        def themeDir = new File(themesDirectory, themeName)
+        File themeDir = new File(themesDirectory, themeName)
         themeDir.mkdirs()
 
-        def substitutions = [:]
+        Map substitutions = [:]
         substitutions['themeName'] = themeName
         substitutions['theme'] = themeName.toLowerCase()
 
@@ -56,8 +56,8 @@ class ThemeCreator implements Runnable {
         TemplateUtil.writeTemplate(STYLES_SCSS_FILE, themeDir, STYLES_SCSS_FILE, substitutions)
         TemplateUtil.writeTemplate('MyTheme.scss', themeDir, themeScssFile, substitutions)
 
-        def favicon = ThemeCreator.class.getClassLoader().getResource(FAVICON_FILENAME)
-        def faviconFile = new File(themeDir, FAVICON_FILENAME)
+        URL favicon = ThemeCreator.classLoader.getResource(FAVICON_FILENAME)
+        File faviconFile = new File(themeDir, FAVICON_FILENAME)
 
         Files.copy(favicon.openStream(), faviconFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
     }

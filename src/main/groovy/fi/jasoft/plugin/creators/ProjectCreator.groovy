@@ -56,7 +56,7 @@ class ProjectCreator implements Runnable {
     }
 
     @PackageScope
-    def makeUIClass() {
+    File makeUIClass() {
 
         uiSubstitutions[APPLICATION_NAME_KEY] = applicationName
         uiSubstitutions[APPLICATION_PACKAGE_KEY] = applicationPackage
@@ -90,24 +90,26 @@ class ProjectCreator implements Runnable {
         if ( groovyProject ) {
             TemplateUtil.writeTemplate("$templateDir/MyUI.groovy",
                     UIDir, "${applicationName}UI.groovy", uiSubstitutions)
+            new File(UIDir, "${applicationName}UI.groovy")
         } else {
             TemplateUtil.writeTemplate("$templateDir/MyUI.java",
                     UIDir, "${applicationName}UI.java", uiSubstitutions)
+            new File (UIDir, "${applicationName}UI.java")
         }
     }
 
     @PackageScope
-    def makeServletClass() {
+    File makeServletClass() {
 
         servletSubstitutions[APPLICATION_NAME_KEY] = applicationName
         servletSubstitutions[APPLICATION_PACKAGE_KEY] = applicationPackage
         servletSubstitutions['asyncEnabled'] = pushSupported
 
-        Map<String,String> initParams = ['ui' : "$applicationPackage.${applicationName}UI"]
+        Map<String,String> initParams = ['ui':"$applicationPackage.${applicationName}UI"]
 
         if ( widgetsetFQN ) {
             if ( widgetsetConfiguration.widgetsetCDN ) {
-                initParams.put(WIDGETSET_KEY, "${widgetsetFQN.replaceAll('[^a-zA-Z0-9]+','')}")
+                initParams.put(WIDGETSET_KEY, "${widgetsetFQN.replaceAll('[^a-zA-Z0-9]+', '')}")
             } else {
                 initParams.put(WIDGETSET_KEY, "$widgetsetFQN")
             }
@@ -117,10 +119,12 @@ class ProjectCreator implements Runnable {
 
         if ( groovyProject ) {
             TemplateUtil.writeTemplate("$templateDir/MyServlet.groovy",
-                    UIDir, applicationName + 'Servlet.groovy', servletSubstitutions)
+                    UIDir, "${applicationName}Servlet.groovy", servletSubstitutions)
+            new File(UIDir, "${applicationName}Servlet.groovy")
         } else {
             TemplateUtil.writeTemplate("$templateDir/MyServlet.java",
-                    UIDir, applicationName + 'Servlet.java', servletSubstitutions)
+                    UIDir, "${applicationName}Servlet.java", servletSubstitutions)
+            new File(UIDir, "${applicationName}Servlet.java")
         }
     }
 
