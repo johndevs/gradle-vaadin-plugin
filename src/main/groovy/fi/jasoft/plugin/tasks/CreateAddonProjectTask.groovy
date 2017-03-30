@@ -106,7 +106,8 @@ class CreateAddonProjectTask extends DefaultTask {
                 uiImports: ["server.${componentName.toLowerCase()}.$componentName"],
                 uiSubstitutions: ['addonComponentType' : componentName],
                 pushSupported:Util.isPushSupportedAndEnabled(project),
-                addonStylesSupported:Util.isAddonStylesSupported(project)
+                addonStylesSupported:Util.isAddonStylesSupported(project),
+                groovyProject: Util.isGroovyProject(project)
         ).run()
 
         new ThemeCreator(
