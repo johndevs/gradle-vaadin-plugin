@@ -1044,7 +1044,13 @@ class Util {
             HTTPBuilder http = new HTTPBuilder('https://plugins.gradle.org/plugin/fi.jasoft.plugin.vaadin')
             def html = http.get([:])
             def versionNode = html."**".find { it.text().startsWith('Version') }
-            VersionNumber.parse((versionNode.text() as String).split()[1])
+            if(versionNode){
+                String[] parts = versionNode.text().split()
+                if(parts.length > 1){
+                    return VersionNumber.parse(parts[1])
+                }
+            }
+            VersionNumber.UNKNOWN
         } catch (IOException | URISyntaxException e){
             VersionNumber.UNKNOWN
         }
