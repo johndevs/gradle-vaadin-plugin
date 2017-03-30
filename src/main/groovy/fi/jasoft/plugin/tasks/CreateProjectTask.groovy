@@ -52,7 +52,8 @@ class CreateProjectTask extends DefaultTask {
     def run() {
         def configuration = project.vaadinCompile as CompileWidgetsetConfiguration
 
-        new ProjectCreator(applicationName:resolveApplicationName(),
+        new ProjectCreator(
+                applicationName:resolveApplicationName(),
                 applicationPackage:resolveApplicationPackage(),
                 widgetsetConfiguration:configuration,
                 widgetsetFQN:widgetsetFQN,
@@ -60,7 +61,8 @@ class CreateProjectTask extends DefaultTask {
                 addonStylesSupported:Util.isAddonStylesSupported(project),
                 javaDir:Util.getMainSourceSet(project).srcDirs.first(),
                 resourceDir:project.sourceSets.main.resources.srcDirs.iterator().next(),
-                templateDir: 'simpleProject'
+                templateDir: 'simpleProject',
+                groovyProject: Util.isGroovyProject(project)
         ).run()
 
         if ( Util.isAddonStylesSupported(project) ) {

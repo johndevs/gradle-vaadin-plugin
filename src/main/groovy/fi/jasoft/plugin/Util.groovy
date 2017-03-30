@@ -356,7 +356,7 @@ class Util {
      */
     @Memoized
     static boolean isGroovyProject(Project project) {
-        project.plugins.findPlugin(fi.jasoft.plugin.GradleVaadinGroovyPlugin)
+        project.plugins.findPlugin(GradleVaadinGroovyPlugin)
     }
 
     /**
