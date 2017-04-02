@@ -412,6 +412,9 @@ class GradleVaadinPlugin implements Plugin<Project> {
                     Dependency testbench = projectDependencies.create(
                             "com.vaadin:vaadin-testbench:${project.vaadinTestbench.version}")
                     dependencies.add(testbench)
+                    Dependency driverManager = projectDependencies.create(
+                            'io.github.bonigarcia:webdrivermanager:1.6.+')
+                    dependencies.add(driverManager)
                 }
             }
 
