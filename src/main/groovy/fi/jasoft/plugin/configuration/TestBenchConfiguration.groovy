@@ -22,6 +22,7 @@ import org.gradle.api.Project
  * Configuration options for Testbench
  */
 @PluginConfiguration
+@PluginConfigurationName('vaadinTestbench')
 class TestBenchConfiguration {
 
     /**

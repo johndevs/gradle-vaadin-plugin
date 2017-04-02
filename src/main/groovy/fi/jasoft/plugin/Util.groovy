@@ -15,6 +15,8 @@
 */
 package fi.jasoft.plugin
 
+import fi.jasoft.plugin.configuration.PluginConfiguration
+import fi.jasoft.plugin.configuration.PluginConfigurationName
 import fi.jasoft.plugin.configuration.VaadinPluginExtension
 import fi.jasoft.plugin.tasks.BuildClassPathJar
 import fi.jasoft.plugin.tasks.UpdateWidgetsetTask
@@ -989,7 +991,11 @@ class Util {
      * @return
      *      the configuration
      */
-    static <T> T findOrCreateExtension(Project project, String name, Class<T> type, Object... args=[]) {
+    static <T> T findOrCreateExtension(Project project, Class<T> type, Object... args=[]) {
+        if(!type.getAnnotation(PluginConfigurationName)) {
+            throw new IllegalArgumentException("$type.canonicalName is missing the PluginConfiguration annotation")
+        }
+        String name = type.getAnnotation(PluginConfigurationName).value()
         T configuration = project.extensions.findByName(name)
         if(!configuration){
             configuration = project.extensions.create(name, type, args)

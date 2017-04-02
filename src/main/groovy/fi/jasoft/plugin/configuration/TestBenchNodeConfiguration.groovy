@@ -19,6 +19,7 @@ package fi.jasoft.plugin.configuration
  * Configuration options for the testbench node
  */
 @PluginConfiguration
+@PluginConfigurationName('vaadinTestbenchNode')
 class TestBenchNodeConfiguration {
 
     /**

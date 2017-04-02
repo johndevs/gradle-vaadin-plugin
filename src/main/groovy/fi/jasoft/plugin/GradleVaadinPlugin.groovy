@@ -153,10 +153,10 @@ class GradleVaadinPlugin implements Plugin<Project> {
         }
 
         // Extensions
-        Util.findOrCreateExtension(project, 'vaadin', VaadinPluginExtension, project)
-        Util.findOrCreateExtension(project, 'vaadinTestbench', TestBenchConfiguration, project)
-        Util.findOrCreateExtension(project, 'vaadinTestbenchHub', TestBenchHubConfiguration)
-        Util.findOrCreateExtension(project, 'vaadinTestbenchNode', TestBenchNodeConfiguration)
+        Util.findOrCreateExtension(project, VaadinPluginExtension, project)
+        Util.findOrCreateExtension(project, TestBenchConfiguration, project)
+        Util.findOrCreateExtension(project, TestBenchHubConfiguration)
+        Util.findOrCreateExtension(project, TestBenchNodeConfiguration)
 
         // Dependency resolution
         gradle.taskGraph.addTaskExecutionListener(new TaskListener())

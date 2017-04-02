@@ -15,10 +15,13 @@
 */
 package fi.jasoft.plugin.configuration
 
+import fi.jasoft.plugin.tasks.CompileWidgetsetTask
+
 /**
  * Created by john on 3/7/16.
  */
 @PluginConfiguration
+@PluginConfigurationName(CompileWidgetsetTask.NAME)
 class CompileWidgetsetConfiguration {
 
     /**

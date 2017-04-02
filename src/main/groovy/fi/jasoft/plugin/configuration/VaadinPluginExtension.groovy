@@ -26,6 +26,7 @@ import org.gradle.api.file.SourceDirectorySet
  * Plugin configuration extension
  */
 @PluginConfiguration
+@PluginConfigurationName('vaadin')
 class VaadinPluginExtension {
 
     /**

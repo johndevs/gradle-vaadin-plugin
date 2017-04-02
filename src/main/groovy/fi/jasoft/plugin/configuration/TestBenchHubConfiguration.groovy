@@ -19,6 +19,7 @@ package fi.jasoft.plugin.configuration
  * Configuration options for the testbench hub
  */
 @PluginConfiguration
+@PluginConfigurationName('vaadinTestbenchHub')
 class TestBenchHubConfiguration {
 
     /**

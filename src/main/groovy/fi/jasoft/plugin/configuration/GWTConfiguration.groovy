@@ -16,6 +16,7 @@
 package fi.jasoft.plugin.configuration
 
 import fi.jasoft.plugin.MessageLogger
+import fi.jasoft.plugin.tasks.DevModeTask
 import org.gradle.api.Project
 
 /**

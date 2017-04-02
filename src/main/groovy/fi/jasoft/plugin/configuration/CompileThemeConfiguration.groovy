@@ -15,10 +15,13 @@
 */
 package fi.jasoft.plugin.configuration
 
+import fi.jasoft.plugin.tasks.CompileThemeTask
+
 /**
  * Configuration for the SASS Compiler
  */
 @PluginConfiguration
+@PluginConfigurationName(CompileThemeTask.NAME)
 class CompileThemeConfiguration {
 
     /**
