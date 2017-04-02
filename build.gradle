@@ -240,6 +240,7 @@ task integrationTest(type:Test, dependsOn:['test','jar']) {
     include '**/integration/**'
     exclude '**/integration/*ProxyTest*'
     systemProperty 'integrationTestProjectVersion', version
+    maxParallelForks = Runtime.runtime.availableProcessors() > 1 ? Runtime.runtime.availableProcessors() - 1 : 1
 }
 check.dependsOn 'integrationTest'
 
