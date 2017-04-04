@@ -576,8 +576,9 @@ class Util {
      */
     @Memoized
     static File getWidgetsetDirectory(Project project) {
-        File webAppDir = project.vaadinCompile.outputDirectory ?:
-                project.convention.getPlugin(WarPluginConvention).webAppDir
+        String outputDir = project.vaadinCompile.outputDirectory
+        File webAppDir = outputDir ? project.file(outputDir) : project.convention
+                .getPlugin(WarPluginConvention).webAppDir
         File vaadinDir = new File(webAppDir, VAADIN)
         File widgetsetsDir = new File(vaadinDir, 'widgetsets')
         widgetsetsDir
@@ -593,8 +594,9 @@ class Util {
      */
     @Memoized
     static File getWidgetsetCacheDirectory(Project project) {
-        File webAppDir = project.vaadinCompile.outputDirectory ?:
-                project.convention.getPlugin(WarPluginConvention).webAppDir
+        String outputDir = project.vaadinCompile.outputDirectory
+        File webAppDir = outputDir ? project.file(outputDir) : project.convention
+                .getPlugin(WarPluginConvention).webAppDir
         File vaadinDir = new File(webAppDir, VAADIN)
         File unitCacheDir = new File(vaadinDir, 'gwt-unitCache')
         unitCacheDir

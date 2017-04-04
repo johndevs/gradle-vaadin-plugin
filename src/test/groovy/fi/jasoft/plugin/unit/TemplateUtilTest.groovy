@@ -31,9 +31,9 @@ class TemplateUtilTest extends PluginTestBase {
         substitutions['color'] = 'brown'
         substitutions['obsticle'] = 'dog'
 
-        TemplateUtil.writeTemplate("MyTestTemplate.java", testDir, "quick-fox.txt", substitutions)
+        TemplateUtil.writeTemplate("MyTestTemplate.java", testDir.root, "quick-fox.txt", substitutions)
 
-        File resultFile = new File(testDir.canonicalPath + "/quick-fox.txt")
+        File resultFile = new File(testDir.root.canonicalPath + "/quick-fox.txt")
 
         assertEquals 'The quick brown fox jumps over the lazy dog', resultFile.text
     }
@@ -41,7 +41,8 @@ class TemplateUtilTest extends PluginTestBase {
     @Test
     void 'search for files in public resource folder'() {
 
-        generateFilesInPublicFolder(testDir.canonicalPath + '/src/main/resources/com/example/client/public' as File)
+        generateFilesInPublicFolder(
+                testDir.root.canonicalPath + '/src/main/resources/com/example/client/public' as File)
 
         // Get files
         def files = TemplateUtil.getFilesFromPublicFolder(project)
@@ -61,8 +62,10 @@ class TemplateUtilTest extends PluginTestBase {
     void 'search for files in multiple source folders'() {
         project.apply plugin: 'java'
         project.sourceSets.main.java.srcDir "src/extra/java"
-        generateFilesInPublicFolder(testDir.canonicalPath + '/src/main/resources/com/example/client/public' as File)
-        generateFilesInPublicFolder(testDir.canonicalPath + '/src/extra/java/com/example/client/public' as File)
+        generateFilesInPublicFolder(
+                testDir.root.canonicalPath + '/src/main/resources/com/example/client/public' as File)
+        generateFilesInPublicFolder(
+                testDir.root.canonicalPath + '/src/extra/java/com/example/client/public' as File)
     	
         def files = TemplateUtil.getFilesFromPublicFolder(project)
         assertEquals 6, files.size()
@@ -71,7 +74,7 @@ class TemplateUtilTest extends PluginTestBase {
     @Test
     void 'search for files in main source set, public folder'() {
 
-        def publicFolder = testDir.canonicalPath + '/src/main/java/com/example/client/public' as File
+        def publicFolder = testDir.root.canonicalPath + '/src/main/java/com/example/client/public' as File
 
         generateFilesInPublicFolder(publicFolder)
 
