@@ -5,3 +5,4 @@ script: ./gradlew --stacktrace check
 branches:
   only:
     - "master"
+    - "1.2"
