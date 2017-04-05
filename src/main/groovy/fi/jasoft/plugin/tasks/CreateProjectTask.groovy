@@ -87,7 +87,7 @@ class CreateProjectTask extends DefaultTask {
         }
 
         // Ensure name is Java compatible
-        Util.makeStringJavaCompatible(applicationName)
+        Util.makeStringJavaCompatible(applicationName).capitalize()
     }
 
     @PackageScope
@@ -102,7 +102,7 @@ class CreateProjectTask extends DefaultTask {
                 String widgetsetName = configuration.widgetset.tokenize(DOT).last()
                 return configuration.widgetset[0..(-widgetsetName.size() - endSlashSize)]
             } else {
-                return "com.example.${applicationName.toLowerCase()}"
+                return "com.example.${resolveApplicationName().toLowerCase()}"
             }
         }
         applicationPackage

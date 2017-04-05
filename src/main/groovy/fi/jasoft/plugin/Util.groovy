@@ -963,22 +963,20 @@ class Util {
      */
     @Memoized
     static String makeStringJavaCompatible(String string) {
-        boolean isFirstCharacter = true
-        boolean capitilizeNextCharacter = false
-        string.chars.collect { char c ->
-            String result = ''
-            if ( isFirstCharacter && Character.isJavaIdentifierStart(c) ) {
-                isFirstCharacter = false
-                result = capitilizeNextCharacter ? c.toUpperCase() : c
-                capitilizeNextCharacter = false
-            } else if ( Character.isJavaIdentifierPart(c) ) {
-                result = capitilizeNextCharacter ? c.toUpperCase() : c
-                capitilizeNextCharacter = false
+        if (!string) {
+            return null
+        }
+        List<Character> collector = []
+        List<String> collector2 = []
+        string.chars.collect(collector) { ch ->
+            if (collector.empty) {
+                Character.isJavaIdentifierStart(ch) ? ch : ''
             } else {
-                capitilizeNextCharacter = true
+                Character.isJavaIdentifierPart(ch) ? ch : ' '
             }
-            result
-        }.join('').capitalize()
+        }.join('').tokenize().collect(collector2) { t ->
+            collector2.empty ? t : t.capitalize()
+        }.join('')
     }
 
     /**
