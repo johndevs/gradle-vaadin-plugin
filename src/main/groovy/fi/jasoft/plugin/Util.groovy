@@ -556,14 +556,19 @@ class Util {
      */
     @Memoized
     static File getThemesDirectory(Project project) {
+        File themesDir
         if ( project.vaadinThemeCompile.themesDirectory ) {
-            project.file(project.vaadinThemeCompile.themesDirectory)
+            String customDir = project.vaadinThemeCompile.themesDirectory
+            themesDir = new File(customDir)
+            if ( !themesDir.absolute ) {
+                themesDir = project.file(project.rootDir.canonicalPath + File.separator + customDir)
+            }
         } else {
             File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
             File vaadinDir = new File(webAppDir, VAADIN)
-            File themesDir = new File(vaadinDir, 'themes')
-            themesDir
+            themesDir = new File(vaadinDir, 'themes')
         }
+        themesDir
     }
 
     /**
