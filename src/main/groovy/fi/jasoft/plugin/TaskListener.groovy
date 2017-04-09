@@ -232,19 +232,16 @@ class TaskListener implements TaskExecutionListener {
     @PackageScope
     static configureTest(Task task, TaskListener listener) {
         Project project = task.project
-        TestBenchConfiguration tb = Util.findOrCreateExtension(project, 'vaadinTestbench',
-                TestBenchConfiguration, project)
+        TestBenchConfiguration tb = Util.findOrCreateExtension(project, TestBenchConfiguration, project)
 
         if ( tb.enabled ) {
-            TestBenchHubConfiguration tbHub = Util.findOrCreateExtension(project, 'vaadinTestbenchHub',
-                    TestBenchHubConfiguration)
+            TestBenchHubConfiguration tbHub = Util.findOrCreateExtension(project, TestBenchHubConfiguration)
             if ( tbHub.enabled ) {
                 listener.testbenchHub = new TestbenchHub(project)
                 listener.testbenchHub.start()
             }
 
-            TestBenchNodeConfiguration tbNode = Util.findOrCreateExtension(project, 'vaadinTestbenchNode',
-                    TestBenchNodeConfiguration)
+            TestBenchNodeConfiguration tbNode = Util.findOrCreateExtension(project, TestBenchNodeConfiguration)
             if ( tbNode.enabled ) {
                 listener.testbenchNode = new TestbenchNode(project)
                 listener.testbenchNode.start()

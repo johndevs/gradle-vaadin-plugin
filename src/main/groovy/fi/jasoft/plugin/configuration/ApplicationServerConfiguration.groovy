@@ -15,10 +15,13 @@
 */
 package fi.jasoft.plugin.configuration
 
+import fi.jasoft.plugin.tasks.RunTask
+
 /**
  * Configuration class for configuring the Application Server
  */
 @PluginConfiguration
+@PluginConfigurationName(RunTask.NAME)
 class ApplicationServerConfiguration {
 
     /**

@@ -15,10 +15,13 @@
 */
 package fi.jasoft.plugin.configuration
 
+import fi.jasoft.plugin.tasks.SuperDevModeTask
+
 /**
  * Configuration for the SuperDevMode task
  */
 @PluginConfiguration
+@PluginConfigurationName(SuperDevModeTask.NAME)
 class SuperDevModeConfiguration extends ApplicationServerConfiguration {
 
     /**
