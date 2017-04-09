@@ -38,6 +38,20 @@ class CreateThemeTest extends IntegrationTest {
         assertCompiledThemeInDirectory(themesDir, projectDir.root.name)
     }
 
+    @Test void 'Create theme in custom external theme directory'() {
+        File customThemesDir = File.createTempDir("$projectDir.root.name-", '-themes')
+        customThemesDir.deleteOnExit()
+        println "Created themes in $customThemesDir"
+
+        buildFile << "vaadinThemeCompile.themesDirectory = '$customThemesDir.canonicalPath'"
+        runWithArguments(CreateThemeTask.NAME)
+
+        assertThemeInDirectory(customThemesDir, projectDir.root.name)
+
+        runWithArguments(CompileThemeTask.NAME)
+        assertCompiledThemeInDirectory(customThemesDir, projectDir.root.name)
+    }
+
     @Test void 'Compile with Compass compiler'() {
         buildFile << "vaadinThemeCompile.compiler = 'compass'"
         assertThemeCreatedAndCompiled('CompassTheme')
