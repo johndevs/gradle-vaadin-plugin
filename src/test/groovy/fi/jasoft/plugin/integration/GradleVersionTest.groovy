@@ -52,7 +52,7 @@ class GradleVersionTest extends IntegrationTest {
     }
 
     @Test void 'Compile Theme'() {
-        setupTest(new CreateThemeTest(){
+        setupTest(new CreateThemeTest('vaadin'){
             protected GradleRunner setupRunner(File projectDir) {
                 return GradleVersionTest.this.setupRunner(projectDir)
             }

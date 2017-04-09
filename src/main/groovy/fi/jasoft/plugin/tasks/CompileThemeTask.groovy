@@ -17,6 +17,7 @@ package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.Util
 import fi.jasoft.plugin.configuration.CompileThemeConfiguration
+import fi.jasoft.plugin.configuration.VaadinPluginExtension
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -45,6 +46,7 @@ class CompileThemeTask extends DefaultTask {
     static final String RUBY_MAIN_CLASS = 'org.jruby.Main'
     static final String COMPASS_COMPILER = 'compass'
     static final String LIBSASS_COMPILER = 'libsass'
+    static final String VAADIN_COMPILER = 'vaadin'
     static final String STYLES_CSS = 'styles.css'
     static final String STYLES_SCSS = 'styles.scss'
 
@@ -122,16 +124,21 @@ class CompileThemeTask extends DefaultTask {
 
             def Process process
             switch (project.vaadinThemeCompile.compiler) {
-                case 'vaadin':
-                    process = executeVaadinSassCompiler(project, theme.canonicalPath,
-                            new File(dir, STYLES_CSS_FILE).canonicalPath)
+                case VAADIN_COMPILER:
+                    File targetCss = new File(dir, STYLES_CSS_FILE)
+                    if (project.vaadinThemeCompile.themesDirectory) {
+                        File sourceScss = Paths.get(unpackedThemesDir.canonicalPath, dir.name, theme.name).toFile()
+                        process = executeVaadinSassCompiler(project, sourceScss, targetCss)
+                    } else {
+                        process = executeVaadinSassCompiler(project, theme, targetCss)
+                    }
                     break
                 case COMPASS_COMPILER:
                     process = executeCompassSassCompiler(project, gemsDir, unpackedThemesDir, dir)
-                    break
+                break
                 case LIBSASS_COMPILER:
                     process = executeLibSassCompiler(project, dir, unpackedThemesDir)
-                    break
+                break
                 default:
                     throw new BuildActionFailureException(
                             "Selected theme compiler \"${project.vaadinThemeCompile.compiler}\" is not valid",null)
@@ -149,6 +156,8 @@ class CompileThemeTask extends DefaultTask {
 
             long time = (System.currentTimeMillis()-start)/1000
             if (result != 0 || failed ) {
+                // Cleanup possible css file
+                new File(dir, STYLES_CSS_FILE).delete()
                 throw new BuildActionFailureException('Theme compilation failed. See error log for details.', null)
             } else if ( isRecompile ) {
                 project.logger.lifecycle("Theme was recompiled in $time seconds")
@@ -170,11 +179,11 @@ class CompileThemeTask extends DefaultTask {
      * @return
      *      the process that runs the compiler
      */
-    static Process executeVaadinSassCompiler(Project project, String themePath, String targetCSSFile) {
+    static Process executeVaadinSassCompiler(Project project, File themeDir, File targetCSSFile) {
         def compileProcess = [Util.getJavaBinary(project)]
         compileProcess += [CLASSPATH_SWITCH,  Util.getCompileClassPathOrJar(project).asPath]
         compileProcess += 'com.vaadin.sass.SassCompiler'
-        compileProcess += [themePath, targetCSSFile]
+        compileProcess += [themeDir.canonicalPath, targetCSSFile.canonicalPath]
         compileProcess.execute()
     }
 
@@ -224,13 +233,7 @@ class CompileThemeTask extends DefaultTask {
     static File unpackThemes(Project project) {
 
         // Unpack Vaadin and addon themes
-        def unpackedThemesDir
-        if(project.vaadinThemeCompile.themesDirectory) {
-            unpackedThemesDir = new File(project.vaadinThemeCompile.themesDirectory)
-        } else {
-            unpackedThemesDir = project.file("$project.buildDir/themes")
-        }
-
+        File unpackedThemesDir = project.file("$project.buildDir/themes")
         unpackedThemesDir.mkdirs()
 
         project.logger.info("Unpacking themes to $unpackedThemesDir")
@@ -240,7 +243,7 @@ class CompileThemeTask extends DefaultTask {
             conf.allDependencies.each { Dependency dependency ->
                 if ( dependency in ProjectDependency ) {
                     def dependentProject = dependency.dependencyProject
-                    if ( dependentProject.hasProperty('vaadin') ) {
+                    if ( dependentProject.hasProperty(VAADIN_COMPILER) ) {
                         dependentProject.copy{
                             from Util.getThemesDirectory(project)
                             into unpackedThemesDir
@@ -332,7 +335,7 @@ class CompileThemeTask extends DefaultTask {
         def compileProcess = [Util.getJavaBinary(project)]
         compileProcess += [CLASSPATH_SWITCH,  Util.getCompileClassPathOrJar(project).asPath]
         compileProcess += 'fi.jasoft.plugin.LibSassCompiler'
-        compileProcess += [stylesScss, stylesCss, unpackedThemesDir]
+        compileProcess += [stylesScss.canonicalPath, stylesCss.canonicalPath, unpackedThemesDir.canonicalPath]
 
         project.logger.debug(compileProcess.toString())
 

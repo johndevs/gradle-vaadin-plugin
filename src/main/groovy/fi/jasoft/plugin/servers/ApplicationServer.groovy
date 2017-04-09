@@ -21,6 +21,7 @@ import fi.jasoft.plugin.Util
 import fi.jasoft.plugin.configuration.ApplicationServerConfiguration
 import fi.jasoft.plugin.tasks.BuildClassPathJar
 import fi.jasoft.plugin.tasks.CompileThemeTask
+import fi.jasoft.plugin.tasks.CompressCssTask
 import groovy.io.FileType
 import groovy.transform.PackageScope
 import org.apache.tools.ant.taskdefs.Pack
@@ -403,6 +404,9 @@ abstract class ApplicationServer {
 
                         // Recompile theme
                         CompileThemeTask.compile(project, true)
+
+                        // Recompress theme
+                        CompressCssTask.compress(project, true)
 
                         // Restart
                         if ( server.configuration.serverRestart && server.process ) {

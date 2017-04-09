@@ -451,9 +451,8 @@ class GradleVaadinPlugin implements Plugin<Project> {
         configurations.create(CONFIGURATION_THEME) { conf ->
             conf.description = 'Libraries needed for SASS theme compilation'
             conf.defaultDependencies { dependencies ->
-                File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
                 FileTree themes = project.fileTree(
-                        dir:webAppDir.canonicalPath + '/VAADIN/themes',
+                        dir: Util.getThemesDirectory(project).canonicalPath,
                         include: '**/styles.scss')
 
                 if ( !themes.isEmpty() ) {
@@ -488,6 +487,9 @@ class GradleVaadinPlugin implements Plugin<Project> {
                             throw new GradleException(
                                     "Selected theme compiler \"${project.vaadinThemeCompile.compiler}\" is not valid")
                     }
+                } else {
+                    project.logger.warn("No themes were found in themes directory $themes, " +
+                            "skipping theme compiler dependencies")
                 }
             }
 

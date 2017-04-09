@@ -20,28 +20,24 @@ import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
+import org.junit.rules.TemporaryFolder
 
 /**
  * Base class for plugin unit tests
  */
 class PluginTestBase {
 
-    protected final File testDir = new File("build/tmp/tests")
+    @Rule
+    public TemporaryFolder testDir = new TemporaryFolder()
+
     protected Project project
+
     protected GradleVaadinPlugin plugin
 
     @Before
     void setUp() {
-        project = ProjectBuilder.builder().withProjectDir(testDir).build()
+        project = ProjectBuilder.builder().withProjectDir(testDir.root).build()
         plugin = new GradleVaadinPlugin().apply(project)
-    }
-
-    @After
-    void tearDown() {
-        plugin = null
-        project = null
-        if ( testDir.exists() ) {
-            testDir.deleteDir()
-        }
     }
 }
