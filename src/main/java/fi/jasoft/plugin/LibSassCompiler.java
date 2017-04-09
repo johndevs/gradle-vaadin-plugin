@@ -19,21 +19,12 @@ import io.bit3.jsass.CompilationException;
 import io.bit3.jsass.Compiler;
 import io.bit3.jsass.Options;
 import io.bit3.jsass.Output;
-import io.bit3.jsass.context.FileContext;
-import io.bit3.jsass.importer.Import;
-import io.bit3.jsass.importer.Importer;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Scanner;
 
 public class LibSassCompiler {
 
@@ -45,6 +36,11 @@ public class LibSassCompiler {
             outputFile.createNewFile();
         }
 
+        File sourceMapFile = new File(args[1]+".map");
+        if(!sourceMapFile.exists()) {
+            sourceMapFile.createNewFile();
+        }
+
         File unpackedThemes = new File(args[2]);
         File unpackedInputFile = Paths.get(
                 unpackedThemes.getCanonicalPath(),
@@ -54,7 +50,14 @@ public class LibSassCompiler {
         Compiler compiler = new Compiler();
         Options options = new Options();
 
-        Output output = compiler.compileFile(unpackedInputFile.toURI(), outputFile.toURI(), options);
-        FileUtils.write(outputFile, output.getCss(), StandardCharsets.UTF_8.name());
+        try {
+            Output output = compiler.compileFile(unpackedInputFile.toURI(), outputFile.toURI(), options);
+            FileUtils.write(outputFile, output.getCss(), StandardCharsets.UTF_8.name());
+            FileUtils.write(sourceMapFile, output.getSourceMap(), StandardCharsets.UTF_8.name());
+        } catch (CompilationException e) {
+            outputFile.delete();
+            sourceMapFile.delete();
+            throw e;
+        }
     }
 }
