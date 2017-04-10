@@ -18,6 +18,7 @@ package fi.jasoft.plugin.tasks
 import fi.jasoft.plugin.Util
 import fi.jasoft.plugin.configuration.CompileThemeConfiguration
 import org.gradle.api.DefaultTask
+import org.gradle.api.Project
 import org.gradle.api.file.FileTree
 import org.gradle.api.tasks.TaskAction
 
@@ -57,14 +58,40 @@ class CompressCssTask extends DefaultTask {
      */
     @TaskAction
     def run() {
+        compress(project)
+    }
+
+    /**
+     * Compresses the compiled CSS theme
+     *
+     * @param project
+     *      the project
+     * @param isRecompress
+     *      are we re-compressing on-the-fly
+     */
+    static compress(Project project, boolean isRecompress=false) {
         File themesDir = Util.getThemesDirectory(project)
-        FileTree themes = project.fileTree(dir:themesDir,
-                include:CompileThemeTask.STYLES_SCSS_PATTERN)
+        FileTree themes = project.fileTree(dir: themesDir, include: CompileThemeTask.STYLES_SCSS_PATTERN)
         themes.each { File theme ->
             File dir = new File(theme.parent)
             File stylesCss = new File(dir, STYLES_CSS)
-            if(stylesCss.exists()){
-                ant.gzip(src: stylesCss.canonicalPath, destfile: "${stylesCss.canonicalPath}.gz")
+            if (stylesCss.exists()) {
+                if(isRecompress) {
+                    project.logger.lifecycle("Recompressing $stylesCss.canonicalPath...")
+                } else {
+                    project.logger.info("Compressing $stylesCss.canonicalPath...")
+                }
+
+                long start = System.currentTimeMillis()
+
+                project.ant.gzip(src: stylesCss.canonicalPath, destfile: "${stylesCss.canonicalPath}.gz")
+
+                long time = (System.currentTimeMillis()-start)/1000
+                if ( isRecompress ) {
+                    project.logger.lifecycle("Theme was recompressed in $time seconds")
+                } else {
+                    project.logger.info("Theme was compressed in $time seconds")
+                }
             } else {
                 project.logger.warn("Failed to find $theme pre-compiled styles.css file.")
             }

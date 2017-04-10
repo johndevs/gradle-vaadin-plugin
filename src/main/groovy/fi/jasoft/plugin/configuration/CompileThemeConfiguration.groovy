@@ -36,6 +36,7 @@ class CompileThemeConfiguration {
      *     <ul>
      *         <li>vaadin - Vaadin's SASS Compiler</li>
      *         <li>compass - Compass's SASS Compiler</li>
+     *         <li>libsass - Libsass SASS Compiler</li>
      *     </ul>
      */
     String compiler = 'vaadin'
