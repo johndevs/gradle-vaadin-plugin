@@ -145,12 +145,14 @@ class CompileThemeTask extends DefaultTask {
             }
 
             boolean failed = false
-            Util.logProcess(project, process, 'theme-compile.log', { String line ->
+            Util.logProcess(project, process, 'theme-compile.log') { String line ->
                 if ( line.contains('error') ) {
                     project.logger.error(line)
                     failed = true
+                    return false
                 }
-            })
+                true
+            }
 
             int result = process.waitFor()
 
@@ -212,7 +214,7 @@ class CompileThemeTask extends DefaultTask {
                     "PATH=${gemsDir.canonicalPath}/bin"
             ], null)
 
-            Util.logProcess(project, gemProcess, 'compass-gem-install.log')
+            Util.logProcess(project, gemProcess, 'compass-gem-install.log'){ true }
             def result = gemProcess.waitFor()
             if ( result != 0 ) {
                 throw new BuildActionFailureException("Installing Compass ruby gem failed. " +

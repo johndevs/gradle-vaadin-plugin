@@ -61,12 +61,15 @@ import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.file.FileTree
 import org.gradle.api.invocation.Gradle
 import org.gradle.api.plugins.WarPlugin
-import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.bundling.War
 import org.gradle.language.jvm.tasks.ProcessResources
 import org.gradle.tooling.UnsupportedVersionException
 import org.gradle.util.VersionNumber
+
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Gradle Plugin for Vaadin Projects
@@ -101,6 +104,11 @@ class GradleVaadinPlugin implements Plugin<Project> {
     static final String PLUGIN_DEVELOPMENTTIME_REPOSITORY_NAME = 'Gradle Vaadin plugin development repository'
     static final String VAADIN_PRERELEASE_REPOSITORY_NAME = 'Vaadin Pre-releases'
     static final String SPRING_BOOT_PLUGIN = 'org.springframework.boot'
+
+    static final AtomicInteger THREAD_COUNTER = new AtomicInteger(1)
+    static final Executor THREAD_POOL = Executors.newCachedThreadPool({ Runnable r ->
+        new Thread(r, "gradle-vaadin-plugin-thread-${THREAD_COUNTER.getAndIncrement()}")
+    })
 
     static {
         PLUGIN_PROPERTIES = new Properties()

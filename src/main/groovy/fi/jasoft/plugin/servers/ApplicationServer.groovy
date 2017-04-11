@@ -19,6 +19,7 @@ import fi.jasoft.plugin.GradleVaadinPlugin
 import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
 import fi.jasoft.plugin.configuration.ApplicationServerConfiguration
+import fi.jasoft.plugin.configuration.CompileThemeConfiguration
 import fi.jasoft.plugin.tasks.BuildClassPathJar
 import fi.jasoft.plugin.tasks.CompileThemeTask
 import fi.jasoft.plugin.tasks.CompressCssTask
@@ -242,9 +243,9 @@ abstract class ApplicationServer {
         }
 
         // Watch for changes in classes
-        if ( configuration.serverRestart ) {
+        if ( firstStart && configuration.serverRestart ) {
             def self = this
-            Thread.start 'Class Directory Watcher', {
+            GradleVaadinPlugin.THREAD_POOL.submit {
                 watchClassDirectoryForChanges(self)
             }
         }
@@ -252,7 +253,7 @@ abstract class ApplicationServer {
         // Watch for changes in theme
         if ( firstStart && configuration.themeAutoRecompile ) {
             def self = this
-            Thread.start 'Theme Directory Watcher', {
+            GradleVaadinPlugin.THREAD_POOL.submit {
                 watchThemeDirectoryForChanges(self)
             }
         }
@@ -261,7 +262,7 @@ abstract class ApplicationServer {
 
     @PackageScope
     def monitorLog(boolean firstStart=false, boolean stopAfterStart=false) {
-        Util.logProcess(project, process, "${serverName}.log", { line ->
+        Util.logProcess(project, process, "${serverName}.log") { line ->
             if ( line.contains(successfullyStartedLogToken) ) {
                 if ( firstStart ) {
                     def resultStr = "Application running on http://localhost:${configuration.serverPort} "
@@ -273,6 +274,7 @@ abstract class ApplicationServer {
 
                     if ( stopAfterStart ) {
                         terminate()
+                        return false
                     } else if ( configuration.openInBrowser ) {
                         openBrowser()
                     }
@@ -284,8 +286,10 @@ abstract class ApplicationServer {
             if ( line.contains('ERROR') ) {
                 // Terminate if server logs an error
                 terminate()
+                return false
             }
-        })
+            true
+        }
     }
 
     @PackageScope
@@ -367,12 +371,7 @@ abstract class ApplicationServer {
             ScheduledFuture currentTask
 
             Util.watchDirectoryForChanges(project, (File) classesDir, { WatchKey key, WatchEvent event ->
-//                Path basePath = (Path) key.watchable();
-//                WatchEvent<Path> watchEventPath = (WatchEvent<Path>) event
-//                Path path =  basePath.resolve(watchEventPath.context())
-//                File file = path.toFile()
-
-                if ( server.configuration.serverRestart && server.process ) {
+                if (server.process && server.configuration.serverRestart ) {
                     if ( currentTask ) {
                         currentTask.cancel(true)
                     }
@@ -382,21 +381,24 @@ abstract class ApplicationServer {
                         server.reload()
                     }, 1 , TimeUnit.SECONDS)
                 }
-                false
+                true
             })
         }
     }
 
     @PackageScope
     static watchThemeDirectoryForChanges(final ApplicationServer server) {
-        def project = server.project
+        Project project = server.project
+        CompileThemeConfiguration compileConf = Util.findOrCreateExtension(project,
+                CompileThemeTask.NAME, CompileThemeConfiguration)
+
         File themesDir = Util.getThemesDirectory(project)
         if ( themesDir.exists() ) {
             def executor = Executors.newSingleThreadScheduledExecutor()
             ScheduledFuture currentTask
 
             Util.watchDirectoryForChanges(project, themesDir, { WatchKey key, WatchEvent event ->
-                if ( event.context().toString().toLowerCase().endsWith(".scss") ) {
+                if (server.process && event.context().toString().toLowerCase().endsWith(".scss") ) {
                     if ( currentTask ) {
                         currentTask.cancel(true)
                     }
@@ -406,7 +408,9 @@ abstract class ApplicationServer {
                         CompileThemeTask.compile(project, true)
 
                         // Recompress theme
-                        CompressCssTask.compress(project, true)
+                        if(compileConf.compress){
+                            CompressCssTask.compress(project, true)
+                        }
 
                         // Restart
                         if ( server.configuration.serverRestart && server.process ) {
@@ -416,7 +420,7 @@ abstract class ApplicationServer {
                         }
                     }, 1 , TimeUnit.SECONDS)
                 }
-                false
+                true
             })
         }
     }

@@ -89,7 +89,7 @@ class UpdateAddonStylesTask extends DefaultTask {
 
             Process process = importer.execute()
 
-            Util.logProcessToConsole(project, process)
+            Util.logProcess(project, process, 'addon-style-updater.log') { true }
 
             int result = process.waitFor()
             if ( result != 0 ) {

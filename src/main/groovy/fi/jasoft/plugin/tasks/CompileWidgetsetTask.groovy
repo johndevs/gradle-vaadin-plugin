@@ -331,12 +331,14 @@ class CompileWidgetsetTask extends DefaultTask {
 
         def Process process = widgetsetCompileProcess.execute()
         def failed = false
-        Util.logProcess(project, process, 'widgetset-compile.log', { String output ->
+        Util.logProcess(project, process, 'widgetset-compile.log') { String output ->
             // Monitor log for errors
             if ( output.trim().startsWith('[ERROR]') ) {
                 failed = true
+                return false
             }
-        })
+            true
+        }
 
         // Block
         def result = process.waitFor()
