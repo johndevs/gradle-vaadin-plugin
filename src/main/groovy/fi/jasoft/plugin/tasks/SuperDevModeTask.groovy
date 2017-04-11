@@ -20,7 +20,6 @@ import fi.jasoft.plugin.servers.ApplicationServer
 import fi.jasoft.plugin.Util
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
-import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -106,11 +105,13 @@ class SuperDevModeTask extends DefaultTask {
 
         codeserverProcess = superdevmodeProcess.execute()
 
-        Util.logProcess(project, codeserverProcess, 'superdevmode.log', { line ->
+        Util.logProcess(project, codeserverProcess, 'superdevmode.log') { line ->
             if ( line.contains('The code server is ready') ) {
                 readyClosure.call()
+                return false
             }
-        })
+            true
+        }
 
         codeserverProcess.waitFor()
     }

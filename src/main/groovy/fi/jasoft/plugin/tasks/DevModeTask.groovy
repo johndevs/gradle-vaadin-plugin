@@ -121,6 +121,6 @@ class DevModeTask extends DefaultTask {
 
         devModeProcess = devmodeProcess.execute()
 
-        Util.logProcess(project, devModeProcess, 'devmode.log')
+        Util.logProcess(project, devModeProcess, 'devmode.log') { true }
     }
 }

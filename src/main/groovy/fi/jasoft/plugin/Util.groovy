@@ -61,8 +61,6 @@ class Util {
     private static final String WARNING_LOG_MARKER = '[WARN]'
     private static final String ERROR_LOG_MARKER = '[ERROR]'
     private static final String INFO_LOG_MARKER = '[INFO]'
-    private static final String INFO_LOGGER = 'Info logger'
-    private static final String ERROR_LOGGER = 'Error logger'
     private static final String STREAM_CLOSED_LOG_MESSAGE = 'Stream was closed'
     private static final String VAADIN = 'VAADIN'
     private static final String GRADLE_HOME = 'org.gradle.java.home'
@@ -277,7 +275,7 @@ class Util {
         if ( project.vaadinRun.openInBrowser
                 && Desktop.isDesktopSupported()
                 && Desktop.desktop.isSupported(Desktop.Action.BROWSE)) {
-            Thread.startDaemon {
+            GradleVaadinPlugin.THREAD_POOL.submit {
                 Desktop.desktop.browse url.toURI()
             }
         } else if ( project.vaadinRun.openInBrowser ) {
@@ -375,7 +373,7 @@ class Util {
      * @param monitor
      *      Optional additional monitor closure for processing output
      */
-    static void logProcess(final Project project, final Process process, final String filename, Closure monitor={ }) {
+    static void logProcess(final Project project, final Process process, final String filename, Closure monitor) {
         if ( project.vaadin.logToConsole ) {
             logProcessToConsole(project, process, monitor)
         } else {
@@ -403,7 +401,7 @@ class Util {
         final File LOGFILE = new File(logDir, filename)
         project.logger.info("Logging to file $LOGFILE")
 
-        Thread.start INFO_LOGGER, {
+        GradleVaadinPlugin.THREAD_POOL.submit {
             LOGFILE.withWriterAppend { out ->
                 try {
                     boolean errorOccurred = false
@@ -431,7 +429,7 @@ class Util {
             }
         }
 
-        Thread.start ERROR_LOGGER, {
+        GradleVaadinPlugin.THREAD_POOL.submit {
             LOGFILE.withWriterAppend { out ->
                 try {
                     process.errorStream.eachLine { output ->
@@ -460,7 +458,7 @@ class Util {
     static void logProcessToConsole(final Project project, final Process process, Closure monitor={}) {
         project.logger.info("Logging to console")
 
-        Thread.start INFO_LOGGER, {
+        GradleVaadinPlugin.THREAD_POOL.submit {
             try {
                 boolean errorOccurred = false
                 process.inputStream.eachLine { output ->
@@ -483,7 +481,7 @@ class Util {
             }
         }
 
-        Thread.start ERROR_LOGGER, {
+        GradleVaadinPlugin.THREAD_POOL.submit {
             try {
                 process.errorStream.eachLine { String output ->
                     monitor.call(output)
