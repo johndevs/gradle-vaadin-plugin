@@ -20,16 +20,30 @@ import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.plus.webapp.EnvConfiguration;
 import org.eclipse.jetty.plus.webapp.PlusConfiguration;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.util.component.LifeCycle;
 import org.eclipse.jetty.util.resource.Resource;
-import org.eclipse.jetty.util.resource.ResourceCollection;
-import org.eclipse.jetty.webapp.*;
+import org.eclipse.jetty.webapp.Configuration;
+import org.eclipse.jetty.webapp.FragmentConfiguration;
+import org.eclipse.jetty.webapp.JettyWebXmlConfiguration;
+import org.eclipse.jetty.webapp.MetaInfConfiguration;
+import org.eclipse.jetty.webapp.WebAppClassLoader;
+import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.webapp.WebInfConfiguration;
+import org.eclipse.jetty.webapp.WebXmlConfiguration;
 
 import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class JettyServerRunner {
+
+    public static final String SERVER_STARTING_TOKEN = "Jetty starting";
+    public static final String SERVER_STARTED_TOKEN = "Jetty started";
+    public static final String SERVER_STOPPING_TOKEN = "Jetty stopping";
+    public static final String SERVER_STOPPED_TOKEN = "Jetty stopped";
+    public static final String SERVER_FAILED_TOKEN = "Jetty error";
 
     // Usage: 'JettyServerRunner [port] [webbappdir] [classesdir] [resourcesdir] [LogLevel]'
     public static void main(String[] args) throws Exception {
@@ -37,14 +51,18 @@ public class JettyServerRunner {
         String webAppDir = args[1];
         String classesDir = args[2];
         String resourcesDir = args[3];
-        String logLevel = args[4];
+        //String logLevel = args[4];
 
         List<String> resources = new ArrayList<>();
         if (new File(webAppDir).exists()){
             resources.add(webAppDir);
         }
 
-        System.setProperty("org.eclipse.jetty.LEVEL", logLevel);
+        // By default always log with info
+        if(System.getProperty("org.eclipse.jetty.LEVEL") == null ||
+                System.getProperty("org.eclipse.jetty.LEVEL").equals("")){
+            System.setProperty("org.eclipse.jetty.LEVEL", "INFO");
+        }
 
         Server server = new Server(port);
     
@@ -72,6 +90,33 @@ public class JettyServerRunner {
                 new JettyWebXmlConfiguration()
         });
         handler.setClassLoader(new WebAppClassLoader(JettyServerRunner.class.getClassLoader(), handler));
+
+        server.addLifeCycleListener(new LifeCycle.Listener() {
+            @Override
+            public void lifeCycleStarting(LifeCycle event) {
+                Logger.getLogger(JettyServerRunner.class.getName()).info(SERVER_STARTING_TOKEN);
+            }
+
+            @Override
+            public void lifeCycleStarted(LifeCycle event) {
+                Logger.getLogger(JettyServerRunner.class.getName()).info(SERVER_STARTED_TOKEN);
+            }
+
+            @Override
+            public void lifeCycleFailure(LifeCycle event, Throwable cause) {
+                Logger.getLogger(JettyServerRunner.class.getName()).info(SERVER_FAILED_TOKEN);
+            }
+
+            @Override
+            public void lifeCycleStopping(LifeCycle event) {
+                Logger.getLogger(JettyServerRunner.class.getName()).info(SERVER_STOPPING_TOKEN);
+            }
+
+            @Override
+            public void lifeCycleStopped(LifeCycle event) {
+                Logger.getLogger(JettyServerRunner.class.getName()).info(SERVER_STOPPED_TOKEN);
+            }
+        });
 
         server.start();
         server.join();
