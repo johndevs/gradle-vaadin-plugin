@@ -54,6 +54,7 @@ import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.DependencyResolveDetails
 import org.gradle.api.artifacts.DependencySet
+import org.gradle.api.artifacts.DependencySubstitutions
 import org.gradle.api.artifacts.ModuleVersionSelector
 import org.gradle.api.artifacts.dsl.ArtifactHandler
 import org.gradle.api.artifacts.dsl.DependencyHandler
@@ -104,6 +105,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
     static final String PLUGIN_DEVELOPMENTTIME_REPOSITORY_NAME = 'Gradle Vaadin plugin development repository'
     static final String VAADIN_PRERELEASE_REPOSITORY_NAME = 'Vaadin Pre-releases'
     static final String SPRING_BOOT_PLUGIN = 'org.springframework.boot'
+    static final String VALIDATION_API_1_0 = 'javax.validation:validation-api:1.0.0.GA'
 
     static final AtomicInteger THREAD_COUNTER = new AtomicInteger(1)
     static final Executor THREAD_POOL = Executors.newCachedThreadPool({ Runnable r ->
@@ -338,7 +340,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
                         dependencies.add(widgetsetCompiler)
 
                         Dependency validationAPI = projectDependencies.create(
-                                'javax.validation:validation-api:1.0.0.GA')
+                                VALIDATION_API_1_0)
                         dependencies.add(validationAPI)
                     }
                 }
@@ -537,43 +539,42 @@ class GradleVaadinPlugin implements Plugin<Project> {
      *      The configuration
      */
     static void configureResolutionStrategy(Project project, Configuration config) {
-        config.resolutionStrategy.eachDependency(new Action<DependencyResolveDetails>() {
+        // Ensure validation-api uses the correct version
+        if ( config.name == CONFIGURATION_CLIENT) {
+            config.resolutionStrategy.dependencySubstitution({ DependencySubstitutions substitutions ->
+                substitutions.substitute(
+                        substitutions.module('javax.validation:validation-api')
+                ).with(
+                        substitutions.module(VALIDATION_API_1_0)
+                )
+            } as Action<DependencySubstitutions>)
+        }
 
-            @Override
-            void execute(DependencyResolveDetails details) {
-                def whitelist = [
-                        'com.vaadin:vaadin-client',
-                        'com.vaadin:vaadin-client-compiled',
-                        'com.vaadin:vaadin-client-compiler',
-                        'com.vaadin:vaadin-server',
-                        'com.vaadin:vaadin-shared',
-                        'com.vaadin:vaadin-themes',
-                        'com.vaadin:vaadin-push',
-                        'com.vaadin:vaadin-compatibility-client',
-                        'com.vaadin:vaadin-compatibility-client-compiled',
-                        'com.vaadin:vaadin-compatibility-server',
-                        'com.vaadin:vaadin-compatibility-shared',
-                        'com.vaadin:vaadin-compatibility-themes'
-                ]
+        config.resolutionStrategy.eachDependency({ DependencyResolveDetails details ->
+            def whitelist = [
+                    'com.vaadin:vaadin-client',
+                    'com.vaadin:vaadin-client-compiled',
+                    'com.vaadin:vaadin-client-compiler',
+                    'com.vaadin:vaadin-server',
+                    'com.vaadin:vaadin-shared',
+                    'com.vaadin:vaadin-themes',
+                    'com.vaadin:vaadin-push',
+                    'com.vaadin:vaadin-compatibility-client',
+                    'com.vaadin:vaadin-compatibility-client-compiled',
+                    'com.vaadin:vaadin-compatibility-server',
+                    'com.vaadin:vaadin-compatibility-shared',
+                    'com.vaadin:vaadin-compatibility-themes'
+            ]
 
-                ModuleVersionSelector dependency = details.requested
-                String group = dependency.group
-                String name = dependency.name
+            ModuleVersionSelector dependency = details.requested
+            String group = dependency.group
+            String name = dependency.name
 
-                if ( "$group:$name".toString() in whitelist ) {
-                    details.useVersion Util.getVaadinVersion(project)
-                }
-
-                if ( config.name == 'vaadin-client' ) {
-                    if ( group == 'javax.validation' && name == 'validation-api' ) {
-                        // GWT only supports this version, do not upgrade it
-                        details.useVersion '1.0.0.GA'
-                    }
-                }
+            if ( "$group:$name".toString() in whitelist ) {
+                details.useVersion Util.getVaadinVersion(project)
             }
-        })
+        } as Action<DependencyResolveDetails>)
     }
-
 
     static void applyVaadinTasks(Project project) {
         TaskContainer tasks = project.tasks
