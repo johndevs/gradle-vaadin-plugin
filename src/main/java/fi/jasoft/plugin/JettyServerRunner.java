@@ -65,10 +65,6 @@ public class JettyServerRunner {
         }
 
         Server server = new Server(port);
-    
-        // Setup JMX
-        MBeanContainer mbContainer = new MBeanContainer(ManagementFactory.getPlatformMBeanServer());
-        server.addBean(mbContainer);
 
         // Static file handler
         WebAppContext handler = new WebAppContext();

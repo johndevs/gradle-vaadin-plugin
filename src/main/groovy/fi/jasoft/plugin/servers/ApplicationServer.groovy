@@ -119,7 +119,7 @@ abstract class ApplicationServer {
             BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
             cp = project.files(pathJarTask.archivePath)
         } else {
-            cp = (project.configurations[GradleVaadinPlugin.CONFIGURATION_RUN_SERVER] + Util.getWarClasspath(project))
+            cp = (Util.getWarClasspath(project) + project.configurations[GradleVaadinPlugin.CONFIGURATION_RUN_SERVER] )
                     .filter { it.file && it.canonicalFile.name.endsWith(JAR_FILE_POSTFIX)}
         }
         cp
@@ -240,7 +240,6 @@ abstract class ApplicationServer {
 
         if ( !process.alive ) {
             // Something is avery, warn user and return
-            project.logger.log(LogLevel.ERROR, "Server failed to start. Exited with exit code ${process.exitValue()}")
             throw new GradleException("Server failed to start. Exited with exit code ${process.exitValue()}")
         }
 
@@ -332,8 +331,13 @@ abstract class ApplicationServer {
             def exitCode = process.waitFor()
             if ( !reloadInProgress && exitCode != 0 ) {
                 terminate()
-                throw new GradleException("Server process terminated with exit code $exitCode. " +
-                        "See ${serverName}.log for further details.")
+                if(project.vaadin.logToConsole){
+                    throw new GradleException("Server process terminated with exit code $exitCode. " +
+                            "See console output for further details (use --info for more details).")
+                } else {
+                    throw new GradleException("Server process terminated with exit code $exitCode. " +
+                            "See build/logs/${serverName}.log for further details.")
+                }
             }
 
             if ( !configuration.serverRestart || stopAfterStart ) {
