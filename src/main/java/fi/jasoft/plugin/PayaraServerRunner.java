@@ -71,14 +71,23 @@ public class PayaraServerRunner {
                     ScatteredArchive.Type.WAR,
                     new File(webAppDir));
 
-            archive.addClassPath(new File(classesDir));
-            LOGGER.log(Level.INFO, "Added "+ classesDir);
+            File classes = new File(classesDir);
+            if(classes.exists()){
+                archive.addClassPath(new File(classesDir));
+                LOGGER.log(Level.INFO, "Added "+ classesDir);
+            }
 
-            archive.addClassPath(new File(resourcesDir));
-            LOGGER.log(Level.INFO, "Added "+ resourcesDir);
+            File resources = new File(resourcesDir);
+            if(resources.exists()) {
+                archive.addClassPath(new File(resourcesDir));
+                LOGGER.log(Level.INFO, "Added "+ resourcesDir);
+            }
 
             for(String dependency : dependencies){
-                archive.addClassPath(new File(dependency));
+                File jar = new File(dependency);
+                if(jar.exists()){
+                    archive.addClassPath(new File(dependency));
+                }
             }
             LOGGER.log(Level.INFO, "Added dependencies listed in "+ Paths.get(workdir + "/classpath.txt"));
 
