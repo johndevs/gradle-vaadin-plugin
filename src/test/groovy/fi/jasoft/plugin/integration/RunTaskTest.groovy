@@ -1,10 +1,10 @@
 package fi.jasoft.plugin.integration
 
-import fi.jasoft.plugin.servers.JettyApplicationServer
-import fi.jasoft.plugin.servers.PayaraApplicationServer
 import fi.jasoft.plugin.tasks.CreateProjectTask
 import fi.jasoft.plugin.tasks.RunTask
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 
 import static org.junit.Assert.assertFalse
 import static org.junit.Assert.assertTrue
@@ -13,24 +13,29 @@ import static org.junit.Assert.assertTrue
 /**
  * Created by john on 18.1.2016.
  */
+@RunWith(Parameterized)
 class RunTaskTest extends IntegrationTest {
 
-    @Test void 'Run default server'() {
-        def output = runWithArguments(CreateProjectTask.NAME, RunTask.NAME, '--stopAfterStart')
-        assertServerRunning output
+    final String server
+
+    RunTaskTest(String server) {
+        this.server = server
     }
 
-    @Test void 'Run Jetty server'() {
-        buildFile << "vaadinRun.server = '${JettyApplicationServer.NAME}'"
-        def output = runWithArguments('--info', CreateProjectTask.NAME, RunTask.NAME, '--stopAfterStart')
-        assertTrue output, output.contains('Starting '+JettyApplicationServer.NAME)
-        assertServerRunning output
+    @Parameterized.Parameters(name = "{0}")
+    static Collection<String> getServers() {
+        [ 'payara', 'jetty']
     }
 
-    @Test void 'Run Payara server'() {
-        buildFile << "vaadinRun.server = '${PayaraApplicationServer.NAME}'"
+    @Override
+    void setup() {
+        super.setup()
+        buildFile << "vaadinRun.server = '$server'\n"
+    }
+
+    @Test void 'Run server'() {
         def output = runWithArguments('--info', CreateProjectTask.NAME, RunTask.NAME, '--stopAfterStart')
-        assertTrue output, output.contains('Starting '+PayaraApplicationServer.NAME)
+        assertTrue output, output.contains("Starting $server")
         assertServerRunning output
     }
 
@@ -64,6 +69,17 @@ class RunTaskTest extends IntegrationTest {
     }
 
     @Test void 'Run with debug flag'() {
+        def output = runWithArguments('--debug', CreateProjectTask.NAME, RunTask.NAME, '--stopAfterStart')
+        assertServerRunning output
+    }
+
+    @Test void 'Run with custom logging'() {
+        buildFile << """
+            dependencies {
+                compile 'ch.qos.logback:logback-classic:1.1.7'
+                compile 'org.slf4j:slf4j-api:1.7.21'
+            }
+        """.stripIndent()
         def output = runWithArguments('--debug', CreateProjectTask.NAME, RunTask.NAME, '--stopAfterStart')
         assertServerRunning output
     }

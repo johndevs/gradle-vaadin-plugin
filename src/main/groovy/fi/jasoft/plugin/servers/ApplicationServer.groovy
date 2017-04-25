@@ -331,12 +331,14 @@ abstract class ApplicationServer {
             def exitCode = process.waitFor()
             if ( !reloadInProgress && exitCode != 0 ) {
                 terminate()
-                if(project.vaadin.logToConsole){
-                    throw new GradleException("Server process terminated with exit code $exitCode. " +
-                            "See console output for further details (use --info for more details).")
-                } else {
-                    throw new GradleException("Server process terminated with exit code $exitCode. " +
-                            "See build/logs/${serverName}.log for further details.")
+                if(!stopAfterStart){
+                    if(project.vaadin.logToConsole){
+                        throw new GradleException("Server process terminated with exit code $exitCode. " +
+                                "See console output for further details (use --info for more details).")
+                    } else {
+                        throw new GradleException("Server process terminated with exit code $exitCode. " +
+                                "See build/logs/${serverName}.log for further details.")
+                    }
                 }
             }
 
