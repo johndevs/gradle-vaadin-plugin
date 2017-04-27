@@ -44,7 +44,7 @@ class JettyApplicationServer extends ApplicationServer {
 
     @Override
     String getSuccessfullyStartedLogToken() {
-        'org.eclipse.jetty.server.Server - Started'
+        'INFO: Jetty started'
     }
 
     @Override
@@ -67,9 +67,6 @@ class JettyApplicationServer extends ApplicationServer {
         def jettyDeploy = projectDependencies.create(
                 "org.eclipse.jetty:jetty-deploy:${properties.getProperty(JETTY_VERSION_PROPERTY)}")
         dependencies.add(jettyDeploy)
-
-        def slf4j = projectDependencies.create('org.slf4j:slf4j-simple:1.7.12')
-        dependencies.add(slf4j)
 
         def asm = projectDependencies.create('org.ow2.asm:asm:5.0.3')
         dependencies.add(asm)

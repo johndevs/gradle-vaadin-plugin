@@ -36,11 +36,11 @@ class GradleVersionTest extends IntegrationTest {
     }
 
     @Test void 'Run Project'() {
-        setupTest(new RunTaskTest(){
+        setupTest(new RunTaskTest('payara'){
             protected GradleRunner setupRunner(File projectDir) {
                 return GradleVersionTest.this.setupRunner(projectDir)
             }
-        }).'Run default server'()
+        }).'Run server'()
     }
 
     @Test void 'Compile Widgetset'() {
