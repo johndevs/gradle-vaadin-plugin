@@ -227,5 +227,4 @@ class ProjectDependenciesTest extends IntegrationTest {
         assertTrue result, result.contains( 'Has Maven Central')
         assertTrue result, result.contains( 'Has Maven Local')
     }
-
 }

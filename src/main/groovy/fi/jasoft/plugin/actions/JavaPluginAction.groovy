@@ -13,49 +13,63 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fi.jasoft.plugin
+package fi.jasoft.plugin.actions
 
+import fi.jasoft.plugin.GradleVaadinPlugin
+
+import fi.jasoft.plugin.TemplateUtil
+import fi.jasoft.plugin.Util
 import fi.jasoft.plugin.configuration.TestBenchConfiguration
 import fi.jasoft.plugin.configuration.TestBenchHubConfiguration
 import fi.jasoft.plugin.configuration.TestBenchNodeConfiguration
 import fi.jasoft.plugin.servers.ApplicationServer
-import fi.jasoft.plugin.tasks.CompileThemeTask
-import fi.jasoft.plugin.tasks.CompileWidgetsetTask
-import fi.jasoft.plugin.tasks.CreateDirectoryZipTask
 import fi.jasoft.plugin.tasks.CreateWidgetsetGeneratorTask
+import fi.jasoft.plugin.tasks.UpdateWidgetsetTask
 import fi.jasoft.plugin.testbench.TestbenchHub
 import fi.jasoft.plugin.testbench.TestbenchNode
 import groovy.transform.PackageScope
-import groovy.xml.MarkupBuilder
 import org.gradle.api.Project
 import org.gradle.api.Task
-import org.gradle.api.execution.TaskExecutionListener
-import org.gradle.api.plugins.PluginManager
+import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskState
-import org.gradle.api.tasks.bundling.War
+import org.gradle.language.jvm.tasks.ProcessResources
 
 import java.nio.file.Paths
 
 /**
- * Listens for task executions and configures the task appropriatly
- *
- * @author John Ahlroos
+ * Actions applied when the java plugin is added to the build
  */
-class TaskListener implements TaskExecutionListener {
+class JavaPluginAction extends PluginAction {
 
     def TestbenchHub testbenchHub
     def TestbenchNode testbenchNode
     def ApplicationServer testbenchAppServer
 
     @Override
-    void beforeExecute(Task task) {
-        if ( !isApplicable(task) ) {
-            // Don't run the task listener on projects that does not have the Vaadin plugin
-            return
-        }
+    String getPluginId() {
+        return 'java'
+    }
 
-        task.project.logger.info "Running task listener for task \"$task.name\" on project \"$task.project.name\""
+    @Override
+    void execute(Project project) {
+        super.execute(project)
 
+        // Add debug information to all compilation results
+        TaskContainer tasks = project.tasks
+        tasks.compileJava.options.debugOptions.debugLevel = 'source,lines,vars'
+
+        // Add sources to test classpath
+        project.sourceSets.test.runtimeClasspath =
+                project.sourceSets.test.runtimeClasspath + (project.files(project.sourceSets.main.java.srcDirs))
+
+        // Ensure widgetset is up-2-date
+        ProcessResources resources = project.processResources
+        resources.dependsOn(UpdateWidgetsetTask.NAME)
+    }
+
+    @Override
+    protected void beforeTaskExecuted(Task task) {
+        super.beforeTaskExecuted(task)
         switch (task.name) {
             case 'compileJava':
                 ensureWidgetsetGeneratorExists(task)
@@ -63,40 +77,23 @@ class TaskListener implements TaskExecutionListener {
             case 'jar':
                 configureAddonMetadata(task)
                 break
-            case 'war':
-                configureWAR(task)
+            case 'javadoc':
+                configureJavadoc(task)
                 break
             case 'test':
                 configureTest(task, this)
                 break
-            case 'javadoc':
-                configureJavadoc(task)
-                break
-            case CreateDirectoryZipTask.NAME:
-                configureAddonZipMetadata(task)
-                break
-            case 'bootRun':
-                configureBootRun(task)
-                break;
         }
     }
 
     @Override
-    void afterExecute(Task task, TaskState state) {
-        if ( !isApplicable(task) ) {
-            return
+    protected void afterTaskExecuted(Task task, TaskState state) {
+        super.afterTaskExecuted(task, state)
+        switch (task.name) {
+            case 'test':
+                terminateTestbench(this)
+                break
         }
-
-        if ( task.name == 'test' ) {
-            terminateTestbench(this)
-        }
-    }
-
-    @PackageScope
-    static boolean isApplicable(Task task) {
-        PluginManager pluginManager = task.project.pluginManager
-        pluginManager.hasPlugin(GradleVaadinPlugin.getPluginId()) || pluginManager
-                .hasPlugin(GradleVaadinGroovyPlugin.getPluginId())
     }
 
     @PackageScope
@@ -112,23 +109,6 @@ class TaskListener implements TaskExecutionListener {
                 task.project.tasks[CreateWidgetsetGeneratorTask.NAME].run()
             }
         }
-    }
-
-    @PackageScope
-    static File getManifest(Task task) {
-        def project = task.project
-        def sources = Util.getMainSourceSet(project).srcDirs.asList()
-        sources.addAll(project.sourceSets.main.resources.srcDirs.asList())
-
-        File manifest = null
-        sources.each {
-            project.fileTree(it).matching({
-                include '**/META-INF/MANIFEST.MF'
-            }).each {
-                manifest = it
-            }
-        }
-        return manifest
     }
 
     @PackageScope
@@ -181,7 +161,7 @@ class TaskListener implements TaskExecutionListener {
             attributes['Vaadin-Widgetsets'] = widgetset
         }
         if ( styles ) {
-           attributes['Vaadin-Stylesheets'] = styles.join(',')
+            attributes['Vaadin-Stylesheets'] = styles.join(',')
         }
         if ( project.vaadin.addon.license ) {
             attributes['Vaadin-License-Title'] = project.vaadin.addon.license
@@ -196,41 +176,7 @@ class TaskListener implements TaskExecutionListener {
     }
 
     @PackageScope
-    static configureAddonZipMetadata(Task task) {
-        def project = task.project
-        def attributes = [
-                'Vaadin-Package-Version':1,
-                'Vaadin-License-Title':project.vaadin.addon.license,
-                'Implementation-Title':project.vaadin.addon.title,
-                'Implementation-Version':project.version != null ? project.version : '',
-                'Implementation-Vendor':project.vaadin.addon.author,
-                'Vaadin-Addon': "libs/${project.jar.archiveName}"
-        ] as HashMap<String, String>
-
-        // Create metadata file
-        def buildDir = project.file('build/tmp/zip')
-        buildDir.mkdirs()
-
-        def meta = project.file(buildDir.absolutePath + '/META-INF')
-        meta.mkdirs()
-
-        def manifestFile = project.file(meta.absolutePath + '/MANIFEST.MF')
-        manifestFile.createNewFile()
-        manifestFile << attributes.collect { key, value -> "$key: $value" }.join("\n")
-    }
-
-    @PackageScope
-    static configureWAR(Task task) {
-        assert task in War
-        War war = (War) task
-        war.exclude('VAADIN/gwt-unitCache/**')
-        if ( task.project.vaadin.manageDependencies ) {
-            war.classpath = Util.getWarClasspath(task.project).files
-        }
-    }
-
-    @PackageScope
-    static configureTest(Task task, TaskListener listener) {
+    static configureTest(Task task, JavaPluginAction listener) {
         Project project = task.project
         TestBenchConfiguration tb = Util.findOrCreateExtension(project, TestBenchConfiguration, project)
 
@@ -258,7 +204,7 @@ class TaskListener implements TaskExecutionListener {
     }
 
     @PackageScope
-    static terminateTestbench(TaskListener listener) {
+    static terminateTestbench(JavaPluginAction listener) {
         if ( listener.testbenchAppServer ) {
             listener.testbenchAppServer.terminate()
             listener.testbenchAppServer = null
@@ -289,9 +235,19 @@ class TaskListener implements TaskExecutionListener {
     }
 
     @PackageScope
-    static configureBootRun(Task task) {
+    static File getManifest(Task task) {
         def project = task.project
-        task.classpath = Util.getWarClasspath(project)
-        task.classpath = task.classpath + (project.configurations[GradleVaadinPlugin.CONFIGURATION_SPRING_BOOT])
+        def sources = Util.getMainSourceSet(project).srcDirs.asList()
+        sources.addAll(project.sourceSets.main.resources.srcDirs.asList())
+
+        File manifest = null
+        sources.each {
+            project.fileTree(it).matching({
+                include '**/META-INF/MANIFEST.MF'
+            }).each {
+                manifest = it
+            }
+        }
+        return manifest
     }
 }
