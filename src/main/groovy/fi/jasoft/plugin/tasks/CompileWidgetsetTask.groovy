@@ -256,44 +256,40 @@ class CompileWidgetsetTask extends DefaultTask {
      * Compiles the widgetset locally
      */
     @PackageScope compileLocally(String widgetset = Util.getWidgetset(project)) {
-        def vaadin = project.vaadin as VaadinPluginExtension
 
         // Re-create directory
         Util.getWidgetsetDirectory(project).mkdirs()
 
         FileCollection classpath = Util.getCompileClassPathOrJar(project)
-        if ( vaadin.useClassPathJar ) {
-            // Add client dependencies missing from the classpath jar
-            classpath += Util.getClientCompilerClassPath(project).filter { File file ->
-                if ( file.name.endsWith('.jar') ) {
-                    // Add GWT compiler + deps
-                    if ( file.name.startsWith('vaadin-client' ) ||
-                            file.name.startsWith('vaadin-shared') ||
-                            file.name.startsWith('vaadin-compatibility-client') ||
-                            file.name.startsWith('vaadin-compatibility-shared') ||
-                            file.name.startsWith('validation-api')) {
-                        return true
-                    }
 
-                    // Addons with client side widgetset
-                    JarFile jar = new JarFile(file.absolutePath)
-
-                    if ( !jar.manifest ) {
-                        return false
-                    }
-
-                    Attributes attributes = jar.manifest.mainAttributes
-                    return attributes.getValue('Vaadin-Widgetsets')
+        // Add client dependencies missing from the classpath jar
+        classpath += Util.getClientCompilerClassPath(project).filter { File file ->
+            if ( file.name.endsWith('.jar') ) {
+                // Add GWT compiler + deps
+                if ( file.name.startsWith('vaadin-client' ) ||
+                        file.name.startsWith('vaadin-shared') ||
+                        file.name.startsWith('vaadin-compatibility-client') ||
+                        file.name.startsWith('vaadin-compatibility-shared') ||
+                        file.name.startsWith('validation-api')) {
+                    return true
                 }
-                true
-            }
 
-            // Ensure gwt sdk libs are in the correct order
-            if ( configuration.gwtSdkFirstInClasspath ) {
-                classpath = Util.moveGwtSdkFirstInClasspath(project, classpath)
+                // Addons with client side widgetset
+                JarFile jar = new JarFile(file.absolutePath)
+
+                if ( !jar.manifest ) {
+                    return false
+                }
+
+                Attributes attributes = jar.manifest.mainAttributes
+                return attributes.getValue('Vaadin-Widgetsets')
             }
-        } else {
-            classpath = Util.getClientCompilerClassPath(project)
+            true
+        }
+
+        // Ensure gwt sdk libs are in the correct order
+        if ( configuration.gwtSdkFirstInClasspath ) {
+            classpath = Util.moveGwtSdkFirstInClasspath(project, classpath)
         }
 
         def widgetsetCompileProcess = [Util.getJavaBinary(project)]
@@ -331,12 +327,14 @@ class CompileWidgetsetTask extends DefaultTask {
 
         def Process process = widgetsetCompileProcess.execute()
         def failed = false
-        Util.logProcess(project, process, 'widgetset-compile.log', { String output ->
+        Util.logProcess(project, process, 'widgetset-compile.log') { String output ->
             // Monitor log for errors
             if ( output.trim().startsWith('[ERROR]') ) {
                 failed = true
+                return false
             }
-        })
+            true
+        }
 
         // Block
         def result = process.waitFor()

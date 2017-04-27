@@ -19,12 +19,15 @@ import fi.jasoft.plugin.GradleVaadinPlugin
 import fi.jasoft.plugin.TemplateUtil
 import fi.jasoft.plugin.Util
 import fi.jasoft.plugin.configuration.ApplicationServerConfiguration
+import fi.jasoft.plugin.configuration.CompileThemeConfiguration
 import fi.jasoft.plugin.tasks.BuildClassPathJar
 import fi.jasoft.plugin.tasks.CompileThemeTask
 import fi.jasoft.plugin.tasks.CompressCssTask
 import groovy.io.FileType
 import groovy.transform.PackageScope
 import org.apache.tools.ant.taskdefs.Pack
+import org.gradle.api.GradleException
+import org.gradle.api.GradleScriptException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.DependencySet
 import org.gradle.api.artifacts.dsl.DependencyHandler
@@ -116,7 +119,7 @@ abstract class ApplicationServer {
             BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
             cp = project.files(pathJarTask.archivePath)
         } else {
-            cp = (project.configurations[GradleVaadinPlugin.CONFIGURATION_RUN_SERVER] + Util.getWarClasspath(project))
+            cp = (Util.getWarClasspath(project) + project.configurations[GradleVaadinPlugin.CONFIGURATION_RUN_SERVER] )
                     .filter { it.file && it.canonicalFile.name.endsWith(JAR_FILE_POSTFIX)}
         }
         cp
@@ -237,14 +240,13 @@ abstract class ApplicationServer {
 
         if ( !process.alive ) {
             // Something is avery, warn user and return
-            project.logger.log(LogLevel.ERROR, "Server failed to start. Exited with exit code ${process.exitValue()}")
-            return false
+            throw new GradleException("Server failed to start. Exited with exit code ${process.exitValue()}")
         }
 
         // Watch for changes in classes
-        if ( configuration.serverRestart ) {
+        if ( firstStart && configuration.serverRestart ) {
             def self = this
-            Thread.start 'Class Directory Watcher', {
+            GradleVaadinPlugin.THREAD_POOL.submit {
                 watchClassDirectoryForChanges(self)
             }
         }
@@ -252,7 +254,7 @@ abstract class ApplicationServer {
         // Watch for changes in theme
         if ( firstStart && configuration.themeAutoRecompile ) {
             def self = this
-            Thread.start 'Theme Directory Watcher', {
+            GradleVaadinPlugin.THREAD_POOL.submit {
                 watchThemeDirectoryForChanges(self)
             }
         }
@@ -261,7 +263,7 @@ abstract class ApplicationServer {
 
     @PackageScope
     def monitorLog(boolean firstStart=false, boolean stopAfterStart=false) {
-        Util.logProcess(project, process, "${serverName}.log", { line ->
+        Util.logProcess(project, process, "${serverName}.log") { line ->
             if ( line.contains(successfullyStartedLogToken) ) {
                 if ( firstStart ) {
                     def resultStr = "Application running on http://localhost:${configuration.serverPort} "
@@ -273,6 +275,7 @@ abstract class ApplicationServer {
 
                     if ( stopAfterStart ) {
                         terminate()
+                        return false
                     } else if ( configuration.openInBrowser ) {
                         openBrowser()
                     }
@@ -284,8 +287,10 @@ abstract class ApplicationServer {
             if ( line.contains('ERROR') ) {
                 // Terminate if server logs an error
                 terminate()
+                return false
             }
-        })
+            true
+        }
     }
 
     @PackageScope
@@ -325,10 +330,16 @@ abstract class ApplicationServer {
             // Wait until server process calls destroy()
             def exitCode = process.waitFor()
             if ( !reloadInProgress && exitCode != 0 ) {
-                project.logger.warn("Server process terminated with exit code $exitCode. " +
-                        "See ${serverName}.log for further details.")
                 terminate()
-                break
+                if(!stopAfterStart){
+                    if(project.vaadin.logToConsole){
+                        throw new GradleException("Server process terminated with exit code $exitCode. " +
+                                "See console output for further details (use --info for more details).")
+                    } else {
+                        throw new GradleException("Server process terminated with exit code $exitCode. " +
+                                "See build/logs/${serverName}.log for further details.")
+                    }
+                }
             }
 
             if ( !configuration.serverRestart || stopAfterStart ) {
@@ -367,12 +378,7 @@ abstract class ApplicationServer {
             ScheduledFuture currentTask
 
             Util.watchDirectoryForChanges(project, (File) classesDir, { WatchKey key, WatchEvent event ->
-//                Path basePath = (Path) key.watchable();
-//                WatchEvent<Path> watchEventPath = (WatchEvent<Path>) event
-//                Path path =  basePath.resolve(watchEventPath.context())
-//                File file = path.toFile()
-
-                if ( server.configuration.serverRestart && server.process ) {
+                if (server.process && server.configuration.serverRestart ) {
                     if ( currentTask ) {
                         currentTask.cancel(true)
                     }
@@ -382,21 +388,24 @@ abstract class ApplicationServer {
                         server.reload()
                     }, 1 , TimeUnit.SECONDS)
                 }
-                false
+                true
             })
         }
     }
 
     @PackageScope
     static watchThemeDirectoryForChanges(final ApplicationServer server) {
-        def project = server.project
+        Project project = server.project
+        CompileThemeConfiguration compileConf = Util.findOrCreateExtension(project,
+                CompileThemeTask.NAME, CompileThemeConfiguration)
+
         File themesDir = Util.getThemesDirectory(project)
         if ( themesDir.exists() ) {
             def executor = Executors.newSingleThreadScheduledExecutor()
             ScheduledFuture currentTask
 
             Util.watchDirectoryForChanges(project, themesDir, { WatchKey key, WatchEvent event ->
-                if ( event.context().toString().toLowerCase().endsWith(".scss") ) {
+                if (server.process && event.context().toString().toLowerCase().endsWith(".scss") ) {
                     if ( currentTask ) {
                         currentTask.cancel(true)
                     }
@@ -406,7 +415,9 @@ abstract class ApplicationServer {
                         CompileThemeTask.compile(project, true)
 
                         // Recompress theme
-                        CompressCssTask.compress(project, true)
+                        if(compileConf.compress){
+                            CompressCssTask.compress(project, true)
+                        }
 
                         // Restart
                         if ( server.configuration.serverRestart && server.process ) {
@@ -416,7 +427,7 @@ abstract class ApplicationServer {
                         }
                     }, 1 , TimeUnit.SECONDS)
                 }
-                false
+                true
             })
         }
     }
