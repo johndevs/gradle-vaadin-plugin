@@ -15,6 +15,11 @@
 */
 package fi.jasoft.plugin
 
+import fi.jasoft.plugin.actions.JavaPluginAction
+import fi.jasoft.plugin.actions.PluginAction
+import fi.jasoft.plugin.actions.SpringBootAction
+import fi.jasoft.plugin.actions.VaadinPluginAction
+import fi.jasoft.plugin.actions.WarPluginAction
 import fi.jasoft.plugin.configuration.TestBenchConfiguration
 import fi.jasoft.plugin.configuration.TestBenchHubConfiguration
 import fi.jasoft.plugin.configuration.TestBenchNodeConfiguration
@@ -61,6 +66,7 @@ import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.file.FileTree
 import org.gradle.api.invocation.Gradle
+import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.WarPlugin
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.bundling.War
@@ -168,11 +174,15 @@ class GradleVaadinPlugin implements Plugin<Project> {
         Util.findOrCreateExtension(project, TestBenchHubConfiguration)
         Util.findOrCreateExtension(project, TestBenchNodeConfiguration)
 
-        // Dependency resolution
-        gradle.taskGraph.addTaskExecutionListener(new TaskListener())
-
-        // Plugins
+        // Apply plugins
+        project.plugins.apply(JavaPlugin)
         project.plugins.apply(WarPlugin)
+
+        // Configure plugins
+        new VaadinPluginAction().apply(project)
+        new JavaPluginAction().apply(project)
+        new WarPluginAction().apply(project)
+        new SpringBootAction().apply(project)
 
         // Repositories
         applyRepositories(project)
@@ -186,25 +196,9 @@ class GradleVaadinPlugin implements Plugin<Project> {
         applyVaadinTestbenchTasks(project)
         applyVaadinDirectoryTasks(project)
 
-        // Add debug information to all compilation results
-        TaskContainer tasks = project.tasks
-        tasks.compileJava.options.debugOptions.debugLevel = 'source,lines,vars'
-
-        // Add sources to test classpath
-        project.sourceSets.test.runtimeClasspath =
-                project.sourceSets.test.runtimeClasspath + (project.files(project.sourceSets.main.java.srcDirs))
-
-        // War project should build the widgetset and themes
-        War war = project.war
-        war.dependsOn(CompileWidgetsetTask.NAME)
-        war.dependsOn(CompileThemeTask.NAME)
-
-        // Ensure widgetset is up-2-date
-        ProcessResources resources = project.processResources
-        resources.dependsOn(UpdateWidgetsetTask.NAME)
-
         // Cleanup plugin outputs
         def clean = project.clean
+        def tasks = project.tasks
         String cleanTaskName = 'clean'
         clean.dependsOn(tasks[cleanTaskName + CompileWidgetsetTask.NAME.capitalize()])
         clean.dependsOn(tasks[cleanTaskName + RunTask.NAME.capitalize()])
@@ -232,12 +226,6 @@ class GradleVaadinPlugin implements Plugin<Project> {
                 p.configurations.removeAll({ Configuration conf ->
                    conf.name.startsWith('vaadin-')
                 })
-            }
-
-            // bootRun should build the widgetset and theme
-            if(p.pluginManager.hasPlugin(SPRING_BOOT_PLUGIN)) {
-                p.bootRun.dependsOn(CompileWidgetsetTask.NAME)
-                p.bootRun.dependsOn(CompileThemeTask.NAME)
             }
         }
 
