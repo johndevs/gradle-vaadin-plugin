@@ -15,7 +15,6 @@
 */
 package fi.jasoft.plugin
 
-import fi.jasoft.plugin.configuration.PluginConfiguration
 import fi.jasoft.plugin.configuration.PluginConfigurationName
 import fi.jasoft.plugin.configuration.VaadinPluginExtension
 import fi.jasoft.plugin.tasks.BuildClassPathJar
@@ -564,7 +563,7 @@ class Util {
                 themesDir = project.file(project.rootDir.canonicalPath + File.separator + customDir)
             }
         } else {
-            File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
+            File webAppDir = getWebAppDirectory(project)
             File vaadinDir = new File(webAppDir, VAADIN)
             themesDir = new File(vaadinDir, 'themes')
         }
@@ -581,9 +580,7 @@ class Util {
      */
     @Memoized
     static File getWidgetsetDirectory(Project project) {
-        String outputDir = project.vaadinCompile.outputDirectory
-        File webAppDir = outputDir ? project.file(outputDir) : project.convention
-                .getPlugin(WarPluginConvention).webAppDir
+        File webAppDir = getWebAppDirectory(project)
         File vaadinDir = new File(webAppDir, VAADIN)
         File widgetsetsDir = new File(vaadinDir, 'widgetsets')
         widgetsetsDir
@@ -599,12 +596,30 @@ class Util {
      */
     @Memoized
     static File getWidgetsetCacheDirectory(Project project) {
-        String outputDir = project.vaadinCompile.outputDirectory
-        File webAppDir = outputDir ? project.file(outputDir) : project.convention
-                .getPlugin(WarPluginConvention).webAppDir
+        File webAppDir = getWebAppDirectory(project)
         File vaadinDir = new File(webAppDir, VAADIN)
         File unitCacheDir = new File(vaadinDir, 'gwt-unitCache')
         unitCacheDir
+    }
+
+    /**
+     * Returns the web-app directory
+     *
+     * @param project
+     *      the project
+     * @return
+     *      the directory
+     */
+    @Memoized
+    static File getWebAppDirectory(Project project) {
+        String outputDir = project.vaadinCompile.outputDirectory
+        if(outputDir){
+            project.file(outputDir)
+        } else if(project.convention.findPlugin(WarPluginConvention)){
+            project.convention.getPlugin(WarPluginConvention).webAppDir
+        } else {
+            project.file('src/main/webapp')
+        }
     }
 
     /**
@@ -805,8 +820,13 @@ class Util {
         }
 
         // Remove provided dependencies
-        classpath -= project.configurations.providedCompile
-        classpath -= project.configurations.providedRuntime
+        if(project.configurations.findByName('providedCompile')){
+            classpath -= project.configurations.providedCompile
+        }
+
+        if(project.configurations.findByName('providedRuntime')){
+            classpath -= project.configurations.providedRuntime
+        }
 
         // Ensure no duplicates
         classpath = project.files(classpath.files)

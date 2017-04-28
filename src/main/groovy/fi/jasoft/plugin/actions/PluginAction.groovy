@@ -42,7 +42,7 @@ abstract class PluginAction {
         task.project.logger.debug("Applying ${getClass().simpleName} after task actions")
     }
 
-    final void apply(Project project) {
+    protected void apply(Project project) {
         project.plugins.withId(pluginId) {
             project.gradle.taskGraph.addTaskExecutionListener(new TaskExecutionListener() {
                 @Override
