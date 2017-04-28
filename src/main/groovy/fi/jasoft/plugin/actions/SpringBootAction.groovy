@@ -25,7 +25,6 @@ import fi.jasoft.plugin.tasks.RunTask
 import groovy.transform.PackageScope
 import org.gradle.api.Project
 import org.gradle.api.Task
-import org.gradle.api.plugins.WarPlugin
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.javadoc.Javadoc
 
@@ -39,18 +38,6 @@ class SpringBootAction extends PluginAction {
     @Override
     String getPluginId() {
         GradleVaadinPlugin.SPRING_BOOT_PLUGIN
-    }
-
-    @Override
-    protected void apply(Project project) {
-        super.apply(project)
-
-        // Do not apply WAR plugin with JAR layout
-        project.afterEvaluate {
-            if (!project.plugins.hasPlugin(pluginId) || !isJarProject(project)) {
-                project.plugins.apply(WarPlugin)
-            }
-        }
     }
 
     @Override
@@ -82,7 +69,7 @@ class SpringBootAction extends PluginAction {
 
     @PackageScope
     static configureBootRun(Task task) {
-        def project = task.project
+        Project project = task.project
         task.classpath = Util.getWarClasspath(project)
         task.classpath = task.classpath + (project.configurations[GradleVaadinPlugin.CONFIGURATION_SPRING_BOOT])
     }
@@ -90,7 +77,7 @@ class SpringBootAction extends PluginAction {
     @PackageScope
     static configureJar(Task task) {
         Project project = task.project
-        if(isJarProject(project)) {
+        if (isJarProject(project)) {
             Jar jar = (Jar) task
             // Include app theme + compiled widget as well as classes into our jar
             jar.from(Util.getWebAppDirectory(project))
@@ -110,11 +97,12 @@ class SpringBootAction extends PluginAction {
 
     @PackageScope
     static boolean isJarProject(Project project) {
-        def layout = project.extensions.findByName('springBoot').layout
-        if(!layout){
+        String layout = project.extensions.findByName('springBoot').layout
+        if (!layout) {
             // Default is jar
             return true
         }
-        layout.toString().toLowerCase() == 'jar'
+        layout.toLowerCase() == 'jar'
     }
+
 }

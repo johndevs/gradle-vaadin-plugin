@@ -30,42 +30,48 @@ abstract class PluginAction {
 
     abstract String getPluginId()
 
+    protected final TaskListener taskListener = new TaskListener()
+
     protected void execute(Project project) {
-        project.logger.debug("Applying ${getClass().simpleName} actions")
+        project.logger.info("Applying ${getClass().simpleName} actions to project $project.name")
     }
 
     protected void beforeTaskExecuted(Task task) {
-        task.project.logger.debug("Applying ${getClass().simpleName} before task actions")
+        task.project.logger.debug("Executing pre task hook for ${getClass().simpleName} for task $task.name")
     }
 
-    protected void afterTaskExecuted(Task task, TaskState state) {
-        task.project.logger.debug("Applying ${getClass().simpleName} after task actions")
+    protected void afterTaskExecuted(Task task) {
+        task.project.logger.debug("Executing post task hook for ${getClass().simpleName} for task $task.name")
     }
 
-    protected void apply(Project project) {
+    void apply(Project project) {
         project.plugins.withId(pluginId) {
-            project.gradle.taskGraph.addTaskExecutionListener(new TaskExecutionListener() {
-                @Override
-                void beforeExecute(Task task) {
-                    if (isApplicable(task) ) {
-                        beforeTaskExecuted(task)
-                    }
-                }
-
-                @Override
-                void afterExecute(Task task, TaskState state) {
-                    if (isApplicable(task) ) {
-                        afterTaskExecuted(task, state)
-                    }
-                }
-            })
+            project.gradle.taskGraph.removeTaskExecutionListener(taskListener)
+            project.gradle.taskGraph.addTaskExecutionListener(taskListener)
             execute(project)
         }
     }
 
     final static boolean isApplicable(Task task) {
         PluginManager pluginManager = task.project.pluginManager
-        pluginManager.hasPlugin(GradleVaadinPlugin.getPluginId()) || pluginManager
-                .hasPlugin(GradleVaadinGroovyPlugin.getPluginId())
+        pluginManager.hasPlugin(GradleVaadinPlugin.pluginId) || pluginManager
+                .hasPlugin(GradleVaadinGroovyPlugin.pluginId)
+    }
+
+    final class TaskListener implements TaskExecutionListener {
+
+        @Override
+        void beforeExecute(Task task) {
+            if (isApplicable(task) ) {
+                beforeTaskExecuted(task)
+            }
+        }
+
+        @Override
+        void afterExecute(Task task, TaskState state) {
+            if (isApplicable(task) && state.executed) {
+                afterTaskExecuted(task)
+            }
+        }
     }
 }

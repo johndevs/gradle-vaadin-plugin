@@ -12,6 +12,11 @@ import static org.junit.Assert.assertFalse
  */
 class TaskConfigurationsTest extends IntegrationTest {
 
+    @Test void 'Vaadin task action is run'() {
+        String output = runWithArguments('--info', 'build')
+        assertTrue output.contains('Applying VaadinPluginAction')
+    }
+
     @Test void 'Eclipse default configuration'() {
 
         buildFile << """

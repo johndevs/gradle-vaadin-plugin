@@ -18,6 +18,7 @@ package fi.jasoft.plugin.actions
 import fi.jasoft.plugin.GradleVaadinPlugin
 import fi.jasoft.plugin.tasks.CreateDirectoryZipTask
 import groovy.transform.PackageScope
+import org.gradle.api.Project
 import org.gradle.api.Task
 
 /**
@@ -42,8 +43,8 @@ class VaadinPluginAction extends PluginAction {
 
     @PackageScope
     static configureAddonZipMetadata(Task task) {
-        def project = task.project
-        def attributes = [
+        Project project = task.project
+        Map attributes = [
                 'Vaadin-Package-Version':1,
                 'Vaadin-License-Title':project.vaadin.addon.license,
                 'Implementation-Title':project.vaadin.addon.title,
@@ -53,13 +54,13 @@ class VaadinPluginAction extends PluginAction {
         ] as HashMap<String, String>
 
         // Create metadata file
-        def buildDir = project.file('build/tmp/zip')
+        File buildDir = project.file('build/tmp/zip')
         buildDir.mkdirs()
 
-        def meta = project.file(buildDir.absolutePath + '/META-INF')
+        File meta = project.file(buildDir.absolutePath + '/META-INF')
         meta.mkdirs()
 
-        def manifestFile = project.file(meta.absolutePath + '/MANIFEST.MF')
+        File manifestFile = project.file(meta.absolutePath + '/MANIFEST.MF')
         manifestFile.createNewFile()
         manifestFile << attributes.collect { key, value -> "$key: $value" }.join("\n")
     }

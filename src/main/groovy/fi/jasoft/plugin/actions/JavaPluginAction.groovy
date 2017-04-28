@@ -30,8 +30,8 @@ import fi.jasoft.plugin.testbench.TestbenchNode
 import groovy.transform.PackageScope
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.TaskContainer
-import org.gradle.api.tasks.TaskState
 import org.gradle.language.jvm.tasks.ProcessResources
 
 import java.nio.file.Paths
@@ -41,13 +41,19 @@ import java.nio.file.Paths
  */
 class JavaPluginAction extends PluginAction {
 
-    def TestbenchHub testbenchHub
-    def TestbenchNode testbenchNode
-    def ApplicationServer testbenchAppServer
+    TestbenchHub testbenchHub
+    TestbenchNode testbenchNode
+    ApplicationServer testbenchAppServer
 
     @Override
     String getPluginId() {
-        return 'java'
+        'java'
+    }
+
+    @Override
+    void apply(Project project) {
+        super.apply(project)
+        project.plugins.apply(JavaPlugin)
     }
 
     @Override
@@ -87,8 +93,8 @@ class JavaPluginAction extends PluginAction {
     }
 
     @Override
-    protected void afterTaskExecuted(Task task, TaskState state) {
-        super.afterTaskExecuted(task, state)
+    protected void afterTaskExecuted(Task task) {
+        super.afterTaskExecuted(task)
         switch (task.name) {
             case 'test':
                 terminateTestbench(this)
@@ -98,11 +104,11 @@ class JavaPluginAction extends PluginAction {
 
     @PackageScope
     static ensureWidgetsetGeneratorExists(Task task) {
-        def generator = task.project.vaadinCompile.widgetsetGenerator
+        String generator = task.project.vaadinCompile.widgetsetGenerator
         if ( generator != null ) {
             String name = generator.tokenize('.').last()
             String pkg = generator.replaceAll(".$name", '')
-            String filename = name + ".java"
+            String filename = "${name}.java"
             File javaDir = Util.getMainSourceSet(task.project).srcDirs.iterator().next()
             File f = Paths.get(javaDir.canonicalPath, TemplateUtil.convertFQNToFilePath(pkg), filename).toFile()
             if ( !f.exists() ) {
@@ -113,10 +119,10 @@ class JavaPluginAction extends PluginAction {
 
     @PackageScope
     static configureAddonMetadata(Task task) {
-        def project = task.project
+        Project project = task.project
 
         // Resolve widgetset
-        def widgetset = project.vaadinCompile.widgetset
+        String widgetset = project.vaadinCompile.widgetset
         if ( widgetset == null ) {
             widgetset = GradleVaadinPlugin.DEFAULT_WIDGETSET
         }
@@ -124,36 +130,36 @@ class JavaPluginAction extends PluginAction {
         // Scan for existing manifest in source folder and reuse if possible
         File manifest = getManifest(task)
         if ( manifest != null ) {
-            project.logger.warn("Manifest found in project, possibly overwriting existing values.")
+            project.logger.warn('Manifest found in project, possibly overwriting existing values.')
             task.manifest.from(manifest)
         }
 
         //Validate values
         if ( project.vaadin.addon.title == '' ) {
-            project.logger.warn("No vaadin.addon.title has been specified, " +
-                    "jar not compatible with Vaadin Directory.")
+            project.logger.warn('No vaadin.addon.title has been specified, ' +
+                    'jar not compatible with Vaadin Directory.')
         }
 
         if ( project.version == 'unspecified' ) {
-            project.logger.warn("No version specified for the project, jar not " +
-                    "compatible with Vaadin Directory.")
+            project.logger.warn('No version specified for the project, jar not ' +
+                    'compatible with Vaadin Directory.')
         }
 
         // Get stylesheets
-        def styles = Util.findAddonSassStylesInProject(project)
-        if ( project.vaadin.addon.styles != null ) {
+        List styles = Util.findAddonSassStylesInProject(project)
+        if ( project.vaadin.addon.styles ) {
             project.vaadin.addon.styles.each({ path ->
                 if ( path.endsWith('scss') || path.endsWith('.css') ) {
                     styles.add(path)
                 } else {
-                    project.logger.warn("Could not add '"+path+"' to jar manifest. " +
-                            "Only CSS and SCSS files are supported as addon styles.")
+                    project.logger.warn("Could not add $path to jar manifest. " +
+                            'Only CSS and SCSS files are supported as addon styles.')
                 }
             })
         }
 
         // Add metadata to jar manifest
-        def attributes = [:]
+        Map attributes = [:]
         attributes['Vaadin-Package-Version'] = 1
         attributes['Implementation-Version'] = project.version
         attributes['Built-By'] = "Gradle Vaadin Plugin ${GradleVaadinPlugin.PLUGIN_VERSION}"
@@ -223,7 +229,7 @@ class JavaPluginAction extends PluginAction {
 
     @PackageScope
     static configureJavadoc(Task task) {
-        def project = task.project
+        Project project = task.project
         task.source = Util.getMainSourceSet(project)
         if ( project.configurations.findByName(GradleVaadinPlugin.CONFIGURATION_JAVADOC) ) {
             task.classpath = task.classpath + (project.configurations[GradleVaadinPlugin.CONFIGURATION_JAVADOC])
@@ -231,13 +237,13 @@ class JavaPluginAction extends PluginAction {
         if ( project.configurations.findByName(GradleVaadinPlugin.CONFIGURATION_SERVER) ) {
             task.classpath = task.classpath + (project.configurations[GradleVaadinPlugin.CONFIGURATION_SERVER])
         }
-        task.options.addStringOption("sourcepath", "")
+        task.options.addStringOption('sourcepath', '')
     }
 
     @PackageScope
     static File getManifest(Task task) {
-        def project = task.project
-        def sources = Util.getMainSourceSet(project).srcDirs.asList()
+        Project project = task.project
+        List sources = Util.getMainSourceSet(project).srcDirs.asList()
         sources.addAll(project.sourceSets.main.resources.srcDirs.asList())
 
         File manifest = null

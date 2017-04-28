@@ -7,6 +7,8 @@ import java.nio.file.Paths
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 
+import static org.junit.Assert.assertTrue
+
 /**
  * Tests the creation the WAR archive
  */
@@ -16,6 +18,12 @@ class WARArchiveTest extends IntegrationTest {
     void setup() {
         super.setup()
         buildFile << "vaadin.version = '7.6.4'\n"
+    }
+
+    @Test void 'WAR task action is run'() {
+        String output = runWithArguments('--info', 'build')
+        assertTrue output.contains('Applying JavaPluginAction')
+        assertTrue output.contains('Applying WarPluginAction')
     }
 
     @Test void 'Project with no dependencies'() {
