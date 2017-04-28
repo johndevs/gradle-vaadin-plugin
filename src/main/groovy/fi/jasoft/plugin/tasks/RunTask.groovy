@@ -58,15 +58,9 @@ class RunTask extends DefaultTask {
     public RunTask() {
         dependsOn(CompileWidgetsetTask.NAME)
         dependsOn(CompileThemeTask.NAME)
-        description = 'Runs the Vaadin application on an embedded Jetty ApplicationServer'
+        description = 'Runs the Vaadin application'
         Runtime.getRuntime().addShutdownHook(cleanupThread)
         configuration = Util.findOrCreateExtension(project, ApplicationServerConfiguration)
-        dependsOn {
-            // Delegate to bootRun if spring boot is present
-            if( project.pluginManager.hasPlugin('org.springframework.boot')){
-                'bootRun'
-            }
-        }
     }
 
     @TaskAction
