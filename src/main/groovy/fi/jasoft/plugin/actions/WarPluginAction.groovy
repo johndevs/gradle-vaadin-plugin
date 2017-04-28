@@ -15,7 +15,6 @@
 */
 package fi.jasoft.plugin.actions
 
-
 import fi.jasoft.plugin.Util
 import fi.jasoft.plugin.tasks.CompileThemeTask
 import fi.jasoft.plugin.tasks.CompileWidgetsetTask
@@ -32,13 +31,22 @@ class WarPluginAction extends PluginAction {
 
     @Override
     String getPluginId() {
-        return WarPlugin.WAR_TASK_NAME
+        WarPlugin.WAR_TASK_NAME
+    }
+
+    @Override
+    void apply(Project project) {
+        super.apply(project)
+        if (!springBootPresent) {
+            // Apply the WAR plugin if spring boot is not present
+            project.plugins.apply(WarPlugin)
+        }
     }
 
     @Override
     protected void execute(Project project) {
         super.execute(project)
-        War war = project.war
+        War war = (War) project.tasks.getByName(WarPlugin.WAR_TASK_NAME)
         war.dependsOn(CompileWidgetsetTask.NAME)
         war.dependsOn(CompileThemeTask.NAME)
     }
@@ -60,6 +68,16 @@ class WarPluginAction extends PluginAction {
         war.exclude('VAADIN/gwt-unitCache/**')
         if ( task.project.vaadin.manageDependencies ) {
             war.classpath = Util.getWarClasspath(task.project).files
+        }
+    }
+
+    @PackageScope
+    boolean isSpringBootPresent() {
+        try {
+            getClass().classLoader.loadClass('org.springframework.boot.gradle.plugin.SpringBootPlugin')
+            return true
+        } catch (ClassNotFoundException e) {
+            return false
         }
     }
 }

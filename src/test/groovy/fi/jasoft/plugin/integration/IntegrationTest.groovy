@@ -60,27 +60,17 @@ class IntegrationTest {
         File buildFile = new File(projectDir, 'build.gradle')
         buildFile.createNewFile()
 
-        def projectVersion = System.getProperty('integrationTestProjectVersion')
-
-        String escapedDir = getPluginDir()
-
         // Apply plugin to project
-        buildFile << """
-            buildscript {
-                repositories {
-                    mavenLocal()
-                    mavenCentral()
-                    flatDir dirs:file('$escapedDir')
-                }
+        buildFile << "buildscript {\n"
+            buildFile << "repositories {\n"
+                applyBuildScriptRepositories(buildFile)
+            buildFile << "}\n"
+        buildFile << "dependencies {\n"
+            applyBuildScriptClasspathDependencies(buildFile)
+            buildFile << "}\n"
+        buildFile << "}\n"
 
-                dependencies {
-                    classpath group: 'org.codehaus.groovy.modules.http-builder', name: 'http-builder', version: '0.7.1'
-                    classpath group: 'fi.jasoft.plugin', name: 'gradle-vaadin-plugin', version: '$projectVersion'
-                }
-            }
-
-        """.stripIndent()
-
+        // Apply custom plugins{} block
         applyThirdPartyPlugins(buildFile)
 
         if ( applyPluginToFile ) {
@@ -90,6 +80,21 @@ class IntegrationTest {
         }
 
         buildFile
+    }
+
+    protected void applyBuildScriptClasspathDependencies(File buildFile) {
+        def projectVersion = System.getProperty('integrationTestProjectVersion')
+        buildFile << "classpath group: 'org.codehaus.groovy.modules.http-builder', " +
+                "name: 'http-builder', version: '0.7.1'\n"
+        buildFile << "classpath group: 'fi.jasoft.plugin', " +
+                "name: 'gradle-vaadin-plugin', version: '$projectVersion'\n"
+    }
+
+    protected void applyBuildScriptRepositories(File buildFile) {
+        String escapedDir = getPluginDir()
+        buildFile << "mavenLocal()\n"
+        buildFile << "mavenCentral()\n"
+        buildFile << "flatDir dirs:file('$escapedDir')\n"
     }
 
     protected void applyThirdPartyPlugins(File buildFile) {

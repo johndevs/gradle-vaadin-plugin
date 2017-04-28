@@ -66,7 +66,7 @@ import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.file.FileTree
 import org.gradle.api.invocation.Gradle
-import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.plugins.WarPlugin
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.tooling.UnsupportedVersionException
 import org.gradle.util.VersionNumber
@@ -109,7 +109,6 @@ class GradleVaadinPlugin implements Plugin<Project> {
     static final String VAADIN_PRERELEASE_REPOSITORY_NAME = 'Vaadin Pre-releases'
     static final String SPRING_BOOT_PLUGIN = 'org.springframework.boot'
     static final String VALIDATION_API_1_0 = 'javax.validation:validation-api:1.0.0.GA'
-    static final String PROVIDED_RUNTIME_CONFIGURATION = 'providedRuntime'
 
     static final AtomicInteger THREAD_COUNTER = new AtomicInteger(1)
     static final Executor THREAD_POOL = Executors.newCachedThreadPool({ Runnable r ->
@@ -172,8 +171,10 @@ class GradleVaadinPlugin implements Plugin<Project> {
         Util.findOrCreateExtension(project, TestBenchHubConfiguration)
         Util.findOrCreateExtension(project, TestBenchNodeConfiguration)
 
-        // Apply plugins
-        project.plugins.apply(JavaPlugin)
+        // Configure plugins
+        new JavaPluginAction().apply(project)
+        new WarPluginAction().apply(project)
+        new VaadinPluginAction().apply(project)
 
         // Repositories
         applyRepositories(project)
@@ -187,10 +188,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
         applyVaadinTestbenchTasks(project)
         applyVaadinDirectoryTasks(project)
 
-        // Configure plugins
-        new VaadinPluginAction().apply(project)
-        new JavaPluginAction().apply(project)
-        new WarPluginAction().apply(project)
+        // Configure plugins that depends on tasks
         new SpringBootAction().apply(project)
 
         // Cleanup plugin outputs
@@ -363,7 +361,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
         configurations.create(CONFIGURATION_RUN_SERVER) { conf ->
             conf.description = 'Libraries for running the embedded server'
             conf.defaultDependencies { dependencies ->
-                if( project.pluginManager.hasPlugin(SPRING_BOOT_PLUGIN)) {
+                if(new WarPluginAction().springBootPresent) {
                     // No server runner is needed, spring boot will run the project
                     return
                 }
@@ -380,8 +378,8 @@ class GradleVaadinPlugin implements Plugin<Project> {
                 ApplicationServer.get(project).defineDependecies(projectDependencies, dependencies)
             }
 
-            if(configurations.findByName(PROVIDED_RUNTIME_CONFIGURATION)){
-                conf.extendsFrom(configurations.findByName(PROVIDED_RUNTIME_CONFIGURATION))
+            if(configurations.findByName(WarPlugin.PROVIDED_RUNTIME_CONFIGURATION_NAME)){
+                conf.extendsFrom(configurations.findByName(WarPlugin.PROVIDED_RUNTIME_CONFIGURATION_NAME))
             }
         }
 

@@ -9,13 +9,10 @@
  * Note: This script is only intended for use when developing the plugin itself,
  * use the vaadin.plugin script in your projects.
  */
-@groovy.transform.SourceURI def sourceURI
-
 buildscript {
-    def gradlePluginDirectory = new File(sourceURI.path).parentFile.path + '/build/libs'
+    def gradlePluginDirectory =  System.getProperty("user.home")+'/Repositories/gradle-vaadin-plugin/build/libs'
 
     repositories {
-        mavenLocal()
         mavenCentral()
     	flatDir dirs: gradlePluginDirectory
     }
