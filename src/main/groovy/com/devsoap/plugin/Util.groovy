@@ -1084,4 +1084,11 @@ class Util {
             VersionNumber.UNKNOWN
         }
     }
+
+    @Memoized
+    static Properties getPluginProperties() {
+        Properties properties = new Properties()
+        properties.load(Util.class.getResourceAsStream('/gradle.properties') as InputStream)
+        properties
+    }
 }

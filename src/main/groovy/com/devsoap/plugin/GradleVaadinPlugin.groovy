@@ -164,6 +164,9 @@ class GradleVaadinPlugin implements Plugin<Project> {
             }
         }
 
+        // Ensure the build dir exists as all external processes will be run inside that directory
+        project.buildDir.mkdirs()
+
         // Extensions
         Util.findOrCreateExtension(project, VaadinPluginExtension, project)
         Util.findOrCreateExtension(project, TestBenchConfiguration, project)
@@ -468,11 +471,13 @@ class GradleVaadinPlugin implements Plugin<Project> {
                             }
                             break
                         case 'compass':
-                            Dependency jruby = projectDependencies.create('org.jruby:jruby-complete:1.7.3')
+                            Dependency jruby = projectDependencies.create(
+                                    "org.jruby:jruby-complete:${Util.pluginProperties.getProperty('jruby.version')}")
                             dependencies.add(jruby)
                             break
                         case 'libsass':
-                            Dependency libsass = projectDependencies.create('io.bit3:jsass:5.3.0')
+                            Dependency libsass = projectDependencies.create(
+                                    "io.bit3:jsass:${Util.pluginProperties.getProperty('jsass.version')}")
                             dependencies.add(libsass)
 
                             Dependency plugin = projectDependencies.create(

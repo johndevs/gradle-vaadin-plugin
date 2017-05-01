@@ -15,6 +15,7 @@
 */
 package com.devsoap.plugin.servers
 
+import com.devsoap.plugin.Util
 import com.devsoap.plugin.configuration.ApplicationServerConfiguration
 import org.gradle.api.Project
 import org.gradle.api.artifacts.DependencySet
@@ -49,23 +50,20 @@ class JettyApplicationServer extends ApplicationServer {
 
     @Override
     def defineDependecies(DependencyHandler projectDependencies, DependencySet dependencies) {
-        Properties properties = new Properties()
-        properties.load(PayaraApplicationServer.class.getResourceAsStream('/gradle.properties') as InputStream)
-
         def jettyAll =  projectDependencies.create(
-                "org.eclipse.jetty.aggregate:jetty-all:${properties.getProperty(JETTY_VERSION_PROPERTY)}")
+                "org.eclipse.jetty.aggregate:jetty-all:${Util.pluginProperties.getProperty(JETTY_VERSION_PROPERTY)}")
         dependencies.add(jettyAll)
 
         def jettyAnnotations = projectDependencies.create("org.eclipse.jetty:jetty-annotations:" +
-                "${properties.getProperty(JETTY_VERSION_PROPERTY)}")
+                "${Util.pluginProperties.getProperty(JETTY_VERSION_PROPERTY)}")
         dependencies.add(jettyAnnotations)
 
         def jettyPlus = projectDependencies.create(
-                "org.eclipse.jetty:jetty-plus:${properties.getProperty(JETTY_VERSION_PROPERTY)}")
+                "org.eclipse.jetty:jetty-plus:${Util.pluginProperties.getProperty(JETTY_VERSION_PROPERTY)}")
         dependencies.add(jettyPlus)
 
         def jettyDeploy = projectDependencies.create(
-                "org.eclipse.jetty:jetty-deploy:${properties.getProperty(JETTY_VERSION_PROPERTY)}")
+                "org.eclipse.jetty:jetty-deploy:${Util.pluginProperties.getProperty(JETTY_VERSION_PROPERTY)}")
         dependencies.add(jettyDeploy)
 
         def asm = projectDependencies.create('org.ow2.asm:asm:5.0.3')

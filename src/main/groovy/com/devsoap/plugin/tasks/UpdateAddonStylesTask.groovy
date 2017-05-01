@@ -86,7 +86,7 @@ class UpdateAddonStylesTask extends DefaultTask {
             importer.add('com.vaadin.server.themeutils.SASSAddonImportFileCreator')
             importer.add(it.canonicalPath)
 
-            Process process = importer.execute()
+            Process process = importer.execute([], project.buildDir)
 
             Util.logProcess(project, process, 'addon-style-updater.log') { true }
 

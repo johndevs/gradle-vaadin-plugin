@@ -324,7 +324,7 @@ class CompileWidgetsetTask extends DefaultTask {
 
         widgetsetCompileProcess += widgetset
 
-        def Process process = widgetsetCompileProcess.execute()
+        def Process process = widgetsetCompileProcess.execute([], project.buildDir)
         def failed = false
         Util.logProcess(project, process, 'widgetset-compile.log') { String output ->
             // Monitor log for errors
