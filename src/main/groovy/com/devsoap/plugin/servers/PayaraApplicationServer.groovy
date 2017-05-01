@@ -15,6 +15,7 @@
 */
 package com.devsoap.plugin.servers
 
+import com.devsoap.plugin.Util
 import com.devsoap.plugin.configuration.ApplicationServerConfiguration
 import org.gradle.api.Project
 import org.gradle.api.artifacts.DependencySet
@@ -57,10 +58,8 @@ class PayaraApplicationServer extends ApplicationServer {
 
     @Override
     def defineDependecies(DependencyHandler projectDependencies, DependencySet dependencies) {
-        Properties properties = new Properties()
-        properties.load(PayaraApplicationServer.class.getResourceAsStream('/gradle.properties') as InputStream)
         def payaraWebProfile = projectDependencies.create(
-                "fish.payara.extras:payara-embedded-web:${properties.getProperty('payara.version')}")
+                "fish.payara.extras:payara-embedded-web:${Util.pluginProperties.getProperty('payara.version')}")
         dependencies.add(payaraWebProfile)
     }
 }

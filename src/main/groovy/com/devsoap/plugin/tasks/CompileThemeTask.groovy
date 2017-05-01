@@ -185,7 +185,7 @@ class CompileThemeTask extends DefaultTask {
         compileProcess += [CLASSPATH_SWITCH,  Util.getCompileClassPathOrJar(project).asPath]
         compileProcess += 'com.vaadin.sass.SassCompiler'
         compileProcess += [themeDir.canonicalPath, targetCSSFile.canonicalPath]
-        compileProcess.execute()
+        compileProcess.execute([], project.buildDir)
     }
 
     /**
@@ -211,7 +211,7 @@ class CompileThemeTask extends DefaultTask {
             gemProcess = gemProcess.execute([
                     "GEM_PATH=${gemsDir.canonicalPath}",
                     "PATH=${gemsDir.canonicalPath}/bin"
-            ], null)
+            ], project.buildDir)
 
             Util.logProcess(project, gemProcess, 'compass-gem-install.log'){ true }
             def result = gemProcess.waitFor()
@@ -303,7 +303,7 @@ class CompileThemeTask extends DefaultTask {
      *      the process that runs the compiler
      */
     static Process executeCompassSassCompiler(Project project, File gemsDir, File unpackedThemesDir, File themeDir) {
-        def themePath = new File(unpackedThemesDir, themeDir.name)
+        File themePath = new File(unpackedThemesDir, themeDir.name)
 
         String compassCompile = '-S compass compile '
         compassCompile += "--sass-dir $themePath "
@@ -323,7 +323,7 @@ class CompileThemeTask extends DefaultTask {
         compileProcess.execute([
                 "GEM_PATH=${gemsDir.canonicalPath}",
                 "PATH=${gemsDir.canonicalPath}/bin"
-        ], null)
+        ], project.buildDir)
     }
 
     static Process executeLibSassCompiler(Project project, File themeDir, File unpackedThemesDir) {
@@ -340,6 +340,6 @@ class CompileThemeTask extends DefaultTask {
 
         project.logger.debug(compileProcess.toString())
 
-        compileProcess.execute()
+        compileProcess.execute([], project.buildDir)
     }
 }

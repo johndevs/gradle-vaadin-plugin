@@ -119,7 +119,7 @@ class DevModeTask extends DefaultTask {
             devmodeProcess += configuration.extraArgs as List
         }
 
-        devModeProcess = devmodeProcess.execute()
+        devModeProcess = devmodeProcess.execute([], project.buildDir)
 
         Util.logProcess(project, devModeProcess, 'devmode.log') { true }
     }

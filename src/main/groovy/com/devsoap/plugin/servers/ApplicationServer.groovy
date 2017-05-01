@@ -232,7 +232,7 @@ abstract class ApplicationServer {
     @PackageScope
     def boolean executeServer(List appServerProcess, boolean firstStart=false) {
         project.logger.debug("Running server with the command: "+appServerProcess)
-        process = appServerProcess.execute()
+        process = appServerProcess.execute([], project.buildDir)
 
         if ( !process.alive ) {
             // Something is avery, warn user and return

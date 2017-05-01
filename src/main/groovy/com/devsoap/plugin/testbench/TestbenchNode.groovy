@@ -76,7 +76,7 @@ class TestbenchNode {
         }
 
         // Execute server
-        process = process.execute()
+        process = process.execute([], project.buildDir)
 
         if ( project.vaadin.logToConsole ) {
             process.consumeProcessOutput(System.out, System.out)

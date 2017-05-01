@@ -103,7 +103,7 @@ class SuperDevModeTask extends DefaultTask {
 
         superdevmodeProcess += Util.getWidgetset(project)
 
-        codeserverProcess = superdevmodeProcess.execute()
+        codeserverProcess = superdevmodeProcess.execute([], project.buildDir)
 
         Util.logProcess(project, codeserverProcess, 'superdevmode.log') { line ->
             if ( line.contains('The code server is ready') ) {
