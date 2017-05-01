@@ -19,10 +19,10 @@ buildscript {
 
     dependencies {
         classpath group: 'org.codehaus.groovy.modules.http-builder', name: 'http-builder', version: '0.7.1'
-        classpath group: 'fi.jasoft.plugin',    name: 'gradle-vaadin-plugin',   version: 'SNAPSHOT-'+ new Date().format('yyyyMMdd')
+        classpath group: 'com.devsoap.plugin',    name: 'gradle-vaadin-plugin',   version: 'SNAPSHOT-'+ new Date().format('yyyyMMdd')
 	}
 }
-if (!project.plugins.findPlugin(fi.jasoft.plugin.GradleVaadinGroovyPlugin)) {
-    project.apply(plugin: fi.jasoft.plugin.GradleVaadinGroovyPlugin)
+if (!project.plugins.findPlugin(com.devsoap.plugin.GradleVaadinGroovyPlugin)) {
+    project.apply(plugin: com.devsoap.plugin.GradleVaadinGroovyPlugin)
 }
 

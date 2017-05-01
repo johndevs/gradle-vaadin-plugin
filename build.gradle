@@ -37,7 +37,7 @@ plugins {
  **********************************************************************************************************************/
 
 defaultTasks 'jar'
-group = "fi.jasoft.plugin"
+group = "com.devsoap.plugin"
 version = project.hasProperty('BUILD_VERSION') ? getProperty('BUILD_VERSION') : 'SNAPSHOT-'+ new Date().format('yyyyMMdd')
 archivesBaseName ='gradle-vaadin-plugin'
 sourceCompatibility = 1.8
@@ -199,8 +199,8 @@ jar {
 task sourcesJar(type: Jar) {
     from sourceSets.main.allSource
     classifier = 'sources'
-    include 'fi/**/*.groovy'
-    include 'fi/**/*.java'
+    include 'com/**/*.groovy'
+    include 'com/**/*.java'
 }
 
 /**
@@ -289,11 +289,11 @@ pluginBundle {
     tags = ['vaadin']
     plugins {
         vaadinPlugin {
-            id = 'fi.jasoft.plugin.vaadin'
+            id = 'com.devsoap.plugin.vaadin'
             displayName = 'Gradle Vaadin plugin'
         }
         vaadinGroovyPlugin {
-            id = 'fi.jasoft.plugin.vaadin.groovy'
+            id = 'com.devsoap.plugin.vaadin.groovy'
             displayName = 'Gradle Vaadin Groovy plugin'
             description = 'Build Vaadin applications with Groovy and Gradle!'
             tags = ['vaadin', 'groovy']
@@ -301,7 +301,7 @@ pluginBundle {
     }
 
     mavenCoordinates {
-        groupId = 'fi.jasoft.plugin'
+        groupId = 'com.devsoap.plugin'
         artifactId = 'gradle-vaadin-plugin'
     }
 }
