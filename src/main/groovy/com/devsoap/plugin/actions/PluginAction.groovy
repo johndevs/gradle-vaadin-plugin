@@ -36,6 +36,10 @@ abstract class PluginAction {
         project.logger.info("Applying ${getClass().simpleName} actions to project $project.name")
     }
 
+    protected void executeAfterEvaluate(Project project){
+        project.logger.debug("Executing afterEvaluate hook for ${getClass().simpleName}")
+    }
+
     protected void beforeTaskExecuted(Task task) {
         task.project.logger.debug("Executing pre task hook for ${getClass().simpleName} for task $task.name")
     }
@@ -49,6 +53,9 @@ abstract class PluginAction {
             project.gradle.taskGraph.removeTaskExecutionListener(taskListener)
             project.gradle.taskGraph.addTaskExecutionListener(taskListener)
             execute(project)
+            project.afterEvaluate {
+                executeAfterEvaluate(project)
+            }
         }
     }
 

@@ -51,11 +51,7 @@ class TaskConfigurationsTest extends IntegrationTest {
         buildFile << """
             apply plugin: 'eclipse-wtp'
 
-            vaadin {
-                plugin {
-                    eclipseOutputDir 'custom/dir'
-                }
-            }
+            vaadinRun.classesDir 'custom/dir'
 
             task verifyOutputDir(dependsOn:'eclipseClasspath') << {
                 println project.eclipse.classpath.defaultOutputDir

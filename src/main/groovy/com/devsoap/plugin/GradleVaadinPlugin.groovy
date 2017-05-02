@@ -15,6 +15,9 @@
 */
 package com.devsoap.plugin
 
+import com.devsoap.plugin.actions.EclipsePluginAction
+import com.devsoap.plugin.actions.EclipseWtpPluginAction
+import com.devsoap.plugin.actions.IdeaPluginAction
 import com.devsoap.plugin.actions.JavaPluginAction
 import com.devsoap.plugin.actions.SpringBootAction
 import com.devsoap.plugin.actions.VaadinPluginAction
@@ -23,8 +26,7 @@ import com.devsoap.plugin.configuration.TestBenchConfiguration
 import com.devsoap.plugin.configuration.TestBenchHubConfiguration
 import com.devsoap.plugin.configuration.TestBenchNodeConfiguration
 import com.devsoap.plugin.configuration.VaadinPluginExtension
-import com.devsoap.plugin.ides.EclipseUtil
-import com.devsoap.plugin.ides.IDEAUtil
+
 import com.devsoap.plugin.servers.ApplicationServer
 import com.devsoap.plugin.tasks.BuildClassPathJar
 import com.devsoap.plugin.tasks.BuildJavadocJarTask
@@ -177,6 +179,9 @@ class GradleVaadinPlugin implements Plugin<Project> {
         new JavaPluginAction().apply(project)
         new WarPluginAction().apply(project)
         new VaadinPluginAction().apply(project)
+        new EclipsePluginAction().apply(project)
+        new EclipseWtpPluginAction().apply(project)
+        new IdeaPluginAction().apply(project)
 
         // Repositories
         applyRepositories(project)
@@ -225,12 +230,6 @@ class GradleVaadinPlugin implements Plugin<Project> {
                 })
             }
         }
-
-        // Configure IDEA
-        IDEAUtil.configureIDEAModule(project)
-
-        // Configure Eclipse
-        EclipseUtil.configureEclipsePlugin(project)
     }
 
     static void applyRepositories(Project project) {
@@ -302,9 +301,6 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
             sources.compileClasspath += conf
             testSources.compileClasspath += conf
-
-            IDEAUtil.addConfigurationToProject(project, CONFIGURATION_SERVER)
-            EclipseUtil.addConfigurationToProject(project, CONFIGURATION_SERVER)
         }
 
         configurations.create(CONFIGURATION_CLIENT) { conf ->
@@ -335,9 +331,6 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
             testSources.compileClasspath += conf
             testSources.runtimeClasspath += conf
-
-            IDEAUtil.addConfigurationToProject(project, CONFIGURATION_CLIENT)
-            EclipseUtil.addConfigurationToProject(project, CONFIGURATION_CLIENT, false)
         }
 
         configurations.create(CONFIGURATION_JAVADOC) { conf ->
@@ -399,9 +392,6 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
             testSources.compileClasspath += conf
             testSources.runtimeClasspath += conf
-
-            IDEAUtil.addConfigurationToProject(project, CONFIGURATION_PUSH)
-            EclipseUtil.addConfigurationToProject(project, CONFIGURATION_PUSH)
         }
 
         configurations.create(CONFIGURATION_TESTBENCH) { conf ->
@@ -419,9 +409,6 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
             testSources.compileClasspath += conf
             testSources.runtimeClasspath += conf
-
-            IDEAUtil.addConfigurationToProject(project, CONFIGURATION_TESTBENCH, true)
-            EclipseUtil.addConfigurationToProject(project, CONFIGURATION_TESTBENCH)
         }
 
         configurations.create(CONFIGURATION_SUPERDEVMODE) { conf ->
@@ -496,9 +483,6 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
             sources.compileClasspath += conf
             testSources.compileClasspath += conf
-
-            IDEAUtil.addConfigurationToProject(project, CONFIGURATION_THEME)
-            EclipseUtil.addConfigurationToProject(project, CONFIGURATION_THEME)
         }
 
         configurations.create(CONFIGURATION_SPRING_BOOT) { conf ->
@@ -513,9 +497,6 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
             sources.compileClasspath += conf
             testSources.compileClasspath += conf
-
-            IDEAUtil.addConfigurationToProject(project, CONFIGURATION_SPRING_BOOT)
-            EclipseUtil.addConfigurationToProject(project, CONFIGURATION_SPRING_BOOT)
         }
 
         // Ensure vaadin version is correct across configurations
