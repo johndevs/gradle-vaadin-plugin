@@ -57,28 +57,6 @@ class DevelopmentModeConfiguration {
     }
 
     /**
-     * Should super devmode be available
-     *
-     * @deprecated
-     */
-    @Deprecated
-    void setSuperDevMode(boolean sdm) {
-        assert sdm
-        isSuperDevMode()
-    }
-    @Deprecated
-    void superDevMode(boolean sdm) {
-        assert sdm
-       isSuperDevMode()
-    }
-    @Deprecated
-    boolean isSuperDevMode() {
-        MessageLogger.nagUserOfDiscontinuedProperty('vaadin.devmode.superDevMode',
-                'This property has been removed and will always be true.')
-        true
-    }
-
-    /**
      * To what host or ip should development mode bind itself to. By default localhost.
      */
     @Deprecated
