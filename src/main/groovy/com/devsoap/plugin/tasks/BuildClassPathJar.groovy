@@ -45,9 +45,7 @@ class BuildClassPathJar extends Jar {
             DefaultConfiguration serverConf = project.configurations
                     .getByName(GradleVaadinPlugin.CONFIGURATION_RUN_SERVER)
             FileCollection classPath = Util.getCompileClassPath(project)
-            CompositeFileCollection files = (serverConf + classPath).filter { File file ->
-                        file.isFile() && file.name.endsWith('.jar')
-            }
+            CompositeFileCollection files = (serverConf + classPath)
 
             inputs.files(files)
 
