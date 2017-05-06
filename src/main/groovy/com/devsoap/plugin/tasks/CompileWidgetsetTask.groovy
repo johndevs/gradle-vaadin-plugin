@@ -15,6 +15,7 @@
 */
 package com.devsoap.plugin.tasks
 
+import com.devsoap.plugin.GradleVaadinPlugin
 import com.devsoap.plugin.TemplateUtil
 import com.devsoap.plugin.Util
 import com.devsoap.plugin.configuration.CompileWidgetsetConfiguration
@@ -48,8 +49,6 @@ class CompileWidgetsetTask extends DefaultTask {
     static final String PUBLIC_FOLDER_PATTERN = '**/*/public/**/*.*'
     static final String GWT_MODULE_XML_PATTERN = '**/*/*.gwt.xml'
     static final String APPWIDGETSET_JAVA_FILE = 'AppWidgetset.java'
-
-    def CompileWidgetsetConfiguration configuration
 
     /**
      * HTTP POST request sent to CDN for requesting a widgetset.
@@ -153,12 +152,10 @@ class CompileWidgetsetTask extends DefaultTask {
 
     CompileWidgetsetTask() {
         description = "Compiles Vaadin Addons and components into Javascript."
-        configuration = Util.findOrCreateExtension(project, CompileWidgetsetConfiguration)
-
         project.afterEvaluate {
 
             // Set task dependencies
-            if ( configuration.widgetsetCDN ) {
+            if ( Util.findOrCreateExtension(project, CompileWidgetsetConfiguration).widgetsetCDN ) {
                 dependsOn 'processResources'
             } else {
                 dependsOn('classes', UpdateWidgetsetTask.NAME, BuildClassPathJar.NAME)
@@ -168,6 +165,7 @@ class CompileWidgetsetTask extends DefaultTask {
             * dependency should also trigger a recompile of the widgetset
             */
             inputs.files(project.configurations.compile)
+            inputs.files(project.configurations[GradleVaadinPlugin.CONFIGURATION_CLIENT])
 
             // Monitor changes in client side classes and resources
             project.sourceSets.main.java.srcDirs.each {
@@ -199,7 +197,7 @@ class CompileWidgetsetTask extends DefaultTask {
 
     @TaskAction
     def run() {
-        if ( configuration.widgetsetCDN ) {
+        if ( Util.findOrCreateExtension(project, CompileWidgetsetConfiguration).widgetsetCDN ) {
             compileRemotely()
             return
         }
@@ -207,7 +205,6 @@ class CompileWidgetsetTask extends DefaultTask {
         String widgetset = Util.getWidgetset(project)
         if ( widgetset ) {
             compileLocally(widgetset)
-            return
         }
     }
 
@@ -255,6 +252,7 @@ class CompileWidgetsetTask extends DefaultTask {
      * Compiles the widgetset locally
      */
     @PackageScope compileLocally(String widgetset = Util.getWidgetset(project)) {
+        def configuration = Util.findOrCreateExtension(project, CompileWidgetsetConfiguration)
 
         // Re-create directory
         Util.getWidgetsetDirectory(project).mkdirs()
@@ -360,7 +358,10 @@ class CompileWidgetsetTask extends DefaultTask {
         def client = new RESTClient(WIDGETSET_CDN_URL)
         configureClient(client)
 
-        def request = queryWidgetsetRequest(Util.getResolvedVaadinVersion(project), configuration.style)
+        def request = queryWidgetsetRequest(
+                Util.getResolvedVaadinVersion(project),
+                Util.findOrCreateExtension(project, CompileWidgetsetConfiguration).style
+        )
         def response = client.post(request)
         response.data
     }
@@ -374,7 +375,7 @@ class CompileWidgetsetTask extends DefaultTask {
     @PackageScope ZipInputStream downloadWidgetset() {
         makeClient(WIDGETSET_CDN_URL).post(downloadWidgetsetRequest(
             Util.getResolvedVaadinVersion(project),
-            configuration.style
+            Util.findOrCreateExtension(project, CompileWidgetsetConfiguration).style
         ), writeWidgetsetToFileSystem)
     }
 
@@ -412,7 +413,8 @@ class CompileWidgetsetTask extends DefaultTask {
     @PackageScope configureClient(RESTClient client) {
 
         // Proxy support
-        WidgetsetCDNConfiguration widgetsetCDNConfig = configuration.widgetsetCDNConfig
+        WidgetsetCDNConfiguration widgetsetCDNConfig = Util.findOrCreateExtension(project,
+                CompileWidgetsetConfiguration).widgetsetCDNConfig
         if(widgetsetCDNConfig.proxyEnabled) {
             client.ignoreSSLIssues()
             client.setProxy(

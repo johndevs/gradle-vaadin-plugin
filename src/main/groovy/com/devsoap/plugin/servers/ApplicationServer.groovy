@@ -62,9 +62,8 @@ abstract class ApplicationServer {
      * @return
      *      returns the application server
      */
-    static ApplicationServer get(Project project,
-                                    List browserParameters = [],
-                                    ApplicationServerConfiguration configuration=project.vaadinRun) {
+    static ApplicationServer get(Project project, List browserParameters,
+                                 ApplicationServerConfiguration configuration) {
         switch(configuration.server) {
             case PayaraApplicationServer.NAME:
                 return new PayaraApplicationServer(project, browserParameters, configuration)
@@ -360,11 +359,12 @@ abstract class ApplicationServer {
 
     @PackageScope
     static watchClassDirectoryForChanges(final ApplicationServer server) {
-        def project = server.project
+        Project project = server.project
 
-        def classesDir
-        if ( project.vaadinRun.classesDir && project.file(project.vaadinRun.classesDir).exists() ) {
-            classesDir = project.file(project.vaadinRun.classesDir)
+        def serverConfiguration = Util.findOrCreateExtension(project, ApplicationServerConfiguration)
+        File classesDir
+        if ( serverConfiguration.classesDir && project.file(serverConfiguration.classesDir).exists() ) {
+            classesDir = project.file(serverConfiguration.classesDir)
         } else {
             classesDir = project.sourceSets.main.output.classesDir
         }

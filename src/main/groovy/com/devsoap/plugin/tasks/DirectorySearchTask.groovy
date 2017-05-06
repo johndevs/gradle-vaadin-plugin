@@ -70,7 +70,7 @@ class DirectorySearchTask extends DefaultTask {
             project.logger.info('Reading addon listing from local cache...')
         }
 
-        def args = project.getProperties()
+        def args = project.properties
         String search = searchPattern ?: args.get('search', null)
         String sort = sortOption ?: args.get('sort', null)
         Boolean verbose = verbose ?: Boolean.parseBoolean(args.get('verbose', 'false'))

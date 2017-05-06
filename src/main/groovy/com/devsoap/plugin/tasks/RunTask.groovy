@@ -39,8 +39,6 @@ class RunTask extends DefaultTask {
     @Option(option = 'nobrowser', description = 'Do not open browser after server has started')
     def boolean nobrowser = false
 
-    def ApplicationServerConfiguration configuration
-
     def cleanupThread = new Thread({
         if ( server ) {
             server.terminate()
@@ -60,11 +58,11 @@ class RunTask extends DefaultTask {
         dependsOn(CompileThemeTask.NAME)
         description = 'Runs the Vaadin application'
         Runtime.getRuntime().addShutdownHook(cleanupThread)
-        configuration = Util.findOrCreateExtension(project, ApplicationServerConfiguration)
     }
 
     @TaskAction
     public void run() {
+        def configuration = Util.findOrCreateExtension(project, ApplicationServerConfiguration)
         if ( nobrowser ) {
             configuration.openInBrowser = false
         }

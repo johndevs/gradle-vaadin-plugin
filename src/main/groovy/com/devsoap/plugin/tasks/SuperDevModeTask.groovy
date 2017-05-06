@@ -15,11 +15,13 @@
 */
 package com.devsoap.plugin.tasks
 
+import com.devsoap.plugin.configuration.ApplicationServerConfiguration
 import com.devsoap.plugin.configuration.SuperDevModeConfiguration
 import com.devsoap.plugin.servers.ApplicationServer
 import com.devsoap.plugin.Util
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -34,8 +36,6 @@ class SuperDevModeTask extends DefaultTask {
     def Process codeserverProcess = null
 
     def ApplicationServer server = null
-
-    def SuperDevModeConfiguration configuration
 
     def cleanupThread = new Thread({
         if ( codeserverProcess ) {
@@ -60,7 +60,6 @@ class SuperDevModeTask extends DefaultTask {
         dependsOn(CompileWidgetsetTask.NAME)
         description = "Run Super Development Mode for easier client widget development."
         Runtime.getRuntime().addShutdownHook(cleanupThread)
-        configuration = Util.findOrCreateExtension(project, SuperDevModeConfiguration)
     }
 
     @TaskAction
@@ -69,25 +68,30 @@ class SuperDevModeTask extends DefaultTask {
             throw new GradleException("No widgetset found in project.")
         }
 
-        runCodeServer({
-
-            server = ApplicationServer.get(project, ['superdevmode'])
-
-            server.startAndBlock()
-
-            codeserverProcess.waitForOrKill(1)
-        })
+        def configuration = Util.findOrCreateExtension(project, SuperDevModeConfiguration)
+        if(configuration.noserver){
+            runCodeServer {
+                codeserverProcess.waitForOrKill(1)
+            }
+        } else {
+            runCodeServer({
+                def serverConf = Util.findOrCreateExtension(project, ApplicationServerConfiguration)
+                server = ApplicationServer.get(project, ['superdevmode'], serverConf)
+                server.startAndBlock()
+                codeserverProcess.waitForOrKill(1)
+            })
+        }
     }
 
     def runCodeServer(Closure readyClosure) {
+        def configuration = Util.findOrCreateExtension(project, SuperDevModeConfiguration)
         File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
-        def widgetsetsDir = Util.getWidgetsetDirectory(project)
+        File widgetsetsDir = Util.getWidgetsetDirectory(project)
         widgetsetsDir.mkdirs()
 
-        def sdmClassPath = project.configurations['vaadin-superdevmode']
-        def classpath = sdmClassPath + Util.getClientCompilerClassPath(project)
+        FileCollection classpath = Util.getClientCompilerClassPath(project)
 
-        def superdevmodeProcess = [Util.getJavaBinary(project)]
+        List superdevmodeProcess = [Util.getJavaBinary(project)]
         superdevmodeProcess += ['-cp', classpath.asPath]
         superdevmodeProcess += 'com.google.gwt.dev.codeserver.CodeServer'
         superdevmodeProcess += ['-bindAddress', configuration.bindAddress]

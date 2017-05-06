@@ -17,6 +17,7 @@ package com.devsoap.plugin.tasks
 
 import com.devsoap.plugin.GradleVaadinPlugin
 import com.devsoap.plugin.Util
+import com.devsoap.plugin.configuration.VaadinPluginExtension
 import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.artifacts.configurations.DefaultConfiguration
 import org.gradle.api.internal.file.CompositeFileCollection
@@ -37,7 +38,7 @@ class BuildClassPathJar extends Jar {
         dependsOn 'classes'
 
         onlyIf {
-            project.vaadin.useClassPathJar
+            Util.findOrCreateExtension(project, VaadinPluginExtension).useClassPathJar
         }
 
         project.afterEvaluate {

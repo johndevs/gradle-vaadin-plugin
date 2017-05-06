@@ -15,4 +15,9 @@ class DevModeConfiguration extends SuperDevModeConfiguration {
     /*
      * To allow configuration of the deprecated devmode task. Will be removed later
      */
+
+    /**
+     * To what port should development mode bind itself to.
+     */
+    int codeServerPort = 9997
 }

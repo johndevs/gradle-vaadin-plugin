@@ -15,7 +15,6 @@
 */
 package com.devsoap.plugin.configuration
 
-import com.devsoap.plugin.configuration.PluginConfiguration
 import com.devsoap.plugin.tasks.SuperDevModeTask
 
 /**
@@ -34,11 +33,6 @@ class SuperDevModeConfiguration extends ApplicationServerConfiguration {
      * To what host or ip should development mode bind itself to. By default localhost.
      */
     String bindAddress = '127.0.0.1'
-
-    /**
-     * To what port should development mode bind itself to.
-     */
-    int codeServerPort = 9997
 
     /**
      * Extra arguments passed to the code server

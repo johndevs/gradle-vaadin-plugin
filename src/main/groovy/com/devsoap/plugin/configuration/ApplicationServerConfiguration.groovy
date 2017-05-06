@@ -15,7 +15,6 @@
 */
 package com.devsoap.plugin.configuration
 
-import com.devsoap.plugin.configuration.PluginConfiguration
 import com.devsoap.plugin.tasks.RunTask
 
 /**

@@ -17,6 +17,7 @@ package com.devsoap.plugin.tasks
 
 import com.devsoap.plugin.TemplateUtil
 import com.devsoap.plugin.Util
+import com.devsoap.plugin.configuration.CompileWidgetsetConfiguration
 import groovy.transform.PackageScope
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
@@ -50,9 +51,12 @@ class CreateWidgetsetGeneratorTask extends DefaultTask {
 
     @PackageScope
     def makeWidgetsetGeneratorClass() {
-        def javaDir = Util.getMainSourceSet(project, true).srcDirs.first()
-        def widgetset = project.vaadinCompile.widgetset as String
-        def widgetsetGenerator = project.vaadinCompile.widgetsetGenerator as String
+        File javaDir = Util.getMainSourceSet(project, true).srcDirs.first()
+
+        def configuration = Util.findOrCreateExtension(project, CompileWidgetsetConfiguration)
+
+        String widgetset = configuration.widgetset
+        String widgetsetGenerator = configuration.widgetsetGenerator
 
         String name, pkg, filename
         if ( !widgetsetGenerator ) {
@@ -66,17 +70,17 @@ class CreateWidgetsetGeneratorTask extends DefaultTask {
             filename = name + JAVA_FILE_POSTFIX
         }
 
-        List<String> sourcePaths = project.vaadinCompile.sourcePaths as List
+        List<String> sourcePaths = configuration.sourcePaths as List
         sourcePaths.each { String path ->
             if(pkg.contains(".${path}.") || pkg.endsWith(".${path}")){
                 throw new GradleException("Widgetset generator cannot be placed inside the client package.")
             }
         }
 
-        def dir = new File(javaDir, TemplateUtil.convertFQNToFilePath(pkg))
+        File dir = new File(javaDir, TemplateUtil.convertFQNToFilePath(pkg))
         dir.mkdirs()
 
-        def substitutions = [:]
+        Map substitutions = [:]
         substitutions['packageName'] = pkg
         substitutions['className'] = filename.replaceAll(JAVA_FILE_POSTFIX, '')
 

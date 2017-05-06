@@ -22,6 +22,11 @@ import com.devsoap.plugin.actions.JavaPluginAction
 import com.devsoap.plugin.actions.SpringBootAction
 import com.devsoap.plugin.actions.VaadinPluginAction
 import com.devsoap.plugin.actions.WarPluginAction
+import com.devsoap.plugin.configuration.ApplicationServerConfiguration
+import com.devsoap.plugin.configuration.CompileThemeConfiguration
+import com.devsoap.plugin.configuration.CompileWidgetsetConfiguration
+import com.devsoap.plugin.configuration.DevModeConfiguration
+import com.devsoap.plugin.configuration.SuperDevModeConfiguration
 import com.devsoap.plugin.configuration.TestBenchConfiguration
 import com.devsoap.plugin.configuration.TestBenchHubConfiguration
 import com.devsoap.plugin.configuration.TestBenchNodeConfiguration
@@ -97,7 +102,6 @@ class GradleVaadinPlugin implements Plugin<Project> {
     static final String CONFIGURATION_SPRING_BOOT = 'vaadin-spring-boot'
     static final String DEFAULT_WIDGETSET = 'com.vaadin.DefaultWidgetSet'
     static final String CONFIGURATION_RUN_SERVER = 'vaadin-run-server'
-    static final String CONFIGURATION_SUPERDEVMODE = 'vaadin-superdevmode'
     static final String CONFIGURATION_THEME = 'vaadin-theme-compiler'
     static final String VAADIN_TASK_GROUP = 'Vaadin'
     static final String VAADIN_UTIL_TASK_GROUP = 'Vaadin Utility'
@@ -174,6 +178,11 @@ class GradleVaadinPlugin implements Plugin<Project> {
         Util.findOrCreateExtension(project, TestBenchConfiguration, project)
         Util.findOrCreateExtension(project, TestBenchHubConfiguration)
         Util.findOrCreateExtension(project, TestBenchNodeConfiguration)
+        Util.findOrCreateExtension(project, ApplicationServerConfiguration)
+        Util.findOrCreateExtension(project, CompileThemeConfiguration)
+        Util.findOrCreateExtension(project, CompileWidgetsetConfiguration)
+        Util.findOrCreateExtension(project, DevModeConfiguration)
+        Util.findOrCreateExtension(project, SuperDevModeConfiguration)
 
         // Configure plugins
         new JavaPluginAction().apply(project)
@@ -370,7 +379,9 @@ class GradleVaadinPlugin implements Plugin<Project> {
                 dependencies.add(plugin)
 
                 // Add server dependencies
-                ApplicationServer.get(project).defineDependecies(projectDependencies, dependencies)
+                def serverConf = Util.findOrCreateExtension(project, ApplicationServerConfiguration)
+                ApplicationServer.get(project, [], serverConf)
+                        .defineDependecies(projectDependencies, dependencies)
             }
 
             if(configurations.findByName(WarPlugin.PROVIDED_RUNTIME_CONFIGURATION_NAME)){
@@ -409,29 +420,6 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
             testSources.compileClasspath += conf
             testSources.runtimeClasspath += conf
-        }
-
-        configurations.create(CONFIGURATION_SUPERDEVMODE) { conf ->
-            conf.description = 'Libraries needed by Vaadin Superdevmode.'
-            conf.defaultDependencies { dependencies ->
-
-                Dependency jettyAll = projectDependencies.create(
-                        'org.eclipse.jetty.aggregate:jetty-all-server:8.1.15.v20140411')
-                dependencies.add(jettyAll)
-
-                Dependency plugin = projectDependencies.create(
-                        "com.devsoap.plugin:gradle-vaadin-plugin:${GradleVaadinPlugin.version}")
-                dependencies.add(plugin)
-
-                Dependency asm = projectDependencies.create('org.ow2.asm:asm:5.0.3')
-                dependencies.add(asm)
-
-                Dependency asmCommons = projectDependencies.create('org.ow2.asm:asm-commons:5.0.3')
-                dependencies.add(asmCommons)
-
-                Dependency jsp = projectDependencies.create('javax.servlet.jsp:jsp-api:2.2')
-                dependencies.add(jsp)
-            }
         }
 
         configurations.create(CONFIGURATION_THEME) { conf ->

@@ -50,7 +50,7 @@ class CreateProjectTask extends DefaultTask {
 
     @TaskAction
     def run() {
-        def configuration = project.vaadinCompile as CompileWidgetsetConfiguration
+        def configuration = Util.findOrCreateExtension(project,CompileWidgetsetConfiguration)
 
         new ProjectCreator(
                 applicationName:resolveApplicationName(),
@@ -92,7 +92,7 @@ class CreateProjectTask extends DefaultTask {
 
     @PackageScope
     String resolveApplicationPackage() {
-        def configuration = project.vaadinCompile as CompileWidgetsetConfiguration
+        def configuration = Util.findOrCreateExtension(project,CompileWidgetsetConfiguration)
         if ( !applicationPackage ) {
             int endSlashSize = 2
             if ( widgetsetFQN?.contains(DOT) ) {
