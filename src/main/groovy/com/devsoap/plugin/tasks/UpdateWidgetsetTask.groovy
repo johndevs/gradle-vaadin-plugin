@@ -212,7 +212,7 @@ class UpdateWidgetsetTask extends DefaultTask {
     private static Map<String, Object> getGWTProperties(Project project, CompileWidgetsetConfiguration configuration) {
         Map<String, Object> properties = [:]
 
-        def ua = 'ie8,ie9,gecko1_8,safari'
+        def ua = 'gecko1_8,safari'
         if ( !configuration.userAgent ) {
             if ( Util.isOperaUserAgentSupported(project) ) {
                 ua += ',opera'
