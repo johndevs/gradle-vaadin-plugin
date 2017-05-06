@@ -32,15 +32,14 @@ class CompressCssTask extends DefaultTask {
     static final String NAME = 'vaadinThemeCompress'
     static final String STYLES_CSS = 'styles.css'
 
-    CompileThemeConfiguration configuration
-
     /**
      * Create a CSS compression task
      */
     CompressCssTask() {
         description = 'Compresses the theme with GZip'
-        configuration = Util.findOrCreateExtension(project, CompileThemeConfiguration)
-        onlyIf = { configuration.compress }
+        onlyIf = {
+            Util.findOrCreateExtension(project, CompileThemeConfiguration).compress
+        }
         dependsOn(CompileThemeTask.NAME)
         project.afterEvaluate {
             File themesDir = Util.getThemesDirectory(project)

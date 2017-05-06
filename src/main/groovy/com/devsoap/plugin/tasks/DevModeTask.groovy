@@ -15,6 +15,7 @@
 */
 package com.devsoap.plugin.tasks
 
+import com.devsoap.plugin.configuration.ApplicationServerConfiguration
 import com.devsoap.plugin.configuration.DevModeConfiguration
 import com.devsoap.plugin.configuration.SuperDevModeConfiguration
 import com.devsoap.plugin.servers.ApplicationServer
@@ -22,6 +23,8 @@ import com.devsoap.plugin.Util
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
+
+import java.nio.file.Paths
 
 /**
  * Runs GWT DevMode
@@ -37,8 +40,6 @@ class DevModeTask extends DefaultTask {
     def Process devModeProcess
 
     def server
-
-    def SuperDevModeConfiguration configuration
 
     def cleanupThread = new Thread({
         if ( devModeProcess ) {
@@ -61,7 +62,6 @@ class DevModeTask extends DefaultTask {
         dependsOn('classes', UpdateWidgetsetTask.NAME)
         description = "Run Development Mode for easier debugging and development of client widgets."
         Runtime.getRuntime().addShutdownHook(cleanupThread)
-        configuration = Util.findOrCreateExtension(project, DevModeConfiguration)
     }
 
     @TaskAction
@@ -72,10 +72,13 @@ class DevModeTask extends DefaultTask {
 
         runDevelopmentMode()
 
+        def configuration = Util.findOrCreateExtension(project, DevModeConfiguration)
+        def serverConf = Util.findOrCreateExtension(project, ApplicationServerConfiguration)
         if ( !configuration.noserver ) {
             server = ApplicationServer.get(
                     project,
-                    ["gwt.codesvr=${configuration.bindAddress}:${configuration.codeServerPort}"]
+                    ["gwt.codesvr=${configuration.bindAddress}:${configuration.codeServerPort}"],
+                    serverConf
             ).startAndBlock()
             devModeProcess.waitForOrKill(1)
         } else {
@@ -84,30 +87,32 @@ class DevModeTask extends DefaultTask {
     }
 
     protected void runDevelopmentMode() {
+        def configuration = Util.findOrCreateExtension(project, DevModeConfiguration)
         def classpath = Util.getClientCompilerClassPath(project)
+        def serverConf = Util.findOrCreateExtension(project, ApplicationServerConfiguration)
 
-        def devmodeDir = new File(project.buildDir, 'devmode')
+        File devmodeDir = new File(project.buildDir, 'devmode')
 
-        def deployDir = new File(devmodeDir, 'deploy')
+        File deployDir = new File(devmodeDir, 'deploy')
         deployDir.mkdirs()
 
-        def logsDir = new File(devmodeDir, 'logs')
+        File logsDir = new File(devmodeDir, 'logs')
         logsDir.mkdirs()
 
-        def genDir = new File(devmodeDir, 'gen')
+        File genDir = new File(devmodeDir, 'gen')
         genDir.mkdirs()
 
-        def widgetsetDir = Util.getWidgetsetDirectory(project)
+        File widgetsetDir = Util.getWidgetsetDirectory(project)
         widgetsetDir.mkdirs()
 
-        def devmodeProcess = [Util.getJavaBinary(project)]
+        List devmodeProcess = [Util.getJavaBinary(project)]
         devmodeProcess += ['-cp', classpath.asPath]
         devmodeProcess += 'com.google.gwt.dev.DevMode'
         devmodeProcess += Util.getWidgetset(project)
         devmodeProcess += '-noserver'
         devmodeProcess += ['-war', widgetsetDir.canonicalPath]
         devmodeProcess += ['-gen', genDir.canonicalPath]
-        devmodeProcess += ['-startupUrl', "http://localhost:${project.vaadinRun.serverPort}"]
+        devmodeProcess += ['-startupUrl', "http://localhost:${serverConf.serverPort}"]
         devmodeProcess += ['-logLevel', configuration.logLevel]
         devmodeProcess += ['-deploy', deployDir.canonicalPath]
         devmodeProcess += ['-workDir', devmodeDir.canonicalPath]

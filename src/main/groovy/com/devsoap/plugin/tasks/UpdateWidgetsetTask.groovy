@@ -58,9 +58,8 @@ class UpdateWidgetsetTask extends DefaultTask {
     public UpdateWidgetsetTask() {
         description = "Updates the widgetset xml file"
         onlyIf { Task task ->
-            task.project.vaadinCompile.manageWidgetset &&
-                    !task.project.vaadinCompile.widgetsetCDN &&
-                    Util.getWidgetset(task.project)
+            def conf = Util.findOrCreateExtension(task.project, CompileWidgetsetConfiguration)
+            conf.manageWidgetset && !conf.widgetsetCDN && Util.getWidgetset(task.project)
         }
     }
 
@@ -71,9 +70,8 @@ class UpdateWidgetsetTask extends DefaultTask {
 
     @PackageScope
     static File ensureWidgetPresent(Project project, String widgetsetFQN=Util.getWidgetset(project)) {
-        if (!project.vaadinCompile.manageWidgetset ||
-                project.vaadinCompile.widgetsetCDN ||
-                !widgetsetFQN) {
+        def config = Util.findOrCreateExtension(project, CompileWidgetsetConfiguration)
+        if (!config.manageWidgetset || config.widgetsetCDN || !widgetsetFQN) {
             return null
         }
 
@@ -94,9 +92,9 @@ class UpdateWidgetsetTask extends DefaultTask {
 
     @PackageScope
     static updateWidgetset(File widgetsetFile, String widgetsetFQN, Project project) {
-        def configuration = project.vaadinCompile as CompileWidgetsetConfiguration
+        def configuration = Util.findOrCreateExtension(project, CompileWidgetsetConfiguration)
 
-        def substitutions = [:]
+        Map substitutions = [:]
         substitutions['inherits'] = getInherits(project, configuration)
         substitutions['sourcePaths'] = configuration.sourcePaths
         substitutions['configurationProperties'] = getConfigurationProperties()

@@ -17,6 +17,7 @@ package com.devsoap.plugin.tasks
 
 import com.devsoap.plugin.Util
 import com.devsoap.plugin.configuration.CompileThemeConfiguration
+import com.devsoap.plugin.configuration.VaadinPluginExtension
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -49,12 +50,9 @@ class CompileThemeTask extends DefaultTask {
     static final String STYLES_CSS = 'styles.css'
     static final String STYLES_SCSS = 'styles.scss'
 
-    private CompileThemeConfiguration configuration
-
     CompileThemeTask() {
         dependsOn('classes', BuildClassPathJar.NAME, UpdateAddonStylesTask.NAME)
         description = 'Compiles a Vaadin SASS theme into CSS'
-        configuration = Util.findOrCreateExtension(project, CompileThemeConfiguration)
 
         project.afterEvaluate {
             File themesDirectory = Util.getThemesDirectory(project)
@@ -65,7 +63,7 @@ class CompileThemeTask extends DefaultTask {
             })
 
             // Add classpath jar
-            if ( project.vaadin.useClassPathJar ) {
+            if ( Util.findOrCreateExtension(project, VaadinPluginExtension).useClassPathJar ) {
                 BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
                 inputs.file(pathJarTask.archivePath)
             }
