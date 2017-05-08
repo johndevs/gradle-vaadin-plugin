@@ -47,6 +47,9 @@ import java.nio.file.WatchEvent
 import java.nio.file.WatchKey
 import java.nio.file.WatchService
 import java.nio.file.attribute.BasicFileAttributes
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 import java.util.jar.Attributes
 import java.util.jar.JarInputStream
 import java.util.jar.Manifest
@@ -1068,7 +1071,19 @@ class Util {
      *      the latest released version number
      */
     @Memoized
-    static VersionNumber getLatestReleaseVersion() {
+    static VersionNumber getLatestReleaseVersion(Project project) {
+
+        // Read from cached version file
+        File pluginCacheDir = Paths.get(project.gradle.gradleUserHomeDir.canonicalPath,
+                'caches', 'gradle-vaadin-plugin').toFile()
+        pluginCacheDir.mkdirs()
+        File versionFile = new File(pluginCacheDir, 'latestVersion.txt')
+        if(versionFile.exists() && isWithin24Hours(versionFile.lastModified())){
+            return VersionNumber.parse(versionFile.text)
+        }
+
+        // Retrieve version from plugin page
+        VersionNumber number = VersionNumber.UNKNOWN
         try {
             HTTPBuilder http = new HTTPBuilder('https://plugins.gradle.org/plugin/com.devsoap.plugin.vaadin')
             def html = http.get([:])
@@ -1076,13 +1091,15 @@ class Util {
             if(versionNode){
                 String[] parts = versionNode.text().split()
                 if(parts.length > 1){
-                    return VersionNumber.parse(parts[1])
+                    number = VersionNumber.parse(parts[1])
                 }
             }
-            VersionNumber.UNKNOWN
         } catch (IOException | URISyntaxException e){
-            VersionNumber.UNKNOWN
+            number = VersionNumber.UNKNOWN
         }
+
+        versionFile.text = number.toString()
+        number
     }
 
     @Memoized
@@ -1090,5 +1107,12 @@ class Util {
         Properties properties = new Properties()
         properties.load(Util.class.getResourceAsStream('/gradle.properties') as InputStream)
         properties
+    }
+
+    static boolean isWithin24Hours(long epochTime) {
+        Instant time = Instant.ofEpochMilli(epochTime)
+        Instant now = Instant.now()
+        Instant twentyFourHoursEarlier = now.minus(24, ChronoUnit.HOURS)
+        !time.isBefore(twentyFourHoursEarlier) && time.isBefore(now)
     }
 }
