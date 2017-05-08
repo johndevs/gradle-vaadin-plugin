@@ -92,8 +92,6 @@ class GradleVaadinPlugin implements Plugin<Project> {
     static final Properties PLUGIN_PROPERTIES
     static final String PLUGIN_DEBUG_DIR
 
-    static int PLUGINS_IN_PROJECT = 0
-
     static final String CONFIGURATION_SERVER = 'vaadin-server'
     static final String CONFIGURATION_CLIENT = 'vaadin-client'
     static final String CONFIGURATION_TESTBENCH = 'vaadin-testbench'
@@ -135,14 +133,6 @@ class GradleVaadinPlugin implements Plugin<Project> {
         PLUGIN_DEBUG_DIR
     }
 
-    static int getNumberOfPluginsInProject() {
-        PLUGINS_IN_PROJECT
-    }
-
-    static boolean isFirstPlugin() {
-        PLUGINS_IN_PROJECT == 1
-    }
-
     static String getPluginId() {
          'com.devsoap.plugin.vaadin'
     }
@@ -158,11 +148,9 @@ class GradleVaadinPlugin implements Plugin<Project> {
                     "Plugin requires Gradle $requiredVersion+")
         }
 
-        PLUGINS_IN_PROJECT++
-
-        if ( firstPlugin ) {
+        if (project == project.rootProject) {
             project.logger.quiet("Using Gradle Vaadin Plugin $PLUGIN_VERSION")
-            VersionNumber latestReleasePluginVersion = Util.getLatestReleaseVersion()
+            VersionNumber latestReleasePluginVersion = Util.getLatestReleaseVersion(project)
             VersionNumber pluginVersion = VersionNumber.parse(PLUGIN_VERSION)
             if(latestReleasePluginVersion > pluginVersion){
                 project.logger.warn "!! A newer version of the Gradle Vaadin plugin is available, " +
@@ -275,10 +263,10 @@ class GradleVaadinPlugin implements Plugin<Project> {
             // Add plugin development repository if specified
             if ( (debugDir as File)?.exists( )
                     && !repositories.findByName(PLUGIN_DEVELOPMENTTIME_REPOSITORY_NAME)) {
-                if ( GradleVaadinPlugin.firstPlugin ) {
+                repositories.flatDir(name:PLUGIN_DEVELOPMENTTIME_REPOSITORY_NAME, dirs:debugDir)
+                if(project == project.rootProject){
                     project.logger.lifecycle("Using development libs found at " + debugDir)
                 }
-                repositories.flatDir(name:PLUGIN_DEVELOPMENTTIME_REPOSITORY_NAME, dirs:debugDir)
             }
         }
     }
