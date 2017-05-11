@@ -35,6 +35,11 @@ class SuperDevModeConfiguration extends ApplicationServerConfiguration {
     String bindAddress = '127.0.0.1'
 
     /**
+     * To what port should development mode bind itself to.
+     */
+    int codeServerPort = 9876
+
+    /**
      * Extra arguments passed to the code server
      */
     String[] extraArgs = null
