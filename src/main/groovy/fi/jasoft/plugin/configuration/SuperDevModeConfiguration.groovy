@@ -34,7 +34,7 @@ class SuperDevModeConfiguration extends ApplicationServerConfiguration {
     /**
      * To what port should development mode bind itself to.
      */
-    int codeServerPort = 9997
+    int codeServerPort = 9876
 
     /**
      * Extra arguments passed to the code server
