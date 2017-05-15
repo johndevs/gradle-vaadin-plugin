@@ -29,7 +29,7 @@ class JettyApplicationServer extends ApplicationServer {
     public static final String NAME = 'jetty'
     public static final String JETTY_VERSION_PROPERTY = 'jetty.version'
 
-    JettyApplicationServer(Project project, List browserParameters, ApplicationServerConfiguration configuration) {
+    JettyApplicationServer(Project project, Map browserParameters, ApplicationServerConfiguration configuration) {
         super(project, browserParameters, configuration)
     }
 

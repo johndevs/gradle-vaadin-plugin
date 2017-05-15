@@ -76,7 +76,9 @@ class SuperDevModeTask extends DefaultTask {
         } else {
             runCodeServer({
                 def serverConf = Util.findOrCreateExtension(project, ApplicationServerConfiguration)
-                server = ApplicationServer.get(project, ['superdevmode'], serverConf)
+                server = ApplicationServer.get(project,
+                        [superdevmode:"$configuration.bindAddress:$configuration.codeServerPort"],
+                        serverConf)
                 server.startAndBlock()
                 codeserverProcess.waitForOrKill(1)
             })

@@ -28,7 +28,7 @@ class PayaraApplicationServer extends ApplicationServer {
 
     public static final String NAME = 'payara'
 
-    PayaraApplicationServer(Project project, List browserParameters, ApplicationServerConfiguration configuration) {
+    PayaraApplicationServer(Project project, Map browserParameters, ApplicationServerConfiguration configuration) {
         super(project, browserParameters, configuration)
     }
 

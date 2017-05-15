@@ -77,7 +77,7 @@ class DevModeTask extends DefaultTask {
         if ( !configuration.noserver ) {
             server = ApplicationServer.get(
                     project,
-                    ["gwt.codesvr=${configuration.bindAddress}:${configuration.codeServerPort}"],
+                    ['gwt.codesvr':"${configuration.bindAddress}:${configuration.codeServerPort}"],
                     serverConf
             ).startAndBlock()
             devModeProcess.waitForOrKill(1)

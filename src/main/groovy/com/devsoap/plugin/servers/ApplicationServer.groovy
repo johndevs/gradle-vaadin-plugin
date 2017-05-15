@@ -62,8 +62,9 @@ abstract class ApplicationServer {
      * @return
      *      returns the application server
      */
-    static ApplicationServer get(Project project, List browserParameters,
-                                 ApplicationServerConfiguration configuration) {
+    static ApplicationServer get(Project project,
+                                    Map browserParameters = [:],
+                                    ApplicationServerConfiguration configuration) {
         switch(configuration.server) {
             case PayaraApplicationServer.NAME:
                 return new PayaraApplicationServer(project, browserParameters, configuration)
@@ -80,7 +81,7 @@ abstract class ApplicationServer {
 
     def final Project project
 
-    def List browserParameters = []
+    def Map browserParameters = [:]
 
     def ApplicationServerConfiguration configuration
 
@@ -94,7 +95,7 @@ abstract class ApplicationServer {
      * @param configuration
      *      the serverconfiguration
      */
-    protected ApplicationServer(Project project, List browserParameters, ApplicationServerConfiguration configuration) {
+    protected ApplicationServer(Project project, Map browserParameters, ApplicationServerConfiguration configuration) {
         this.project = project
         this.browserParameters = browserParameters
         this.configuration = configuration
@@ -291,12 +292,16 @@ abstract class ApplicationServer {
     @PackageScope
     def openBrowser() {
         // Build browser GET parameters
-        def paramString = ''
+        String paramString = ''
         if ( configuration.debug ) {
             paramString += '?debug'
-            paramString += AMPERSAND + browserParameters.join(AMPERSAND)
+            paramString += AMPERSAND + browserParameters.collect {key,value ->
+                "$key=$value"
+            }.join(AMPERSAND)
         } else if ( !browserParameters.isEmpty() ) {
-            paramString += '?' + browserParameters.join(AMPERSAND)
+            paramString += '?' + browserParameters.collect {key,value ->
+                "$key=$value"
+            }.join(AMPERSAND)
         }
         paramString = paramString.replaceAll('\\?$|&$', '')
 
