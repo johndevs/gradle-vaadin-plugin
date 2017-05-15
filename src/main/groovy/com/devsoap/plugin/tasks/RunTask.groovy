@@ -66,7 +66,7 @@ class RunTask extends DefaultTask {
         if ( nobrowser ) {
             configuration.openInBrowser = false
         }
-        server = ApplicationServer.get(project, [], configuration)
+        server = ApplicationServer.get(project, [:], configuration)
         server.startAndBlock(stopAfterStarting)
     }
 }

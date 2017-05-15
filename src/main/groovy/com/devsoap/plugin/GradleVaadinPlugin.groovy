@@ -368,7 +368,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
                 // Add server dependencies
                 def serverConf = Util.findOrCreateExtension(project, ApplicationServerConfiguration)
-                ApplicationServer.get(project, [], serverConf)
+                ApplicationServer.get(project, [:], serverConf)
                         .defineDependecies(projectDependencies, dependencies)
             }
 
