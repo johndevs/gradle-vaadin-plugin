@@ -23,6 +23,7 @@ import groovy.io.FileType
 import groovy.transform.Memoized
 import groovyx.net.http.HTTPBuilder
 import org.apache.commons.lang.StringUtils
+import org.apache.http.impl.client.DefaultHttpRequestRetryHandler
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -47,9 +48,6 @@ import java.nio.file.WatchEvent
 import java.nio.file.WatchKey
 import java.nio.file.WatchService
 import java.nio.file.attribute.BasicFileAttributes
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.temporal.ChronoUnit
 import java.util.jar.Attributes
 import java.util.jar.JarInputStream
 import java.util.jar.Manifest
@@ -1044,7 +1042,7 @@ class Util {
     static boolean hasNonResolvableConfigurations(Project project) {
         VersionNumber gradleVersion = VersionNumber.parse(project.gradle.gradleVersion)
         VersionNumber gradleVersionWithUnresolvableDeps = new VersionNumber(3, 3, 0, null)
-        gradleVersion >= gradleVersionWithUnresolvableDeps;
+        gradleVersion >= gradleVersionWithUnresolvableDeps
     }
 
     /**
@@ -1065,43 +1063,8 @@ class Util {
     }
 
     /**
-     * Gets the latest released Gradle plugin version
-     *
-     * @return
-     *      the latest released version number
+     * Gets the plugin properties defined in gradle.properties
      */
-    @Memoized
-    static VersionNumber getLatestReleaseVersion(Project project) {
-
-        // Read from cached version file
-        File pluginCacheDir = Paths.get(project.gradle.gradleUserHomeDir.canonicalPath,
-                'caches', 'gradle-vaadin-plugin').toFile()
-        pluginCacheDir.mkdirs()
-        File versionFile = new File(pluginCacheDir, 'latestVersion.txt')
-        if(versionFile.exists() && isWithin24Hours(versionFile.lastModified())){
-            return VersionNumber.parse(versionFile.text)
-        }
-
-        // Retrieve version from plugin page
-        VersionNumber number = VersionNumber.UNKNOWN
-        try {
-            HTTPBuilder http = new HTTPBuilder('https://plugins.gradle.org/plugin/com.devsoap.plugin.vaadin')
-            def html = http.get([:])
-            def versionNode = html."**".find { it.text().startsWith('Version') }
-            if(versionNode){
-                String[] parts = versionNode.text().split()
-                if(parts.length > 1){
-                    number = VersionNumber.parse(parts[1])
-                }
-            }
-        } catch (IOException | URISyntaxException e){
-            number = VersionNumber.UNKNOWN
-        }
-
-        versionFile.text = number.toString()
-        number
-    }
-
     @Memoized
     static Properties getPluginProperties() {
         Properties properties = new Properties()
@@ -1109,10 +1072,40 @@ class Util {
         properties
     }
 
-    static boolean isWithin24Hours(long epochTime) {
-        Instant time = Instant.ofEpochMilli(epochTime)
-        Instant now = Instant.now()
-        Instant twentyFourHoursEarlier = now.minus(24, ChronoUnit.HOURS)
-        !time.isBefore(twentyFourHoursEarlier) && time.isBefore(now)
+    /**
+     * Configures a HTTPBuilder with timeout and proxy settings
+     * @param http
+     *      the http builder
+     * @param timeout
+     *      the timeout in milliseconds for the request
+     * @param retryCount
+     *      the retry count of the request
+     * @return
+     *      the configured builder
+     */
+    static HTTPBuilder configureHttpBuilder(HTTPBuilder http, int timeout=5000, int retryCount=1) {
+        // SSL
+        http.ignoreSSLIssues()
+
+        // Timeout
+        http.client.params.setIntParameter('http.socket.timeout', timeout)
+        http.client.params.setIntParameter('http.connection.timeout', timeout)
+        http.client.params.setParameter('http.method.retry-handler',
+                new DefaultHttpRequestRetryHandler(retryCount, true))
+
+        // Proxy
+        int proxyPort = Integer.parseInt(System.getProperty('http.proxyPort', '-1'))
+        if (proxyPort > 0) {
+            String proxyScheme = System.getProperty('http.proxyScheme', 'http')
+            String proxyHost = System.getProperty('http.proxyHost', 'localhost')
+            http.setProxy(proxyHost, proxyPort, proxyScheme)
+            String proxyUser = System.getProperty('http.proxyUser', null)
+            if (proxyUser) {
+                String proxyPass = System.getProperty('http.proxyPassword', null)
+                http.auth.basic(proxyUser, proxyPass)
+            }
+        }
+
+        http
     }
 }

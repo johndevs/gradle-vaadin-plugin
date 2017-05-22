@@ -55,6 +55,7 @@ import com.devsoap.plugin.tasks.RunTask
 import com.devsoap.plugin.tasks.SuperDevModeTask
 import com.devsoap.plugin.tasks.UpdateAddonStylesTask
 import com.devsoap.plugin.tasks.UpdateWidgetsetTask
+import com.devsoap.plugin.tasks.VersionCheckTask
 import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.InvalidUserDataException
@@ -148,13 +149,15 @@ class GradleVaadinPlugin implements Plugin<Project> {
                     "Plugin requires Gradle $requiredVersion+")
         }
 
-        if (project == project.rootProject) {
-            project.logger.quiet("Using Gradle Vaadin Plugin $PLUGIN_VERSION")
-            VersionNumber latestReleasePluginVersion = Util.getLatestReleaseVersion(project)
-            VersionNumber pluginVersion = VersionNumber.parse(PLUGIN_VERSION)
-            if(latestReleasePluginVersion > pluginVersion){
-                project.logger.warn "!! A newer version of the Gradle Vaadin plugin is available, " +
-                        "please upgrade to $latestReleasePluginVersion !!"
+        // Add version check as first task
+        if(gradle.startParameter.taskNames.find { it.contains('vaadin')} &&
+            !gradle.startParameter.taskNames.find { it.contains(VersionCheckTask.NAME)}){
+            if(gradle.rootProject == project) {
+                gradle.startParameter.taskNames = gradle.startParameter.taskNames.plus(0,
+                        ":$VersionCheckTask.NAME".toString())
+            } else {
+                gradle.startParameter.taskNames = gradle.startParameter.taskNames.plus(0,
+                        "$project.name:$VersionCheckTask.NAME".toString())
             }
         }
 
@@ -263,10 +266,8 @@ class GradleVaadinPlugin implements Plugin<Project> {
             // Add plugin development repository if specified
             if ( (debugDir as File)?.exists( )
                     && !repositories.findByName(PLUGIN_DEVELOPMENTTIME_REPOSITORY_NAME)) {
+                project.logger.lifecycle("Using development libs found at " + debugDir)
                 repositories.flatDir(name:PLUGIN_DEVELOPMENTTIME_REPOSITORY_NAME, dirs:debugDir)
-                if(project == project.rootProject){
-                    project.logger.lifecycle("Using development libs found at " + debugDir)
-                }
             }
         }
     }
@@ -555,6 +556,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
         tasks.create(name:BuildSourcesJarTask.NAME, type:BuildSourcesJarTask, group:VAADIN_UTIL_TASK_GROUP)
         tasks.create(name:BuildJavadocJarTask.NAME, type:BuildJavadocJarTask, group:VAADIN_UTIL_TASK_GROUP)
         tasks.create(name:BuildClassPathJar.NAME, type:BuildClassPathJar, group:VAADIN_UTIL_TASK_GROUP)
+        tasks.create(name:VersionCheckTask.NAME, type:VersionCheckTask, group:VAADIN_UTIL_TASK_GROUP)
     }
 
     static void applyVaadinTestbenchTasks(Project project) {
