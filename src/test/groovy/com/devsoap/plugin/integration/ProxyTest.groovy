@@ -3,14 +3,11 @@ package com.devsoap.plugin.integration
 import com.devsoap.plugin.tasks.CompileWidgetsetTask
 import com.devsoap.plugin.tasks.CreateProjectTask
 import groovy.json.JsonSlurper
-import groovy.transform.Memoized
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mockserver.integration.ClientAndProxy
-
 import java.nio.file.Paths
-
 import static org.junit.Assert.assertTrue
 import static org.junit.Assert.assertEquals
 import static org.mockserver.integration.ClientAndProxy.startClientAndProxy
@@ -69,22 +66,23 @@ class ProxyTest extends IntegrationTest {
         assertTrue 'Widgetsets folder did not contain widgetset',
                 widgetsetFolder.listFiles().size() == 1
 
-        assertTrue 'Vaadin version was not right',  getRequest(0).vaadinVersion.startsWith('8')
-        assertEquals 'Compile style not correct', getRequest(0).compileStyle, 'OBF'
+        Map request = getRequest('/api/compiler/download')
+        assertTrue 'Vaadin version was not right',  request.vaadinVersion.startsWith('8')
+        assertEquals 'Compile style not correct', request.compileStyle, 'OBF'
 
-        Map qrCodeAddon = getRequest(0).addons[0]
+        Map qrCodeAddon = request.addons[0]
         assertEquals qrCodeAddon.groupId, 'org.vaadin.addons'
         assertEquals qrCodeAddon.artifactId, 'qrcode'
         assertEquals qrCodeAddon.version, '2.1'
     }
 
-    @Memoized
-    private Map getRequest(int index) {
-        new JsonSlurper().parseText(parseRequests()[index].body)
+    private Map getRequest(String path) {
+        (Map) new JsonSlurper().parseText(parseRequests()
+                .find { req -> req.path == path }.body)
     }
 
-    @Memoized
-    private List parseRequests() {
-        new JsonSlurper().parseText(proxy.retrieveAsJSON())
+    private List<Map> parseRequests() {
+        String json = proxy.retrieveAsJSON(null)
+        (List<Map>) new JsonSlurper().parseText(json)
     }
 }

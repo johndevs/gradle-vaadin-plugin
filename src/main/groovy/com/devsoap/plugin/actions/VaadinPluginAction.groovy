@@ -20,6 +20,7 @@ import com.devsoap.plugin.tasks.CreateDirectoryZipTask
 import groovy.transform.PackageScope
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.invocation.Gradle
 
 /**
  * Actions applied when the Vaadin plugin is added to the build
@@ -39,6 +40,12 @@ class VaadinPluginAction extends PluginAction {
                 configureAddonZipMetadata(task)
                 break
         }
+    }
+
+    @Override
+    protected void executeAfterEvaluate(Project project) {
+        super.executeAfterEvaluate(project)
+        VersionPrinter.instance.printIfNotPrintedBefore(project)
     }
 
     @PackageScope
@@ -63,5 +70,17 @@ class VaadinPluginAction extends PluginAction {
         File manifestFile = project.file(meta.absolutePath + '/MANIFEST.MF')
         manifestFile.createNewFile()
         manifestFile << attributes.collect { key, value -> "$key: $value" }.join("\n")
+    }
+
+    @Singleton(lazy = false, strict = true)
+    static class VersionPrinter {
+        private Gradle gradle
+        void printIfNotPrintedBefore(Project project) {
+            if(project.gradle == gradle){
+                return
+            }
+            gradle = project.gradle
+            project.logger.quiet "Using Gradle Vaadin Plugin $GradleVaadinPlugin.PLUGIN_VERSION"
+        }
     }
 }
