@@ -16,8 +16,8 @@
 package com.devsoap.plugin.tasks
 
 import com.devsoap.plugin.Util
-import com.devsoap.plugin.configuration.CompileThemeConfiguration
 import com.devsoap.plugin.configuration.VaadinPluginExtension
+
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -30,7 +30,6 @@ import org.gradle.tooling.BuildActionFailureException
 import java.nio.file.Paths
 import java.util.jar.Attributes
 import java.util.jar.JarInputStream
-
 /**
  * Compiles the SASS theme into CSS
  *
@@ -230,10 +229,11 @@ class CompileThemeTask extends DefaultTask {
      *      returns the directory where the themes has been unpacked
      */
     static File unpackThemes(Project project) {
-
         // Unpack Vaadin and addon themes
-        File unpackedThemesDir = project.file("$project.buildDir/themes")
+        File unpackedThemesDir = project.file("$project.buildDir/VAADIN/themes")
+        File unpackedAddonsThemesDir = project.file("$project.buildDir/VAADIN/addons")
         unpackedThemesDir.mkdirs()
+        unpackedAddonsThemesDir.mkdirs()
 
         project.logger.info("Unpacking themes to $unpackedThemesDir")
         def themesAttribute = new Attributes.Name('Vaadin-Stylesheets')
@@ -256,16 +256,16 @@ class CompileThemeTask extends DefaultTask {
                                 def mf = jarStream.manifest
                                 def attributes = mf?.mainAttributes
                                 String value = attributes?.getValue(themesAttribute)
-                                String themesValue = attributes?.getValue(bundleName) == 'vaadin-themes'
+                                def themesValue = attributes?.getValue(bundleName) == 'vaadin-themes'
                                 if ( value || themesValue ) {
                                     project.logger.info("Unpacking $file")
                                     project.copy {
                                         includeEmptyDirs = false
                                         from project.zipTree(file)
-                                        into unpackedThemesDir
-                                        include 'VAADIN/themes/**/*'
+                                        into project.file("$project.buildDir/VAADIN")
+                                        include 'VAADIN/themes/**/*.scss', 'VAADIN/addons/**/*.scss'
                                         eachFile { details ->
-                                            details.path -= 'VAADIN/themes/'
+                                            details.path -= 'VAADIN'
                                         }
                                     }
                                 }
@@ -278,7 +278,7 @@ class CompileThemeTask extends DefaultTask {
 
         // Copy project theme into unpacked directory
         project.logger.info "Copying project theme into $unpackedThemesDir"
-        project.copy{
+        project.copy {
             from Util.getThemesDirectory(project)
             into unpackedThemesDir
         }
