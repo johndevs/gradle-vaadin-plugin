@@ -232,8 +232,9 @@ class CompileThemeTask extends DefaultTask {
      */
     static File unpackThemes(Project project) {
         // Unpack Vaadin and addon themes
-        File unpackedThemesDir = project.file("$project.buildDir/VAADIN/themes")
-        File unpackedAddonsThemesDir = project.file("$project.buildDir/VAADIN/addons")
+        File unpackedVaadinDir = project.file("$project.buildDir/VAADIN")
+        File unpackedThemesDir = project.file("$unpackedVaadinDir/themes")
+        File unpackedAddonsThemesDir = project.file("$unpackedVaadinDir/addons")
         unpackedThemesDir.mkdirs()
         unpackedAddonsThemesDir.mkdirs()
 
@@ -258,13 +259,13 @@ class CompileThemeTask extends DefaultTask {
                                 def mf = jarStream.manifest
                                 def attributes = mf?.mainAttributes
                                 String value = attributes?.getValue(themesAttribute)
-                                def themesValue = attributes?.getValue(bundleName) == 'vaadin-themes'
+                                Boolean themesValue = attributes?.getValue(bundleName) == 'vaadin-themes'
                                 if ( value || themesValue ) {
                                     project.logger.info("Unpacking $file")
                                     project.copy {
                                         includeEmptyDirs = false
                                         from project.zipTree(file)
-                                        into project.file("$project.buildDir/VAADIN")
+                                        into unpackedVaadinDir
                                         include 'VAADIN/themes/**/*.scss', 'VAADIN/addons/**/*.scss'
                                         eachFile { details ->
                                             details.path -= 'VAADIN'
