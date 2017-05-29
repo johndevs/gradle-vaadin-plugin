@@ -397,8 +397,7 @@ abstract class ApplicationServer {
     @PackageScope
     static watchThemeDirectoryForChanges(final ApplicationServer server) {
         Project project = server.project
-        CompileThemeConfiguration compileConf = Util.findOrCreateExtension(project,
-                CompileThemeTask.NAME, CompileThemeConfiguration)
+        CompileThemeConfiguration compileConf = Util.findOrCreateExtension(project, CompileThemeConfiguration)
 
         File themesDir = Util.getThemesDirectory(project)
         if ( themesDir.exists() ) {

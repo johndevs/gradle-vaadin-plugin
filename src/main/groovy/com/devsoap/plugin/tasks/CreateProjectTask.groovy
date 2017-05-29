@@ -46,6 +46,7 @@ class CreateProjectTask extends DefaultTask {
 
     public CreateProjectTask() {
         description = "Creates a new Vaadin Project."
+        finalizedBy UpdateAddonStylesTask.NAME, CompileThemeTask.NAME
     }
 
     @TaskAction
@@ -65,15 +66,11 @@ class CreateProjectTask extends DefaultTask {
                 projectType: Util.getProjectType(project)
         ).run()
 
-        if ( Util.isAddonStylesSupported(project) ) {
-
-            new ThemeCreator(themeName:resolveApplicationName(),
-                    themesDirectory:Util.getThemesDirectory(project),
-                    vaadinVersion:Util.getVaadinVersion(project)
-            ).run()
-
-            project.tasks[UpdateAddonStylesTask.NAME].run()
-        }
+        new ThemeCreator(
+                themeName:resolveApplicationName(),
+                themesDirectory:Util.getThemesDirectory(project),
+                vaadinVersion:Util.getVaadinVersion(project)
+        ).run()
 
         UpdateWidgetsetTask.ensureWidgetPresent(project, widgetsetFQN)
     }
@@ -93,6 +90,7 @@ class CreateProjectTask extends DefaultTask {
     @PackageScope
     String resolveApplicationPackage() {
         def configuration = Util.findOrCreateExtension(project,CompileWidgetsetConfiguration)
+
         if ( !applicationPackage ) {
             int endSlashSize = 2
             if ( widgetsetFQN?.contains(DOT) ) {

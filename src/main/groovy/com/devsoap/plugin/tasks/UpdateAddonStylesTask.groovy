@@ -34,6 +34,7 @@ class UpdateAddonStylesTask extends DefaultTask {
     UpdateAddonStylesTask() {
         dependsOn('classes', BuildClassPathJar.NAME)
         description = 'Updates the addons.scss file with addon styles.'
+        onlyIf { Util.isAddonStylesSupported(project) }
 
         project.afterEvaluate {
 
