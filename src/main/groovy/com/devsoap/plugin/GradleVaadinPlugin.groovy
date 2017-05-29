@@ -56,6 +56,7 @@ import com.devsoap.plugin.tasks.SuperDevModeTask
 import com.devsoap.plugin.tasks.UpdateAddonStylesTask
 import com.devsoap.plugin.tasks.UpdateWidgetsetTask
 import com.devsoap.plugin.tasks.VersionCheckTask
+
 import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.InvalidUserDataException
@@ -71,7 +72,6 @@ import org.gradle.api.artifacts.ModuleVersionSelector
 import org.gradle.api.artifacts.dsl.ArtifactHandler
 import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.artifacts.dsl.RepositoryHandler
-import org.gradle.api.file.FileTree
 import org.gradle.api.invocation.Gradle
 import org.gradle.api.plugins.WarPlugin
 import org.gradle.api.tasks.TaskContainer
@@ -414,31 +414,27 @@ class GradleVaadinPlugin implements Plugin<Project> {
         configurations.create(CONFIGURATION_THEME) { conf ->
             conf.description = 'Libraries needed for SASS theme compilation'
             conf.defaultDependencies { dependencies ->
-                FileTree themes = project.fileTree(
-                        dir: Util.getThemesDirectory(project).canonicalPath,
-                        include: '**/styles.scss')
-
-                if ( !themes.isEmpty() ) {
-                    switch (project.vaadinThemeCompile.compiler) {
-                        case 'vaadin':
-                            if(Util.isThemeDependencyNeeded(project)) {
-                                VersionNumber version = VersionNumber.parse(Util.getResolvedVaadinVersion(project))
-                                if(version.major == 7) {
-                                    Dependency themeCompiler = projectDependencies.create(
-                                            "com.vaadin:vaadin-theme-compiler:${Util.getVaadinVersion(project)}")
-                                    dependencies.add(themeCompiler)
-                                } else {
-                                    Dependency themeCompiler = projectDependencies.create(
-                                            "com.vaadin:vaadin-sass-compiler:+")
-                                    dependencies.add(themeCompiler)
-                                }
+                def themeConf = Util.findOrCreateExtension(project, CompileThemeConfiguration)
+                switch (themeConf.compiler) {
+                    case 'vaadin':
+                        if(Util.isThemeDependencyNeeded(project)) {
+                            VersionNumber version = VersionNumber.parse(Util.getResolvedVaadinVersion(project))
+                            if (version.major == 7) {
+                                Dependency themeCompiler = projectDependencies.create(
+                                        "com.vaadin:vaadin-theme-compiler:${Util.getVaadinVersion(project)}")
+                                dependencies.add(themeCompiler)
+                            } else {
+                                Dependency themeCompiler = projectDependencies.create(
+                                        "com.vaadin:vaadin-sass-compiler:+")
+                                dependencies.add(themeCompiler)
                             }
-                            break
+                        }
+                        break
                         case 'compass':
                             Dependency jruby = projectDependencies.create(
                                     "org.jruby:jruby-complete:${Util.pluginProperties.getProperty('jruby.version')}")
                             dependencies.add(jruby)
-                            break
+                        break
                         case 'libsass':
                             Dependency libsass = projectDependencies.create(
                                     "io.bit3:jsass:${Util.pluginProperties.getProperty('jsass.version')}")
@@ -447,16 +443,12 @@ class GradleVaadinPlugin implements Plugin<Project> {
                             Dependency plugin = projectDependencies.create(
                                     "com.devsoap.plugin:gradle-vaadin-plugin:${GradleVaadinPlugin.version}")
                             dependencies.add(plugin)
-                            break
+                        break
                         default:
                             throw new GradleException(
                                     "Selected theme compiler \"${project.vaadinThemeCompile.compiler}\" is not valid")
                     }
-                } else {
-                    project.logger.warn("No themes were found in themes directory $themes, " +
-                            "skipping theme compiler dependencies")
                 }
-            }
 
             sources.compileClasspath += conf
             testSources.compileClasspath += conf
