@@ -264,7 +264,7 @@ class CompileThemeTask extends DefaultTask {
                                         includeEmptyDirs = false
                                         from project.zipTree(file)
                                         into unpackedVaadinDir
-                                        include 'VAADIN/themes/**/*.scss', 'VAADIN/addons/**/*.scss'
+                                        include 'VAADIN/themes/**/*', 'VAADIN/addons/**/*'
                                         eachFile { details ->
                                             details.path -= 'VAADIN'
                                         }
