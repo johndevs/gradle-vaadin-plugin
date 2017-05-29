@@ -46,11 +46,13 @@ class CreateProjectTask extends DefaultTask {
 
     public CreateProjectTask() {
         description = "Creates a new Vaadin Project."
+        finalizedBy UpdateAddonStylesTask.NAME, CompileThemeTask.NAME
     }
 
     @TaskAction
     def run() {
-        def configuration = project.vaadinCompile as CompileWidgetsetConfiguration
+        def configuration = Util.findOrCreateExtension(project, CompileWidgetsetTask.NAME,
+                CompileWidgetsetConfiguration)
 
         new ProjectCreator(
                 applicationName:resolveApplicationName(),
@@ -65,15 +67,11 @@ class CreateProjectTask extends DefaultTask {
                 groovyProject: Util.isGroovyProject(project)
         ).run()
 
-        if ( Util.isAddonStylesSupported(project) ) {
-
-            new ThemeCreator(themeName:resolveApplicationName(),
-                    themesDirectory:Util.getThemesDirectory(project),
-                    vaadinVersion:Util.getVaadinVersion(project)
-            ).run()
-
-            project.tasks[UpdateAddonStylesTask.NAME].run()
-        }
+        new ThemeCreator(
+                themeName:resolveApplicationName(),
+                themesDirectory:Util.getThemesDirectory(project),
+                vaadinVersion:Util.getVaadinVersion(project)
+        ).run()
 
         UpdateWidgetsetTask.ensureWidgetPresent(project, widgetsetFQN)
     }
@@ -92,7 +90,9 @@ class CreateProjectTask extends DefaultTask {
 
     @PackageScope
     String resolveApplicationPackage() {
-        def configuration = project.vaadinCompile as CompileWidgetsetConfiguration
+        def configuration = Util.findOrCreateExtension(project, CompileWidgetsetTask.NAME,
+                CompileWidgetsetConfiguration)
+
         if ( !applicationPackage ) {
             int endSlashSize = 2
             if ( widgetsetFQN?.contains(DOT) ) {
