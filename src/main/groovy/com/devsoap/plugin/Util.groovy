@@ -176,10 +176,17 @@ class Util {
     static SourceDirectorySet getMainSourceSet(Project project, boolean forceDefaultJavaSourceset=false) {
         if ( project.vaadin.mainSourceSet ) {
             project.vaadin.mainSourceSet
-        } else if ( isGroovyProject(project) && !forceDefaultJavaSourceset ) {
-            project.sourceSets.main.groovy
-        } else {
+        } else if(forceDefaultJavaSourceset) {
             project.sourceSets.main.java
+        } else {
+            switch (getProjectType(project)) {
+                case ProjectType.GROOVY:
+                    return project.sourceSets.main.groovy
+                case ProjectType.KOTLIN:
+                    return project.sourceSets.main.kotlin
+                case ProjectType.JAVA:
+                    return project.sourceSets.main.java
+            }
         }
     }
 
@@ -197,10 +204,17 @@ class Util {
     static SourceDirectorySet getMainTestSourceSet(Project project, forceDefaultJavaSourceset=false) {
         if ( project.vaadin.mainTestSourceSet ) {
             project.vaadin.mainTestSourceSet
-        } else if ( isGroovyProject(project) && !forceDefaultJavaSourceset ) {
-            project.sourceSets.test.groovy
-        } else {
+        } else if(forceDefaultJavaSourceset) {
             project.sourceSets.test.java
+        } else {
+            switch (getProjectType(project)) {
+                case ProjectType.GROOVY:
+                    return project.sourceSets.test.groovy
+                case ProjectType.KOTLIN:
+                    return project.sourceSets.test.kotlin
+                case ProjectType.JAVA:
+                    return project.sourceSets.test.java
+            }
         }
     }
 
@@ -349,18 +363,15 @@ class Util {
         paths
     }
 
-    /**
-     * Is the project a groovy Vaadin project
-     *
-     * @param project
-     *      the project to check groovyness on
-     *
-     * @return
-     *      <code>true</code> if project is a groovy project
-     */
     @Memoized
-    static boolean isGroovyProject(Project project) {
-        project.plugins.findPlugin(GradleVaadinGroovyPlugin)
+    static ProjectType getProjectType(Project project) {
+        if(project.plugins.findPlugin(GradleVaadinGroovyPlugin)) {
+            ProjectType.GROOVY
+        } else if (project.plugins.findPlugin('org.jetbrains.kotlin.jvm')) {
+            ProjectType.KOTLIN
+        } else {
+            ProjectType.JAVA
+        }
     }
 
     /**
