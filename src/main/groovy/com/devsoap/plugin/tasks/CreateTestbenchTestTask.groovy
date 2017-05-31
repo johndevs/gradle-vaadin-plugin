@@ -15,6 +15,7 @@
 */
 package com.devsoap.plugin.tasks
 
+import com.devsoap.plugin.ProjectType
 import com.devsoap.plugin.TemplateUtil
 import com.devsoap.plugin.Util
 import com.devsoap.plugin.configuration.ApplicationServerConfiguration
@@ -64,7 +65,7 @@ class CreateTestbenchTestTask extends DefaultTask {
         substitutions['testName'] = testName
         substitutions['appUrl'] = "http://localhost:${serverConfiguration.serverPort}"
 
-        if ( Util.isGroovyProject(project) ) {
+        if ( Util.getProjectType(project) == ProjectType.GROOVY ) {
             TemplateUtil.writeTemplate("MyTest.groovy", packageDir, testName + ".groovy", substitutions)
         } else {
             TemplateUtil.writeTemplate("MyTest.java", packageDir, testName + ".java", substitutions)

@@ -15,6 +15,7 @@
 */
 package com.devsoap.plugin.creators
 
+import com.devsoap.plugin.ProjectType
 import com.devsoap.plugin.TemplateUtil
 import com.devsoap.plugin.configuration.CompileWidgetsetConfiguration
 import groovy.transform.Canonical
@@ -36,7 +37,7 @@ class ProjectCreator implements Runnable {
     private CompileWidgetsetConfiguration widgetsetConfiguration
     private boolean pushSupported = true
     private boolean addonStylesSupported = true
-    private boolean groovyProject = false
+    private ProjectType projectType = ProjectType.JAVA
     private File javaDir
     private File resourceDir
     private String templateDir
@@ -78,24 +79,49 @@ class ProjectCreator implements Runnable {
         }
 
         if ( addonStylesSupported ) {
-            if ( groovyProject ) {
-                uiAnnotations.add("Theme('${applicationName}')")
-            } else {
-                uiAnnotations.add("Theme(\"${applicationName}\")")
+            switch (projectType) {
+                case ProjectType.GROOVY:
+                    uiAnnotations.add("Theme('${applicationName}')")
+                    break
+                case ProjectType.KOTLIN:
+                    uiAnnotations.add("Theme(\"${applicationName}\")")
+                    break
+                case ProjectType.JAVA:
+                    uiAnnotations.add("Theme(\"${applicationName}\")")
             }
         }
 
         uiSubstitutions['annotations'] = uiAnnotations
 
-        if ( groovyProject ) {
-            TemplateUtil.writeTemplate("$templateDir/MyUI.groovy",
-                    UIDir, "${applicationName}UI.groovy", uiSubstitutions)
-            new File(UIDir, "${applicationName}UI.groovy")
-        } else {
-            TemplateUtil.writeTemplate("$templateDir/MyUI.java",
-                    UIDir, "${applicationName}UI.java", uiSubstitutions)
-            new File (UIDir, "${applicationName}UI.java")
+        File uiClass
+        switch (projectType) {
+            case ProjectType.GROOVY:
+                TemplateUtil.writeTemplate(
+                        "$templateDir/MyUI.groovy",
+                        UIDir,
+                        "${applicationName}UI.groovy",
+                        uiSubstitutions)
+                uiClass = new File(UIDir, "${applicationName}UI.groovy")
+                break
+
+            case ProjectType.KOTLIN:
+                TemplateUtil.writeTemplate(
+                        "$templateDir/MyUI.kt",
+                        UIDir,
+                        "${applicationName}UI.kt",
+                        uiSubstitutions)
+                uiClass = new File(UIDir, "${applicationName}UI.kt")
+                break
+
+            case ProjectType.JAVA:
+                TemplateUtil.writeTemplate(
+                        "$templateDir/MyUI.java",
+                        UIDir,
+                        "${applicationName}UI.java",
+                        uiSubstitutions)
+                uiClass = new File (UIDir, "${applicationName}UI.java")
         }
+        uiClass
     }
 
     @PackageScope
@@ -117,15 +143,25 @@ class ProjectCreator implements Runnable {
 
         servletSubstitutions['initParams'] = initParams
 
-        if ( groovyProject ) {
-            TemplateUtil.writeTemplate("$templateDir/MyServlet.groovy",
-                    UIDir, "${applicationName}Servlet.groovy", servletSubstitutions)
-            new File(UIDir, "${applicationName}Servlet.groovy")
-        } else {
-            TemplateUtil.writeTemplate("$templateDir/MyServlet.java",
-                    UIDir, "${applicationName}Servlet.java", servletSubstitutions)
-            new File(UIDir, "${applicationName}Servlet.java")
+        File servletClass
+        switch (projectType) {
+            case ProjectType.GROOVY:
+                TemplateUtil.writeTemplate("$templateDir/MyServlet.groovy",
+                        UIDir, "${applicationName}Servlet.groovy", servletSubstitutions)
+                servletClass = new File(UIDir, "${applicationName}Servlet.groovy")
+                break
+            case ProjectType.KOTLIN:
+                TemplateUtil.writeTemplate("$templateDir/MyServlet.kt",
+                        UIDir, "${applicationName}Servlet.kt", servletSubstitutions)
+                servletClass = new File(UIDir, "${applicationName}Servlet.kt")
+                break
+            case ProjectType.JAVA:
+                TemplateUtil.writeTemplate("$templateDir/MyServlet.java",
+                        UIDir, "${applicationName}Servlet.java", servletSubstitutions)
+                servletClass = new File(UIDir, "${applicationName}Servlet.java")
         }
+
+        servletClass
     }
 
     @PackageScope

@@ -62,7 +62,7 @@ class CreateProjectTask extends DefaultTask {
                 javaDir:Util.getMainSourceSet(project).srcDirs.first(),
                 resourceDir:project.sourceSets.main.resources.srcDirs.iterator().next(),
                 templateDir: 'simpleProject',
-                groovyProject: Util.isGroovyProject(project)
+                projectType: Util.getProjectType(project)
         ).run()
 
         if ( Util.isAddonStylesSupported(project) ) {

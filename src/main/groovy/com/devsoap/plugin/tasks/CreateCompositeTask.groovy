@@ -15,6 +15,7 @@
 */
 package com.devsoap.plugin.tasks
 
+import com.devsoap.plugin.ProjectType
 import com.devsoap.plugin.TemplateUtil
 import com.devsoap.plugin.Util
 import com.devsoap.plugin.configuration.CompileWidgetsetConfiguration
@@ -67,7 +68,7 @@ class CreateCompositeTask extends DefaultTask {
         substitutions['componentPackage'] = componentPackage
         substitutions['componentName'] = componentName
 
-        if ( Util.isGroovyProject(project) ) {
+        if ( Util.getProjectType(project) == ProjectType.GROOVY) {
             TemplateUtil.writeTemplate("MyComposite.groovy", componentDir, componentName + ".groovy", substitutions)
         } else {
             TemplateUtil.writeTemplate("MyComposite.java", componentDir, componentName + ".java", substitutions)
