@@ -98,11 +98,14 @@ class Util {
      */
     @Memoized
     static FileCollection getCompileClassPathOrJar(Project project) {
-        VaadinPluginExtension vaadin = project.vaadin as VaadinPluginExtension
+        def vaadin = findOrCreateExtension(project, VaadinPluginExtension)
         FileCollection classpath
         if ( vaadin.useClassPathJar ) {
             // Add dependencies using the classpath jar
-            BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
+            BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, false).first()
+            if(!pathJarTask.archivePath.exists()) {
+                throw new IllegalStateException("Classpath jar has not been created in project $pathJarTask.project")
+            }
             classpath = project.files(pathJarTask.archivePath)
         } else {
             classpath = getCompileClassPath(project)
