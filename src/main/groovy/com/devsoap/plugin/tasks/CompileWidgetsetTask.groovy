@@ -16,6 +16,7 @@
 package com.devsoap.plugin.tasks
 
 import com.devsoap.plugin.GradleVaadinPlugin
+import com.devsoap.plugin.ProjectType
 import com.devsoap.plugin.TemplateUtil
 import com.devsoap.plugin.Util
 import com.devsoap.plugin.configuration.CompileWidgetsetConfiguration
@@ -48,7 +49,6 @@ class CompileWidgetsetTask extends DefaultTask {
     static final WIDGETSET_CDN_URL = 'https://wsc.vaadin.com/'
     static final String PUBLIC_FOLDER_PATTERN = '**/*/public/**/*.*'
     static final String GWT_MODULE_XML_PATTERN = '**/*/*.gwt.xml'
-    static final String APPWIDGETSET_JAVA_FILE = 'AppWidgetset.java'
 
     /**
      * HTTP POST request sent to CDN for requesting a widgetset.
@@ -142,12 +142,28 @@ class CompileWidgetsetTask extends DefaultTask {
         }
         zipStream.close()
 
-        project.logger.info("Generating AppWidgetset.java")
+        project.logger.info("Generating AppWidgetset")
 
         def substitutions = [:]
         substitutions['widgetsetName'] = generatedWidgetSetName
         File sourceDir = Util.getMainSourceSet(project).srcDirs.first()
-        TemplateUtil.writeTemplate(APPWIDGETSET_JAVA_FILE, sourceDir, APPWIDGETSET_JAVA_FILE,  substitutions)
+
+        String widgetsetName = 'AppWidgetset'
+        switch (Util.getProjectType(project)) {
+            case ProjectType.JAVA:
+                TemplateUtil.writeTemplate("${widgetsetName}.java", sourceDir,
+                        "${widgetsetName}.java",  substitutions)
+                break
+            case ProjectType.GROOVY:
+                TemplateUtil.writeTemplate("${widgetsetName}.groovy", sourceDir,
+                        "${widgetsetName}.groovy",  substitutions)
+                break
+            case ProjectType.KOTLIN:
+                TemplateUtil.writeTemplate("${widgetsetName}.kt", sourceDir,
+                        "${widgetsetName}.kt",  substitutions)
+                break
+
+        }
     }
 
     CompileWidgetsetTask() {
