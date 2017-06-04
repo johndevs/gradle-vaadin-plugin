@@ -91,7 +91,7 @@ class SuperDevModeTask extends DefaultTask {
         superdevmodeProcess += ['-cp', classpath.asPath]
         superdevmodeProcess += 'com.google.gwt.dev.codeserver.CodeServer'
         superdevmodeProcess += ['-bindAddress', configuration.bindAddress]
-        superdevmodeProcess += ['-port', 9876]
+        superdevmodeProcess += ['-port', configuration.codeServerPort ]
         superdevmodeProcess += ['-workDir', widgetsetsDir.canonicalPath]
         superdevmodeProcess += ['-src', javaDir.canonicalPath]
         superdevmodeProcess += ['-logLevel', configuration.logLevel]
