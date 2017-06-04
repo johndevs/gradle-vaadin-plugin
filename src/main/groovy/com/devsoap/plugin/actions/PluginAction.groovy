@@ -15,7 +15,6 @@
 */
 package com.devsoap.plugin.actions
 
-import com.devsoap.plugin.GradleVaadinGroovyPlugin
 import com.devsoap.plugin.GradleVaadinPlugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -61,8 +60,7 @@ abstract class PluginAction {
 
     final static boolean isApplicable(Task task) {
         PluginManager pluginManager = task.project.pluginManager
-        pluginManager.hasPlugin(GradleVaadinPlugin.pluginId) || pluginManager
-                .hasPlugin(GradleVaadinGroovyPlugin.pluginId)
+        pluginManager.hasPlugin(GradleVaadinPlugin.pluginId)
     }
 
     final class TaskListener implements TaskExecutionListener {
