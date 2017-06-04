@@ -39,7 +39,7 @@ class CompressCssTask extends DefaultTask {
      */
     CompressCssTask() {
         description = 'Compresses the theme with GZip'
-        configuration = Util.findOrCreateExtension(project, CompileThemeTask.NAME, CompileThemeConfiguration)
+        configuration = Util.findOrCreateExtension(project, CompileThemeConfiguration)
         onlyIf = { configuration.compress }
         project.afterEvaluate {
             File themesDir = Util.getThemesDirectory(project)

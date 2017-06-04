@@ -19,6 +19,7 @@ package fi.jasoft.plugin.configuration
  * Configuration for the groovy plugin
  */
 @PluginConfiguration
+@PluginConfigurationName('vaadinGroovy')
 class VaadinPluginGroovyExtension {
 
     /*

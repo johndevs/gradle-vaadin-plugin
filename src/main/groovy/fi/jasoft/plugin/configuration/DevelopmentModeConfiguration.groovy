@@ -16,6 +16,7 @@
 package fi.jasoft.plugin.configuration
 
 import fi.jasoft.plugin.MessageLogger
+import fi.jasoft.plugin.tasks.DevModeTask
 import org.gradle.api.Project
 
 /**
@@ -23,8 +24,8 @@ import org.gradle.api.Project
  *
  * @author John Ahlroos
  */
-@PluginConfiguration
 @Deprecated
+@PluginConfiguration
 class DevelopmentModeConfiguration {
 
     @Deprecated

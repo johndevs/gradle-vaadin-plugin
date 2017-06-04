@@ -15,12 +15,12 @@
 */
 package fi.jasoft.plugin.tasks
 
+import fi.jasoft.plugin.configuration.DevModeConfiguration
 import fi.jasoft.plugin.configuration.SuperDevModeConfiguration
 import fi.jasoft.plugin.servers.ApplicationServer
 import fi.jasoft.plugin.Util
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
-import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -61,7 +61,7 @@ class DevModeTask extends DefaultTask {
         dependsOn('classes', UpdateWidgetsetTask.NAME)
         description = "Run Development Mode for easier debugging and development of client widgets."
         Runtime.getRuntime().addShutdownHook(cleanupThread)
-        configuration = Util.findOrCreateExtension(project, NAME, SuperDevModeConfiguration)
+        configuration = Util.findOrCreateExtension(project, DevModeConfiguration)
     }
 
     @TaskAction

@@ -1,13 +1,18 @@
 package ${packageName};
 
-import static org.junit.Assert.*;
-
-import org.junit.*;
-import org.openqa.selenium.*;
-import org.openqa.selenium.firefox.FirefoxDriver;
-
 import com.vaadin.testbench.TestBench;
 import com.vaadin.testbench.TestBenchTestCase;
+import io.github.bonigarcia.wdm.ChromeDriverManager;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+
+import static org.junit.Assert.assertTrue;
 
 public class ${testName} extends TestBenchTestCase {
 
@@ -15,14 +20,23 @@ public class ${testName} extends TestBenchTestCase {
 
 	private String baseUrl;
 
+    /*
+     * Executed first time the class is instantiated
+     */
+    @BeforeClass
+	public static void setupClass() {
+		// Configure browser driver (see https://github.com/bonigarcia/webdrivermanager for a list of browser options)
+		ChromeDriverManager.getInstance().setup();
+	}
+
 	/*
 	 * Executed before the test is run
 	 */
 	@Before
 	public void setUp() throws Exception {
 		
-		// Using the Firefox driver (firefox need to be installed)
-		driver = TestBench.createDriver(new FirefoxDriver());
+		// Using the Chrome driver (Google Chrome need to be installed)
+        driver = TestBench.createDriver(new ChromeDriver());
 		
 		// URL where the tested application can be accessed
 		baseUrl = "${appUrl}";
@@ -35,7 +49,9 @@ public class ${testName} extends TestBenchTestCase {
 	public void tearDown() throws Exception {
 		
 		// Terminate the driver
-		driver.quit();
+        if(driver != null){
+            driver.quit();
+        }
 	}
 
 	@Test

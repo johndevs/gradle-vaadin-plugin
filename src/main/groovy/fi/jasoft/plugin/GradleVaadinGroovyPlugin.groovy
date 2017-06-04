@@ -43,7 +43,7 @@ class GradleVaadinGroovyPlugin extends GradleVaadinPlugin {
         project.plugins.apply(GroovyPlugin)
 
         // Extensions
-        Util.findOrCreateExtension(project, NAME, VaadinPluginGroovyExtension)
+        Util.findOrCreateExtension(project, VaadinPluginGroovyExtension)
 
         // Dependencies
         if ( project.vaadin.manageDependencies ) {
