@@ -368,7 +368,7 @@ class Util {
 
     @Memoized
     static ProjectType getProjectType(Project project) {
-        if(project.plugins.findPlugin(GradleVaadinGroovyPlugin)) {
+        if(project.plugins.findPlugin('groovy')) {
             ProjectType.GROOVY
         } else if (project.plugins.findPlugin('org.jetbrains.kotlin.jvm')) {
             ProjectType.KOTLIN

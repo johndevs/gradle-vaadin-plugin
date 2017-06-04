@@ -286,17 +286,11 @@ pluginBundle {
     website = 'https://github.com/johndevs/gradle-vaadin-plugin/wiki'
     vcsUrl = 'https://github.com/johndevs/gradle-vaadin-plugin'
     description = 'Build Vaadin applications with Gradle!'
-    tags = ['vaadin']
+    tags = ['vaadin', 'java', 'groovy', 'kotlin']
     plugins {
         vaadinPlugin {
             id = 'com.devsoap.plugin.vaadin'
             displayName = 'Gradle Vaadin plugin'
-        }
-        vaadinGroovyPlugin {
-            id = 'com.devsoap.plugin.vaadin.groovy'
-            displayName = 'Gradle Vaadin Groovy plugin'
-            description = 'Build Vaadin applications with Groovy and Gradle!'
-            tags = ['vaadin', 'groovy']
         }
     }
 

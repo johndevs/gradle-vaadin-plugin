@@ -13,11 +13,21 @@ import static org.junit.Assert.fail
 /**
  * Created by john on 7/13/16.
  */
-class GroovyProjectTest extends IntegrationTest{
+class GroovyProjectTest extends IntegrationTest {
 
     @Override
-    protected void applyPlugin(File buildFile) {
-        buildFile << "apply plugin:com.devsoap.plugin.GradleVaadinGroovyPlugin\n"
+    protected void applyThirdPartyPlugins(File buildFile) {
+        super.applyThirdPartyPlugins(buildFile)
+        buildFile << """
+           plugins {
+                id 'groovy'
+           }
+
+           dependencies {
+                compile 'org.codehaus.groovy:groovy-all:2.4.+'
+           }
+
+        """.stripIndent()
     }
 
     @Test void 'Run Groovy Project'() {
