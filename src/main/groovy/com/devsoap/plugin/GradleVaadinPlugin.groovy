@@ -179,8 +179,6 @@ class GradleVaadinPlugin implements Plugin<Project> {
         new JavaPluginAction().apply(project)
         new WarPluginAction().apply(project)
         new VaadinPluginAction().apply(project)
-        new EclipsePluginAction().apply(project)
-        new EclipseWtpPluginAction().apply(project)
 
         // Repositories
         applyRepositories(project)
@@ -197,6 +195,8 @@ class GradleVaadinPlugin implements Plugin<Project> {
         // Configure plugins that depends on tasks
         new SpringBootAction().apply(project)
         new IdeaPluginAction().apply(project)
+        new EclipsePluginAction().apply(project)
+        new EclipseWtpPluginAction().apply(project)
 
         // Cleanup plugin outputs
         def clean = project.clean

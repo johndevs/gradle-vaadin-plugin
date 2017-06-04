@@ -15,6 +15,7 @@
 */
 package com.devsoap.plugin.tasks
 
+import com.devsoap.plugin.ProjectType
 import com.devsoap.plugin.TemplateUtil
 import com.devsoap.plugin.Util
 import com.devsoap.plugin.configuration.CompileWidgetsetConfiguration
@@ -34,8 +35,6 @@ class CreateWidgetsetGeneratorTask extends DefaultTask {
 
     private static final String DOT = '.'
 
-    private static final String JAVA_FILE_POSTFIX = '.java'
-
     public CreateWidgetsetGeneratorTask() {
         description = "Creates a new widgetset generator for optimizing the widgetset"
     }
@@ -51,7 +50,7 @@ class CreateWidgetsetGeneratorTask extends DefaultTask {
 
     @PackageScope
     def makeWidgetsetGeneratorClass() {
-        File javaDir = Util.getMainSourceSet(project, true).srcDirs.first()
+        File javaDir = Util.getMainSourceSet(project).srcDirs.first()
 
         def configuration = Util.findOrCreateExtension(project, CompileWidgetsetConfiguration)
 
@@ -62,12 +61,12 @@ class CreateWidgetsetGeneratorTask extends DefaultTask {
         if ( !widgetsetGenerator ) {
             name = widgetset.tokenize(DOT).last()
             pkg = widgetset.replaceAll(DOT + name, '')
-            filename = name + "Generator.java"
+            filename = name + "Generator"
 
         } else {
             name = widgetsetGenerator.tokenize(DOT).last()
             pkg = widgetsetGenerator.replaceAll(DOT + name, '')
-            filename = name + JAVA_FILE_POSTFIX
+            filename = name
         }
 
         List<String> sourcePaths = configuration.sourcePaths as List
@@ -82,8 +81,21 @@ class CreateWidgetsetGeneratorTask extends DefaultTask {
 
         Map substitutions = [:]
         substitutions['packageName'] = pkg
-        substitutions['className'] = filename.replaceAll(JAVA_FILE_POSTFIX, '')
+        substitutions['className'] = filename
 
-        TemplateUtil.writeTemplate('MyConnectorBundleLoaderFactory.java', dir, filename, substitutions)
+        switch (Util.getProjectType(project)) {
+            case ProjectType.JAVA:
+                TemplateUtil.writeTemplate('MyConnectorBundleLoaderFactory.java', dir,
+                        "${filename}.java", substitutions)
+                break
+            case ProjectType.GROOVY:
+                TemplateUtil.writeTemplate('MyConnectorBundleLoaderFactory.groovy', dir,
+                        "${filename}.groovy", substitutions)
+                break
+            case ProjectType.KOTLIN:
+                TemplateUtil.writeTemplate('MyConnectorBundleLoaderFactory.kt', dir,
+                        "${filename}.kt", substitutions)
+                break
+        }
     }
 }

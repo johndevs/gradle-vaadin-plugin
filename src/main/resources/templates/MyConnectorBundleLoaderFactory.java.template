@@ -1,6 +1,6 @@
 package ${packageName};
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.core.ext.typeinfo.JClassType;
@@ -8,25 +8,24 @@ import com.vaadin.server.widgetsetutils.ConnectorBundleLoaderFactory;
 import com.vaadin.shared.ui.Connect;
 import com.vaadin.shared.ui.Connect.LoadStyle;
 
-public class ${className} extends
-        ConnectorBundleLoaderFactory {
+public class ${className} extends ConnectorBundleLoaderFactory {
 
-    private static final List<Class> eagerComponents = new LinkedList<Class>();
+    private static final List<Class> eagerComponents = new ArrayList<>();
     static {
-       
+
         // Add your eager components here...
         // eagerComponents.add(VerticalLayout.class)
 
     }
 
-    private static final List<Class> deferredComponents = new LinkedList<Class>();
+    private static final List<Class> deferredComponents = new ArrayList<>();
     static {
 
         // Add your deferred components here...
         // deferredComponents.add(VerticalLayout.class)
-    }    
+    }
 
-    private static final List<Class> lazyComponents = new LinkedList<Class>();
+    private static final List<Class> lazyComponents = new ArrayList<>();
     static {
 
         // Add your lazy components here...

@@ -19,5 +19,7 @@ package com.devsoap.plugin
  * Project language type
  */
 enum ProjectType {
-    JAVA, GROOVY, KOTLIN
+    JAVA,
+    GROOVY,
+    KOTLIN
 }

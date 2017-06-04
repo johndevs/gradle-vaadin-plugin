@@ -1,0 +1,56 @@
+package ${packageName}
+
+import java.util.ArrayList
+
+import com.google.gwt.core.ext.typeinfo.JClassType
+import com.vaadin.server.widgetsetutils.ConnectorBundleLoaderFactory
+import com.vaadin.shared.ui.Connect
+import com.vaadin.shared.ui.Connect.LoadStyle
+
+class ${className} : ConnectorBundleLoaderFactory() {
+
+    companion object {
+
+        private val eagerComponents = ArrayList<Class<*>>()
+
+        init {
+
+            // Add your eager components here...
+            // eagerComponents.add(VerticalLayout::class)
+
+        }
+
+        private val deferredComponents = ArrayList<Class<*>>()
+
+        init {
+
+            // Add your deferred components here...
+            // deferredComponents.add(VerticalLayout::class)
+        }
+
+        private val lazyComponents = ArrayList<Class<*>>()
+
+        init {
+
+            // Add your lazy components here...
+            // lazyComponents.add(VerticalLayout::class)
+        }
+    }
+
+    override fun getLoadStyle(connectorType: JClassType): LoadStyle {
+        val annotation = connectorType.annotations.find { it is Connect } as? Connect
+        val componentClass = annotation!!.value as Class<*>
+
+        if (eagerComponents.contains(componentClass)) {
+            return LoadStyle.EAGER
+
+        } else if (deferredComponents.contains(componentClass)) {
+            return LoadStyle.DEFERRED
+
+        } else if (lazyComponents.contains(componentClass)) {
+            return LoadStyle.LAZY
+        }
+
+        return super.getLoadStyle(connectorType)
+    }
+}

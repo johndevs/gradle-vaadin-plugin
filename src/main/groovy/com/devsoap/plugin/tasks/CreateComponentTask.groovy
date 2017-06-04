@@ -33,12 +33,12 @@ class CreateComponentTask extends DefaultTask {
     @Option(option = 'name', description = 'Component name')
     def componentName = 'MyComponent'
 
-    public CreateComponentTask() {
+    CreateComponentTask() {
         description = "Creates a new Vaadin Component."
     }
 
     @TaskAction
-    public void run() {
+    void run() {
 
         def widgetset = Util.getWidgetset(project)
         if ( !widgetset ) {

@@ -15,6 +15,7 @@
 */
 package com.devsoap.plugin.tasks
 
+import com.devsoap.plugin.ProjectType
 import com.devsoap.plugin.TemplateUtil
 import com.devsoap.plugin.Util
 import groovy.transform.PackageScope
@@ -39,25 +40,25 @@ class CreateDesignTask extends DefaultTask{
     static final String DESIGN_HTML_FILE = 'Design.html'
 
     @Option(option = 'name', description = 'The name of the design')
-    def String designName = 'Basic'
+    String designName = 'BasicView'
 
     @Option(option = 'package', description = 'The package of the design')
-    def String designPackage = "com.example.${designName.toLowerCase()}"
+    String designPackage = "com.example.${designName.toLowerCase()}"
 
     @Option(option = 'companionFile', description = 'Create the companion file for the design')
-    def boolean createCompanionFile = true
+    boolean createCompanionFile = true
 
     @Option(option = 'implementationFile', description = 'Create implemenation file for the design')
-    def boolean createImplementationFile = true
+    boolean createImplementationFile = true
 
     @Option(option = 'templates', description =
             'Lists the available templates. Add your templates to .vaadin/designer/templates to use them here.')
-    def boolean listTemplates = false
+    boolean listTemplates = false
 
-    @Option(option = 'template', description = "The selected tempalte to use. Must be included in --templates")
-    def String template = null
+    @Option(option = 'template', description = "The selected template to use. Must be included in --templates")
+    String template = null
 
-    public CreateDesignTask() {
+    CreateDesignTask() {
         description = 'Creates a new design file'
     }
 
@@ -104,7 +105,7 @@ class CreateDesignTask extends DefaultTask{
 
     @PackageScope
     def makeDesignCompanionFile() {
-        File javaDir = Util.getMainSourceSet(project).srcDirs.first()
+        File javaDir = Util.getMainSourceSet(project, true).srcDirs.first()
         File designDir = new File(javaDir, TemplateUtil.convertFQNToFilePath(designPackage))
         designDir.mkdirs()
 
@@ -125,11 +126,25 @@ class CreateDesignTask extends DefaultTask{
         substitutions[DESIGN_PACKAGE_KEY] = designPackage
         substitutions[DESIGN_NAME_KEY] = designName
 
-        TemplateUtil.writeTemplate('MyDesignImpl.java', designDir, designName + '.java', substitutions)
+        switch (Util.getProjectType(project)) {
+            case ProjectType.JAVA:
+                TemplateUtil.writeTemplate('MyDesignImpl.java', designDir,
+                        designName + '.java', substitutions)
+                break
+            case ProjectType.KOTLIN:
+                TemplateUtil.writeTemplate('MyDesignImpl.kt', designDir,
+                        designName + '.kt', substitutions)
+                break
+            case ProjectType.GROOVY:
+                TemplateUtil.writeTemplate('MyDesignImpl.groovy', designDir,
+                        designName + '.groovy', substitutions)
+                break
+        }
+
     }
 
     @PackageScope
-    def Map<String, File> getTemplates() {
+    Map<String, File> getTemplates() {
         def templatesDir = Paths.get(System.getProperty("user.home"), '.vaadin', 'designer', 'templates').toFile()
         def templateMap = [:]
         templatesDir.eachFile { File file ->

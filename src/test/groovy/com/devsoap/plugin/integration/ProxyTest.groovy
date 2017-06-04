@@ -54,7 +54,7 @@ class ProxyTest extends IntegrationTest {
         assertTrue result, result.contains('Querying widgetset for')
         assertTrue result, result.contains('Widgetset is available, downloading...')
         assertTrue result, result.contains('Extracting widgetset')
-        assertTrue result, result.contains('Generating AppWidgetset.java')
+        assertTrue result, result.contains('Generating AppWidgetset')
 
         File appWidgetset = Paths.get(projectDir.root.canonicalPath,
                 'src', 'main', 'java', 'AppWidgetset.java').toFile()

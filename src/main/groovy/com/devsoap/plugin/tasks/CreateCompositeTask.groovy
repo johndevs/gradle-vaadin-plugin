@@ -41,13 +41,13 @@ class CreateCompositeTask extends DefaultTask {
     @Option(option = 'package', description = 'Package name')
     def componentPackage = "com.example.${componentName.toLowerCase()}"
 
-    public CreateCompositeTask() {
+    CreateCompositeTask() {
         description = "Creates a new Vaadin Composite."
     }
 
     @TaskAction
-    public void run() {
-        def configuration = project.vaadinCompile as CompileWidgetsetConfiguration
+    void run() {
+        def configuration = Util.findOrCreateExtension(project, CompileWidgetsetConfiguration)
         if ( !componentPackage && configuration.widgetset ) {
             String widgetsetClass = configuration.widgetset
             String widgetsetPackage = widgetsetClass.substring(0, widgetsetClass.lastIndexOf(DOT))
@@ -68,10 +68,18 @@ class CreateCompositeTask extends DefaultTask {
         substitutions['componentPackage'] = componentPackage
         substitutions['componentName'] = componentName
 
-        if ( Util.getProjectType(project) == ProjectType.GROOVY) {
-            TemplateUtil.writeTemplate("MyComposite.groovy", componentDir, componentName + ".groovy", substitutions)
-        } else {
-            TemplateUtil.writeTemplate("MyComposite.java", componentDir, componentName + ".java", substitutions)
+        switch (Util.getProjectType(project)) {
+            case ProjectType.GROOVY:
+                TemplateUtil.writeTemplate("MyComposite.groovy", componentDir,
+                        componentName + ".groovy", substitutions)
+                break
+            case ProjectType.KOTLIN:
+                TemplateUtil.writeTemplate("MyComposite.kt", componentDir,
+                        componentName + ".kt", substitutions)
+                break
+            case ProjectType.JAVA:
+                TemplateUtil.writeTemplate("MyComposite.java", componentDir,
+                        componentName + ".java", substitutions)
         }
     }
 }
