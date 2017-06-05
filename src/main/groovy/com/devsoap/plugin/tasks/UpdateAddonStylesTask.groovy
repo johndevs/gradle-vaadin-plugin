@@ -18,6 +18,7 @@ package com.devsoap.plugin.tasks
 import com.devsoap.plugin.Util
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -25,6 +26,7 @@ import org.gradle.api.tasks.TaskAction
  *
  * @author John Ahlroos
  */
+@CacheableTask
 class UpdateAddonStylesTask extends DefaultTask {
 
     static final String NAME = 'vaadinUpdateAddonStyles'
@@ -56,7 +58,7 @@ class UpdateAddonStylesTask extends DefaultTask {
     }
 
     @TaskAction
-    public void run() {
+    void run() {
         if ( !Util.isAddonStylesSupported(project) ) {
             return
         }
