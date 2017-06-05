@@ -15,6 +15,8 @@
 */
 package com.devsoap.plugin.tasks
 
+import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.tasks.ParallelizableTask
 import org.gradle.api.tasks.bundling.Jar
 
 /**
@@ -22,6 +24,8 @@ import org.gradle.api.tasks.bundling.Jar
  *
  * @author John Ahlroos
  */
+@ParallelizableTask
+@CacheableTask
 class BuildJavadocJarTask extends Jar {
 
     static final String NAME = 'vaadinJavadocJar'

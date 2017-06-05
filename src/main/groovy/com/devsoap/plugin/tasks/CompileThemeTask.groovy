@@ -24,6 +24,7 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.file.FileTree
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.TaskAction
 import org.gradle.tooling.BuildActionFailureException
 
@@ -35,6 +36,7 @@ import java.util.jar.JarInputStream
  *
  * @author John Ahlroos
  */
+@CacheableTask
 class CompileThemeTask extends DefaultTask {
 
     static final String NAME = 'vaadinThemeCompile'

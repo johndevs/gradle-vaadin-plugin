@@ -20,6 +20,8 @@ import com.devsoap.plugin.configuration.CompileThemeConfiguration
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.FileTree
+import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.tasks.ParallelizableTask
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -27,6 +29,8 @@ import org.gradle.api.tasks.TaskAction
  *
  * @author John Ahlroos
  */
+@ParallelizableTask
+@CacheableTask
 class CompressCssTask extends DefaultTask {
 
     static final String NAME = 'vaadinThemeCompress'

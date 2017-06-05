@@ -36,15 +36,15 @@ class CreateProjectTask extends DefaultTask {
     static final String DOT = '.'
 
     @Option(option = 'name', description = 'Application name')
-    def String applicationName
+    String applicationName
 
     @Option(option = 'package', description = 'Application UI package')
-    def String applicationPackage
+    String applicationPackage
 
     @Option(option = 'widgetset', description = 'Widgetset name')
-    def String widgetsetFQN
+    String widgetsetFQN
 
-    public CreateProjectTask() {
+    CreateProjectTask() {
         description = "Creates a new Vaadin Project."
         finalizedBy UpdateAddonStylesTask.NAME, CompileThemeTask.NAME
     }

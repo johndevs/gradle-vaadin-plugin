@@ -28,6 +28,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ProjectDependency
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.Task
 
@@ -41,6 +42,7 @@ import java.util.jar.JarInputStream
  * @author John Ahlroos
  */
 @Log
+@CacheableTask
 class UpdateWidgetsetTask extends DefaultTask {
 
     public static final String NAME = 'vaadinUpdateWidgetset'
@@ -55,7 +57,7 @@ class UpdateWidgetsetTask extends DefaultTask {
     static final String DOT = '.'
     static final String JAVA_FILE_POSTFIX = ".java"
 
-    public UpdateWidgetsetTask() {
+    UpdateWidgetsetTask() {
         description = "Updates the widgetset xml file"
         onlyIf { Task task ->
             def conf = Util.findOrCreateExtension(task.project, CompileWidgetsetConfiguration)
