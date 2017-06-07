@@ -72,7 +72,8 @@ public class JettyServerRunner {
         handler.setBaseResource(Resource.newResource(webAppDir));
         handler.setParentLoaderPriority(true);
         handler.setExtraClasspath(classesDir+";"+resourcesDir);
-        handler.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern", ".*/build/classes/.*");
+        handler.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern",
+                ".*/build/classes/.*");
         handler.setConfigurations(new Configuration[]{
                 new WebXmlConfiguration(),
                 new WebInfConfiguration(),

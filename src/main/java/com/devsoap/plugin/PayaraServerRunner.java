@@ -40,7 +40,8 @@ public class PayaraServerRunner {
         String name = args[5];
         String workdir = args[6];
 
-        String[] dependencies = new String(Files.readAllBytes(Paths.get(workdir + "/classpath.txt")), StandardCharsets.UTF_8).split(";");
+        String[] dependencies = new String(Files.readAllBytes(Paths.get(workdir + "/classpath.txt")),
+                StandardCharsets.UTF_8).split(";");
 
         LOGGER.log(Level.CONFIG, "Configuring logger log levels to "+logLevel);
 
@@ -54,7 +55,8 @@ public class PayaraServerRunner {
 
             BootstrapProperties bootstrap = new BootstrapProperties();
 
-            GlassFishRuntime runtime = GlassFishRuntime.bootstrap(bootstrap, PayaraServerRunner.class.getClass().getClassLoader());
+            GlassFishRuntime runtime = GlassFishRuntime.bootstrap(bootstrap,
+                    PayaraServerRunner.class.getClass().getClassLoader());
 
             GlassFishProperties glassfishProperties = new GlassFishProperties();
             glassfishProperties.setPort("http-listener", port);

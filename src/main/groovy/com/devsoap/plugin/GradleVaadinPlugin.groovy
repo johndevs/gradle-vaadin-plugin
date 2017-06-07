@@ -74,7 +74,6 @@ import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.invocation.Gradle
 import org.gradle.api.plugins.WarPlugin
-import org.gradle.api.tasks.TaskContainer
 import org.gradle.tooling.UnsupportedVersionException
 import org.gradle.util.VersionNumber
 
@@ -112,12 +111,13 @@ class GradleVaadinPlugin implements Plugin<Project> {
     static final String PLUGIN_DEVELOPMENTTIME_REPOSITORY_NAME = 'Gradle Vaadin plugin development repository'
     static final String VAADIN_PRERELEASE_REPOSITORY_NAME = 'Vaadin Pre-releases'
     static final String SPRING_BOOT_PLUGIN = 'org.springframework.boot'
-    static final String VALIDATION_API_1_0 = 'javax.validation:validation-api:1.0.0.GA'
+    static final String VALIDATION_API_VERSION = 'validation.api.version'
 
     static final AtomicInteger THREAD_COUNTER = new AtomicInteger(1)
     static final Executor THREAD_POOL = Executors.newCachedThreadPool({ Runnable r ->
         new Thread(r, "gradle-vaadin-plugin-thread-${THREAD_COUNTER.getAndIncrement()}")
     })
+
 
     static {
         PLUGIN_PROPERTIES = new Properties()
@@ -198,18 +198,8 @@ class GradleVaadinPlugin implements Plugin<Project> {
         new EclipsePluginAction().apply(project)
         new EclipseWtpPluginAction().apply(project)
 
-        // Cleanup plugin outputs
-        def clean = project.clean
-        def tasks = project.tasks
-        String cleanTaskName = 'clean'
-        clean.dependsOn(tasks[cleanTaskName + CompileWidgetsetTask.NAME.capitalize()])
-        clean.dependsOn(tasks[cleanTaskName + RunTask.NAME.capitalize()])
-        clean.dependsOn(tasks[cleanTaskName + CompileThemeTask.NAME.capitalize()])
-        clean.dependsOn(tasks[cleanTaskName + CompressCssTask.NAME.capitalize()])
-        clean.dependsOn(tasks[cleanTaskName + SuperDevModeTask.NAME.capitalize()])
-        clean.dependsOn(tasks[cleanTaskName + DevModeTask.NAME.capitalize()])
-
         // Utilities
+        def tasks = project.tasks
         ArtifactHandler artifacts = project.artifacts
         String archivesArtifactsName = 'archives'
         artifacts.add(archivesArtifactsName, tasks[BuildSourcesJarTask.NAME])
@@ -273,7 +263,8 @@ class GradleVaadinPlugin implements Plugin<Project> {
     }
 
     static void applyServletApi(DependencyHandler projectDependencies, DependencySet dependencies) {
-        Dependency servletAPI = projectDependencies.create('javax.servlet:javax.servlet-api:3.1.0')
+        Dependency servletAPI = projectDependencies.create(
+                "javax.servlet:javax.servlet-api:${Util.pluginProperties.getProperty('servlet.version')}")
         dependencies.add(servletAPI)
     }
 
@@ -319,7 +310,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
                         dependencies.add(widgetsetCompiler)
 
                         Dependency validationAPI = projectDependencies.create(
-                                VALIDATION_API_1_0)
+                              "javax.validation:validation-api:${Util.pluginProperties.get(VALIDATION_API_VERSION)}")
                         dependencies.add(validationAPI)
                     }
                 }
@@ -334,7 +325,8 @@ class GradleVaadinPlugin implements Plugin<Project> {
         configurations.create(CONFIGURATION_JAVADOC) { conf ->
             conf.description = 'Libraries for compiling JavaDoc for a Vaadin project.'
             conf.defaultDependencies { dependencies ->
-                Dependency portletAPI = projectDependencies.create('javax.portlet:portlet-api:2.0')
+                Dependency portletAPI = projectDependencies.create(
+                        "javax.portlet:portlet-api:${Util.pluginProperties.get('portlet.version')}")
                 dependencies.add(portletAPI)
 
                 applyServletApi(projectDependencies, dependencies)
@@ -402,7 +394,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
                             "com.vaadin:vaadin-testbench:${project.vaadinTestbench.version}")
                     dependencies.add(testbench)
                     Dependency driverManager = projectDependencies.create(
-                            'io.github.bonigarcia:webdrivermanager:1.6.+')
+               "io.github.bonigarcia:webdrivermanager:${Util.pluginProperties.getProperty('webdrivermanager.version')}")
                     dependencies.add(driverManager)
                 }
             }
@@ -489,7 +481,8 @@ class GradleVaadinPlugin implements Plugin<Project> {
                 substitutions.substitute(
                         substitutions.module('javax.validation:validation-api')
                 ).with(
-                        substitutions.module(VALIDATION_API_1_0)
+                        substitutions.module(
+                          "javax.validation:validation-api:${Util.pluginProperties.get(VALIDATION_API_VERSION)}")
                 )
             } as Action<DependencySubstitutions>)
         }
@@ -521,47 +514,44 @@ class GradleVaadinPlugin implements Plugin<Project> {
     }
 
     static void applyVaadinTasks(Project project) {
-        TaskContainer tasks = project.tasks
-        tasks.create(name:CreateProjectTask.NAME, type:CreateProjectTask, group:VAADIN_TASK_GROUP)
-        tasks.create(name:CreateAddonProjectTask.NAME, type:CreateAddonProjectTask, group:VAADIN_TASK_GROUP)
-        tasks.create(name:CreateComponentTask.NAME, type:CreateComponentTask, group:VAADIN_TASK_GROUP)
-        tasks.create(name:CreateCompositeTask.NAME, type:CreateCompositeTask, group:VAADIN_TASK_GROUP)
-        tasks.create(name:CreateThemeTask.NAME, type:CreateThemeTask, group:VAADIN_TASK_GROUP)
-        tasks.create(name:CreateWidgetsetGeneratorTask.NAME, type:CreateWidgetsetGeneratorTask,
-                group:VAADIN_TASK_GROUP)
-        tasks.create(name:CreateDesignTask.NAME, type:CreateDesignTask, group:VAADIN_TASK_GROUP)
+        addTask(project, CreateProjectTask.NAME, CreateProjectTask, VAADIN_TASK_GROUP)
+        addTask(project, CreateAddonProjectTask.NAME, CreateAddonProjectTask, VAADIN_TASK_GROUP)
+        addTask(project, CreateComponentTask.NAME, CreateComponentTask, VAADIN_TASK_GROUP)
+        addTask(project, CreateCompositeTask.NAME, CreateCompositeTask, VAADIN_TASK_GROUP)
+        addTask(project, CreateThemeTask.NAME, CreateThemeTask, VAADIN_TASK_GROUP)
+        addTask(project, CreateWidgetsetGeneratorTask.NAME, CreateWidgetsetGeneratorTask,VAADIN_TASK_GROUP)
+        addTask(project, CreateDesignTask.NAME, CreateDesignTask, VAADIN_TASK_GROUP)
 
-        tasks.create(name:CompileWidgetsetTask.NAME, type:CompileWidgetsetTask, group:VAADIN_TASK_GROUP)
-        tasks.create(name:DevModeTask.NAME, type:DevModeTask, group:VAADIN_TASK_GROUP)
-        tasks.create(name:SuperDevModeTask.NAME, type:SuperDevModeTask, group:VAADIN_TASK_GROUP)
-        tasks.create(name:CompileThemeTask.NAME, type:CompileThemeTask, group:VAADIN_TASK_GROUP)
-        tasks.create(name:CompressCssTask.NAME, type:CompressCssTask, group:VAADIN_TASK_GROUP)
-        tasks.create(name:RunTask.NAME, type:RunTask, group:VAADIN_TASK_GROUP)
-        tasks.create(name:UpdateWidgetsetTask.NAME, type:UpdateWidgetsetTask, group:VAADIN_TASK_GROUP)
+        addTask(project, CompileWidgetsetTask.NAME, CompileWidgetsetTask, VAADIN_TASK_GROUP)
+        addTask(project, DevModeTask.NAME, DevModeTask, VAADIN_TASK_GROUP)
+        addTask(project, SuperDevModeTask.NAME, SuperDevModeTask, VAADIN_TASK_GROUP)
+        addTask(project, CompileThemeTask.NAME, CompileThemeTask, VAADIN_TASK_GROUP)
+        addTask(project, CompressCssTask.NAME, CompressCssTask, VAADIN_TASK_GROUP)
+        addTask(project, RunTask.NAME, RunTask, VAADIN_TASK_GROUP)
+        addTask(project, UpdateWidgetsetTask.NAME, UpdateWidgetsetTask, VAADIN_TASK_GROUP)
 
-        tasks.create(name:UpdateAddonStylesTask.NAME, type:UpdateAddonStylesTask, group:VAADIN_TASK_GROUP)
-        tasks.create(name:CreateAddonThemeTask.NAME, type:CreateAddonThemeTask, group:VAADIN_TASK_GROUP)
+        addTask(project, UpdateAddonStylesTask.NAME, UpdateAddonStylesTask, VAADIN_TASK_GROUP)
+        addTask(project, CreateAddonThemeTask.NAME, CreateAddonThemeTask, VAADIN_TASK_GROUP)
     }
 
     static void applyVaadinUtilityTasks(Project project) {
-        TaskContainer tasks = project.tasks
-        tasks.create(name:BuildSourcesJarTask.NAME, type:BuildSourcesJarTask, group:VAADIN_UTIL_TASK_GROUP)
-        tasks.create(name:BuildJavadocJarTask.NAME, type:BuildJavadocJarTask, group:VAADIN_UTIL_TASK_GROUP)
-        tasks.create(name:BuildClassPathJar.NAME, type:BuildClassPathJar, group:VAADIN_UTIL_TASK_GROUP)
-        tasks.create(name:VersionCheckTask.NAME, type:VersionCheckTask, group:VAADIN_UTIL_TASK_GROUP)
+        addTask(project, BuildSourcesJarTask.NAME, BuildSourcesJarTask, VAADIN_UTIL_TASK_GROUP)
+        addTask(project, BuildJavadocJarTask.NAME, BuildJavadocJarTask, VAADIN_UTIL_TASK_GROUP)
+        addTask(project, BuildClassPathJar.NAME, BuildClassPathJar, VAADIN_UTIL_TASK_GROUP)
+        addTask(project, VersionCheckTask.NAME, VersionCheckTask, VAADIN_UTIL_TASK_GROUP)
     }
 
     static void applyVaadinTestbenchTasks(Project project) {
-        TaskContainer tasks = project.tasks
-        tasks.create(name:CreateTestbenchTestTask.NAME, type:CreateTestbenchTestTask,
-                group:VAADIN_TESTBENCH_TASK_GROUP)
+        addTask(project, CreateTestbenchTestTask.NAME, CreateTestbenchTestTask,VAADIN_TESTBENCH_TASK_GROUP)
     }
 
     static void applyVaadinDirectoryTasks(Project project) {
-        TaskContainer tasks = project.tasks
-        tasks.create(name:DirectorySearchTask.NAME, type:DirectorySearchTask,
-                group:VAADIN_DIRECTORY_TASK_GROUP)
-        tasks.create(name:CreateDirectoryZipTask.NAME, type:CreateDirectoryZipTask,
-                group:VAADIN_DIRECTORY_TASK_GROUP)
+        addTask(project, DirectorySearchTask.NAME, DirectorySearchTask, VAADIN_DIRECTORY_TASK_GROUP)
+        addTask(project, CreateDirectoryZipTask.NAME, CreateDirectoryZipTask, VAADIN_DIRECTORY_TASK_GROUP)
+    }
+
+    static void addTask(Project project, String name, Class type, String group) {
+        project.tasks.create(name:name, type:type, group:group)
+        project.clean.dependsOn(project.tasks["clean${name.capitalize()}" ])
     }
 }
