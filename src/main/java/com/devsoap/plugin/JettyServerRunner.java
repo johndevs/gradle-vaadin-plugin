@@ -32,6 +32,7 @@ import org.eclipse.jetty.webapp.WebXmlConfiguration;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -47,7 +48,7 @@ public class JettyServerRunner {
     public static void main(String[] args) throws Exception {
         int port = Integer.parseInt(args[0]);
         String webAppDir = args[1];
-        String classesDir = args[2];
+        List<String> classesDirs = Arrays.asList(args[2].split(","));
         String resourcesDir = args[3];
         //String logLevel = args[4];
 
@@ -71,7 +72,9 @@ public class JettyServerRunner {
         handler.setContextPath("/");
         handler.setBaseResource(Resource.newResource(webAppDir));
         handler.setParentLoaderPriority(true);
-        handler.setExtraClasspath(classesDir+";"+resourcesDir);
+
+        handler.setExtraClasspath(String.join(";", classesDirs) + ";" + resourcesDir);
+
         handler.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern",
                 ".*/build/classes/.*");
         handler.setConfigurations(new Configuration[]{

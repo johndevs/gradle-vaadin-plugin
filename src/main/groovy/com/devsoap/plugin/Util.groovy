@@ -33,6 +33,8 @@ import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileVisitDetails
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.logging.LogLevel
+import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.util.VersionNumber
 
@@ -813,10 +815,8 @@ class Util {
     static FileCollection getWarClasspath(Project project) {
 
         // Include project classes and resources
-        FileCollection classpath = project.files(
-                project.sourceSets.main.output.classesDir,
-                project.sourceSets.main.output.resourcesDir
-        )
+        FileCollection classpath = project.files(project.sourceSets.main.output.classesDirs)
+        classpath += project.files(project.sourceSets.main.output.resourcesDir)
 
         // Include server dependencies
         classpath += project.configurations[GradleVaadinPlugin.CONFIGURATION_SERVER]

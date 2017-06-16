@@ -17,9 +17,23 @@ package com.devsoap.plugin
 
 /**
  * Project language type
+ *
+ * @author John Ahlroos
  */
 enum ProjectType {
+
+    /**
+     * Project with Java plugin applied
+     */
     JAVA,
+
+    /**
+     * Project with Groovy plugin applied
+     */
     GROOVY,
-    KOTLIN
+
+    /**
+     * Project with Kotlin plugin applied
+     */
+     KOTLIN
 }

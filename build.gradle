@@ -126,7 +126,7 @@ task compileGroovyAstTransforms(type: GroovyCompile) {
     }
     source = sourceSets.ast.groovy.srcDirs
     classpath = sourceSets.main.compileClasspath
-    destinationDir = sourceSets.ast.output.classesDir
+    destinationDir = sourceSets.ast.output.classesDirs.first()
 }
 
 /**
@@ -134,7 +134,7 @@ task compileGroovyAstTransforms(type: GroovyCompile) {
  */
 compileGroovy {
     dependsOn compileGroovyAstTransforms
-    classpath += files(sourceSets.ast.output.classesDir)
+    classpath += files(sourceSets.ast.output.classesDirs.first())
 }
 
 /**
@@ -142,7 +142,7 @@ compileGroovy {
  */
 compileTestGroovy {
     dependsOn compileGroovyAstTransforms
-    classpath += files(sourceSets.ast.output.classesDir)
+    classpath += files(sourceSets.ast.output.classesDirs.first())
     classpath += configurations.proxyTest
 }
 
@@ -221,7 +221,7 @@ artifacts {
  * Configure test phase only to run ordinary unit tests.
  */
 test {
-    classpath += files(sourceSets.ast.output.classesDir)
+    classpath += files(sourceSets.ast.output.classesDirs.first())
     testLogging {
         exceptionFormat "full"
     }
@@ -232,7 +232,7 @@ test {
  * Run integration tests with a different tasks so they are only run when running check
  */
 task integrationTest(type:Test, dependsOn:['test','jar']) {
-    classpath += files(sourceSets.ast.output.classesDir)
+    classpath += files(sourceSets.ast.output.classesDirs.first())
     testLogging {
         exceptionFormat "full"
         showStandardStreams = true
@@ -251,7 +251,7 @@ task proxyTest(type:Test, dependsOn: ['test','jar']) {
     def oldClassPath = classpath
     classpath = configurations.proxyTest
     classpath += oldClassPath
-    classpath += files(sourceSets.ast.output.classesDir)
+    classpath += files(sourceSets.ast.output.classesDirs.first())
     testLogging {
         exceptionFormat "full"
         showStandardStreams = true
@@ -266,11 +266,11 @@ check.dependsOn 'proxyTest'
  * Code formatting configurations with Codenarc
  */
 codenarc{
-    toolVersion = '0.25.1'
+    toolVersion = '0.27.0'
     configFile = rootProject.file('config/codenarc/ruleset.groovy')
     maxPriority1Violations = 0
     maxPriority2Violations = 0
-    maxPriority3Violations = 700
+    maxPriority3Violations = 600
     codenarcTest {
         configFile = rootProject.file('config/codenarc/ruleset-test.groovy')
     }
@@ -306,5 +306,5 @@ pluginBundle {
  *
  **********************************************************************************************************************/
 task wrapper(type: Wrapper) {
-    gradleVersion = '3.5'
+    gradleVersion = '4.0'
 }

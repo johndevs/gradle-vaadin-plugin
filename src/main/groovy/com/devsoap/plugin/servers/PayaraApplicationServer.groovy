@@ -18,6 +18,7 @@ package com.devsoap.plugin.servers
 import com.devsoap.plugin.Util
 import com.devsoap.plugin.configuration.ApplicationServerConfiguration
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.DependencySet
 import org.gradle.api.artifacts.dsl.DependencyHandler
 
@@ -48,7 +49,7 @@ class PayaraApplicationServer extends ApplicationServer {
     }
 
     @Override
-    def configureProcess(List<String> parameters) {
+    void configureProcess(List<String> parameters) {
         super.configureProcess(parameters)
 
         // Override internal Payara classes. See https://payara.gitbooks.io/payara-server/content/documentation/
@@ -57,8 +58,8 @@ class PayaraApplicationServer extends ApplicationServer {
     }
 
     @Override
-    def defineDependecies(DependencyHandler projectDependencies, DependencySet dependencies) {
-        def payaraWebProfile = projectDependencies.create(
+    void defineDependecies(DependencyHandler projectDependencies, DependencySet dependencies) {
+        Dependency payaraWebProfile = projectDependencies.create(
                 "fish.payara.extras:payara-embedded-web:${Util.pluginProperties.getProperty('payara.version')}")
         dependencies.add(payaraWebProfile)
     }

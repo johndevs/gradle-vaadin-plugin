@@ -18,6 +18,7 @@ package com.devsoap.plugin.servers
 import com.devsoap.plugin.Util
 import com.devsoap.plugin.configuration.ApplicationServerConfiguration
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.DependencySet
 import org.gradle.api.artifacts.dsl.DependencyHandler
 
@@ -49,30 +50,30 @@ class JettyApplicationServer extends ApplicationServer {
     }
 
     @Override
-    def defineDependecies(DependencyHandler projectDependencies, DependencySet dependencies) {
-        def jettyAll =  projectDependencies.create(
+    void defineDependecies(DependencyHandler projectDependencies, DependencySet dependencies) {
+        Dependency jettyAll =  projectDependencies.create(
                 "org.eclipse.jetty.aggregate:jetty-all:${Util.pluginProperties.getProperty(JETTY_VERSION_PROPERTY)}")
         dependencies.add(jettyAll)
 
-        def jettyAnnotations = projectDependencies.create("org.eclipse.jetty:jetty-annotations:" +
+        Dependency jettyAnnotations = projectDependencies.create("org.eclipse.jetty:jetty-annotations:" +
                 "${Util.pluginProperties.getProperty(JETTY_VERSION_PROPERTY)}")
         dependencies.add(jettyAnnotations)
 
-        def jettyPlus = projectDependencies.create(
+        Dependency jettyPlus = projectDependencies.create(
                 "org.eclipse.jetty:jetty-plus:${Util.pluginProperties.getProperty(JETTY_VERSION_PROPERTY)}")
         dependencies.add(jettyPlus)
 
-        def jettyDeploy = projectDependencies.create(
+        Dependency jettyDeploy = projectDependencies.create(
                 "org.eclipse.jetty:jetty-deploy:${Util.pluginProperties.getProperty(JETTY_VERSION_PROPERTY)}")
         dependencies.add(jettyDeploy)
 
-        def asm = projectDependencies.create('org.ow2.asm:asm:5.0.3')
+        Dependency asm = projectDependencies.create('org.ow2.asm:asm:5.0.3')
         dependencies.add(asm)
 
-        def asmCommons = projectDependencies.create('org.ow2.asm:asm-commons:5.0.3')
+        Dependency asmCommons = projectDependencies.create('org.ow2.asm:asm-commons:5.0.3')
         dependencies.add(asmCommons)
 
-        def jspApi = projectDependencies.create('javax.servlet.jsp:jsp-api:2.2')
+        Dependency jspApi = projectDependencies.create('javax.servlet.jsp:jsp-api:2.2')
         dependencies.add(jspApi)
     }
 }

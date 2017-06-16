@@ -37,6 +37,7 @@ import org.gradle.api.tasks.SourceSetContainer
 import java.nio.file.WatchEvent
 import java.nio.file.WatchKey
 import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 import java.util.logging.Level
@@ -75,15 +76,15 @@ abstract class ApplicationServer {
         }
     }
 
-    def Process process
+    Process process
 
-    def boolean reloadInProgress = false
+    boolean reloadInProgress = false
 
-    def final Project project
+    final Project project
 
-    def Map browserParameters = [:]
+    Map browserParameters = [:]
 
-    def ApplicationServerConfiguration configuration
+    ApplicationServerConfiguration configuration
 
     /**
      * Create a application server
@@ -107,9 +108,15 @@ abstract class ApplicationServer {
 
     abstract String getSuccessfullyStartedLogToken()
 
-    abstract defineDependecies(DependencyHandler projectDependencies, DependencySet dependencies)
+    abstract void defineDependecies(DependencyHandler projectDependencies, DependencySet dependencies)
 
-    def FileCollection getClassPath() {
+    /**
+     * Get the class path of the server
+     *
+     * @return
+     *      the files as a FileCollection
+     */
+    FileCollection getClassPath() {
         FileCollection cp
         if ( project.vaadin.useClassPathJar ) {
             BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
@@ -121,11 +128,20 @@ abstract class ApplicationServer {
         cp
     }
 
-    def makeClassPathFile(File buildDir) {
+    /**
+     * Creates the classpath file containing the project classpath
+     *
+     * @param buildDir
+     *      the build directory
+     * @return
+     *      the classpath file
+     */
+    File makeClassPathFile(File buildDir) {
         def buildClasspath = new File(buildDir, 'classpath.txt')
         buildClasspath.text = Util.getWarClasspath(project)
                 .filter { it.file && it.canonicalFile.name.endsWith(JAR_FILE_POSTFIX)}
                 .join(";")
+        buildClasspath
     }
 
     /**
@@ -135,7 +151,7 @@ abstract class ApplicationServer {
      * @param parameters
      *      the command line parameters
      */
-    def configureProcess(List<String> parameters) {
+    void configureProcess(List<String> parameters) {
         // Debug
         if ( configuration.debug ) {
             parameters.add('-Xdebug')
@@ -165,35 +181,14 @@ abstract class ApplicationServer {
         SourceSetContainer sourceSets = project.sourceSets
         SourceSet mainSourceSet = sourceSets.main
 
-        File classesDir = mainSourceSet.output.classesDir
+        List<File> classesDirs = new ArrayList<>(mainSourceSet.output.classesDirs.toList())
         File resourcesDir = mainSourceSet.output.resourcesDir
         if ( configuration.classesDir ) {
-            // Eclipse might output somewhere else
-            classesDir = project.file(configuration.classesDir)
+            classesDirs.add(0, project.file(configuration.classesDir));
             resourcesDir = project.file(configuration.classesDir)
-
-            // Check if directory contains classes, if it does not then the IDE has not
-            // compiled any classes here.
-            boolean hasClassFiles = false
-            if ( classesDir.exists() ) {
-                classesDir.eachFileRecurse(FileType.FILES) { File file ->
-                    if ( file.getName().endsWith(".class") ) {
-                        hasClassFiles = true
-                    }
-                }
-            }
-
-            if ( !hasClassFiles ) {
-                // Fallback to main class folder with a warning
-                project.logger.log(LogLevel.WARN, "The defined classesDir does not " +
-                        "contain any classes, are you sure the classes exist in that " +
-                        "directory? Falling back to default classes directory.")
-                classesDir = mainSourceSet.output.classesDir
-                resourcesDir = mainSourceSet.output.resourcesDir
-            }
         }
 
-        parameters.add(classesDir.canonicalPath + File.separator)
+        parameters.add(classesDirs.collect { it.canonicalPath + File.separator}.join(','))
         parameters.add(resourcesDir.canonicalPath + File.separator)
 
         if ( project.logger.debugEnabled ) {
@@ -209,7 +204,7 @@ abstract class ApplicationServer {
         parameters.add(buildDir.absolutePath)
     }
 
-    def boolean start(boolean firstStart=false, boolean stopAfterStart=false) {
+    boolean start(boolean firstStart=false, boolean stopAfterStart=false) {
         if ( process ) {
             project.logger.error('Server is already running.')
             return false
@@ -230,7 +225,7 @@ abstract class ApplicationServer {
     }
 
     @PackageScope
-    def boolean executeServer(List appServerProcess, boolean firstStart=false) {
+    boolean executeServer(List appServerProcess, boolean firstStart=false) {
         project.logger.debug("Running server with the command: "+appServerProcess)
         process = appServerProcess.execute([], project.buildDir)
 
@@ -258,7 +253,7 @@ abstract class ApplicationServer {
     }
 
     @PackageScope
-    def monitorLog(boolean firstStart=false, boolean stopAfterStart=false) {
+    void monitorLog(boolean firstStart=false, boolean stopAfterStart=false) {
         Util.logProcess(project, process, "${serverName}.log") { line ->
             if ( line.contains(successfullyStartedLogToken) ) {
                 if ( firstStart ) {
@@ -290,7 +285,7 @@ abstract class ApplicationServer {
     }
 
     @PackageScope
-    def openBrowser() {
+    void openBrowser() {
         // Build browser GET parameters
         String paramString = ''
         if ( configuration.debug ) {
@@ -310,7 +305,7 @@ abstract class ApplicationServer {
     }
 
     @PackageScope
-    def startAndBlock(boolean stopAfterStart=false) {
+    void startAndBlock(boolean stopAfterStart=false) {
         def firstStart = true
 
         while(true) {
@@ -351,51 +346,53 @@ abstract class ApplicationServer {
         }
     }
 
-    def terminate() {
+    void terminate() {
         process?.destroy()
         process = null
         project.logger.info("Application server terminated.")
     }
 
-    def reload() {
+    void reload() {
         reloadInProgress = true
         terminate()
     }
 
     @PackageScope
-    static watchClassDirectoryForChanges(final ApplicationServer server) {
+    static void watchClassDirectoryForChanges(final ApplicationServer server) {
         Project project = server.project
 
         def serverConfiguration = Util.findOrCreateExtension(project, ApplicationServerConfiguration)
-        File classesDir
+        List<File> classesDirs = []
         if ( serverConfiguration.classesDir && project.file(serverConfiguration.classesDir).exists() ) {
-            classesDir = project.file(serverConfiguration.classesDir)
-        } else {
-            classesDir = project.sourceSets.main.output.classesDir
+            classesDirs.add(project.file(serverConfiguration.classesDir))
         }
 
-        if ( classesDir && classesDir.exists() ) {
-            def executor = Executors.newSingleThreadScheduledExecutor()
-            ScheduledFuture currentTask
+        classesDirs.addAll(project.sourceSets.main.output.classesDirs.toList())
 
-            Util.watchDirectoryForChanges(project, (File) classesDir, { WatchKey key, WatchEvent event ->
-                if (server.process && server.configuration.serverRestart ) {
-                    if ( currentTask ) {
-                        currentTask.cancel(true)
+        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor()
+
+        classesDirs.each {
+            ScheduledFuture currentTask
+            if(it.exists()) {
+                Util.watchDirectoryForChanges(project, (File) classesDir, { WatchKey key, WatchEvent event ->
+                    if (server.process && server.configuration.serverRestart ) {
+                        if ( currentTask ) {
+                            currentTask.cancel(true)
+                        }
+                        currentTask = executor.schedule({
+                            // Force restart of server
+                            project.logger.lifecycle(RELOADING_SERVER_MESSAGE)
+                            server.reload()
+                        }, 1 , TimeUnit.SECONDS)
                     }
-                    currentTask = executor.schedule({
-                        // Force restart of server
-                        project.logger.lifecycle(RELOADING_SERVER_MESSAGE)
-                        server.reload()
-                    }, 1 , TimeUnit.SECONDS)
-                }
-                true
-            })
+                    true
+                })
+            }
         }
     }
 
     @PackageScope
-    static watchThemeDirectoryForChanges(final ApplicationServer server) {
+    static void watchThemeDirectoryForChanges(final ApplicationServer server) {
         Project project = server.project
         CompileThemeConfiguration compileConf = Util.findOrCreateExtension(project, CompileThemeConfiguration)
 
