@@ -20,7 +20,6 @@ import com.devsoap.plugin.Util
 import groovy.transform.Memoized
 import groovyx.net.http.HTTPBuilder
 import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.ParallelizableTask
 import org.gradle.api.tasks.TaskAction
 import org.gradle.util.VersionNumber
 
@@ -32,7 +31,6 @@ import java.util.concurrent.TimeUnit
  *  @author John Ahlroos
  *  @since 1.2.0
  */
-@ParallelizableTask
 class VersionCheckTask extends DefaultTask {
 
     static final String URL = "https://plugins.gradle.org/plugin/$GradleVaadinPlugin.pluginId"

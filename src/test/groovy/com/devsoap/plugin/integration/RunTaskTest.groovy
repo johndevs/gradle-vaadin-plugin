@@ -39,18 +39,6 @@ class RunTaskTest extends IntegrationTest {
         assertServerRunning output
     }
 
-    @Test void 'Run with custom classesDir without classes'() {
-        buildFile << """
-            vaadinRun {
-                classesDir 'bin'
-            }
-        """
-        def output = runWithArguments(CreateProjectTask.NAME, RunTask.NAME, '--stopAfterStart')
-        assertServerRunning output
-
-        assertTrue output, output.contains('The defined classesDir does not contain any classes')
-    }
-
     @Test void 'Run with custom classesDir'() {
         buildFile << """
             sourceSets {

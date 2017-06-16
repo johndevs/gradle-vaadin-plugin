@@ -30,7 +30,6 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.CacheableTask
-import org.gradle.api.tasks.ParallelizableTask
 import org.gradle.api.tasks.TaskAction
 
 import java.util.concurrent.TimeUnit
@@ -44,7 +43,6 @@ import java.util.zip.ZipInputStream
  *
  * @author John Ahlroos
  */
-@ParallelizableTask
 @CacheableTask
 class CompileWidgetsetTask extends DefaultTask {
 

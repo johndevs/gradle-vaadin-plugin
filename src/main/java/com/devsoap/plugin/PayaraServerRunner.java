@@ -19,10 +19,13 @@ import org.glassfish.embeddable.*;
 import org.glassfish.embeddable.archive.ScatteredArchive;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,7 +37,7 @@ public class PayaraServerRunner {
     public static void main(String[] args) throws Exception {
         int port = Integer.parseInt(args[0]);
         String webAppDir = args[1];
-        String classesDir = args[2];
+        List<String> classesDirs = Arrays.asList(args[2].split(","));
         String resourcesDir = args[3];
         Level logLevel = Level.parse(args[4]);
         String name = args[5];
@@ -73,11 +76,17 @@ public class PayaraServerRunner {
                     ScatteredArchive.Type.WAR,
                     new File(webAppDir));
 
-            File classes = new File(classesDir);
-            if(classes.exists()){
-                archive.addClassPath(new File(classesDir));
-                LOGGER.log(Level.INFO, "Added "+ classesDir);
-            }
+            classesDirs.forEach(dir -> {
+                File classes = new File(dir);
+                if(classes.exists()){
+                    try {
+                        archive.addClassPath(classes);
+                        LOGGER.log(Level.INFO, "Added class dir "+ dir);
+                    } catch (IOException e) {
+                        LOGGER.log(Level.SEVERE, "Failed to add class dir " + dir, e);
+                    }
+                }
+            });
 
             File resources = new File(resourcesDir);
             if(resources.exists()) {

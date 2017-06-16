@@ -20,11 +20,11 @@ class KotlinTest extends IntegrationTest {
 
         buildFile << """
            plugins {
-                id "org.jetbrains.kotlin.jvm" version "1.1.2-2"
+                id "org.jetbrains.kotlin.jvm" version "1.1.2-5"
            }
 
            dependencies {
-                compile "org.jetbrains.kotlin:kotlin-stdlib:1.1.2-2"
+                compile "org.jetbrains.kotlin:kotlin-stdlib:1.1.2-5"
            }
 
         """.stripIndent()
@@ -34,16 +34,16 @@ class KotlinTest extends IntegrationTest {
 
         runWithArguments(CreateProjectTask.NAME, '--name=hello-world')
 
-        runWithArguments('classes')
-
         File pkg = Paths.get(projectDir.root.canonicalPath,
                 'src', 'main', 'kotlin','com','example', 'helloworld').toFile()
         assertTrue 'Package name should have been converted', pkg.exists()
         assertTrue 'Servlet should exist', new File(pkg, 'HelloWorldServlet.kt').exists()
         assertTrue 'UI should exist', new File(pkg, 'HelloWorldUI.kt').exists()
 
+        runWithArguments('classes')
+
         File classes = Paths.get(projectDir.root.canonicalPath,
-                'build', 'classes', 'main', 'com','example', 'helloworld').toFile()
+                'build', 'classes', 'java', 'main', 'com','example', 'helloworld').toFile()
         assertTrue 'Classes should exist', classes.exists()
         assertTrue 'Servlet not compiled', new File(classes, 'HelloWorldServlet.class').exists()
         assertTrue 'UI not compiled', new File(classes, 'HelloWorldUI.class').exists()
