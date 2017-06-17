@@ -20,6 +20,7 @@ import com.devsoap.plugin.configuration.VaadinPluginExtension
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ProjectDependency
@@ -90,7 +91,6 @@ class CompileThemeTask extends DefaultTask {
     /**
      * Get custom directory where themes can be found
      */
-    @Input
     String getThemesDirectory() {
         themesDirectory.getOrNull()
     }
@@ -168,15 +168,17 @@ class CompileThemeTask extends DefaultTask {
 
         project.logger.info("Found ${themes.files.size() } themes.")
 
+        CompileThemeTask compileThemeTask = project.tasks.getByName(CompileThemeTask.NAME)
+
         File gemsDir
-        if ( project.vaadinThemeCompile.compiler in [COMPASS_COMPILER] ) {
+        if ( compileThemeTask.getCompiler() in [COMPASS_COMPILER] ) {
             gemsDir = installCompassGem(project)
         }
 
         File unpackedThemesDir
-        if ( project.vaadinThemeCompile.compiler in [COMPASS_COMPILER, LIBSASS_COMPILER] ) {
+        if ( compileThemeTask.getCompiler() in [COMPASS_COMPILER, LIBSASS_COMPILER] ) {
             unpackedThemesDir = unpackThemes(project)
-        } else if(project.vaadinThemeCompile.themesDirectory) {
+        } else if(compileThemeTask.getThemesDirectory()) {
             // Must unpack themes for Valo to work when using custom directory
             unpackedThemesDir = unpackThemes(project)
         }
@@ -196,7 +198,7 @@ class CompileThemeTask extends DefaultTask {
             switch (project.vaadinThemeCompile.compiler) {
                 case VAADIN_COMPILER:
                     File targetCss = new File(dir, STYLES_CSS_FILE)
-                    if (project.vaadinThemeCompile.themesDirectory) {
+                    if (compileThemeTask.getThemesDirectory()) {
                         File sourceScss = Paths.get(unpackedThemesDir.canonicalPath, dir.name, theme.name).toFile()
                         process = executeVaadinSassCompiler(project, sourceScss, targetCss)
                     } else {

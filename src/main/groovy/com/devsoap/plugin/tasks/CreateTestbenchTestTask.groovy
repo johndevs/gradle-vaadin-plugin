@@ -18,7 +18,7 @@ package com.devsoap.plugin.tasks
 import com.devsoap.plugin.ProjectType
 import com.devsoap.plugin.TemplateUtil
 import com.devsoap.plugin.Util
-import com.devsoap.plugin.configuration.ApplicationServerConfiguration
+
 import groovy.transform.PackageScope
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
@@ -55,15 +55,15 @@ class CreateTestbenchTestTask extends DefaultTask {
 
     @PackageScope
     def makeTestClass() {
-        def javaDir = Util.getMainTestSourceSet(project).srcDirs.first()
-        def serverConfiguration = Util.findOrCreateExtension(project, ApplicationServerConfiguration)
-        def packageDir = new File(javaDir, TemplateUtil.convertFQNToFilePath(testPackage))
+        File javaDir = Util.getMainTestSourceSet(project).srcDirs.first()
+        RunTask runTask = project.tasks.getByName(RunTask.NAME)
+        File packageDir = new File(javaDir, TemplateUtil.convertFQNToFilePath(testPackage))
         packageDir.mkdirs()
 
         def substitutions = [:]
         substitutions['packageName'] = testPackage
         substitutions['testName'] = testName
-        substitutions['appUrl'] = "http://localhost:${serverConfiguration.serverPort}"
+        substitutions['appUrl'] = "http://localhost:${runTask.serverPort}"
 
         if ( Util.getProjectType(project) == ProjectType.GROOVY ) {
             TemplateUtil.writeTemplate("MyTest.groovy", packageDir, testName + ".groovy", substitutions)

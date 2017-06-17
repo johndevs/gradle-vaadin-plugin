@@ -22,11 +22,9 @@ import com.devsoap.plugin.actions.JavaPluginAction
 import com.devsoap.plugin.actions.SpringBootAction
 import com.devsoap.plugin.actions.VaadinPluginAction
 import com.devsoap.plugin.actions.WarPluginAction
-import com.devsoap.plugin.configuration.ApplicationServerConfiguration
 
 import com.devsoap.plugin.configuration.CompileWidgetsetConfiguration
-import com.devsoap.plugin.configuration.DevModeConfiguration
-import com.devsoap.plugin.configuration.SuperDevModeConfiguration
+
 import com.devsoap.plugin.configuration.TestBenchConfiguration
 import com.devsoap.plugin.configuration.TestBenchHubConfiguration
 import com.devsoap.plugin.configuration.TestBenchNodeConfiguration
@@ -169,10 +167,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
         Util.findOrCreateExtension(project, TestBenchConfiguration, project)
         Util.findOrCreateExtension(project, TestBenchHubConfiguration)
         Util.findOrCreateExtension(project, TestBenchNodeConfiguration)
-        Util.findOrCreateExtension(project, ApplicationServerConfiguration)
         Util.findOrCreateExtension(project, CompileWidgetsetConfiguration)
-        Util.findOrCreateExtension(project, DevModeConfiguration)
-        Util.findOrCreateExtension(project, SuperDevModeConfiguration)
 
         // Configure plugins
         new JavaPluginAction().apply(project)
@@ -359,9 +354,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
                 dependencies.add(plugin)
 
                 // Add server dependencies
-                def serverConf = Util.findOrCreateExtension(project, ApplicationServerConfiguration)
-                ApplicationServer.get(project, [:], serverConf)
-                        .defineDependecies(projectDependencies, dependencies)
+                ApplicationServer.get(project, [:]).defineDependecies(projectDependencies, dependencies)
             }
 
             if(configurations.findByName(WarPlugin.PROVIDED_RUNTIME_CONFIGURATION_NAME)){

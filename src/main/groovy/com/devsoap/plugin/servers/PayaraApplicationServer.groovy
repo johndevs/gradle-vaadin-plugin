@@ -16,7 +16,7 @@
 package com.devsoap.plugin.servers
 
 import com.devsoap.plugin.Util
-import com.devsoap.plugin.configuration.ApplicationServerConfiguration
+
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.DependencySet
@@ -29,8 +29,8 @@ class PayaraApplicationServer extends ApplicationServer {
 
     public static final String NAME = 'payara'
 
-    PayaraApplicationServer(Project project, Map browserParameters, ApplicationServerConfiguration configuration) {
-        super(project, browserParameters, configuration)
+    PayaraApplicationServer(Project project, Map browserParameters) {
+        super(project, browserParameters)
     }
 
     @Override

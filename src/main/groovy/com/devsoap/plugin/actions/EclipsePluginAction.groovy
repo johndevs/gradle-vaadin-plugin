@@ -16,8 +16,7 @@
 package com.devsoap.plugin.actions
 
 import com.devsoap.plugin.GradleVaadinPlugin
-import com.devsoap.plugin.Util
-import com.devsoap.plugin.configuration.ApplicationServerConfiguration
+import com.devsoap.plugin.tasks.RunTask
 import groovy.transform.PackageScope
 import org.gradle.api.Project
 import org.gradle.plugins.ide.eclipse.model.EclipseClasspath
@@ -64,12 +63,12 @@ class EclipsePluginAction extends PluginAction {
     protected void executeAfterEvaluate(Project project) {
         super.executeAfterEvaluate(project)
         EclipseModel eclipse = project.extensions.getByType(EclipseModel)
-        def serverConf = Util.findOrCreateExtension(project, ApplicationServerConfiguration)
+        RunTask runTask = project.tasks.getByName(RunTask.NAME)
         def cp = eclipse.classpath
-        if ( serverConf.classesDir == null ) {
+        if ( runTask.classesDir == null ) {
             cp.defaultOutputDir = project.sourceSets.main.output.classesDir
         } else {
-            cp.defaultOutputDir = project.file(serverConf.classesDir)
+            cp.defaultOutputDir = project.file(runTask.classesDir)
         }
     }
 /**
