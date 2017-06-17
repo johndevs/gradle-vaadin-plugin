@@ -16,7 +16,7 @@
 package com.devsoap.plugin.tasks
 
 import com.devsoap.plugin.Util
-import com.devsoap.plugin.configuration.CompileThemeConfiguration
+
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.FileTree
@@ -40,7 +40,8 @@ class CompressCssTask extends DefaultTask {
     CompressCssTask() {
         description = 'Compresses the theme with GZip'
         onlyIf = {
-            Util.findOrCreateExtension(project, CompileThemeConfiguration).compress
+            CompileThemeTask themeConf = project.tasks.getByName(CompileThemeTask.NAME)
+            themeConf.compress
         }
         dependsOn(CompileThemeTask.NAME)
         project.afterEvaluate {

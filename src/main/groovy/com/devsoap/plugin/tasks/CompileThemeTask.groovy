@@ -24,7 +24,9 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.file.FileTree
+import org.gradle.api.provider.PropertyState
 import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import org.gradle.tooling.BuildActionFailureException
 
@@ -51,9 +53,20 @@ class CompileThemeTask extends DefaultTask {
     static final String STYLES_CSS = 'styles.css'
     static final String STYLES_SCSS = 'styles.scss'
 
+    final PropertyState<String> themesDirectory = project.property(String)
+    final PropertyState<String> compiler = project.property(String)
+    final PropertyState<Boolean> compress = project.property(Boolean)
+
+/**
+     * Creates a new theme compilation task
+     */
     CompileThemeTask() {
         dependsOn('classes', BuildClassPathJar.NAME, UpdateAddonStylesTask.NAME)
         description = 'Compiles a Vaadin SASS theme into CSS'
+
+        themesDirectory.set(null)
+        compiler.set('vaadin')
+        compress.set(true)
 
         project.afterEvaluate {
             File themesDirectory = Util.getThemesDirectory(project)
@@ -72,6 +85,65 @@ class CompileThemeTask extends DefaultTask {
             // Compress if needed
             finalizedBy project.tasks[CompressCssTask.NAME]
         }
+    }
+
+    /**
+     * Get custom directory where themes can be found
+     */
+    @Input
+    String getThemesDirectory() {
+        themesDirectory.getOrNull()
+    }
+
+    /**
+     * Set custom directory where themes can be found
+     */
+    void setThemesDirectory(String directory) {
+        themesDirectory.set(directory)
+    }
+
+    /**
+     * Get theme compiler to use
+     * <p>
+     *     Available options are
+     *     <ul>
+     *         <li>vaadin - Vaadin's SASS Compiler</li>
+     *         <li>compass - Compass's SASS Compiler</li>
+     *         <li>libsass - Libsass SASS Compiler</li>
+     *     </ul>
+     */
+    @Input
+    String getCompiler() {
+        compiler.get()
+    }
+
+    /**
+     * Set theme compiler to use
+     * <p>
+     *     Available options are
+     *     <ul>
+     *         <li>vaadin - Vaadin's SASS Compiler</li>
+     *         <li>compass - Compass's SASS Compiler</li>
+     *         <li>libsass - Libsass SASS Compiler</li>
+     *     </ul>
+     */
+    void setCompiler(String compiler) {
+        this.compiler.set(compiler)
+    }
+
+    /**
+     * Is theme compression in use
+     */
+    @Input
+    Boolean getCompress() {
+        compress.get()
+    }
+
+    /**
+     * Enable theme compression
+     */
+    void setCompress(Boolean compress)  {
+        this.compress.set(compress)
     }
 
     @TaskAction
