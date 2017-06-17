@@ -18,6 +18,7 @@ package com.devsoap.plugin
 import com.devsoap.plugin.configuration.PluginConfigurationName
 import com.devsoap.plugin.configuration.VaadinPluginExtension
 import com.devsoap.plugin.tasks.BuildClassPathJar
+import com.devsoap.plugin.tasks.CompileThemeTask
 import com.devsoap.plugin.tasks.UpdateWidgetsetTask
 import groovy.io.FileType
 import groovy.transform.Memoized
@@ -573,8 +574,9 @@ class Util {
     @Memoized
     static File getThemesDirectory(Project project) {
         File themesDir
-        if ( project.vaadinThemeCompile.themesDirectory ) {
-            String customDir = project.vaadinThemeCompile.themesDirectory
+        CompileThemeTask compileThemeTask = project.tasks.getByName(CompileThemeTask.NAME)
+        if ( compileThemeTask.themesDirectory ) {
+            String customDir = compileThemeTask.themesDirectory
             themesDir = new File(customDir)
             if ( !themesDir.absolute ) {
                 themesDir = project.file(project.rootDir.canonicalPath + File.separator + customDir)

@@ -15,16 +15,12 @@
 */
 package com.devsoap.plugin.tasks
 
-import com.devsoap.plugin.configuration.ApplicationServerConfiguration
-import com.devsoap.plugin.configuration.DevModeConfiguration
-import com.devsoap.plugin.configuration.SuperDevModeConfiguration
 import com.devsoap.plugin.servers.ApplicationServer
 import com.devsoap.plugin.Util
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.provider.PropertyState
 import org.gradle.api.tasks.TaskAction
-
-import java.nio.file.Paths
 
 /**
  * Runs GWT DevMode
@@ -37,18 +33,33 @@ class DevModeTask extends DefaultTask {
 
     public static final String NAME = 'vaadinDevMode'
 
-    def Process devModeProcess
+    Process devModeProcess
 
-    def server
+    def serverInstance
+
+    final PropertyState<String> server = project.property(String)
+    final PropertyState<Boolean> debug = project.property(Boolean)
+    final PropertyState<Integer> debugPort = project.property(Integer)
+    final PropertyState<List<String>> jvmArgs = project.property(List)
+    final PropertyState<Boolean> serverRestart = project.property(Boolean)
+    final PropertyState<Integer> serverPort = project.property(Integer)
+    final PropertyState<Boolean> themeAutoRecompile = project.property(Boolean)
+    final PropertyState<Boolean> openInBrowser = project.property(Boolean)
+    final PropertyState<String> classesDir = project.property(String)
+    final PropertyState<Boolean> noserver = project.property(Boolean)
+    final PropertyState<String> bindAddress = project.property(String)
+    final PropertyState<Integer> codeServerPort = project.property(Integer)
+    final PropertyState<List<String>> extraArgs = project.property(List)
+    final PropertyState<String> logLevel = project.property(String)
 
     def cleanupThread = new Thread({
         if ( devModeProcess ) {
             devModeProcess.destroy()
             devModeProcess = null
         }
-        if ( server ) {
-            server.terminate()
-            server = null
+        if ( serverInstance ) {
+            serverInstance.terminate()
+            serverInstance = null
         }
         try {
             Runtime.getRuntime().removeShutdownHook(cleanupThread)
@@ -58,27 +69,39 @@ class DevModeTask extends DefaultTask {
         }
     })
 
-    public DevModeTask() {
+    DevModeTask() {
         dependsOn('classes', UpdateWidgetsetTask.NAME)
         description = "Run Development Mode for easier debugging and development of client widgets."
         Runtime.getRuntime().addShutdownHook(cleanupThread)
+
+        server.set('payara')
+        debug.set(true)
+        debugPort.set(8000)
+        jvmArgs.set(null)
+        serverRestart.set(true)
+        serverPort.set(8080)
+        themeAutoRecompile.set(true)
+        openInBrowser.set(true)
+        classesDir.set(null)
+        noserver.set(false)
+        bindAddress.set('127.0.0.1')
+        codeServerPort.set(9997)
+        extraArgs.set(null)
+        logLevel.set('INFO')
     }
 
     @TaskAction
-    public void run() {
+    void run() {
         if ( !Util.getWidgetset(project) ) {
             throw new GradleException("No widgetset found in project.")
         }
 
         runDevelopmentMode()
 
-        def configuration = Util.findOrCreateExtension(project, DevModeConfiguration)
-        def serverConf = Util.findOrCreateExtension(project, ApplicationServerConfiguration)
-        if ( !configuration.noserver ) {
-            server = ApplicationServer.get(
+        if ( !noserver ) {
+            serverInstance = ApplicationServer.get(
                     project,
-                    ['gwt.codesvr':"${configuration.bindAddress}:${configuration.codeServerPort}"],
-                    serverConf
+                    ['gwt.codesvr':"${getBindAddress()}:${getCodeServerPort()}"]
             ).startAndBlock()
             devModeProcess.waitForOrKill(1)
         } else {
@@ -87,9 +110,8 @@ class DevModeTask extends DefaultTask {
     }
 
     protected void runDevelopmentMode() {
-        def configuration = Util.findOrCreateExtension(project, DevModeConfiguration)
         def classpath = Util.getClientCompilerClassPath(project)
-        def serverConf = Util.findOrCreateExtension(project, ApplicationServerConfiguration)
+        RunTask runTask = project.tasks.getByName(RunTask.NAME)
 
         File devmodeDir = new File(project.buildDir, 'devmode')
 
@@ -112,20 +134,231 @@ class DevModeTask extends DefaultTask {
         devmodeProcess += '-noserver'
         devmodeProcess += ['-war', widgetsetDir.canonicalPath]
         devmodeProcess += ['-gen', genDir.canonicalPath]
-        devmodeProcess += ['-startupUrl', "http://localhost:${serverConf.serverPort}"]
-        devmodeProcess += ['-logLevel', configuration.logLevel]
+        devmodeProcess += ['-startupUrl', "http://localhost:${runTask.serverPort}"]
+        devmodeProcess += ['-logLevel', getLogLevel()]
         devmodeProcess += ['-deploy', deployDir.canonicalPath]
         devmodeProcess += ['-workDir', devmodeDir.canonicalPath]
         devmodeProcess += ['-logdir', logsDir.canonicalPath]
-        devmodeProcess += ['-codeServerPort', configuration.codeServerPort]
-        devmodeProcess += ['-bindAddress', configuration.bindAddress]
+        devmodeProcess += ['-codeServerPort', getCodeServerPort()]
+        devmodeProcess += ['-bindAddress', getBindAddress()]
 
-        if ( configuration.extraArgs ) {
-            devmodeProcess += configuration.extraArgs as List
+        if ( getExtraArgs() ) {
+            devmodeProcess += getExtraArgs() as List
         }
 
         devModeProcess = devmodeProcess.execute([], project.buildDir)
 
         Util.logProcess(project, devModeProcess, 'devmode.log') { true }
+    }
+
+
+    /**
+     * Get application server in use.
+     * <p>
+     * Available options are
+     * <ul>
+     *     <li>payara - Webserver with EJB/CDI support</li>
+     *     <li>jetty - Plain J2EE web server</li>
+     * </ul>
+     * Default server is payara.
+     */
+    String getServer() {
+        serverInstance.get()
+    }
+
+    /**
+     * Set application server to use.
+     * <p>
+     * Available options are
+     * <ul>
+     *     <li>payara - Webserver with EJB/CDI support</li>
+     *     <li>jetty - Plain J2EE web server</li>
+     * </ul>
+     * Default server is payara.
+     */
+    void setServer(String serverName) {
+        serverInstance.set(serverName)
+    }
+
+    /**
+     * Should application be run in debug mode. When running in production set this to true
+     */
+    Boolean getDebug() {
+        debug.get()
+    }
+
+    /**
+     * Should application be run in debug mode. When running in production set this to true
+     */
+    void setDebug(Boolean debugEnabled) {
+        debug.set(debugEnabled)
+    }
+
+    /**
+     * The port the debugger listens to
+     */
+    Integer getDebugPort() {
+        debugPort.get()
+    }
+
+    /**
+     * The port the debugger listens to
+     */
+    void setDebugPort(Integer debugPort) {
+        this.debugPort.set(debugPort)
+    }
+
+    /**
+     * Extra jvm args passed to the JVM running the Vaadin application
+     */
+    String[] getJvmArgs() {
+        jvmArgs.present ? new String[jvmArgs.get().size()] : null
+    }
+
+    /**
+     * Extra jvm args passed to the JVM running the Vaadin application
+     */
+    void setJvmArgs(String[] args) {
+        jvmArgs.set(Arrays.asList(args))
+    }
+
+    /**
+     * Should the server restart after every change.
+     */
+    Boolean getServerRestart() {
+        serverRestart.get()
+    }
+
+    /**
+     * Should the server restart after every change.
+     */
+    void setServerRestart(Boolean restart) {
+        serverRestart.set(restart)
+    }
+
+    /**
+     * The port the vaadin application should run on
+     */
+    Integer getServerPort() {
+        serverPort.get()
+    }
+
+    /**
+     * The port the vaadin application should run on
+     */
+    void setServerPort(Integer port) {
+        serverPort.set(port)
+    }
+
+    /**
+     * Should theme be recompiled when SCSS file is changes.
+     */
+    Boolean getThemeAutoRecompile() {
+        themeAutoRecompile.get()
+    }
+
+    /**
+     * Should theme be recompiled when SCSS file is changes.
+     */
+    void setThemeAutoRecompile(Boolean recompile) {
+        themeAutoRecompile.set(recompile)
+    }
+
+    /**
+     * Should the application be opened in a browser when it has been launched
+     */
+    Boolean getOpenInBrowser() {
+        openInBrowser.get()
+    }
+
+    /**
+     * Should the application be opened in a browser when it has been launched
+     */
+    void setOpenInBrowser(Boolean open) {
+        openInBrowser.set(open)
+    }
+
+    /**
+     * The directory where compiled application classes are found
+     */
+    String getClassesDir() {
+        classesDir.getOrNull()
+    }
+
+    /**
+     * The directory where compiled application classes are found
+     */
+    void setClassesDir(String dir) {
+        classesDir.set(dir)
+    }
+
+    /**
+     * Should the internal server be used.
+     */
+    Boolean getNoserver() {
+        noserver.get()
+    }
+
+    /**
+     * Should the internal server be used.
+     */
+    void setNoserver(Boolean noServer) {
+        noserver.set(noServer)
+    }
+
+    /**
+     * To what host or ip should development mode bind itself to. By default localhost.
+     */
+    String getBindAddress() {
+        bindAddress.get()
+    }
+
+    /**
+     * To what host or ip should development mode bind itself to. By default localhost.
+     */
+    void setBindAddress(String bindAddress) {
+        this.bindAddress.set(bindAddress)
+    }
+
+    /**
+     * To what port should development mode bind itself to.
+     */
+    Integer getCodeServerPort() {
+        codeServerPort.get()
+    }
+
+    /**
+     * To what port should development mode bind itself to.
+     */
+    void setCodeServerPort(Integer port) {
+        codeServerPort.set(port)
+    }
+
+    /**
+     * Extra arguments passed to the code server
+     */
+    String[] getExtraArgs() {
+        extraArgs.getOrNull()?.toArray(new String[extraArgs.get().size()])
+    }
+
+    /**
+     * Extra arguments passed to the code server
+     */
+    void setExtraArgs(String[] args) {
+        extraArgs.set(Arrays.asList(args))
+    }
+
+    /**
+     * The log level. Possible levels NONE,DEBUG,TRACE,INFO
+     */
+    String getLogLevel() {
+        logLevel.get()
+    }
+
+    /**
+     * The log level. Possible levels NONE,DEBUG,TRACE,INFO
+     */
+    void setLogLevel(String level) {
+        logLevel.set(level)
     }
 }

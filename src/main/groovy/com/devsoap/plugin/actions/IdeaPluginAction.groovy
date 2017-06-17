@@ -16,8 +16,7 @@
 package com.devsoap.plugin.actions
 
 import com.devsoap.plugin.GradleVaadinPlugin
-import com.devsoap.plugin.Util
-import com.devsoap.plugin.configuration.ApplicationServerConfiguration
+import com.devsoap.plugin.tasks.RunTask
 import groovy.transform.PackageScope
 import org.gradle.api.Project
 
@@ -57,13 +56,13 @@ class IdeaPluginAction extends PluginAction {
         // Configure output dirs only if user has not defined it himself
         if ( module.inheritOutputDirs == null ) {
             module.inheritOutputDirs = false
-            def serverConf = Util.findOrCreateExtension(project, ApplicationServerConfiguration)
-            if ( serverConf.classesDir == null ) {
+            RunTask runTask = project.tasks.getByName(RunTask.NAME)
+            if ( runTask.classesDir == null ) {
                 module.outputDir = project.sourceSets.main.output.classesDir
                 module.testOutputDir = project.sourceSets.test.output.classesDir
             } else {
-                module.outputDir = project.file(serverConf.classesDir)
-                module.testOutputDir = project.file(serverConf.classesDir)
+                module.outputDir = project.file(runTask.classesDir)
+                module.testOutputDir = project.file(runTask.classesDir)
             }
         }
     }

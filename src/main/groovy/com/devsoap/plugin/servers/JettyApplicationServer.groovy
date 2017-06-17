@@ -16,7 +16,7 @@
 package com.devsoap.plugin.servers
 
 import com.devsoap.plugin.Util
-import com.devsoap.plugin.configuration.ApplicationServerConfiguration
+
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.DependencySet
@@ -30,8 +30,8 @@ class JettyApplicationServer extends ApplicationServer {
     public static final String NAME = 'jetty'
     public static final String JETTY_VERSION_PROPERTY = 'jetty.version'
 
-    JettyApplicationServer(Project project, Map browserParameters, ApplicationServerConfiguration configuration) {
-        super(project, browserParameters, configuration)
+    JettyApplicationServer(Project project, Map browserParameters) {
+        super(project, browserParameters)
     }
 
     @Override

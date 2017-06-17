@@ -17,11 +17,11 @@ package com.devsoap.plugin.servers
 
 import com.devsoap.plugin.GradleVaadinPlugin
 import com.devsoap.plugin.Util
-import com.devsoap.plugin.configuration.ApplicationServerConfiguration
 
 import com.devsoap.plugin.tasks.BuildClassPathJar
 import com.devsoap.plugin.tasks.CompileThemeTask
 import com.devsoap.plugin.tasks.CompressCssTask
+import com.devsoap.plugin.tasks.RunTask
 import groovy.transform.PackageScope
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -62,13 +62,13 @@ abstract class ApplicationServer {
      *      returns the application server
      */
     static ApplicationServer get(Project project,
-                                    Map browserParameters = [:],
-                                    ApplicationServerConfiguration configuration) {
-        switch(configuration.server) {
+                                 Map browserParameters = [:]) {
+        RunTask runTask = project.tasks.getByName(RunTask.NAME)
+        switch(runTask.server) {
             case PayaraApplicationServer.NAME:
-                return new PayaraApplicationServer(project, browserParameters, configuration)
+                return new PayaraApplicationServer(project, browserParameters)
             case JettyApplicationServer.NAME:
-                return new JettyApplicationServer(project, browserParameters, configuration)
+                return new JettyApplicationServer(project, browserParameters)
             default:
                 throw new IllegalArgumentException("Server name not recognized. Must be either payara or jetty.")
         }
@@ -82,8 +82,6 @@ abstract class ApplicationServer {
 
     Map browserParameters = [:]
 
-    ApplicationServerConfiguration configuration
-
     /**
      * Create a application server
      *
@@ -94,10 +92,9 @@ abstract class ApplicationServer {
      * @param configuration
      *      the serverconfiguration
      */
-    protected ApplicationServer(Project project, Map browserParameters, ApplicationServerConfiguration configuration) {
+    protected ApplicationServer(Project project, Map browserParameters) {
         this.project = project
         this.browserParameters = browserParameters
-        this.configuration = configuration
     }
 
     abstract String getServerRunner()
@@ -150,28 +147,31 @@ abstract class ApplicationServer {
      *      the command line parameters
      */
     void configureProcess(List<String> parameters) {
+
+        RunTask runTask = project.tasks.getByName(RunTask.NAME)
+
         // Debug
-        if ( configuration.debug ) {
+        if ( runTask.debug ) {
             parameters.add('-Xdebug')
-            parameters.add("-Xrunjdwp:transport=dt_socket,address=${configuration.debugPort},server=y,suspend=n")
+            parameters.add("-Xrunjdwp:transport=dt_socket,address=${runTask.debugPort},server=y,suspend=n")
         }
 
         // JVM options
-        if ( configuration.debug ) {
+        if ( runTask.debug ) {
             parameters.add('-ea')
         }
 
         parameters.add('-cp')
         parameters.add(classPath.asPath)
 
-        if ( configuration.jvmArgs ) {
-            parameters.addAll(configuration.jvmArgs)
+        if ( runTask.jvmArgs ) {
+            parameters.addAll(runTask.jvmArgs)
         }
 
         // Program args
         parameters.add(serverRunner)
 
-        parameters.add(configuration.serverPort.toString())
+        parameters.add(runTask.serverPort.toString())
 
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
         parameters.add(webAppDir.canonicalPath + File.separator)
@@ -181,9 +181,9 @@ abstract class ApplicationServer {
 
         List<File> classesDirs = new ArrayList<>(mainSourceSet.output.classesDirs.toList())
         File resourcesDir = mainSourceSet.output.resourcesDir
-        if ( configuration.classesDir ) {
-            classesDirs.add(0, project.file(configuration.classesDir));
-            resourcesDir = project.file(configuration.classesDir)
+        if ( runTask.classesDir ) {
+            classesDirs.add(0, project.file(runTask.classesDir))
+            resourcesDir = project.file(runTask.classesDir)
         }
 
         parameters.add(classesDirs.collect { it.canonicalPath + File.separator}.join(','))
@@ -233,7 +233,8 @@ abstract class ApplicationServer {
         }
 
         // Watch for changes in classes
-        if ( firstStart && configuration.serverRestart ) {
+        RunTask runTask = project.tasks.getByName(RunTask.NAME)
+        if ( firstStart && runTask.serverRestart ) {
             def self = this
             GradleVaadinPlugin.THREAD_POOL.submit {
                 watchClassDirectoryForChanges(self)
@@ -241,7 +242,7 @@ abstract class ApplicationServer {
         }
 
         // Watch for changes in theme
-        if ( firstStart && configuration.themeAutoRecompile ) {
+        if ( firstStart && runTask.themeAutoRecompile ) {
             def self = this
             GradleVaadinPlugin.THREAD_POOL.submit {
                 watchThemeDirectoryForChanges(self)
@@ -255,9 +256,10 @@ abstract class ApplicationServer {
         Util.logProcess(project, process, "${serverName}.log") { line ->
             if ( line.contains(successfullyStartedLogToken) ) {
                 if ( firstStart ) {
-                    def resultStr = "Application running on http://localhost:${configuration.serverPort} "
-                    if ( configuration.debug ) {
-                        resultStr += "(debugger on ${configuration.debugPort})"
+                    RunTask runTask = project.tasks.getByName(RunTask.NAME)
+                    def resultStr = "Application running on http://localhost:${runTask.serverPort} "
+                    if ( runTask.debug ) {
+                        resultStr += "(debugger on ${runTask.debugPort})"
                     }
                     project.logger.lifecycle(resultStr)
                     project.logger.lifecycle('Press [Ctrl+C] to terminate server...')
@@ -265,7 +267,7 @@ abstract class ApplicationServer {
                     if ( stopAfterStart ) {
                         terminate()
                         return false
-                    } else if ( configuration.openInBrowser ) {
+                    } else if ( runTask.openInBrowser ) {
                         openBrowser()
                     }
                 } else {
@@ -284,9 +286,10 @@ abstract class ApplicationServer {
 
     @PackageScope
     void openBrowser() {
+        RunTask runTask = project.tasks.getByName(RunTask.NAME)
         // Build browser GET parameters
         String paramString = ''
-        if ( configuration.debug ) {
+        if ( runTask.debug ) {
             paramString += '?debug'
             paramString += AMPERSAND + browserParameters.collect {key,value ->
                 "$key=$value"
@@ -299,7 +302,7 @@ abstract class ApplicationServer {
         paramString = paramString.replaceAll('\\?$|&$', '')
 
         // Open browser
-        Util.openBrowser((Project)project, "http://localhost:${(Integer)configuration.serverPort}/${paramString}")
+        Util.openBrowser((Project)project, "http://localhost:${(Integer)runTask.serverPort}/${paramString}")
     }
 
     @PackageScope
@@ -307,7 +310,7 @@ abstract class ApplicationServer {
         def firstStart = true
 
         while(true) {
-            // Keep main loop running so task does not end. Task
+            // Keep main loop running so runTask does not end. Task
             // shutdownhook will terminate server
 
             if ( process != null ) {
@@ -335,7 +338,8 @@ abstract class ApplicationServer {
                 }
             }
 
-            if ( !configuration.serverRestart || stopAfterStart ) {
+            RunTask runTask = project.tasks.getByName(RunTask.NAME)
+            if ( !runTask.serverRestart || stopAfterStart ) {
                 // Auto-refresh turned off
                 break
             }
@@ -359,20 +363,20 @@ abstract class ApplicationServer {
     static void watchClassDirectoryForChanges(final ApplicationServer server) {
         Project project = server.project
 
-        def serverConfiguration = Util.findOrCreateExtension(project, ApplicationServerConfiguration)
+        RunTask runTask = project.tasks.getByName(RunTask.NAME)
         List<File> classesDirs = []
-        if ( serverConfiguration.classesDir && project.file(serverConfiguration.classesDir).exists() ) {
-            classesDirs.add(project.file(serverConfiguration.classesDir))
+        if ( runTask.classesDir && project.file(runTask.classesDir).exists() ) {
+            classesDirs.add(project.file(runTask.classesDir))
         }
 
         classesDirs.addAll(project.sourceSets.main.output.classesDirs.toList())
 
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor()
 
-        classesDirs.each {
+        classesDirs.each { dir ->
             ScheduledFuture currentTask
-            if(it.exists()) {
-                Util.watchDirectoryForChanges(project, (File) classesDir, { WatchKey key, WatchEvent event ->
+            if(dir.exists()) {
+                Util.watchDirectoryForChanges(project, dir, { WatchKey key, WatchEvent event ->
                     if (server.process && server.configuration.serverRestart ) {
                         if ( currentTask ) {
                             currentTask.cancel(true)
@@ -392,7 +396,7 @@ abstract class ApplicationServer {
     @PackageScope
     static void watchThemeDirectoryForChanges(final ApplicationServer server) {
         Project project = server.project
-        CompileThemeTask compileConf = project.tasks.getByName(CompileThemeTask.NAME)
+        CompileThemeTask compileThemeTask = project.tasks.getByName(CompileThemeTask.NAME)
 
         File themesDir = Util.getThemesDirectory(project)
         if ( themesDir.exists() ) {
@@ -410,13 +414,13 @@ abstract class ApplicationServer {
                         CompileThemeTask.compile(project, true)
 
                         // Recompress theme
-                        if(compileConf.compress){
+                        if(compileThemeTask.compress){
                             CompressCssTask.compress(project, true)
                         }
 
                         // Restart
                         if ( server.configuration.serverRestart && server.process ) {
-                            // Force restart of server
+                            // Force restart of serverInstance
                             project.logger.lifecycle(RELOADING_SERVER_MESSAGE)
                             server.reload()
                         }
