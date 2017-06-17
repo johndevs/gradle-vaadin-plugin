@@ -18,18 +18,16 @@ package com.devsoap.plugin.servers
 import com.devsoap.plugin.GradleVaadinPlugin
 import com.devsoap.plugin.Util
 import com.devsoap.plugin.configuration.ApplicationServerConfiguration
-import com.devsoap.plugin.configuration.CompileThemeConfiguration
+
 import com.devsoap.plugin.tasks.BuildClassPathJar
 import com.devsoap.plugin.tasks.CompileThemeTask
 import com.devsoap.plugin.tasks.CompressCssTask
-import groovy.io.FileType
 import groovy.transform.PackageScope
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.DependencySet
 import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.file.FileCollection
-import org.gradle.api.logging.LogLevel
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.SourceSetContainer
@@ -394,7 +392,7 @@ abstract class ApplicationServer {
     @PackageScope
     static void watchThemeDirectoryForChanges(final ApplicationServer server) {
         Project project = server.project
-        CompileThemeConfiguration compileConf = Util.findOrCreateExtension(project, CompileThemeConfiguration)
+        CompileThemeTask compileConf = project.tasks.getByName(CompileThemeTask.NAME)
 
         File themesDir = Util.getThemesDirectory(project)
         if ( themesDir.exists() ) {

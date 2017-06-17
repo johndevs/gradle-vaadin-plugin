@@ -23,7 +23,7 @@ import com.devsoap.plugin.actions.SpringBootAction
 import com.devsoap.plugin.actions.VaadinPluginAction
 import com.devsoap.plugin.actions.WarPluginAction
 import com.devsoap.plugin.configuration.ApplicationServerConfiguration
-import com.devsoap.plugin.configuration.CompileThemeConfiguration
+
 import com.devsoap.plugin.configuration.CompileWidgetsetConfiguration
 import com.devsoap.plugin.configuration.DevModeConfiguration
 import com.devsoap.plugin.configuration.SuperDevModeConfiguration
@@ -170,7 +170,6 @@ class GradleVaadinPlugin implements Plugin<Project> {
         Util.findOrCreateExtension(project, TestBenchHubConfiguration)
         Util.findOrCreateExtension(project, TestBenchNodeConfiguration)
         Util.findOrCreateExtension(project, ApplicationServerConfiguration)
-        Util.findOrCreateExtension(project, CompileThemeConfiguration)
         Util.findOrCreateExtension(project, CompileWidgetsetConfiguration)
         Util.findOrCreateExtension(project, DevModeConfiguration)
         Util.findOrCreateExtension(project, SuperDevModeConfiguration)
@@ -406,7 +405,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
         configurations.create(CONFIGURATION_THEME) { conf ->
             conf.description = 'Libraries needed for SASS theme compilation'
             conf.defaultDependencies { dependencies ->
-                def themeConf = Util.findOrCreateExtension(project, CompileThemeConfiguration)
+                CompileThemeTask themeConf = project.tasks.getByName(CompileThemeTask.NAME)
                 switch (themeConf.compiler) {
                     case 'vaadin':
                         if(Util.isThemeDependencyNeeded(project)) {
