@@ -18,7 +18,7 @@ package com.devsoap.plugin.tasks
 import com.devsoap.plugin.GradleVaadinPlugin
 import com.devsoap.plugin.TemplateUtil
 import com.devsoap.plugin.Util
-import com.devsoap.plugin.configuration.CompileWidgetsetConfiguration
+
 import com.devsoap.plugin.creators.AddonThemeCreator
 import com.devsoap.plugin.creators.ComponentCreator
 import com.devsoap.plugin.creators.ProjectCreator
@@ -95,10 +95,11 @@ class CreateAddonProjectTask extends DefaultTask {
 
         TemplateUtil.writeTemplate('addonProject/demo.gradle', demoDir, BUILD_FILE, substitutions)
 
+        CompileWidgetsetTask compileWidgetsetTask = project.tasks.getByName(CompileWidgetsetTask.NAME)
         new ProjectCreator(
                 applicationName:DEMO_APPLICATION_NAME,
                 applicationPackage: 'com.example.demo',
-                widgetsetConfiguration:project.vaadinCompile as CompileWidgetsetConfiguration,
+                widgetsetCDN: compileWidgetsetTask.widgetsetCDN,
                 javaDir:new File(demoDir, MAIN_SOURCE_FOLDER),
                 resourceDir:new File(demoDir, 'src/main/resources/'),
                 templateDir:TEMPLATE_DIRECTORY,

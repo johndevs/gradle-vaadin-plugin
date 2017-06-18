@@ -19,8 +19,8 @@ import com.devsoap.plugin.GradleVaadinPlugin
 import com.devsoap.plugin.ProjectType
 import com.devsoap.plugin.TemplateUtil
 import com.devsoap.plugin.Util
-import com.devsoap.plugin.configuration.CompileWidgetsetConfiguration
-import com.devsoap.plugin.configuration.WidgetsetCDNConfiguration
+
+import com.devsoap.plugin.extensions.WidgetsetCDNExtension
 import groovy.transform.PackageScope
 import groovyx.net.http.ContentType
 import groovyx.net.http.HttpResponseDecorator
@@ -29,6 +29,7 @@ import org.apache.commons.codec.digest.DigestUtils
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
+import org.gradle.api.provider.PropertyState
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.TaskAction
 
@@ -52,9 +53,30 @@ class CompileWidgetsetTask extends DefaultTask {
     static final String PUBLIC_FOLDER_PATTERN = '**/*/public/**/*.*'
     static final String GWT_MODULE_XML_PATTERN = '**/*/*.gwt.xml'
 
-    /**
-     * HTTP POST request sent to CDN for requesting a widgetset.
-     */
+    final PropertyState<String> style = project.property(String)
+    final PropertyState<Integer> optimize = project.property(Integer)
+    final PropertyState<Boolean> logEnabled = project.property(Boolean)
+    final PropertyState<String> logLevel = project.property(String)
+    final PropertyState<Integer> localWorkers = project.property(Integer)
+    final PropertyState<Boolean> draftCompile = project.property(Boolean)
+    final PropertyState<Boolean> strict = project.property(Boolean)
+    final PropertyState<String> userAgent = project.property(String)
+    final PropertyState<List<String>> jvmArgs = project.property(List)
+    final PropertyState<List<String>> extraArgs = project.property(List)
+    final PropertyState<List<String>> sourcePaths = project.property(List)
+    final PropertyState<Boolean> collapsePermutations = project.property(Boolean)
+    final PropertyState<List<String>> extraInherits = project.property(List)
+    final PropertyState<Boolean> gwtSdkFirstInClasspath = project.property(Boolean)
+    final PropertyState<String> outputDirectory = project.property(String)
+    final PropertyState<Boolean> widgetsetCDN = project.property(Boolean)
+    final PropertyState<Boolean> profiler = project.property(Boolean)
+    final PropertyState<Boolean> manageWidgetset = project.property(Boolean)
+    final PropertyState<String> widgetset = project.property(String)
+    final PropertyState<String> widgetsetGenerator = project.property(String)
+
+    final WidgetsetCDNExtension widgetsetCDNConfig =  extensions.create('widgetsetCDNConfig',
+                                                                            WidgetsetCDNExtension, project)
+
     @PackageScope
     def queryWidgetsetRequest = { version, style ->
         Set addons = Util.findAddonsInProject(project)
@@ -170,10 +192,33 @@ class CompileWidgetsetTask extends DefaultTask {
 
     CompileWidgetsetTask() {
         description = "Compiles Vaadin Addons and components into Javascript."
+
+        style.set('OBF')
+        optimize.set(0)
+        logEnabled.set(true)
+        logLevel.set('INFO')
+        localWorkers.set(Runtime.getRuntime().availableProcessors())
+        draftCompile.set(true)
+        strict.set(true)
+        userAgent.set(null)
+        jvmArgs.set(null)
+        extraArgs.set(null)
+        sourcePaths.set(['client', 'shared'])
+        collapsePermutations.set(true)
+        extraInherits.set(null)
+        gwtSdkFirstInClasspath.set(true)
+        outputDirectory.set(null)
+        widgetsetCDN.set(false)
+        profiler.set(false)
+        manageWidgetset.set(true)
+        widgetset.set(null)
+        widgetsetGenerator.set(null)
+
         project.afterEvaluate {
 
             // Set task dependencies
-            if ( Util.findOrCreateExtension(project, CompileWidgetsetConfiguration).widgetsetCDN ) {
+
+            if ( getWidgetsetCDN() ) {
                 dependsOn 'processResources'
             } else {
                 dependsOn('classes', UpdateWidgetsetTask.NAME, BuildClassPathJar.NAME)
@@ -215,7 +260,7 @@ class CompileWidgetsetTask extends DefaultTask {
 
     @TaskAction
     def run() {
-        if ( Util.findOrCreateExtension(project, CompileWidgetsetConfiguration).widgetsetCDN ) {
+        if ( getWidgetsetCDN() ) {
             compileRemotely()
             return
         }
@@ -270,7 +315,6 @@ class CompileWidgetsetTask extends DefaultTask {
      * Compiles the widgetset locally
      */
     @PackageScope compileLocally(String widgetset = Util.getWidgetset(project)) {
-        def configuration = Util.findOrCreateExtension(project, CompileWidgetsetConfiguration)
 
         // Re-create directory
         Util.getWidgetsetDirectory(project).mkdirs()
@@ -303,14 +347,14 @@ class CompileWidgetsetTask extends DefaultTask {
         }
 
         // Ensure gwt sdk libs are in the correct order
-        if ( configuration.gwtSdkFirstInClasspath ) {
+        if ( getGwtSdkFirstInClasspath() ) {
             classpath = Util.moveGwtSdkFirstInClasspath(project, classpath)
         }
 
         def widgetsetCompileProcess = [Util.getJavaBinary(project)]
 
-        if ( configuration.jvmArgs ) {
-            widgetsetCompileProcess += configuration.jvmArgs as List
+        if ( getJvmArgs() ) {
+            widgetsetCompileProcess += getJvmArgs() as List
         }
 
         widgetsetCompileProcess += ['-cp',  classpath.asPath]
@@ -319,23 +363,23 @@ class CompileWidgetsetTask extends DefaultTask {
 
         widgetsetCompileProcess += 'com.google.gwt.dev.Compiler'
 
-        widgetsetCompileProcess += ['-style', configuration.style]
-        widgetsetCompileProcess += ['-optimize', configuration.optimize]
+        widgetsetCompileProcess += ['-style', getStyle()]
+        widgetsetCompileProcess += ['-optimize', getOptimize()]
         widgetsetCompileProcess += ['-war', Util.getWidgetsetDirectory(project).canonicalPath]
-        widgetsetCompileProcess += ['-logLevel', configuration.logLevel]
-        widgetsetCompileProcess += ['-localWorkers', configuration.localWorkers]
+        widgetsetCompileProcess += ['-logLevel', getLogLevel()]
+        widgetsetCompileProcess += ['-localWorkers', getLocalWorkers()]
         widgetsetCompileProcess += ['-workDir', project.buildDir.canonicalPath + File.separator + 'tmp']
 
-        if ( configuration.draftCompile ) {
+        if ( getDraftCompile() ) {
             widgetsetCompileProcess += '-draftCompile'
         }
 
-        if ( configuration.strict ) {
+        if ( getStrict() ) {
             widgetsetCompileProcess += '-strict'
         }
 
-        if ( configuration.extraArgs ) {
-            widgetsetCompileProcess += configuration.extraArgs as List
+        if ( getExtraArgs() ) {
+            widgetsetCompileProcess += getExtraArgs() as List
         }
 
         widgetsetCompileProcess += widgetset
@@ -378,7 +422,7 @@ class CompileWidgetsetTask extends DefaultTask {
 
         def request = queryWidgetsetRequest(
                 Util.getResolvedVaadinVersion(project),
-                Util.findOrCreateExtension(project, CompileWidgetsetConfiguration).style
+                getStyle()
         )
         def response = client.post(request)
         response.data
@@ -393,7 +437,7 @@ class CompileWidgetsetTask extends DefaultTask {
     @PackageScope ZipInputStream downloadWidgetset() {
         makeClient(WIDGETSET_CDN_URL).post(downloadWidgetsetRequest(
             Util.getResolvedVaadinVersion(project),
-            Util.findOrCreateExtension(project, CompileWidgetsetConfiguration).style
+            getStyle()
         ), writeWidgetsetToFileSystem)
     }
 
@@ -431,8 +475,6 @@ class CompileWidgetsetTask extends DefaultTask {
     @PackageScope configureClient(RESTClient client) {
 
         // Proxy support
-        WidgetsetCDNConfiguration widgetsetCDNConfig = Util.findOrCreateExtension(project,
-                CompileWidgetsetConfiguration).widgetsetCDNConfig
         if(widgetsetCDNConfig.proxyEnabled) {
             client.ignoreSSLIssues()
             client.setProxy(
@@ -457,5 +499,285 @@ class CompileWidgetsetTask extends DefaultTask {
         ua.append(';')
         ua.append(DigestUtils.md5Hex(System.properties['user.name']))
         ua.toString()
+    }
+
+    /**
+     * Compilation style
+     */
+    String getStyle() {
+        style.get()
+    }
+
+    /**
+     * Compilation style
+     */
+    void setStyle(String style) {
+        this.style.set(style)
+    }
+
+    /**
+     * Should the compilation result be optimized
+     */
+    Integer getOptimize() {
+        optimize.get()
+    }
+
+    /**
+     * Should the compilation result be optimized
+     */
+    void setOptimize(Integer optimized) {
+        optimize.set(optimized)
+    }
+
+    /**
+     * Should logging be enabled
+     */
+    Boolean getLogEnabled() {
+        logEnabled.get()
+    }
+
+    /**
+     * Should logging be enabled
+     */
+    void setLogEnabled(Boolean enabled) {
+        logEnabled.set(enabled)
+    }
+
+    /**
+     * The log level. Possible levels NONE,DEBUG,TRACE,INFO
+     */
+    String getLogLevel() {
+        logLevel.get()
+    }
+
+    /**
+     * The log level. Possible levels NONE,DEBUG,TRACE,INFO
+     */
+    void setLogLevel(String logLevel) {
+        this.logLevel.set(logLevel)
+    }
+
+    /**
+     * Amount of local workers used when compiling. By default the amount of processors.
+     */
+    Integer getLocalWorkers() {
+        localWorkers.get()
+    }
+
+    /**
+     * Amount of local workers used when compiling. By default the amount of processors.
+     */
+    void setLocalWorkers(Integer workers) {
+        localWorkers.set(workers)
+    }
+
+    /**
+     * Should draft compile be used
+     */
+    Boolean getDraftCompile() {
+        draftCompile.get()
+    }
+
+    /**
+     * Should draft compile be used
+     */
+    void setDraftCompile(Boolean draft) {
+        draftCompile.set(draft)
+    }
+
+    /**
+     * Should strict compiling be used
+     */
+    Boolean getStrict() {
+        strict.get()
+    }
+
+    /**
+     * Should strict compiling be used
+     */
+    void setStrict(Boolean strict) {
+        this.strict.set(strict)
+    }
+
+    /**
+     * What user agents (browsers should be used. By defining null all user agents are used.
+     */
+    String getUserAgent() {
+        userAgent.getOrNull()
+    }
+
+    /**
+     * What user agents (browsers should be used. By defining null all user agents are used.
+     */
+    void setUserAgent(String ua) {
+        userAgent.set(ua)
+    }
+
+    /**
+     * Extra jvm arguments passed the JVM running the compiler
+     */
+    String[] getJvmArgs() {
+        jvmArgs.present ? jvmArgs.get().toArray(new String[jvmArgs.get().size()]) : null
+    }
+
+    /**
+     * Extra jvm arguments passed the JVM running the compiler
+     */
+    void setJvmArgs(String... args) {
+        jvmArgs.set(Arrays.asList(args))
+    }
+
+    /**
+     * Extra arguments passed to the compiler
+     */
+    String[] getExtraArgs() {
+        extraArgs.present ? extraArgs.get().toArray(new String[extraArgs.get().size()]) : null
+    }
+
+    /**
+     * Extra arguments passed to the compiler
+     */
+    void setExtraArgs(String... args) {
+        extraArgs.set(Arrays.asList(args))
+    }
+
+    /**
+     * Source paths where the compiler will look for source files
+     */
+    String[] getSourcePaths() {
+        sourcePaths.present ? sourcePaths.get().toArray(new String[sourcePaths.get().size()]): null
+    }
+
+    /**
+     * Source paths where the compiler will look for source files
+     */
+    void setSourcePaths(String... paths) {
+        sourcePaths.set(Arrays.asList(paths))
+    }
+
+    /**
+     * Should the compiler permutations be collapsed to save time
+     */
+    Boolean getCollapsePermutations() {
+        collapsePermutations.get()
+    }
+
+    /**
+     * Should the compiler permutations be collapsed to save time
+     */
+    void setCollapsePermutations(Boolean collapse) {
+        collapsePermutations.set(collapse)
+    }
+
+    /**
+     * Extra module inherits
+     */
+    String[] getExtraInherits() {
+        extraInherits.present ? extraInherits.get().toArray(new String[extraInherits.get().size()]) : null
+    }
+
+    /**
+     * Extra module inherits
+     */
+    void setExtraInherits(String... inherits) {
+        extraInherits.set(Arrays.asList(inherits))
+    }
+
+    /**
+     * Should GWT be placed first in the classpath when compiling the widgetset.
+     */
+    Boolean getGwtSdkFirstInClasspath() {
+        gwtSdkFirstInClasspath.get()
+    }
+
+    /**
+     * Should GWT be placed first in the classpath when compiling the widgetset.
+     */
+    void setGwtSdkFirstInClasspath(Boolean first) {
+        gwtSdkFirstInClasspath.set(first)
+    }
+
+    /**
+     * (Optional) root directory, for generated files; default is the web-app dir from the WAR plugin
+     */
+    String getOutputDirectory() {
+        outputDirectory.getOrNull()
+    }
+
+    /**
+     * (Optional) root directory, for generated files; default is the web-app dir from the WAR plugin
+     */
+    void setOutputDirectory(String outputDir) {
+        outputDirectory.set(outputDir)
+    }
+
+    /**
+     * Use the widgetset CDN located at cdn.virit.in
+     */
+    Boolean getWidgetsetCDN() {
+        widgetsetCDN.get()
+    }
+
+    /**
+     * Use the widgetset CDN located at cdn.virit.in
+     */
+    void setWidgetsetCDN(Boolean cdn) {
+        widgetsetCDN.set(cdn)
+    }
+
+    /**
+     * Should the Vaadin client side profiler be used
+     */
+    Boolean getProfiler() {
+        profiler.get()
+    }
+
+    /**
+     * Should the Vaadin client side profiler be used
+     */
+    void setProfiler(Boolean enabled) {
+        profiler.set(enabled)
+    }
+
+    /**
+     * Should the plugin manage the widgetset (gwt.xml file)
+     */
+    Boolean getManageWidgetset() {
+        manageWidgetset.get()
+    }
+
+    /**
+     * Should the plugin manage the widgetset (gwt.xml file)
+     */
+    void setManageWidgetset(Boolean manage) {
+        manageWidgetset.set(manage)
+    }
+
+    /**
+     * The widgetset to use for the project. Leave emptu for a pure server side project
+     */
+    String getWidgetset() {
+        widgetset.getOrNull()
+    }
+
+    /**
+     * The widgetset to use for the project. Leave emptu for a pure server side project
+     */
+    void setWidgetset(String widgetset) {
+        this.widgetset.set(widgetset)
+    }
+
+    /**
+     * The widgetset generator to use
+     */
+    String getWidgetsetGenerator() {
+        widgetsetGenerator.getOrNull()
+    }
+
+    /**
+     * The widgetset generator to use
+     */
+    void setWidgetsetGenerator(String generator) {
+        widgetsetGenerator.set(generator)
     }
 }

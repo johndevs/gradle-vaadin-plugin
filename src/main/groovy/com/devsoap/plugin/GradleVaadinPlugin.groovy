@@ -23,7 +23,6 @@ import com.devsoap.plugin.actions.SpringBootAction
 import com.devsoap.plugin.actions.VaadinPluginAction
 import com.devsoap.plugin.actions.WarPluginAction
 
-import com.devsoap.plugin.configuration.CompileWidgetsetConfiguration
 
 import com.devsoap.plugin.configuration.TestBenchConfiguration
 import com.devsoap.plugin.configuration.TestBenchHubConfiguration
@@ -167,7 +166,6 @@ class GradleVaadinPlugin implements Plugin<Project> {
         Util.findOrCreateExtension(project, TestBenchConfiguration, project)
         Util.findOrCreateExtension(project, TestBenchHubConfiguration)
         Util.findOrCreateExtension(project, TestBenchNodeConfiguration)
-        Util.findOrCreateExtension(project, CompileWidgetsetConfiguration)
 
         // Configure plugins
         new JavaPluginAction().apply(project)

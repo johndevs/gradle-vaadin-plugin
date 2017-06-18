@@ -18,7 +18,7 @@ package com.devsoap.plugin.tasks
 import com.devsoap.plugin.ProjectType
 import com.devsoap.plugin.TemplateUtil
 import com.devsoap.plugin.Util
-import com.devsoap.plugin.configuration.CompileWidgetsetConfiguration
+
 import groovy.transform.PackageScope
 import org.gradle.api.DefaultTask
 import org.gradle.api.internal.tasks.options.Option
@@ -47,9 +47,9 @@ class CreateCompositeTask extends DefaultTask {
 
     @TaskAction
     void run() {
-        def configuration = Util.findOrCreateExtension(project, CompileWidgetsetConfiguration)
-        if ( !componentPackage && configuration.widgetset ) {
-            String widgetsetClass = configuration.widgetset
+        CompileWidgetsetTask compileWidgetsetTask = project.tasks.getByName(CompileWidgetsetTask.NAME)
+        if ( !componentPackage && compileWidgetsetTask.widgetset ) {
+            String widgetsetClass = compileWidgetsetTask.widgetset
             String widgetsetPackage = widgetsetClass.substring(0, widgetsetClass.lastIndexOf(DOT))
             componentPackage = widgetsetPackage + DOT + componentName.toLowerCase()
         }

@@ -17,7 +17,7 @@ package com.devsoap.plugin.tasks
 
 import com.devsoap.plugin.TemplateUtil
 import com.devsoap.plugin.Util
-import com.devsoap.plugin.configuration.CompileWidgetsetConfiguration
+
 import groovy.transform.PackageScope
 import groovy.util.logging.Log
 import org.apache.commons.lang.StringUtils
@@ -60,8 +60,8 @@ class UpdateWidgetsetTask extends DefaultTask {
     UpdateWidgetsetTask() {
         description = "Updates the widgetset xml file"
         onlyIf { Task task ->
-            def conf = Util.findOrCreateExtension(task.project, CompileWidgetsetConfiguration)
-            conf.manageWidgetset && !conf.widgetsetCDN && Util.getWidgetset(task.project)
+            CompileWidgetsetTask compileWidgetsetTask = project.tasks.getByName(CompileWidgetsetTask.NAME)
+            compileWidgetsetTask.manageWidgetset && !compileWidgetsetTask.widgetsetCDN && Util.getWidgetset(task.project)
         }
     }
 
@@ -72,8 +72,8 @@ class UpdateWidgetsetTask extends DefaultTask {
 
     @PackageScope
     static File ensureWidgetPresent(Project project, String widgetsetFQN=Util.getWidgetset(project)) {
-        def config = Util.findOrCreateExtension(project, CompileWidgetsetConfiguration)
-        if (!config.manageWidgetset || config.widgetsetCDN || !widgetsetFQN) {
+        CompileWidgetsetTask compileWidgetsetTask = project.tasks.getByName(CompileWidgetsetTask.NAME)
+        if (!compileWidgetsetTask.manageWidgetset || compileWidgetsetTask.widgetsetCDN || !widgetsetFQN) {
             return null
         }
 
@@ -94,18 +94,18 @@ class UpdateWidgetsetTask extends DefaultTask {
 
     @PackageScope
     static updateWidgetset(File widgetsetFile, String widgetsetFQN, Project project) {
-        def configuration = Util.findOrCreateExtension(project, CompileWidgetsetConfiguration)
+        CompileWidgetsetTask compileWidgetsetTask = project.tasks.getByName(CompileWidgetsetTask.NAME)
 
         Map substitutions = [:]
-        substitutions['inherits'] = getInherits(project, configuration)
-        substitutions['sourcePaths'] = configuration.sourcePaths
+        substitutions['inherits'] = getInherits(project)
+        substitutions['sourcePaths'] = compileWidgetsetTask.sourcePaths
         substitutions['configurationProperties'] = getConfigurationProperties()
-        substitutions['properties'] = getGWTProperties(project, configuration)
+        substitutions['properties'] = getGWTProperties(project)
         substitutions['linkers'] = getLinkers(project)
         substitutions['stylesheets'] = getClientStylesheets(project)
-        substitutions['collapsePermutations'] = configuration.collapsePermutations
+        substitutions['collapsePermutations'] = compileWidgetsetTask.collapsePermutations
 
-        String widgetsetGenerator = getWidgetsetGenerator(project, configuration, widgetsetFQN)
+        String widgetsetGenerator = getWidgetsetGenerator(project, widgetsetFQN)
         if ( widgetsetGenerator ) {
             substitutions['widgetsetGenerator'] = widgetsetGenerator
         }
@@ -209,11 +209,13 @@ class UpdateWidgetsetTask extends DefaultTask {
         inherits
     }
 
-    private static Map<String, Object> getGWTProperties(Project project, CompileWidgetsetConfiguration configuration) {
+    private static Map<String, Object> getGWTProperties(Project project) {
         Map<String, Object> properties = [:]
 
+        CompileWidgetsetTask compileWidgetsetTask = project.tasks.getByName(CompileWidgetsetTask.NAME)
+
         def ua = 'gecko1_8,safari'
-        if ( !configuration.userAgent ) {
+        if ( !compileWidgetsetTask.userAgent ) {
             if ( Util.isOperaUserAgentSupported(project) ) {
                 ua += ',opera'
             }
@@ -221,21 +223,23 @@ class UpdateWidgetsetTask extends DefaultTask {
                 ua += ',ie10'
             }
         } else {
-            ua = configuration.userAgent
+            ua = compileWidgetsetTask.userAgent
         }
         properties.put('user.agent', ua)
 
-        if ( configuration.profiler ) {
+        if ( compileWidgetsetTask.profiler ) {
             properties.put('vaadin.profiler', true)
         }
 
-        if ( !configuration.logging ) {
+        if ( !compileWidgetsetTask.logging ) {
             properties.put('gwt.logging.enabled', false)
         }
         properties
     }
 
-    private static Set<String> getInherits(Project project, CompileWidgetsetConfiguration configuration) {
+    private static Set<String> getInherits(Project project) {
+        CompileWidgetsetTask compileWidgetsetTask = project.tasks.getByName(CompileWidgetsetTask.NAME)
+
         Set<String> inherits
         if(Util.isLegacyVaadin8Project(project)) {
             inherits = [DEFAULT_LEGACY_V7_WIDGETSET]
@@ -247,8 +251,8 @@ class UpdateWidgetsetTask extends DefaultTask {
         inherits.addAll(findInheritsInDependencies(project))
 
         // Custom inherits
-        if ( configuration.extraInherits ) {
-            inherits.addAll(configuration.extraInherits)
+        if ( compileWidgetsetTask.extraInherits ) {
+            inherits.addAll(compileWidgetsetTask.extraInherits)
         }
 
         inherits
@@ -260,18 +264,18 @@ class UpdateWidgetsetTask extends DefaultTask {
         configurationProperties
     }
 
-    private static String getWidgetsetGenerator(Project project,
-                                                CompileWidgetsetConfiguration configuration,
-                                                String widgetsetFQN) {
+    private static String getWidgetsetGenerator(Project project, String widgetsetFQN) {
+        CompileWidgetsetTask compileWidgetsetTask = project.tasks.getByName(CompileWidgetsetTask.NAME)
+
         String name, pkg, filename
-        if ( configuration.widgetsetGenerator == null ) {
+        if ( compileWidgetsetTask.widgetsetGenerator == null ) {
             name = widgetsetFQN.tokenize(DOT).last()
             pkg = widgetsetFQN.replace(DOT + name, '')
             filename = name + "Generator.java"
 
         } else {
-            name = configuration.widgetsetGenerator.tokenize(DOT).last()
-            pkg = configuration.widgetsetGenerator.replace(DOT + name, '')
+            name = compileWidgetsetTask.widgetsetGenerator.tokenize(DOT).last()
+            pkg = compileWidgetsetTask.widgetsetGenerator.replace(DOT + name, '')
             filename = name + JAVA_FILE_POSTFIX
         }
 
@@ -281,7 +285,7 @@ class UpdateWidgetsetTask extends DefaultTask {
 
         File javaDir = Util.getMainSourceSet(project).srcDirs.first()
         File f = new File(new File(javaDir, TemplateUtil.convertFQNToFilePath(pkg)), filename)
-        if ( f.exists() || configuration.widgetsetGenerator != null ) {
+        if ( f.exists() || compileWidgetsetTask.widgetsetGenerator != null ) {
             return  "${pkg}.${StringUtils.removeEnd(filename, JAVA_FILE_POSTFIX)}"
         }
         null
