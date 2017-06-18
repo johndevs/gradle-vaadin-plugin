@@ -18,7 +18,7 @@ package com.devsoap.plugin.tasks
 import com.devsoap.plugin.ProjectType
 import com.devsoap.plugin.TemplateUtil
 import com.devsoap.plugin.Util
-import com.devsoap.plugin.configuration.CompileWidgetsetConfiguration
+
 import groovy.transform.PackageScope
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
@@ -52,10 +52,10 @@ class CreateWidgetsetGeneratorTask extends DefaultTask {
     def makeWidgetsetGeneratorClass() {
         File javaDir = Util.getMainSourceSet(project).srcDirs.first()
 
-        def configuration = Util.findOrCreateExtension(project, CompileWidgetsetConfiguration)
+        CompileWidgetsetTask compileWidgetsetTask = project.tasks.getByName(CompileWidgetsetTask.NAME)
 
-        String widgetset = configuration.widgetset
-        String widgetsetGenerator = configuration.widgetsetGenerator
+        String widgetset = compileWidgetsetTask.widgetset
+        String widgetsetGenerator = compileWidgetsetTask.widgetsetGenerator
 
         String name, pkg, filename
         if ( !widgetsetGenerator ) {
@@ -69,7 +69,7 @@ class CreateWidgetsetGeneratorTask extends DefaultTask {
             filename = name
         }
 
-        List<String> sourcePaths = configuration.sourcePaths as List
+        List<String> sourcePaths = compileWidgetsetTask.sourcePaths as List
         sourcePaths.each { String path ->
             if(pkg.contains(".${path}.") || pkg.endsWith(".${path}")){
                 throw new GradleException("Widgetset generator cannot be placed inside the client package.")

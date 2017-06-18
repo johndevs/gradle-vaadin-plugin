@@ -16,7 +16,7 @@
 package com.devsoap.plugin.tasks
 
 import com.devsoap.plugin.Util
-import com.devsoap.plugin.configuration.CompileWidgetsetConfiguration
+
 import com.devsoap.plugin.creators.ProjectCreator
 import com.devsoap.plugin.creators.ThemeCreator
 import groovy.transform.PackageScope
@@ -51,12 +51,12 @@ class CreateProjectTask extends DefaultTask {
 
     @TaskAction
     def run() {
-        def configuration = Util.findOrCreateExtension(project,CompileWidgetsetConfiguration)
+        CompileWidgetsetTask compileWidgetsetTask = project.tasks.getByName(CompileWidgetsetTask.NAME)
 
         new ProjectCreator(
                 applicationName:resolveApplicationName(),
                 applicationPackage:resolveApplicationPackage(),
-                widgetsetConfiguration:configuration,
+                widgetsetCDN: compileWidgetsetTask.widgetsetCDN,
                 widgetsetFQN:widgetsetFQN,
                 pushSupported:Util.isPushSupportedAndEnabled(project),
                 addonStylesSupported:Util.isAddonStylesSupported(project),
@@ -89,16 +89,16 @@ class CreateProjectTask extends DefaultTask {
 
     @PackageScope
     String resolveApplicationPackage() {
-        def configuration = Util.findOrCreateExtension(project,CompileWidgetsetConfiguration)
+        CompileWidgetsetTask compileWidgetsetTask = project.tasks.getByName(CompileWidgetsetTask.NAME)
 
         if ( !applicationPackage ) {
             int endSlashSize = 2
             if ( widgetsetFQN?.contains(DOT) ) {
                 String widgetsetName = widgetsetFQN.tokenize(DOT).last()
                 return widgetsetFQN[0..(-widgetsetName.size() - endSlashSize)]
-            } else if ( configuration.widgetset?.contains(DOT) ) {
-                String widgetsetName = configuration.widgetset.tokenize(DOT).last()
-                return configuration.widgetset[0..(-widgetsetName.size() - endSlashSize)]
+            } else if ( compileWidgetsetTask.widgetset?.contains(DOT) ) {
+                String widgetsetName = compileWidgetsetTask.widgetset.tokenize(DOT).last()
+                return compileWidgetsetTask.widgetset[0..(-widgetsetName.size() - endSlashSize)]
             } else {
                 return "com.example.${resolveApplicationName().toLowerCase()}"
             }

@@ -17,7 +17,7 @@ package com.devsoap.plugin.creators
 
 import com.devsoap.plugin.ProjectType
 import com.devsoap.plugin.TemplateUtil
-import com.devsoap.plugin.configuration.CompileWidgetsetConfiguration
+
 import groovy.transform.Canonical
 import groovy.transform.PackageScope
 
@@ -34,8 +34,8 @@ class ProjectCreator implements Runnable {
     private String applicationName
     private String applicationPackage
     private String widgetsetFQN
-    private CompileWidgetsetConfiguration widgetsetConfiguration
     private boolean pushSupported = true
+    private boolean widgetsetCDN = false
     private boolean addonStylesSupported = true
     private ProjectType projectType = ProjectType.JAVA
     private File javaDir
@@ -134,7 +134,7 @@ class ProjectCreator implements Runnable {
         Map<String,String> initParams = ['ui':"$applicationPackage.${applicationName}UI"]
 
         if ( widgetsetFQN ) {
-            if ( widgetsetConfiguration.widgetsetCDN ) {
+            if ( widgetsetCDN ) {
                 initParams.put(WIDGETSET_KEY, "${widgetsetFQN.replaceAll('[^a-zA-Z0-9]+', '')}")
             } else {
                 initParams.put(WIDGETSET_KEY, "$widgetsetFQN")

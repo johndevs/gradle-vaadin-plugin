@@ -212,7 +212,7 @@ class DevModeTask extends DefaultTask {
      * Extra jvm args passed to the JVM running the Vaadin application
      */
     String[] getJvmArgs() {
-        jvmArgs.present ? new String[jvmArgs.get().size()] : null
+        jvmArgs.present ? jvmArgs.get().toArray(new String[jvmArgs.get().size()]) : null
     }
 
     /**
