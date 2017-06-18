@@ -47,7 +47,7 @@ class CreateThemeTest extends IntegrationTest {
     }
 
     @Test void 'Create theme in custom theme directory'() {
-        buildFile << "vaadinThemeCompile.themesDirectory = 'build/mythemedir'"
+        buildFile << "vaadinThemeCompile.themesDirectory = new File(project.buildDir, 'mythemedir').canonicalPath\n"
         runWithArguments(CreateThemeTask.NAME)
 
         def themesDir = Paths.get(projectDir.root.canonicalPath, 'build', 'mythemedir').toFile()
