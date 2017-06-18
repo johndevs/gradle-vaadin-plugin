@@ -66,7 +66,7 @@ class CompileThemeTask extends DefaultTask {
         description = 'Compiles a Vaadin SASS theme into CSS'
 
         themesDirectory.set(null)
-        compiler.set('vaadin')
+        compiler.set(VAADIN_COMPILER)
         compress.set(true)
 
         project.afterEvaluate {

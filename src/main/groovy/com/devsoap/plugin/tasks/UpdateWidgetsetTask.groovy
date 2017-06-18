@@ -60,8 +60,8 @@ class UpdateWidgetsetTask extends DefaultTask {
     UpdateWidgetsetTask() {
         description = "Updates the widgetset xml file"
         onlyIf { Task task ->
-            CompileWidgetsetTask compileWidgetsetTask = project.tasks.getByName(CompileWidgetsetTask.NAME)
-            compileWidgetsetTask.manageWidgetset && !compileWidgetsetTask.widgetsetCDN && Util.getWidgetset(task.project)
+            CompileWidgetsetTask compileTask = project.tasks.getByName(CompileWidgetsetTask.NAME)
+            compileTask.manageWidgetset && !compileTask.widgetsetCDN && Util.getWidgetset(task.project)
         }
     }
 
