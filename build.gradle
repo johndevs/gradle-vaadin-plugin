@@ -229,7 +229,7 @@ codenarc{
     configFile = rootProject.file('config/codenarc/ruleset.groovy')
     maxPriority1Violations = 0
     maxPriority2Violations = 0
-    maxPriority3Violations = 600
+    maxPriority3Violations = 500
     codenarcTest {
         configFile = rootProject.file('config/codenarc/ruleset-test.groovy')
     }

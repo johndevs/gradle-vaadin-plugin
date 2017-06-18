@@ -525,8 +525,8 @@ class GradleVaadinPlugin implements Plugin<Project> {
         addTask(project, UpdateWidgetsetTask.NAME, UpdateWidgetsetTask, VAADIN_TASK_GROUP)
 
         addTask(project, UpdateAddonStylesTask.NAME, UpdateAddonStylesTask, VAADIN_TASK_GROUP)
-        addTask(project, CreateAddonThemeTask.NAME, CreateAddonThemeTask, VAADIN_TASK_GROUP) { CreateAddonThemeTask task ->
-            task.addonTitle = project.extensions.getByType(AddonExtension).titleProvider
+        addTask(project, CreateAddonThemeTask.NAME, CreateAddonThemeTask, VAADIN_TASK_GROUP) {
+            CreateAddonThemeTask task -> task.addonTitle = project.extensions.getByType(AddonExtension).titleProvider
         }
     }
 
