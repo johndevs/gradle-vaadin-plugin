@@ -16,6 +16,7 @@
 package com.devsoap.plugin.actions
 
 import com.devsoap.plugin.GradleVaadinPlugin
+import com.devsoap.plugin.Util
 import com.devsoap.plugin.tasks.RunTask
 import groovy.transform.PackageScope
 import org.gradle.api.Project
@@ -66,7 +67,7 @@ class EclipsePluginAction extends PluginAction {
         RunTask runTask = project.tasks.getByName(RunTask.NAME)
         def cp = eclipse.classpath
         if ( runTask.classesDir == null ) {
-            cp.defaultOutputDir = project.sourceSets.main.output.classesDir
+            cp.defaultOutputDir = Util.getMainSourceSet(project).outputDir
         } else {
             cp.defaultOutputDir = project.file(runTask.classesDir)
         }

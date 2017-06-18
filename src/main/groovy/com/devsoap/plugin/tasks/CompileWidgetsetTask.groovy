@@ -74,8 +74,8 @@ class CompileWidgetsetTask extends DefaultTask {
     final PropertyState<String> widgetset = project.property(String)
     final PropertyState<String> widgetsetGenerator = project.property(String)
 
-    final WidgetsetCDNExtension widgetsetCDNConfig =  extensions.create('widgetsetCDNConfig',
-                                                                            WidgetsetCDNExtension, project)
+    final WidgetsetCDNExtension widgetsetCDNConfig =  extensions.create(WidgetsetCDNExtension.NAME,
+            WidgetsetCDNExtension, project)
 
     @PackageScope
     def queryWidgetsetRequest = { version, style ->

@@ -14,7 +14,7 @@ class ProjectDependenciesTest extends IntegrationTest {
     @Test void 'Project has Vaadin extension'() {
 
         buildFile << """
-            import com.devsoap.plugin.configuration.VaadinPluginExtension
+            import com.devsoap.plugin.extensions.VaadinPluginExtension
             task testProperties << {
                 println 'Has Vaadin property ' + project.hasProperty('vaadin')
                 println 'Has Vaadin extension ' + (project.extensions.getByName('vaadin') != null)
@@ -138,7 +138,10 @@ class ProjectDependenciesTest extends IntegrationTest {
 
         buildFile << """
             vaadin {
-                version '7.3.0'
+                version '7.3.0'               
+            }
+            
+            vaadinCompile {
                 widgetset 'com.example.TestWidgetset'
             }
 

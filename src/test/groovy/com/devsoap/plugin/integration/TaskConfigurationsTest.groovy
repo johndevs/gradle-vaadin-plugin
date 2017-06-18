@@ -70,10 +70,8 @@ class TaskConfigurationsTest extends IntegrationTest {
         buildFile << """
             apply plugin: 'eclipse-wtp'
 
-            vaadin {
-                testbench {
-                    enabled true
-                }
+            vaadinTestbench {
+               enabled true                
             }
 
             task verifyTestbenchDependency(dependsOn: 'eclipseClasspath') << {
@@ -172,10 +170,8 @@ class TaskConfigurationsTest extends IntegrationTest {
         buildFile << """
              apply plugin: 'idea'
 
-             vaadin {
-                testbench {
-                    enabled true
-                }
+             vaadinTestbench {
+                enabled true
              }
 
              task verifyTestBench(dependsOn: 'ideaModule') << {
@@ -217,7 +213,7 @@ class TaskConfigurationsTest extends IntegrationTest {
     @Test void 'Update widgetset generator before compile'() {
 
         buildFile << """
-             vaadin {
+             vaadinCompile {
                 widgetset 'com.example.Widgetset'
                 widgetsetGenerator 'com.example.WidgetsetGenerator'
              }
@@ -264,14 +260,15 @@ class TaskConfigurationsTest extends IntegrationTest {
 
         buildFile << """
             version '1.2.3'
-
-            vaadin {
+            
+            vaadinCompile {
                 widgetset 'com.example.Widgetset'
-                addon {
-                    title 'test-addon'
-                    license 'my-license'
-                    author 'test-author'
-                }
+            }
+            
+            vaadinAddon {
+                title 'test-addon'
+                license 'my-license'
+                author 'test-author'
             }
 
             task verifyAddonJarManifest(dependsOn: 'jar') << {
@@ -298,13 +295,14 @@ class TaskConfigurationsTest extends IntegrationTest {
         buildFile << """
             version '1.2.3'
 
-            vaadin {
+            vaadinCompile {
                 widgetset 'com.example.Widgetset'
-                addon {
-                    title 'test-addon'
-                    license 'my-license'
-                    author 'test-author'
-                }
+            }
+
+            vaadinAddon {
+                title 'test-addon'
+                license 'my-license'
+                author 'test-author'
             }
 
             task verifyAddonZipManifest(dependsOn: '${CreateDirectoryZipTask.NAME}') << {
@@ -342,7 +340,7 @@ class TaskConfigurationsTest extends IntegrationTest {
 
         // Vaadin jar configurations are not applied to subproject
         def result = runWithArguments(':noVaadinSubProject:jar')
-        assertFalse result, result.contains('No vaadin.addon.title has been specified')
+        assertFalse result, result.contains('No addon title has been specified')
         assertFalse result, result.contains('No version specified for the project')
     }
 }

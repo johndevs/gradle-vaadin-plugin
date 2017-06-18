@@ -19,10 +19,12 @@ import com.devsoap.plugin.GradleVaadinPlugin
 
 import com.devsoap.plugin.TemplateUtil
 import com.devsoap.plugin.Util
-import com.devsoap.plugin.configuration.TestBenchConfiguration
-import com.devsoap.plugin.configuration.TestBenchHubConfiguration
-import com.devsoap.plugin.configuration.TestBenchNodeConfiguration
+import com.devsoap.plugin.extensions.AddonExtension
+import com.devsoap.plugin.extensions.TestBenchExtension
+import com.devsoap.plugin.extensions.TestBenchHubExtension
+import com.devsoap.plugin.extensions.TestBenchNodeExtension
 import com.devsoap.plugin.servers.ApplicationServer
+import com.devsoap.plugin.tasks.CompileWidgetsetTask
 import com.devsoap.plugin.tasks.CreateWidgetsetGeneratorTask
 import com.devsoap.plugin.tasks.UpdateWidgetsetTask
 import com.devsoap.plugin.testbench.TestbenchHub
@@ -104,7 +106,8 @@ class JavaPluginAction extends PluginAction {
 
     @PackageScope
     static ensureWidgetsetGeneratorExists(Task task) {
-        String generator = task.project.vaadinCompile.widgetsetGenerator
+        CompileWidgetsetTask compileWidgetsetTask = task.project.tasks.getByName(CompileWidgetsetTask.NAME)
+        String generator = compileWidgetsetTask.widgetsetGenerator
         if ( generator != null ) {
             String name = generator.tokenize('.').last()
             String pkg = generator.replaceAll(".$name", '')
@@ -120,9 +123,10 @@ class JavaPluginAction extends PluginAction {
     @PackageScope
     static configureAddonMetadata(Task task) {
         Project project = task.project
+        CompileWidgetsetTask compileWidgetsetTask = project.tasks.getByName(CompileWidgetsetTask.NAME)
 
         // Resolve widgetset
-        String widgetset = project.vaadinCompile.widgetset
+        String widgetset = compileWidgetsetTask.widgetset
         if ( widgetset == null ) {
             widgetset = GradleVaadinPlugin.DEFAULT_WIDGETSET
         }
@@ -135,8 +139,9 @@ class JavaPluginAction extends PluginAction {
         }
 
         //Validate values
-        if ( project.vaadin.addon.title == '' ) {
-            project.logger.warn('No vaadin.addon.title has been specified, ' +
+        AddonExtension addonExtension = project.extensions.getByType(AddonExtension)
+        if ( addonExtension.title == '' ) {
+            project.logger.warn('No addon title has been specified, ' +
                     'jar not compatible with Vaadin Directory.')
         }
 
@@ -147,8 +152,8 @@ class JavaPluginAction extends PluginAction {
 
         // Get stylesheets
         List styles = Util.findAddonSassStylesInProject(project)
-        if ( project.vaadin.addon.styles ) {
-            project.vaadin.addon.styles.each({ path ->
+        if ( addonExtension.styles ) {
+            addonExtension.styles.each({ path ->
                 if ( path.endsWith('scss') || path.endsWith('.css') ) {
                     styles.add(path)
                 } else {
@@ -169,14 +174,14 @@ class JavaPluginAction extends PluginAction {
         if ( styles ) {
             attributes['Vaadin-Stylesheets'] = styles.join(',')
         }
-        if ( project.vaadin.addon.license ) {
-            attributes['Vaadin-License-Title'] = project.vaadin.addon.license
+        if ( addonExtension.license ) {
+            attributes['Vaadin-License-Title'] = addonExtension.license
         }
-        if ( project.vaadin.addon.title ) {
-            attributes['Implementation-Title'] = project.vaadin.addon.title
+        if ( addonExtension.title ) {
+            attributes['Implementation-Title'] = addonExtension.title
         }
-        if ( project.vaadin.addon.author ) {
-            attributes['Implementation-Vendor'] = project.vaadin.addon.author
+        if ( addonExtension.author ) {
+            attributes['Implementation-Vendor'] = addonExtension.author
         }
         task.manifest.attributes(attributes)
     }
@@ -184,16 +189,16 @@ class JavaPluginAction extends PluginAction {
     @PackageScope
     static configureTest(Task task, JavaPluginAction listener) {
         Project project = task.project
-        TestBenchConfiguration tb = Util.findOrCreateExtension(project, TestBenchConfiguration, project)
+        TestBenchExtension tb = project.extensions.getByType(TestBenchExtension)
 
         if ( tb.enabled ) {
-            TestBenchHubConfiguration tbHub = Util.findOrCreateExtension(project, TestBenchHubConfiguration)
+            TestBenchHubExtension tbHub = project.extensions.getByType(TestBenchHubExtension)
             if ( tbHub.enabled ) {
                 listener.testbenchHub = new TestbenchHub(project)
                 listener.testbenchHub.start()
             }
 
-            TestBenchNodeConfiguration tbNode = Util.findOrCreateExtension(project, TestBenchNodeConfiguration)
+            TestBenchNodeExtension tbNode = project.extensions.getByType(TestBenchNodeExtension)
             if ( tbNode.enabled ) {
                 listener.testbenchNode = new TestbenchNode(project)
                 listener.testbenchNode.start()

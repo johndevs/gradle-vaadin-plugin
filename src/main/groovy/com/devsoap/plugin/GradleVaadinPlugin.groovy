@@ -24,10 +24,11 @@ import com.devsoap.plugin.actions.VaadinPluginAction
 import com.devsoap.plugin.actions.WarPluginAction
 
 
-import com.devsoap.plugin.configuration.TestBenchConfiguration
-import com.devsoap.plugin.configuration.TestBenchHubConfiguration
-import com.devsoap.plugin.configuration.TestBenchNodeConfiguration
-import com.devsoap.plugin.configuration.VaadinPluginExtension
+import com.devsoap.plugin.extensions.TestBenchExtension
+import com.devsoap.plugin.extensions.TestBenchHubExtension
+import com.devsoap.plugin.extensions.TestBenchNodeExtension
+import com.devsoap.plugin.extensions.AddonExtension
+import com.devsoap.plugin.extensions.VaadinPluginExtension
 
 import com.devsoap.plugin.servers.ApplicationServer
 import com.devsoap.plugin.tasks.BuildClassPathJar
@@ -162,10 +163,11 @@ class GradleVaadinPlugin implements Plugin<Project> {
         project.buildDir.mkdirs()
 
         // Extensions
-        Util.findOrCreateExtension(project, VaadinPluginExtension, project)
-        Util.findOrCreateExtension(project, TestBenchConfiguration, project)
-        Util.findOrCreateExtension(project, TestBenchHubConfiguration)
-        Util.findOrCreateExtension(project, TestBenchNodeConfiguration)
+        project.extensions.create(VaadinPluginExtension.NAME, VaadinPluginExtension, project)
+        project.extensions.create(AddonExtension.NAME, AddonExtension, project)
+        project.extensions.create(TestBenchExtension.NAME, TestBenchExtension, project)
+        project.extensions.create(TestBenchHubExtension.NAME, TestBenchHubExtension, project)
+        project.extensions.create(TestBenchNodeExtension.NAME, TestBenchNodeExtension, project)
 
         // Configure plugins
         new JavaPluginAction().apply(project)
@@ -515,19 +517,25 @@ class GradleVaadinPlugin implements Plugin<Project> {
         addTask(project, CompileWidgetsetTask.NAME, CompileWidgetsetTask, VAADIN_TASK_GROUP)
         addTask(project, DevModeTask.NAME, DevModeTask, VAADIN_TASK_GROUP)
         addTask(project, SuperDevModeTask.NAME, SuperDevModeTask, VAADIN_TASK_GROUP)
-        addTask(project, CompileThemeTask.NAME, CompileThemeTask, VAADIN_TASK_GROUP)
+        addTask(project, CompileThemeTask.NAME, CompileThemeTask, VAADIN_TASK_GROUP) { CompileThemeTask task ->
+            task.useClasspathJar = project.extensions.getByType(VaadinPluginExtension).useClassPathJarProvider
+        }
         addTask(project, CompressCssTask.NAME, CompressCssTask, VAADIN_TASK_GROUP)
         addTask(project, RunTask.NAME, RunTask, VAADIN_TASK_GROUP)
         addTask(project, UpdateWidgetsetTask.NAME, UpdateWidgetsetTask, VAADIN_TASK_GROUP)
 
         addTask(project, UpdateAddonStylesTask.NAME, UpdateAddonStylesTask, VAADIN_TASK_GROUP)
-        addTask(project, CreateAddonThemeTask.NAME, CreateAddonThemeTask, VAADIN_TASK_GROUP)
+        addTask(project, CreateAddonThemeTask.NAME, CreateAddonThemeTask, VAADIN_TASK_GROUP) { CreateAddonThemeTask task ->
+            task.addonTitle = project.extensions.getByType(AddonExtension).titleProvider
+        }
     }
 
     static void applyVaadinUtilityTasks(Project project) {
         addTask(project, BuildSourcesJarTask.NAME, BuildSourcesJarTask, VAADIN_UTIL_TASK_GROUP)
         addTask(project, BuildJavadocJarTask.NAME, BuildJavadocJarTask, VAADIN_UTIL_TASK_GROUP)
-        addTask(project, BuildClassPathJar.NAME, BuildClassPathJar, VAADIN_UTIL_TASK_GROUP)
+        addTask(project, BuildClassPathJar.NAME, BuildClassPathJar, VAADIN_UTIL_TASK_GROUP) { BuildClassPathJar task ->
+            task.useClassPathJar = project.extensions.getByType(VaadinPluginExtension).useClassPathJarProvider
+        }
         addTask(project, VersionCheckTask.NAME, VersionCheckTask, VAADIN_UTIL_TASK_GROUP)
     }
 
@@ -540,8 +548,8 @@ class GradleVaadinPlugin implements Plugin<Project> {
         addTask(project, CreateDirectoryZipTask.NAME, CreateDirectoryZipTask, VAADIN_DIRECTORY_TASK_GROUP)
     }
 
-    static void addTask(Project project, String name, Class type, String group) {
-        project.tasks.create(name:name, type:type, group:group)
+    static void addTask(Project project, String name, Class type, String group, Closure configure={}) {
+        project.tasks.create(name:name, type:type, group:group, configure)
         project.clean.dependsOn(project.tasks["clean${name.capitalize()}" ])
     }
 }

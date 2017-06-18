@@ -16,7 +16,7 @@
 package com.devsoap.plugin.testbench
 
 import com.devsoap.plugin.Util
-import com.devsoap.plugin.configuration.TestBenchNodeConfiguration
+import com.devsoap.plugin.extensions.TestBenchNodeExtension
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 
@@ -31,18 +31,16 @@ class TestbenchNode {
 
     private process
 
-    private TestBenchNodeConfiguration configuration
-
     TestbenchNode(Project project) {
         this.project = project
-        configuration = project.vaadinTestbenchNode as TestBenchNodeConfiguration
     }
 
-    public start() {
-        def host = configuration.host
-        def port = configuration.port
-        def hub = configuration.hub
-        def browsers = configuration.browsers
+    void start() {
+        TestBenchNodeExtension nodeExtension = project.extensions.getByType(TestBenchNodeExtension)
+        String host = nodeExtension.host
+        Integer port = nodeExtension.port
+        String hub = nodeExtension.hub
+        List<Map> browsers = nodeExtension.browsers
 
         File logDir = project.file('build/testbench/')
         logDir.mkdirs()
@@ -92,7 +90,7 @@ class TestbenchNode {
 
     }
 
-    public terminate() {
+    void terminate() {
         process.in.close()
         process.out.close()
         process.err.close()

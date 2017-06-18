@@ -24,7 +24,7 @@ class MultimoduleWidgetsetThemeTest extends MultiProjectIntegrationTest {
                 widgetset 'com.example.MyWidgetset'
             }
 
-            vaadin.addon {
+            vaadinAddon {
                 title 'app-widgetset'
                 version '1'
             }
@@ -37,7 +37,7 @@ class MultimoduleWidgetsetThemeTest extends MultiProjectIntegrationTest {
         File themeModule = makeProject('theme-module')
         File themeModuleBuildFile = makeBuildFile(themeModule)
         themeModuleBuildFile << """
-            vaadin.addon {
+            vaadinAddon {
                 title 'app-theme'
                 version '1'
             }
@@ -92,7 +92,7 @@ class MultimoduleWidgetsetThemeTest extends MultiProjectIntegrationTest {
         File themeModule = makeProject('theme-module')
         File themeModuleBuildFile = makeBuildFile(themeModule)
         themeModuleBuildFile << """
-            vaadin.addon {
+            vaadinAddon {
                 title 'app-theme'
                 version '1'
             }
