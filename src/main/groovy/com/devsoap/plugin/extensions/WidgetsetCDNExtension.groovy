@@ -24,6 +24,8 @@ import org.gradle.api.provider.PropertyState
  */
 class WidgetsetCDNExtension {
 
+    static final String NAME = 'widgetsetCDNConfig'
+
     final PropertyState<Boolean> proxyEnabled
     final PropertyState<Integer> proxyPort
     final PropertyState<String> proxyScheme

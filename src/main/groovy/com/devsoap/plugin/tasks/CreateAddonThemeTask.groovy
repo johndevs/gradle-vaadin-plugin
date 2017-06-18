@@ -18,6 +18,8 @@ package com.devsoap.plugin.tasks
 import com.devsoap.plugin.creators.AddonThemeCreator
 import org.gradle.api.DefaultTask
 import org.gradle.api.internal.tasks.options.Option
+import org.gradle.api.provider.PropertyState
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -30,9 +32,11 @@ class CreateAddonThemeTask extends DefaultTask {
     static final String NAME = 'vaadinCreateAddonTheme'
 
     @Option(option = 'name', description = 'Theme name')
-    def themeName = 'MyAddonTheme'
+    String themeName = 'MyAddonTheme'
 
-    public CreateAddonThemeTask() {
+    final PropertyState<String> addonTitle = project.property(String)
+
+    CreateAddonThemeTask() {
         description = "Creates a new theme for addon project."
     }
 
@@ -40,9 +44,8 @@ class CreateAddonThemeTask extends DefaultTask {
     def run() {
 
         // Build theme name from addon title
-        if ( !themeName && project.vaadin.addon.title ) {
-              def title = project.vaadin.addon.title as String
-              themeName = title.toLowerCase().replaceAll(/[_ ](\w)?/) { wholeMatch, firstLetter ->
+        if ( !themeName && addonTitle.present ) {
+              themeName = addonTitle.get().toLowerCase().replaceAll(/[_ ](\w)?/) { wholeMatch, firstLetter ->
                   firstLetter?.toUpperCase() ?: ""
               }.capitalize()
         }
@@ -51,5 +54,26 @@ class CreateAddonThemeTask extends DefaultTask {
                 resourceDir:project.sourceSets.main.resources.srcDirs.first(),
                 themeName:themeName,
         ).run()
+    }
+
+    /**
+     * Get the title displayed in the directory
+     */
+    String getAddonTitle() {
+        addonTitle.getOrNull()
+    }
+
+    /**
+     * Set the title displayed in the directory
+     */
+    void setAddonTitle(String title) {
+        addonTitle.set(title)
+    }
+
+    /**
+     * Set the title displayed in the directory
+     */
+    void setAddonTitle(Provider<String> title) {
+        addonTitle.set(title)
     }
 }

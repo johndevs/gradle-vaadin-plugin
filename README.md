@@ -11,5 +11,5 @@ started by providing tasks for project, component and theme creation.
 To get started using the plugin have a look a the Gradle Vaadin Plugin Wiki at https://github.com/johndevs/gradle-vaadin-plugin/wiki
 
 # License
-This softare is distributed under the Apache License 2.0. For more information about the license see the LICENSE.md file 
+This software is distributed under the Apache License 2.0. For more information about the license see the LICENSE.md file 
 in the root directory of the repository.

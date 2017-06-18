@@ -23,13 +23,11 @@ artifacts {
 }
 
 // Vaadin configuration
-vaadin {
+vaadinAddon {
     // Addon metadata for the Vaadin Directory
-    addon {
-      author '${author}'
-      license '${license}'
-      title '${title}'
-    }
+    author '${author}'
+    license '${license}'
+    title '${title}'
 }
 
 // Creates the addon POM for the directory

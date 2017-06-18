@@ -15,8 +15,8 @@
 */
 package com.devsoap.plugin
 
-import com.devsoap.plugin.configuration.PluginConfigurationName
-import com.devsoap.plugin.configuration.VaadinPluginExtension
+
+import com.devsoap.plugin.extensions.VaadinPluginExtension
 import com.devsoap.plugin.tasks.BuildClassPathJar
 import com.devsoap.plugin.tasks.CompileThemeTask
 import com.devsoap.plugin.tasks.UpdateWidgetsetTask
@@ -34,8 +34,6 @@ import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileVisitDetails
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.logging.LogLevel
-import org.gradle.api.plugins.JavaPlugin
-import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.util.VersionNumber
 
@@ -101,11 +99,12 @@ class Util {
      */
     @Memoized
     static FileCollection getCompileClassPathOrJar(Project project) {
-        def vaadin = findOrCreateExtension(project, VaadinPluginExtension)
+        VaadinPluginExtension pluginExtension = project.extensions.getByType(VaadinPluginExtension)
+
         FileCollection classpath
-        if ( vaadin.useClassPathJar ) {
+        if ( pluginExtension.useClassPathJar ) {
             // Add dependencies using the classpath jar
-            BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, false).first()
+            BuildClassPathJar pathJarTask = project.tasks.getByName(BuildClassPathJar.NAME)
             if(!pathJarTask.archivePath.exists()) {
                 throw new IllegalStateException("Classpath jar has not been created in project $pathJarTask.project")
             }
@@ -1019,28 +1018,6 @@ class Util {
         }.join('').tokenize().collect(collector2) { t ->
             collector2.empty ? t : t.capitalize()
         }.join('')
-    }
-
-    /**
-     * Finds a configuration on a project and if it does not exist creates it
-     *
-     * @param project
-     *      the project
-     * @param type
-     *      the type
-     * @return
-     *      the configuration
-     */
-    static <T> T findOrCreateExtension(Project project, Class<T> type, Object... args=[]) {
-        if(!type.getAnnotation(PluginConfigurationName)) {
-            throw new IllegalArgumentException("$type.canonicalName is missing the PluginConfiguration annotation")
-        }
-        String name = type.getAnnotation(PluginConfigurationName).value()
-        T configuration = project.extensions.findByName(name)
-        if(!configuration){
-            configuration = project.extensions.create(name, type, args)
-        }
-        configuration
     }
 
     /**

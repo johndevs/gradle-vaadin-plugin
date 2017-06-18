@@ -16,6 +16,7 @@
 package com.devsoap.plugin.actions
 
 import com.devsoap.plugin.GradleVaadinPlugin
+import com.devsoap.plugin.extensions.AddonExtension
 import com.devsoap.plugin.tasks.CreateDirectoryZipTask
 import groovy.transform.PackageScope
 import org.gradle.api.Project
@@ -51,12 +52,13 @@ class VaadinPluginAction extends PluginAction {
     @PackageScope
     static configureAddonZipMetadata(Task task) {
         Project project = task.project
+        AddonExtension addonExtension = project.extensions.getByType(AddonExtension)
         Map attributes = [
                 'Vaadin-Package-Version':1,
-                'Vaadin-License-Title':project.vaadin.addon.license,
-                'Implementation-Title':project.vaadin.addon.title,
+                'Vaadin-License-Title':addonExtension.license,
+                'Implementation-Title':addonExtension.title,
                 'Implementation-Version':project.version != null ? project.version : '',
-                'Implementation-Vendor':project.vaadin.addon.author,
+                'Implementation-Vendor':addonExtension.author,
                 'Vaadin-Addon': "libs/${project.jar.archiveName}"
         ] as HashMap<String, String>
 

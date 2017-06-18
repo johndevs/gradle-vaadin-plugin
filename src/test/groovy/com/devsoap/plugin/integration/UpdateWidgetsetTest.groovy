@@ -20,7 +20,7 @@ class UpdateWidgetsetTest extends IntegrationTest {
 
     @Test void 'No Widgetset generated when widgetset management off'() {
         buildFile << "vaadinCompile.widgetset = 'com.example.MyWidgetset'\n"
-        buildFile << "vaadin.manageWidgetset = false"
+        buildFile << "vaadinCompile.manageWidgetset = false"
         runWithArguments(UpdateWidgetsetTask.NAME)
         assertFalse widgetsetFile.exists()
     }

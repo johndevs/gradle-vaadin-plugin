@@ -97,52 +97,14 @@ idea {
 
 /***********************************************************************************************************************
  *
- * Sources
- *
- **********************************************************************************************************************/
-sourceSets {
-    ast {
-        groovy {
-            srcDirs = ['src/ast']
-        }
-    }
-}
-
-/***********************************************************************************************************************
- *
  * Compilation
  *
  **********************************************************************************************************************/
 
 /**
- * Compiles the AST transforms. These must be compiled before the main sources are compiled so the AST transforms
- * can be applied.
- */
-task compileGroovyAstTransforms(type: GroovyCompile) {
-    groovyOptions.with {
-        fork = true
-        keepStubs = false
-        fileExtensions = ["groovy"]
-    }
-    source = sourceSets.ast.groovy.srcDirs
-    classpath = sourceSets.main.compileClasspath
-    destinationDir = sourceSets.ast.output.classesDirs.first()
-}
-
-/**
- * Compiles the sources
- */
-compileGroovy {
-    dependsOn compileGroovyAstTransforms
-    classpath += files(sourceSets.ast.output.classesDirs.first())
-}
-
-/**
  * Compiles the tests
  */
 compileTestGroovy {
-    dependsOn compileGroovyAstTransforms
-    classpath += files(sourceSets.ast.output.classesDirs.first())
     classpath += configurations.proxyTest
 }
 
@@ -221,7 +183,6 @@ artifacts {
  * Configure test phase only to run ordinary unit tests.
  */
 test {
-    classpath += files(sourceSets.ast.output.classesDirs.first())
     testLogging {
         exceptionFormat "full"
     }
@@ -232,7 +193,6 @@ test {
  * Run integration tests with a different tasks so they are only run when running check
  */
 task integrationTest(type:Test, dependsOn:['test','jar']) {
-    classpath += files(sourceSets.ast.output.classesDirs.first())
     testLogging {
         exceptionFormat "full"
         showStandardStreams = true
@@ -251,7 +211,6 @@ task proxyTest(type:Test, dependsOn: ['test','jar']) {
     def oldClassPath = classpath
     classpath = configurations.proxyTest
     classpath += oldClassPath
-    classpath += files(sourceSets.ast.output.classesDirs.first())
     testLogging {
         exceptionFormat "full"
         showStandardStreams = true

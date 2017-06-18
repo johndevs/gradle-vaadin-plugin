@@ -16,16 +16,15 @@
 package com.devsoap.plugin.tasks
 
 import com.devsoap.plugin.Util
-import com.devsoap.plugin.configuration.VaadinPluginExtension
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.file.FileTree
 import org.gradle.api.provider.PropertyState
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
@@ -57,6 +56,7 @@ class CompileThemeTask extends DefaultTask {
     final PropertyState<String> themesDirectory = project.property(String)
     final PropertyState<String> compiler = project.property(String)
     final PropertyState<Boolean> compress = project.property(Boolean)
+    final PropertyState<Boolean> useClasspathJar = project.property(Boolean)
 
 /**
      * Creates a new theme compilation task
@@ -78,8 +78,8 @@ class CompileThemeTask extends DefaultTask {
             })
 
             // Add classpath jar
-            if ( Util.findOrCreateExtension(project, VaadinPluginExtension).useClassPathJar ) {
-                BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
+            if ( getUseClasspathJar() ) {
+                BuildClassPathJar pathJarTask = project.tasks.getByName(BuildClassPathJar.NAME)
                 inputs.file(pathJarTask.archivePath)
             }
 
@@ -144,6 +144,27 @@ class CompileThemeTask extends DefaultTask {
      */
     void setCompress(Boolean compress)  {
         this.compress.set(compress)
+    }
+
+    /**
+     * Does the task use a classpath jar
+     */
+    Boolean getUseClasspathJar() {
+        useClasspathJar.get()
+    }
+
+    /**
+     * Does the task use a classpath jar
+     */
+    void setUseClasspathJar(Boolean enabled) {
+        useClasspathJar.set(enabled)
+    }
+
+    /**
+     * Does the task use a classpath jar
+     */
+    void setUseClasspathJar(Provider<Boolean> enabled) {
+        useClasspathJar.set(enabled)
     }
 
     @TaskAction
