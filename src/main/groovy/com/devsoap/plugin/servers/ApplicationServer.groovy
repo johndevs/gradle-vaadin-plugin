@@ -363,10 +363,10 @@ abstract class ApplicationServer {
     static void watchClassDirectoryForChanges(final ApplicationServer server) {
         Project project = server.project
 
-        RunTask runTask = project.tasks.getByName(RunTask.NAME)
+        final RunTask RUNTASK = project.tasks.getByName(RunTask.NAME)
         List<File> classesDirs = []
-        if ( runTask.classesDir && project.file(runTask.classesDir).exists() ) {
-            classesDirs.add(project.file(runTask.classesDir))
+        if ( RUNTASK.classesDir && project.file(RUNTASK.classesDir).exists() ) {
+            classesDirs.add(project.file(RUNTASK.classesDir))
         }
 
         classesDirs.addAll(project.sourceSets.main.output.classesDirs.toList())
@@ -377,7 +377,7 @@ abstract class ApplicationServer {
             ScheduledFuture currentTask
             if(dir.exists()) {
                 Util.watchDirectoryForChanges(project, dir, { WatchKey key, WatchEvent event ->
-                    if (server.process && server.configuration.serverRestart ) {
+                    if (server.process && RUNTASK.serverRestart ) {
                         if ( currentTask ) {
                             currentTask.cancel(true)
                         }
@@ -397,6 +397,7 @@ abstract class ApplicationServer {
     static void watchThemeDirectoryForChanges(final ApplicationServer server) {
         Project project = server.project
         CompileThemeTask compileThemeTask = project.tasks.getByName(CompileThemeTask.NAME)
+        final RunTask RUNTASK = project.tasks.getByName(RunTask.NAME)
 
         File themesDir = Util.getThemesDirectory(project)
         if ( themesDir.exists() ) {
@@ -419,7 +420,7 @@ abstract class ApplicationServer {
                         }
 
                         // Restart
-                        if ( server.configuration.serverRestart && server.process ) {
+                        if ( RUNTASK.serverRestart && server.process ) {
                             // Force restart of serverInstance
                             project.logger.lifecycle(RELOADING_SERVER_MESSAGE)
                             server.reload()
