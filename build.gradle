@@ -284,18 +284,26 @@ codenarc{
 pluginBundle {
     website = 'https://github.com/johndevs/gradle-vaadin-plugin/wiki'
     vcsUrl = 'https://github.com/johndevs/gradle-vaadin-plugin'
-    description = 'Build Vaadin applications with Gradle!'
-    tags = ['vaadin']
+    description = '''
+        Build Vaadin applications with Gradle!
+
+        This plugin has been deprecated, please use https://plugins.gradle.org/plugin/com.devsoap.plugin.vaadin instead.
+    '''.stripIndent()
+    tags = ['vaadin', 'deprecated']
     plugins {
         vaadinPlugin {
             id = 'fi.jasoft.plugin.vaadin'
-            displayName = 'Gradle Vaadin plugin'
+            displayName = 'Gradle Vaadin plugin (Deprecated)'
         }
         vaadinGroovyPlugin {
             id = 'fi.jasoft.plugin.vaadin.groovy'
-            displayName = 'Gradle Vaadin Groovy plugin'
-            description = 'Build Vaadin applications with Groovy and Gradle!'
-            tags = ['vaadin', 'groovy']
+            displayName = 'Gradle Vaadin Groovy plugin (Deprecated)'
+            description = '''
+                Build Vaadin applications with Groovy and Gradle!
+
+                This plugin has been deprecated, please use https://plugins.gradle.org/plugin/com.devsoap.plugin.vaadin instead.
+             '''.stripIndent()
+            tags = ['vaadin', 'groovy', 'deprecated']
         }
     }
 
