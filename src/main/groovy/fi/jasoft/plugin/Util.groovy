@@ -1044,7 +1044,7 @@ class Util {
     @Memoized
     static VersionNumber getLatestReleaseVersion() {
         try {
-            HTTPBuilder http = new HTTPBuilder('https://plugins.gradle.org/plugin/fi.jasoft.plugin.vaadin')
+            HTTPBuilder http = new HTTPBuilder('https://plugins.gradle.org/plugin/com.devsoap.plugin.vaadin')
             def html = http.get([:])
             def versionNode = html."**".find { it.text().startsWith('Version') }
             if(versionNode){
