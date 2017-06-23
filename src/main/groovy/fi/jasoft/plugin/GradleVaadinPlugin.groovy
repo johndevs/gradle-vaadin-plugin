@@ -157,8 +157,26 @@ class GradleVaadinPlugin implements Plugin<Project> {
             VersionNumber latestReleasePluginVersion = Util.getLatestReleaseVersion()
             VersionNumber pluginVersion = VersionNumber.parse(PLUGIN_VERSION)
             if(latestReleasePluginVersion > pluginVersion){
+
                 project.logger.warn "!! A newer version of the Gradle Vaadin plugin is available, " +
                         "please upgrade to $latestReleasePluginVersion !!"
+
+                project.logger.warn """
+
+                    The Gradle Vaadin plugin has changed id and has moved to a new location. This plugin
+                    will no longer recieve any updates.
+
+                    Please update the plugin by using the following statement in your build.gradle
+
+                    plugins {
+                        id 'com.devsoap.plugin.vaadin' version '$latestReleasePluginVersion'
+                    }
+
+                    Please see https://plugins.gradle.org/plugin/com.devsoap.plugin.vaadin for further
+                    instructions of how to apply the new plugin to your build or visit the plugin wiki
+                    page at https://github.com/johndevs/gradle-vaadin-plugin/wiki.
+                    
+                 """.stripIndent()
             }
         }
 
