@@ -34,18 +34,27 @@ class CreateTestbenchTestTask extends DefaultTask {
 
     static final String NAME = 'vaadinCreateTestbenchTest'
 
+    /**
+     * The test class name
+     */
     @Option(option = 'name', description = 'Test name')
-    def testName = 'MyTest'
+    String testName = 'MyTest'
 
+    /**
+     * The test package
+     */
     @Option(option = 'package', description = 'Test package')
-    def testPackage = 'com.example.tests'
+    String testPackage = 'com.example.tests'
 
-    public CreateTestbenchTestTask() {
+    CreateTestbenchTestTask() {
         description = "Creates a new Testbench test"
     }
 
+    /**
+     * Creates the test
+     */
     @TaskAction
-    def run() {
+    void run() {
         if ( !project.vaadinTestbench.enabled ) {
             throw new GradleException('Please enable Testbench by setting vaadinTestbench.enabled=true before ' +
                     'creating a test')
@@ -53,8 +62,7 @@ class CreateTestbenchTestTask extends DefaultTask {
         makeTestClass()
     }
 
-    @PackageScope
-    def makeTestClass() {
+    private makeTestClass() {
         File javaDir = Util.getMainTestSourceSet(project).srcDirs.first()
         RunTask runTask = project.tasks.getByName(RunTask.NAME)
         File packageDir = new File(javaDir, TemplateUtil.convertFQNToFilePath(testPackage))

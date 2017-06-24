@@ -28,19 +28,29 @@ import org.gradle.api.tasks.TaskAction
  * Creates a new Vaadin Project
  *
  * @author John Ahlroos
+ * @since 1.0
  */
 class CreateProjectTask extends DefaultTask {
 
     static final NAME = 'vaadinCreateProject'
 
-    static final String DOT = '.'
+    private static final String DOT = '.'
 
+    /**
+     * The application class name
+     */
     @Option(option = 'name', description = 'Application name')
     String applicationName
 
+    /**
+     * The application package
+     */
     @Option(option = 'package', description = 'Application UI package')
     String applicationPackage
 
+    /**
+     * The fully qualified name of the widgetset
+     */
     @Option(option = 'widgetset', description = 'Widgetset name')
     String widgetsetFQN
 
@@ -49,8 +59,11 @@ class CreateProjectTask extends DefaultTask {
         finalizedBy UpdateAddonStylesTask.NAME, CompileThemeTask.NAME
     }
 
+    /**
+     * Creates a new project
+     */
     @TaskAction
-    def run() {
+    void run() {
         CompileWidgetsetTask compileWidgetsetTask = project.tasks.getByName(CompileWidgetsetTask.NAME)
 
         new ProjectCreator(
@@ -75,8 +88,7 @@ class CreateProjectTask extends DefaultTask {
         UpdateWidgetsetTask.ensureWidgetPresent(project, widgetsetFQN)
     }
 
-    @PackageScope
-    String resolveApplicationName() {
+    private String resolveApplicationName() {
 
         // Use capitalized project name if no application name is given
         if ( !applicationName ) {
@@ -87,8 +99,7 @@ class CreateProjectTask extends DefaultTask {
         Util.makeStringJavaCompatible(applicationName).capitalize()
     }
 
-    @PackageScope
-    String resolveApplicationPackage() {
+    private String resolveApplicationPackage() {
         CompileWidgetsetTask compileWidgetsetTask = project.tasks.getByName(CompileWidgetsetTask.NAME)
 
         if ( !applicationPackage ) {

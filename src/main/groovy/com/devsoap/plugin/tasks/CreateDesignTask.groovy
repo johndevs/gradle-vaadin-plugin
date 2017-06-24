@@ -30,31 +30,50 @@ import java.nio.file.Paths
  * Creates a new Vaadin Design
  *
  * @author John Ahlroos
+ * @since 1.1
  */
 class CreateDesignTask extends DefaultTask{
 
     static final String NAME = 'vaadinCreateDesign'
 
-    static final String DESIGN_PACKAGE_KEY = 'designPackage'
-    static final String DESIGN_NAME_KEY = 'designName'
-    static final String DESIGN_HTML_FILE = 'Design.html'
+    private static final String DESIGN_PACKAGE_KEY = 'designPackage'
+    private static final String DESIGN_NAME_KEY = 'designName'
+    private static final String DESIGN_HTML_FILE = 'Design.html'
 
+    /**
+     * The design class name
+     */
     @Option(option = 'name', description = 'The name of the design')
     String designName = 'BasicView'
 
+    /**
+     * The package where the design should be put
+     */
     @Option(option = 'package', description = 'The package of the design')
     String designPackage = "com.example.${designName.toLowerCase()}"
 
+    /**
+     * Should a companion java file be created
+     */
     @Option(option = 'companionFile', description = 'Create the companion file for the design')
     boolean createCompanionFile = true
 
-    @Option(option = 'implementationFile', description = 'Create implemenation file for the design')
+    /**
+     * Should a companion implementation file be created
+     */
+    @Option(option = 'implementationFile', description = 'Create implementation file for the design')
     boolean createImplementationFile = true
 
+    /**
+     * Should we output the templates available to the console instead of creating a design.
+     */
     @Option(option = 'templates', description =
             'Lists the available templates. Add your templates to .vaadin/designer/templates to use them here.')
     boolean listTemplates = false
 
+    /**
+     * The template to use for creating a design
+     */
     @Option(option = 'template', description = "The selected template to use. Must be included in --templates")
     String template = null
 
@@ -62,8 +81,11 @@ class CreateDesignTask extends DefaultTask{
         description = 'Creates a new design file'
     }
 
+    /**
+     * Creates a new design or lists the templates
+     */
     @TaskAction
-    def run() {
+    void run() {
         if ( listTemplates ) {
             project.logger.lifecycle("Available templates:")
             templates.each { String name, File file ->
@@ -87,8 +109,7 @@ class CreateDesignTask extends DefaultTask{
         }
     }
 
-    @PackageScope
-    def makeDesignFile() {
+    private makeDesignFile() {
         File resourcesDir = project.sourceSets.main.resources.srcDirs.first()
         File designDir = new File(resourcesDir, TemplateUtil.convertFQNToFilePath(designPackage))
         designDir.mkdirs()
@@ -103,26 +124,24 @@ class CreateDesignTask extends DefaultTask{
         }
     }
 
-    @PackageScope
-    def makeDesignCompanionFile() {
+    private makeDesignCompanionFile() {
         File javaDir = Util.getMainSourceSet(project, true).srcDirs.first()
         File designDir = new File(javaDir, TemplateUtil.convertFQNToFilePath(designPackage))
         designDir.mkdirs()
 
-        def substitutions = [:]
+        Map substitutions = [:]
         substitutions[DESIGN_PACKAGE_KEY] = designPackage
         substitutions[DESIGN_NAME_KEY] = designName
 
         TemplateUtil.writeTemplate('MyDesign.java', designDir, designName + 'Design.java', substitutions)
     }
 
-    @PackageScope
-    def makeDesignImplementationFile() {
+    private makeDesignImplementationFile() {
         File javaDir = Util.getMainSourceSet(project).srcDirs.first()
         File designDir = new File(javaDir, TemplateUtil.convertFQNToFilePath(designPackage))
         designDir.mkdirs()
 
-        def substitutions = [:]
+        Map substitutions = [:]
         substitutions[DESIGN_PACKAGE_KEY] = designPackage
         substitutions[DESIGN_NAME_KEY] = designName
 
@@ -143,13 +162,12 @@ class CreateDesignTask extends DefaultTask{
 
     }
 
-    @PackageScope
-    Map<String, File> getTemplates() {
-        def templatesDir = Paths.get(System.getProperty("user.home"), '.vaadin', 'designer', 'templates').toFile()
-        def templateMap = [:]
+    private Map<String, File> getTemplates() {
+        File templatesDir = Paths.get(System.getProperty("user.home"), '.vaadin', 'designer', 'templates').toFile()
+        Map templateMap = [:]
         templatesDir.eachFile { File file ->
             if ( !file.isDirectory() && file.name.toLowerCase().endsWith('.html') ) {
-                def templateName = file.name.take(file.name.lastIndexOf('.'))
+                String templateName = file.name.take(file.name.lastIndexOf('.'))
                 templateMap[templateName] = file
             }
         }

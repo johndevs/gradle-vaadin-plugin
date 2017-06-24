@@ -23,17 +23,31 @@ import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 
 /**
- * Created by john on 9/12/16.
+ * Creates a new Vaadin project theme from a pre-defined template
+ *
+ * @author John Ahlroos
+ * @since 1.1
  */
 @Canonical
 class ThemeCreator implements Runnable {
 
-    static final String STYLES_SCSS_FILE = 'styles.scss'
-    static final String FAVICON_FILENAME = 'favicon.ico'
+    private static final String STYLES_SCSS_FILE = 'styles.scss'
+    private static final String FAVICON_FILENAME = 'favicon.ico'
 
-    private String themeName
-    private File themesDirectory
-    private String vaadinVersion
+    /**
+     * The theme name. If not set then it will be the project name
+     */
+    String themeName
+
+    /**
+     * The theme directory
+     */
+    File themesDirectory
+
+    /**
+     * The vaadin version
+     */
+    String vaadinVersion
 
     @Override
     void run() {

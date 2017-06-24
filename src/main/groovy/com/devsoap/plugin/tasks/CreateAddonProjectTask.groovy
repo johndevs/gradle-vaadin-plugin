@@ -28,27 +28,36 @@ import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
 
 /**
- * Created by john on 8/31/16.
+ * Creates a new addon project with two modules, one addon module and one demo modules which utilizes the addon
+ *
+ * @author John Ahlroos
+ * @since 1.1
  */
 class CreateAddonProjectTask extends DefaultTask {
 
     static final String NAME = 'vaadinCreateAddonProject'
-    static final String DOT = '.'
-    static final String PLUGIN_VERSION_ATTRIBUTE = 'pluginVersion'
-    static final String MAIN_SOURCE_FOLDER = 'src/main/java/'
-    static final String TEMPLATE_DIRECTORY = 'addonProject'
-    static final String DEMO_APPLICATION_NAME = 'Demo'
-    static final String BUILD_FILE = 'build.gradle'
 
+    private static final String PLUGIN_VERSION_ATTRIBUTE = 'pluginVersion'
+    private static final String MAIN_SOURCE_FOLDER = 'src/main/java/'
+    private static final String TEMPLATE_DIRECTORY = 'addonProject'
+    private static final String DEMO_APPLICATION_NAME = 'Demo'
+    private static final String BUILD_FILE = 'build.gradle'
+
+    /**
+     * The addon name
+     */
     @Option(option = 'name', description = 'Addon name')
-    def componentName = 'MyComponent'
+    String componentName = 'MyComponent'
 
-    public CreateAddonProjectTask() {
+    CreateAddonProjectTask() {
         description = "Creates a new Vaadin addon development project."
     }
 
+    /**
+     * Creates the addon project
+     */
     @TaskAction
-    def run() {
+    void run() {
 
         makeGradleSettings()
 
@@ -62,7 +71,7 @@ class CreateAddonProjectTask extends DefaultTask {
         addonDir.mkdirs()
 
         def substitutions = [:]
-        substitutions[PLUGIN_VERSION_ATTRIBUTE] = GradleVaadinPlugin.PLUGIN_VERSION
+        substitutions[PLUGIN_VERSION_ATTRIBUTE] = GradleVaadinPlugin.version
         substitutions['author'] = 'Kickass Vaadin Ninja'
         substitutions['license'] = 'Apache 2.0'
         substitutions['title'] = componentName
@@ -86,12 +95,12 @@ class CreateAddonProjectTask extends DefaultTask {
         TemplateUtil.writeTemplate('addonProject/AddonWidgetset.xml', widgetsetDir, "${componentName}Widgetset.gwt.xml")
     }
 
-    def makeDemoModule() {
+    private makeDemoModule() {
         def demoDir = project.file('demo')
         demoDir.mkdirs()
 
         def substitutions = [:]
-        substitutions[PLUGIN_VERSION_ATTRIBUTE] = GradleVaadinPlugin.PLUGIN_VERSION
+        substitutions[PLUGIN_VERSION_ATTRIBUTE] = GradleVaadinPlugin.version
 
         TemplateUtil.writeTemplate('addonProject/demo.gradle', demoDir, BUILD_FILE, substitutions)
 

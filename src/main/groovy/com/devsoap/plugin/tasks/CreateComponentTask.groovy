@@ -25,13 +25,17 @@ import org.gradle.api.tasks.TaskAction
  * Creates a new Vaadin Component
  *
  * @author John Ahlroos
+ * @since 1.0
  */
 class CreateComponentTask extends DefaultTask {
 
     static final String NAME = 'vaadinCreateComponent'
 
+    /**
+     * The component name
+     */
     @Option(option = 'name', description = 'Component name')
-    def componentName = 'MyComponent'
+    String componentName = 'MyComponent'
 
     CreateComponentTask() {
         description = "Creates a new Vaadin Component."
@@ -40,7 +44,7 @@ class CreateComponentTask extends DefaultTask {
     @TaskAction
     void run() {
 
-        def widgetset = Util.getWidgetset(project)
+        String widgetset = Util.getWidgetset(project)
         if ( !widgetset ) {
             // Project does not yet have a client package, addons or widgetset. use AppWidgetset
             widgetset = Util.APP_WIDGETSET

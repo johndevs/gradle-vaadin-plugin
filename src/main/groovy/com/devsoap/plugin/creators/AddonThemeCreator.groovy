@@ -19,17 +19,32 @@ import com.devsoap.plugin.TemplateUtil
 import groovy.transform.Canonical
 
 /**
- * Created by john on 9/15/16.
+ * Creates a Vaadin addon theme using pre-defined theme templates.
+ *
+ * @author John Ahlroos
+ * @since 1.1
  */
 @Canonical
 class AddonThemeCreator implements Runnable {
 
-    private File resourceDir
+    /**
+     * Resource source directory.
+     */
+    File resourceDir
 
-    private String themeName
+    /**
+     * Theme name.
+     */
+    String themeName
 
-    private String templateDir
+    /**
+     * Theme templates directory.
+     */
+    String templateDir
 
+    /**
+     * Creates the addon theme
+     */
     @Override
     void run() {
         File vaadinDir = new File(resourceDir, 'VAADIN')

@@ -24,6 +24,9 @@ import org.gradle.api.artifacts.dsl.DependencyHandler
 
 /**
  * Runs the project on a Jetty server
+ *
+ * @author John Ahlroos
+ * @since 1.0
  */
 class JettyApplicationServer extends ApplicationServer {
 

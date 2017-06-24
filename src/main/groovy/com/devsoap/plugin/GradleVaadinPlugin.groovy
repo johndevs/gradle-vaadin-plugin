@@ -29,7 +29,7 @@ import com.devsoap.plugin.extensions.TestBenchHubExtension
 import com.devsoap.plugin.extensions.TestBenchNodeExtension
 import com.devsoap.plugin.extensions.AddonExtension
 import com.devsoap.plugin.extensions.VaadinPluginExtension
-
+import com.devsoap.plugin.extensions.WidgetsetCDNExtension
 import com.devsoap.plugin.servers.ApplicationServer
 import com.devsoap.plugin.tasks.BuildClassPathJar
 import com.devsoap.plugin.tasks.BuildJavadocJarTask
@@ -83,40 +83,99 @@ import java.util.concurrent.atomic.AtomicInteger
  * Gradle Plugin for Vaadin Projects
  *
  * @author John Ahlroos
+ * @since 1.0
  */
 class GradleVaadinPlugin implements Plugin<Project> {
 
-    static final String PLUGIN_VERSION
-    static final Properties PLUGIN_PROPERTIES
-    static final String PLUGIN_DEBUG_DIR
-
+    /**
+     * The configuration name for Vaadin server side dependencies
+     */
     static final String CONFIGURATION_SERVER = 'vaadin-server'
-    static final String CONFIGURATION_CLIENT = 'vaadin-client'
-    static final String CONFIGURATION_TESTBENCH = 'vaadin-testbench'
-    static final String CONFIGURATION_PUSH = 'vaadin-push'
-    static final String CONFIGURATION_JAVADOC = 'vaadin-javadoc'
-    static final String CONFIGURATION_SPRING_BOOT = 'vaadin-spring-boot'
-    static final String DEFAULT_WIDGETSET = 'com.vaadin.DefaultWidgetSet'
-    static final String CONFIGURATION_RUN_SERVER = 'vaadin-run-server'
-    static final String CONFIGURATION_THEME = 'vaadin-theme-compiler'
-    static final String VAADIN_TASK_GROUP = 'Vaadin'
-    static final String VAADIN_UTIL_TASK_GROUP = 'Vaadin Utility'
-    static final String VAADIN_TESTBENCH_TASK_GROUP = 'Vaadin Testbench'
-    static final String VAADIN_DIRECTORY_TASK_GROUP = 'Vaadin Directory'
-    static final String ADDON_REPOSITORY_NAME = 'Vaadin addons'
-    static final String VAADIN_SNAPSHOT_REPOSITORY_NAME = 'Vaadin snapshots'
-    static final String GRADLE_PORTAL_PLUGIN_REPOSITORY_NAME = 'Bintray.com Maven repository'
-    static final String PLUGIN_DEVELOPMENTTIME_REPOSITORY_NAME = 'Gradle Vaadin plugin development repository'
-    static final String VAADIN_PRERELEASE_REPOSITORY_NAME = 'Vaadin Pre-releases'
-    static final String SPRING_BOOT_PLUGIN = 'org.springframework.boot'
-    static final String VALIDATION_API_VERSION = 'validation.api.version'
 
-    static final AtomicInteger THREAD_COUNTER = new AtomicInteger(1)
+    /**
+     * The configuration name for Vaadin client side dependencies
+     */
+    static final String CONFIGURATION_CLIENT = 'vaadin-client'
+
+    /**
+     * The configuration name for Vaadin Testbench dependencies
+     */
+    static final String CONFIGURATION_TESTBENCH = 'vaadin-testbench'
+
+    /**
+     * The configuration name for Vaadin push dependencies
+     */
+    static final String CONFIGURATION_PUSH = 'vaadin-push'
+
+    /**
+     * The configuration name for Vaadin javadoc dependencies
+     */
+    static final String CONFIGURATION_JAVADOC = 'vaadin-javadoc'
+
+    /**
+     * The configuration name for Vaadin Spring Boot dependencies
+     */
+    static final String CONFIGURATION_SPRING_BOOT = 'vaadin-spring-boot'
+
+    /**
+     * The default widgetset name
+     */
+    static final String DEFAULT_WIDGETSET = 'com.vaadin.DefaultWidgetSet'
+
+    /**
+     * The configuration name for Vaadin Run dependencies
+     */
+    static final String CONFIGURATION_RUN_SERVER = 'vaadin-run-server'
+
+    /**
+     * The configuration name for Vaadin theme compiler dependencies
+     */
+    static final String CONFIGURATION_THEME = 'vaadin-theme-compiler'
+
+    /**
+     * The task group name for Vaadin generic tasks
+     */
+    static final String VAADIN_TASK_GROUP = 'Vaadin'
+
+    /**
+     * The task group name for Vaadin utility tasks
+     */
+    static final String VAADIN_UTIL_TASK_GROUP = 'Vaadin Utility'
+
+    /**
+     * The task group name for Vaadin Testbench tasks
+     */
+    static final String VAADIN_TESTBENCH_TASK_GROUP = 'Vaadin Testbench'
+
+    /**
+     * The task group name for Vaadin Directory tasks
+     */
+    static final String VAADIN_DIRECTORY_TASK_GROUP = 'Vaadin Directory'
+
+    /**
+     * The plugin id of the Spring Boot plugin
+     */
+    static final String SPRING_BOOT_PLUGIN = 'org.springframework.boot'
+
+    private static final String VALIDATION_API_VERSION = 'validation.api.version'
+    private static final String ADDON_REPOSITORY_NAME = 'Vaadin addons'
+    private static final String VAADIN_SNAPSHOT_REPOSITORY_NAME = 'Vaadin snapshots'
+    private static final String GRADLE_PORTAL_PLUGIN_REPOSITORY_NAME = 'Bintray.com Maven repository'
+    private static final String PLUGIN_DEVELOPMENTTIME_REPOSITORY_NAME = 'Gradle Vaadin plugin development repository'
+    private static final String VAADIN_PRERELEASE_REPOSITORY_NAME = 'Vaadin Pre-releases'
+    private static final AtomicInteger THREAD_COUNTER = new AtomicInteger(1)
+    private static final String PLUGIN_VERSION
+
+    /**
+     * The common thread pool for all Gradle Vaadin plugin threads
+     */
     static final Executor THREAD_POOL = Executors.newCachedThreadPool({ Runnable r ->
         new Thread(r, "gradle-vaadin-plugin-thread-${THREAD_COUNTER.getAndIncrement()}")
     })
 
 
+    private static final Properties PLUGIN_PROPERTIES
+    private static final String PLUGIN_DEBUG_DIR
     static {
         PLUGIN_PROPERTIES = new Properties()
         PLUGIN_PROPERTIES.load(GradleVaadinPlugin.getResourceAsStream('/vaadin_plugin.properties'))
@@ -124,14 +183,23 @@ class GradleVaadinPlugin implements Plugin<Project> {
         PLUGIN_DEBUG_DIR = PLUGIN_PROPERTIES.getProperty('debugdir')
     }
 
+    /**
+     * Get the plugin version
+     */
     static String getVersion() {
         PLUGIN_VERSION
     }
 
+    /**
+     * Get the directory for the development plugin versions
+     */
     static String getDebugDir() {
         PLUGIN_DEBUG_DIR
     }
 
+    /**
+     * Get the plugin id of this plugin
+     */
     static String getPluginId() {
          'com.devsoap.plugin.vaadin'
     }
@@ -162,8 +230,9 @@ class GradleVaadinPlugin implements Plugin<Project> {
         // Ensure the build dir exists as all external processes will be run inside that directory
         project.buildDir.mkdirs()
 
-        // Extensions
+        // Extensions (must be added before any action)
         project.extensions.create(VaadinPluginExtension.NAME, VaadinPluginExtension, project)
+        project.extensions.create(WidgetsetCDNExtension.NAME, WidgetsetCDNExtension, project)
         project.extensions.create(AddonExtension.NAME, AddonExtension, project)
         project.extensions.create(TestBenchExtension.NAME, TestBenchExtension, project)
         project.extensions.create(TestBenchHubExtension.NAME, TestBenchHubExtension, project)
@@ -216,7 +285,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
         }
     }
 
-    static void applyRepositories(Project project) {
+    private static void applyRepositories(Project project) {
         project.afterEvaluate { Project p ->
             if ( !p.vaadin.manageRepositories ) {
                 return
@@ -256,13 +325,13 @@ class GradleVaadinPlugin implements Plugin<Project> {
         }
     }
 
-    static void applyServletApi(DependencyHandler projectDependencies, DependencySet dependencies) {
+    private static void applyServletApi(DependencyHandler projectDependencies, DependencySet dependencies) {
         Dependency servletAPI = projectDependencies.create(
                 "javax.servlet:javax.servlet-api:${Util.pluginProperties.getProperty('servlet.version')}")
         dependencies.add(servletAPI)
     }
 
-    static void applyDependencies(Project project) {
+    private static void applyDependencies(Project project) {
         ConfigurationContainer configurations = project.configurations
         DependencyHandler projectDependencies = project.dependencies
         def sources = project.sourceSets.main
@@ -458,15 +527,10 @@ class GradleVaadinPlugin implements Plugin<Project> {
         }
     }
 
-    /**
+    /*
      * Configures the resolution strategy for a configuration. Ensures Vaadin version is the correct one.
-     *
-     * @param project
-     *      The project of the configuration
-     * @param configuration
-     *      The configuration
      */
-    static void configureResolutionStrategy(Project project, Configuration config) {
+    private static void configureResolutionStrategy(Project project, Configuration config) {
         // Ensure validation-api uses the correct version
         if ( config.name == CONFIGURATION_CLIENT) {
             config.resolutionStrategy.dependencySubstitution({ DependencySubstitutions substitutions ->
@@ -505,7 +569,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
         } as Action<DependencyResolveDetails>)
     }
 
-    static void applyVaadinTasks(Project project) {
+    private static void applyVaadinTasks(Project project) {
         addTask(project, CreateProjectTask.NAME, CreateProjectTask, VAADIN_TASK_GROUP)
         addTask(project, CreateAddonProjectTask.NAME, CreateAddonProjectTask, VAADIN_TASK_GROUP)
         addTask(project, CreateComponentTask.NAME, CreateComponentTask, VAADIN_TASK_GROUP)
@@ -514,7 +578,16 @@ class GradleVaadinPlugin implements Plugin<Project> {
         addTask(project, CreateWidgetsetGeneratorTask.NAME, CreateWidgetsetGeneratorTask,VAADIN_TASK_GROUP)
         addTask(project, CreateDesignTask.NAME, CreateDesignTask, VAADIN_TASK_GROUP)
 
-        addTask(project, CompileWidgetsetTask.NAME, CompileWidgetsetTask, VAADIN_TASK_GROUP)
+        addTask(project, CompileWidgetsetTask.NAME, CompileWidgetsetTask, VAADIN_TASK_GROUP) {
+            CompileWidgetsetTask task ->
+            WidgetsetCDNExtension cdnExtension = project.extensions.getByType(WidgetsetCDNExtension)
+            task.proxyEnabled = cdnExtension.proxyEnabledProvider
+            task.proxyPort = cdnExtension.proxyPortProvider
+            task.proxyScheme = cdnExtension.proxySchemeProvider
+            task.proxyHost = cdnExtension.proxyHostProvider
+            task.proxyAuth = cdnExtension.proxyAuthProvider
+        }
+
         addTask(project, DevModeTask.NAME, DevModeTask, VAADIN_TASK_GROUP)
         addTask(project, SuperDevModeTask.NAME, SuperDevModeTask, VAADIN_TASK_GROUP)
         addTask(project, CompileThemeTask.NAME, CompileThemeTask, VAADIN_TASK_GROUP) { CompileThemeTask task ->
@@ -530,7 +603,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
         }
     }
 
-    static void applyVaadinUtilityTasks(Project project) {
+    private static void applyVaadinUtilityTasks(Project project) {
         addTask(project, BuildSourcesJarTask.NAME, BuildSourcesJarTask, VAADIN_UTIL_TASK_GROUP)
         addTask(project, BuildJavadocJarTask.NAME, BuildJavadocJarTask, VAADIN_UTIL_TASK_GROUP)
         addTask(project, BuildClassPathJar.NAME, BuildClassPathJar, VAADIN_UTIL_TASK_GROUP) { BuildClassPathJar task ->
@@ -539,16 +612,16 @@ class GradleVaadinPlugin implements Plugin<Project> {
         addTask(project, VersionCheckTask.NAME, VersionCheckTask, VAADIN_UTIL_TASK_GROUP)
     }
 
-    static void applyVaadinTestbenchTasks(Project project) {
+    private static void applyVaadinTestbenchTasks(Project project) {
         addTask(project, CreateTestbenchTestTask.NAME, CreateTestbenchTestTask,VAADIN_TESTBENCH_TASK_GROUP)
     }
 
-    static void applyVaadinDirectoryTasks(Project project) {
+    private static void applyVaadinDirectoryTasks(Project project) {
         addTask(project, DirectorySearchTask.NAME, DirectorySearchTask, VAADIN_DIRECTORY_TASK_GROUP)
         addTask(project, CreateDirectoryZipTask.NAME, CreateDirectoryZipTask, VAADIN_DIRECTORY_TASK_GROUP)
     }
 
-    static void addTask(Project project, String name, Class type, String group, Closure configure={}) {
+    private static void addTask(Project project, String name, Class type, String group, Closure configure={}) {
         project.tasks.create(name:name, type:type, group:group, configure)
         project.clean.dependsOn(project.tasks["clean${name.capitalize()}" ])
     }

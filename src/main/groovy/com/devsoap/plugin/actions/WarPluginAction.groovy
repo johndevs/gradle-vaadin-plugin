@@ -26,6 +26,9 @@ import org.gradle.api.tasks.bundling.War
 
 /**
  * Actions applied when the war plugin is added to the build
+ *
+ * @author John Ahlroos
+ * @since 1.2
  */
 class WarPluginAction extends PluginAction {
 
@@ -61,8 +64,7 @@ class WarPluginAction extends PluginAction {
         }
     }
 
-    @PackageScope
-    static configureWAR(Task task) {
+    private static configureWAR(Task task) {
         assert task in War
         War war = (War) task
         war.exclude('VAADIN/gwt-unitCache/**')
@@ -71,8 +73,7 @@ class WarPluginAction extends PluginAction {
         }
     }
 
-    @PackageScope
-    boolean isSpringBootPresent() {
+    private boolean isSpringBootPresent() {
         try {
             getClass().classLoader.loadClass('org.springframework.boot.gradle.plugin.SpringBootPlugin')
             return true

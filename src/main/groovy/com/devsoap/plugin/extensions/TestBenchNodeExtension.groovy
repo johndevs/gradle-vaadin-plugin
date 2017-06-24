@@ -17,19 +17,23 @@ package com.devsoap.plugin.extensions
 
 import org.gradle.api.Project
 import org.gradle.api.provider.PropertyState
+import org.gradle.api.provider.Provider
 
 /**
  * Configuration options for the testbench node
+ *
+ * @author John Ahlroos
+ * @since 1.2
  */
 class TestBenchNodeExtension {
 
     static final String NAME = 'vaadinTestbenchNode'
 
-    final PropertyState<Boolean> enabled
-    final PropertyState<String> host
-    final PropertyState<Integer> port
-    final PropertyState<String> hub
-    final PropertyState<List<Map>> browsers
+    private final PropertyState<Boolean> enabled
+    private final PropertyState<String> host
+    private final PropertyState<Integer> port
+    private final PropertyState<String> hub
+    private final PropertyState<List<Map>> browsers
 
     TestBenchNodeExtension(Project project) {
 
@@ -68,6 +72,13 @@ class TestBenchNodeExtension {
     }
 
     /**
+     * Get the provider for the host value
+     */
+    Provider<String> getHostProvider() {
+        host
+    }
+
+    /**
      * The hostname of the node
      */
     void setHost(String host) {
@@ -79,6 +90,13 @@ class TestBenchNodeExtension {
      */
     Integer getPort() {
         port.get()
+    }
+
+    /**
+     * Get the provider for the port value
+     */
+    Provider<Integer> getPortProvider() {
+        port
     }
 
     /**
@@ -100,6 +118,13 @@ class TestBenchNodeExtension {
      */
     void setHub(String hub) {
         this.hub.set(hub)
+    }
+
+    /**
+     * Get the provider for the hub value
+     */
+    Provider<String> getHubProvider() {
+        hub
     }
 
     /** A list of browser configurations:
@@ -130,5 +155,12 @@ class TestBenchNodeExtension {
      */
     void setBrowsers(List<Map> browsers) {
         this.browsers.set(browsers)
+    }
+
+    /**
+     * Get the provider for the browsers value
+     */
+    Provider<List<Map>> getBrowsersProvider() {
+        browsers
     }
 }

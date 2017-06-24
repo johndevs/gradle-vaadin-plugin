@@ -27,12 +27,12 @@ import org.gradle.api.tasks.TaskAction
  * Compresses the theme styles with GZip
  *
  * @author John Ahlroos
+ * @since 1.1
  */
 @CacheableTask
 class CompressCssTask extends DefaultTask {
 
     static final String NAME = 'vaadinThemeCompress'
-    static final String STYLES_CSS = 'styles.css'
 
     /**
      * Create a CSS compression task
@@ -50,7 +50,7 @@ class CompressCssTask extends DefaultTask {
                     include:CompileThemeTask.STYLES_SCSS_PATTERN)
             themes.each { File theme ->
                 File dir = new File(theme.parent)
-                inputs.file new File(dir, STYLES_CSS)
+                inputs.file new File(dir, CompileThemeTask.STYLES_CSS)
                 outputs.file new File(dir, 'styles.css.gz')
             }
         }
@@ -60,7 +60,7 @@ class CompressCssTask extends DefaultTask {
      * Executes the Gzip compression on the remaining styles.css file. Must be executed after the theme is compiled
      */
     @TaskAction
-    def run() {
+    void run() {
         compress(project)
     }
 
@@ -77,7 +77,7 @@ class CompressCssTask extends DefaultTask {
         FileTree themes = project.fileTree(dir: themesDir, include: CompileThemeTask.STYLES_SCSS_PATTERN)
         themes.each { File theme ->
             File dir = new File(theme.parent)
-            File stylesCss = new File(dir, STYLES_CSS)
+            File stylesCss = new File(dir, CompileThemeTask.STYLES_CSS)
             if (stylesCss.exists()) {
                 if(isRecompress) {
                     project.logger.lifecycle("Recompressing $stylesCss.canonicalPath...")

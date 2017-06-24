@@ -25,6 +25,9 @@ import org.gradle.plugins.ide.eclipse.model.Facet
 
 /**
  * Actions applied when the eclipse-wtp plugin is applied
+ *
+ * @author John Ahlroos
+ * @since 1.2
  */
 class EclipseWtpPluginAction extends PluginAction {
 
@@ -65,8 +68,7 @@ class EclipseWtpPluginAction extends PluginAction {
      * @param version
      *      the version of the facet
      */
-    @PackageScope
-    static void setOrAddFacet(Project project, EclipseWtp wtp, String name, String version) {
+    private static void setOrAddFacet(Project project, EclipseWtp wtp, String name, String version) {
         EclipseWtpFacet facetContainer = wtp.facet
         List<Facet> facets = facetContainer.facets
         Facet facet = facets.find { it.name == name && it.type == Facet.FacetType.installed }
@@ -90,8 +92,7 @@ class EclipseWtpPluginAction extends PluginAction {
      * @param deploy
      *      also add to wtp deployment assembly
      */
-    @PackageScope
-    static void addConfigurationToProject(Project project, String conf) {
+    private static void addConfigurationToProject(Project project, String conf) {
         EclipseModel eclipse = project.extensions.getByType(EclipseModel)
         EclipseWtp wtp = eclipse.wtp as EclipseWtp
         wtp.component.plusConfigurations += [project.configurations[conf]]

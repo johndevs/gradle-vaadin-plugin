@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit
  * Searches for an addon in the Vaadin Directory
  *
  * @author John Ahlroos
+ * @since 1.0
  */
 class DirectorySearchTask extends DefaultTask {
 
@@ -39,19 +40,31 @@ class DirectorySearchTask extends DefaultTask {
 
     private final int maxCacheAge = TimeUnit.MILLISECONDS.convert(1, TimeUnit.HOURS)
 
+    /**
+     * Searches for addons using the given search pattern
+     */
     @Option(option = 'search', description ='String to search for in addons')
-    def String searchPattern
+    String searchPattern
 
+    /**
+     * Sorts the result with the given options
+     */
     @Option(option = 'sort', description = 'Sort criteria (options:name,description,date,rating)')
-    def String sortOption
+    String sortOption
 
+    /**
+     * If enabled prints more information in the search results
+     */
     @Option(option = 'verbose', description = 'Should verbose descriptions be shown')
-    def Boolean verbose
+    Boolean verbose
 
     DirectorySearchTask() {
         description = "Lists addons in the Vaadin Directory"
     }
 
+    /**
+     * Runs the search
+     */
     @TaskAction
     void run() {
 

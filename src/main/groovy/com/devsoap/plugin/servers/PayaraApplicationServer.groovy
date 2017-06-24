@@ -24,6 +24,9 @@ import org.gradle.api.artifacts.dsl.DependencyHandler
 
 /**
  * Runs the project on a Payara server
+ *
+ * @author John Ahlroos
+ * @since 1.1
  */
 class PayaraApplicationServer extends ApplicationServer {
 

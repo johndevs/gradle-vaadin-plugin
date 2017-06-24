@@ -26,30 +26,38 @@ import org.gradle.api.tasks.TaskAction
  * Runs the application on a application server
  *
  * @author John Ahlroos
+ * @since 1.0
  */
 class RunTask extends DefaultTask {
 
     static final String NAME = 'vaadinRun'
 
-    ApplicationServer serverInstance
+    private ApplicationServer serverInstance
 
+    /**
+     * Should the server be stopped after it has been started
+     */
     @Option(option = 'stopAfterStart', description = 'Should the server stop after starting')
     boolean stopAfterStarting = false
 
+    /**
+     * Should the browser be shown
+     */
+    // FIXME Is this duplicate to the property openInBrowser?
     @Option(option = 'nobrowser', description = 'Do not open browser after server has started')
     boolean nobrowser = false
 
-    final PropertyState<String> server = project.property(String)
-    final PropertyState<Boolean> debug = project.property(Boolean)
-    final PropertyState<Integer> debugPort = project.property(Integer)
-    final PropertyState<List<String>> jvmArgs = project.property(List)
-    final PropertyState<Boolean> serverRestart = project.property(Boolean)
-    final PropertyState<Integer> serverPort = project.property(Integer)
-    final PropertyState<Boolean> themeAutoRecompile = project.property(Boolean)
-    final PropertyState<Boolean> openInBrowser = project.property(Boolean)
-    final PropertyState<String> classesDir = project.property(String)
+    private final PropertyState<String> server = project.property(String)
+    private final PropertyState<Boolean> debug = project.property(Boolean)
+    private final PropertyState<Integer> debugPort = project.property(Integer)
+    private final PropertyState<List<String>> jvmArgs = project.property(List)
+    private final PropertyState<Boolean> serverRestart = project.property(Boolean)
+    private final PropertyState<Integer> serverPort = project.property(Integer)
+    private final PropertyState<Boolean> themeAutoRecompile = project.property(Boolean)
+    private final PropertyState<Boolean> openInBrowser = project.property(Boolean)
+    private final PropertyState<String> classesDir = project.property(String)
 
-    Thread cleanupThread = new Thread({
+    private Thread cleanupThread = new Thread({
         if ( serverInstance ) {
             serverInstance.terminate()
             serverInstance = null
@@ -80,6 +88,9 @@ class RunTask extends DefaultTask {
         classesDir.set(null)
     }
 
+    /**
+     * Run the application server
+     */
     @TaskAction
     void run() {
         if ( nobrowser ) {

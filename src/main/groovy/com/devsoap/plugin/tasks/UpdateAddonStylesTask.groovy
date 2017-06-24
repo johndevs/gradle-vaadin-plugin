@@ -25,12 +25,16 @@ import org.gradle.api.tasks.TaskAction
  * Updates the addon.scss file listing with addons styles found in the classpath
  *
  * @author John Ahlroos
+ * @since 1.1
  */
 @CacheableTask
 class UpdateAddonStylesTask extends DefaultTask {
 
     static final String NAME = 'vaadinUpdateAddonStyles'
 
+    /**
+     * SCSS file where addon themes are imported
+     */
     static final String ADDONS_SCSS_FILE = 'addons.scss'
 
     UpdateAddonStylesTask() {
@@ -57,6 +61,9 @@ class UpdateAddonStylesTask extends DefaultTask {
         }
     }
 
+    /**
+     * Updates the addon styles
+     */
     @TaskAction
     void run() {
         if ( !Util.isAddonStylesSupported(project) ) {

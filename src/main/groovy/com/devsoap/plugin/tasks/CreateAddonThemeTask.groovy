@@ -26,22 +26,30 @@ import org.gradle.api.tasks.TaskAction
  * Creates a theme for an addon
  *
  * @author John Ahlroos
+ * @since 1.0
  */
 class CreateAddonThemeTask extends DefaultTask {
 
     static final String NAME = 'vaadinCreateAddonTheme'
 
+    private final PropertyState<String> addonTitle = project.property(String)
+
+    /**
+     * The theme name
+     */
     @Option(option = 'name', description = 'Theme name')
     String themeName = 'MyAddonTheme'
 
-    final PropertyState<String> addonTitle = project.property(String)
 
     CreateAddonThemeTask() {
         description = "Creates a new theme for addon project."
     }
 
+    /**
+     * Creates the addon theme
+     */
     @TaskAction
-    def run() {
+    void run() {
 
         // Build theme name from addon title
         if ( !themeName && addonTitle.present ) {

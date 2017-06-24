@@ -40,36 +40,50 @@ import java.util.jar.JarInputStream
  * Updates the GWT module XML file with correct imports
  *
  * @author John Ahlroos
+ * @since 1.0
  */
 @Log
 @CacheableTask
 class UpdateWidgetsetTask extends DefaultTask {
 
-    public static final String NAME = 'vaadinUpdateWidgetset'
+    static final String NAME = 'vaadinUpdateWidgetset'
 
-    static final String PUBLIC_FOLDER = 'public'
-    static final String CSS_FILE_POSTFIX = 'css'
-    static final String SCSS_FILE_POSTFIX = 'scss'
-    static final String GWT_MODULE_XML_POSTFIX = '.gwt.xml'
-    static final String DEFAULT_WIDGETSET = 'com.vaadin.DefaultWidgetSet'
-    static final String DEFAULT_LEGACY_V6_WIDGETSET = 'com.vaadin.terminal.gwt.DefaultWidgetSet'
-    static final String DEFAULT_LEGACY_V7_WIDGETSET = 'com.vaadin.v7.Vaadin7WidgetSet'
-    static final String DOT = '.'
-    static final String JAVA_FILE_POSTFIX = ".java"
+    private static final String PUBLIC_FOLDER = 'public'
+    private static final String CSS_FILE_POSTFIX = 'css'
+    private static final String SCSS_FILE_POSTFIX = 'scss'
+    private static final String GWT_MODULE_XML_POSTFIX = '.gwt.xml'
+    private static final String DEFAULT_WIDGETSET = 'com.vaadin.DefaultWidgetSet'
+    private static final String DEFAULT_LEGACY_V6_WIDGETSET = 'com.vaadin.terminal.gwt.DefaultWidgetSet'
+    private static final String DEFAULT_LEGACY_V7_WIDGETSET = 'com.vaadin.v7.Vaadin7WidgetSet'
+    private static final String DOT = '.'
+    private static final String JAVA_FILE_POSTFIX = ".java"
 
     UpdateWidgetsetTask() {
-        description = "Updates the widgetset xml file"
+        description = 'Updates the widgetset xml file'
         onlyIf { Task task ->
             CompileWidgetsetTask compileTask = project.tasks.getByName(CompileWidgetsetTask.NAME)
             compileTask.manageWidgetset && !compileTask.widgetsetCDN && Util.getWidgetset(task.project)
         }
     }
 
+    /**
+     * Updates the widgetset XML file
+     */
     @TaskAction
     void run() {
        ensureWidgetPresent(project)
     }
 
+    /**
+     * Ensures that the widgetset XML file is present in the project. If it is not, then a new one is generated
+     *
+     * @param project
+     *      the project to check
+     * @param widgetsetFQN
+     *      the fully qualified name of the widgetset
+     * @return
+     *      the widgetset file
+     */
     @PackageScope
     static File ensureWidgetPresent(Project project, String widgetsetFQN=Util.getWidgetset(project)) {
         CompileWidgetsetTask compileWidgetsetTask = project.tasks.getByName(CompileWidgetsetTask.NAME)
@@ -92,8 +106,7 @@ class UpdateWidgetsetTask extends DefaultTask {
         widgetsetFile
     }
 
-    @PackageScope
-    static updateWidgetset(File widgetsetFile, String widgetsetFQN, Project project) {
+    private static updateWidgetset(File widgetsetFile, String widgetsetFQN, Project project) {
         CompileWidgetsetTask compileWidgetsetTask = project.tasks.getByName(CompileWidgetsetTask.NAME)
 
         Map substitutions = [:]
@@ -116,11 +129,13 @@ class UpdateWidgetsetTask extends DefaultTask {
 
     /**
      * Scans the child projects of the given project for GWT inherits
+     *
      * @param project
      *      The root project to scan, inherits from this project will *NOT* be included
      * @param scannedProjects
      *      the scanned projects, includes the root project
      * @return
+     *      the found inherit statements
      */
     @PackageScope
     static Set<String> findInheritsInDependencies(Project project, List<Project> scannedProjects = []) {

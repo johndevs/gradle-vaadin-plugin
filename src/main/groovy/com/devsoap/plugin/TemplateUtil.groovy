@@ -24,10 +24,11 @@ import org.gradle.api.Project
  * Utility class for template converstions
  *
  * @author John Ahlroos
+ * @since 1.0
  */
 class TemplateUtil {
 
-    static final String DOT = '.'
+    private static final String DOT = '.'
 
     /**
      * Write a template based file to a directory
@@ -47,8 +48,11 @@ class TemplateUtil {
      * @removeBlankLines
      *      Should resulting blank lines be removed. By default false.
      *
+     * @return
+     *      the target file where the template was written
+     *
      */
-    static writeTemplate(String templateFileName, File targetDir, String targetFileName = templateFileName,
+    static File writeTemplate(String templateFileName, File targetDir, String targetFileName = templateFileName,
                          Map substitutions = [:], removeBlankLines = false) {
         URL templateUrl = TemplateUtil.getClassLoader().getResource("templates/${templateFileName}.template")
         if ( !templateUrl ) {
@@ -74,8 +78,10 @@ class TemplateUtil {
      *      the target directory
      * @param targetFileName
      *      the target file name
+     * @return
+     *      the target file where the template was written
      */
-    static writeTemplateFromString(String templateContent, File targetDir, String targetFileName) {
+    static File writeTemplateFromString(String templateContent, File targetDir, String targetFileName) {
         File targetFile = new File(targetDir, targetFileName)
         if ( !targetFile.exists() ) {
             targetFile.parentFile.mkdirs()
@@ -87,6 +93,7 @@ class TemplateUtil {
         }
 
         targetFile.write(templateContent)
+        targetFile
     }
 
     /**

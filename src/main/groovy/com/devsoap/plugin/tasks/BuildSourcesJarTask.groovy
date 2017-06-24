@@ -19,9 +19,10 @@ import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.bundling.Jar
 
 /**
- * Build the sources jar
+ * Builds the sources jar
  *
  * @author John Ahlroos
+ * @since 1.1
  */
 @CacheableTask
 class BuildSourcesJarTask extends Jar {

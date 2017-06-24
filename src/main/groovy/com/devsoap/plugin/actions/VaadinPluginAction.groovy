@@ -25,6 +25,9 @@ import org.gradle.api.invocation.Gradle
 
 /**
  * Actions applied when the Vaadin plugin is added to the build
+ *
+ * @author John Ahlroos
+ * @since 1.2
  */
 class VaadinPluginAction extends PluginAction {
 
@@ -49,8 +52,7 @@ class VaadinPluginAction extends PluginAction {
         VersionPrinter.instance.printIfNotPrintedBefore(project)
     }
 
-    @PackageScope
-    static configureAddonZipMetadata(Task task) {
+    private static configureAddonZipMetadata(Task task) {
         Project project = task.project
         AddonExtension addonExtension = project.extensions.getByType(AddonExtension)
         Map attributes = [
@@ -75,14 +77,14 @@ class VaadinPluginAction extends PluginAction {
     }
 
     @Singleton(lazy = false, strict = true)
-    static class VersionPrinter {
+    private static class VersionPrinter {
         private Gradle gradle
         void printIfNotPrintedBefore(Project project) {
             if(project.gradle == gradle){
                 return
             }
             gradle = project.gradle
-            project.logger.quiet "Using Gradle Vaadin Plugin $GradleVaadinPlugin.PLUGIN_VERSION"
+            project.logger.quiet "Using Gradle Vaadin Plugin $GradleVaadinPlugin.version"
         }
     }
 }

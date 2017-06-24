@@ -25,25 +25,32 @@ import org.gradle.api.tasks.TaskAction
  * Creates a new theme
  *
  * @author John Ahlroos
+ * @since 1.0
  */
 class CreateThemeTask extends DefaultTask {
 
     static final String NAME = 'vaadinCreateTheme'
 
+    /**
+     * The theme name
+     */
     @Option(option = 'name', description = 'Theme name')
-    def String themeName
+    String themeName
 
-    public CreateThemeTask() {
+    CreateThemeTask() {
         description = "Creates a new Vaadin Theme"
         dependsOn(BuildClassPathJar.NAME)
         finalizedBy(UpdateAddonStylesTask.NAME)
     }
 
+    /**
+     * Creates a new theme
+     */
     @TaskAction
-    def run() {
+    void run() {
 
         if ( !themeName ) {
-            themeName = project.getName()
+            themeName = project.name
         }
 
         new ThemeCreator(themeName:themeName,

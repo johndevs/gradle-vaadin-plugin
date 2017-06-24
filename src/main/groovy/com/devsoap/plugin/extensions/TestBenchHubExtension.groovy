@@ -17,17 +17,21 @@ package com.devsoap.plugin.extensions
 
 import org.gradle.api.Project
 import org.gradle.api.provider.PropertyState
+import org.gradle.api.provider.Provider
 
 /**
  * Configuration options for the testbench hub
+ *
+ * @author John Ahlroos
+ * @since 1.2
  */
 class TestBenchHubExtension {
 
     static final String NAME = 'vaadinTestbenchHub'
 
-    final PropertyState<Boolean> enabled
-    final PropertyState<String> host
-    final PropertyState<Integer> port
+    private final PropertyState<Boolean> enabled
+    private final PropertyState<String> host
+    private final PropertyState<Integer> port
 
     TestBenchHubExtension(Project project) {
         enabled = project.property(Boolean)
@@ -61,6 +65,13 @@ class TestBenchHubExtension {
     }
 
     /**
+     * Get the provider of the host value
+     */
+    Provider<String> getHostProvider() {
+        host
+    }
+
+    /**
      * The host the hub should be run on
      */
     void setHost(String host) {
@@ -72,6 +83,13 @@ class TestBenchHubExtension {
      */
     Integer getPort() {
         port.get()
+    }
+
+    /**
+     * Get the provider or the port value
+     */
+    Provider<Integer> getPortProvider() {
+        port
     }
 
     /**

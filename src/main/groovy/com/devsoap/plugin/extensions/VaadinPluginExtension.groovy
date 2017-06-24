@@ -22,20 +22,23 @@ import org.gradle.api.provider.PropertyState
 import org.gradle.api.provider.Provider
 
 /**
- * Plugin configuration extension
+ * Generic plugin configuration options
+ *
+ * @author John Ahlroos
+ * @since 1.2
  */
 class VaadinPluginExtension {
 
     static final NAME = 'vaadin'
 
-    final PropertyState<String> version
-    final PropertyState<Boolean> manageDependencies
-    final PropertyState<Boolean> manageRepositories
-    final PropertyState<SourceDirectorySet> mainSourceSet
-    final PropertyState<SourceDirectorySet> mainTestSourceSet
-    final PropertyState<Boolean> push
-    final PropertyState<Boolean> logToConsole
-    final PropertyState<Boolean> useClassPathJar
+    private final PropertyState<String> version
+    private final PropertyState<Boolean> manageDependencies
+    private final PropertyState<Boolean> manageRepositories
+    private final PropertyState<SourceDirectorySet> mainSourceSet
+    private final PropertyState<SourceDirectorySet> mainTestSourceSet
+    private final PropertyState<Boolean> push
+    private final PropertyState<Boolean> logToConsole
+    private final PropertyState<Boolean> useClassPathJar
 
     VaadinPluginExtension(Project project) {
         version = project.property(String)

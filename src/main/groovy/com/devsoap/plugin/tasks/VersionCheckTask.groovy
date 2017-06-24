@@ -20,6 +20,8 @@ import com.devsoap.plugin.Util
 import groovy.transform.Memoized
 import groovyx.net.http.HTTPBuilder
 import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.util.VersionNumber
 
@@ -29,17 +31,15 @@ import java.util.concurrent.TimeUnit
  * Checks the plugin version for a new version
  *
  *  @author John Ahlroos
- *  @since 1.2.0
+ *  @since 1.2
  */
 class VersionCheckTask extends DefaultTask {
 
-    static final String URL = "https://plugins.gradle.org/plugin/$GradleVaadinPlugin.pluginId"
-
     static final String NAME = "vaadinPluginVersionCheck"
 
-    static final long CACHE_TIME = TimeUnit.DAYS.toMillis(1)
+    private static final String URL = "https://plugins.gradle.org/plugin/$GradleVaadinPlugin.pluginId"
 
-    File versionCacheFile
+    private File versionCacheFile
 
     VersionCheckTask() {
         project.afterEvaluate {
@@ -51,15 +51,16 @@ class VersionCheckTask extends DefaultTask {
                 firstRun = true
             }
 
-            inputs.file(versionCacheFile)
-            outputs.file(versionCacheFile)
-
             long cacheAge = System.currentTimeMillis() - versionCacheFile.lastModified()
-            outputs.upToDateWhen { !firstRun && cacheAge < CACHE_TIME}
-            onlyIf { firstRun || cacheAge > CACHE_TIME }
+            long cacheTime = TimeUnit.DAYS.toMillis(1)
+            outputs.upToDateWhen { !firstRun && cacheAge < cacheTime}
+            onlyIf { firstRun || cacheAge > cacheTime }
         }
     }
 
+    /**
+     * Checks for a new version
+     */
     @TaskAction
     void run() {
         VersionNumber pluginVersion = VersionNumber.parse(GradleVaadinPlugin.version)
@@ -68,6 +69,25 @@ class VersionCheckTask extends DefaultTask {
                     "please upgrade to $latestReleaseVersion !!"
         }
         versionCacheFile.text = latestReleaseVersion.toString()
+    }
+
+    /**
+     * Get the version cache file where previous version checks have been stored
+     */
+    @OutputFile
+    File getVersionCacheFile() {
+        versionCacheFile
+    }
+
+    /**
+     * Set the version cache file where previous version checks have been stored
+     *
+     * @param versionCacheFile
+     *      the version cache file
+     */
+    @InputFile
+    void setVersionCacheFile(File versionCacheFile) {
+        this.versionCacheFile = versionCacheFile
     }
 
     /**

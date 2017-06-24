@@ -19,6 +19,7 @@ package com.devsoap.plugin
  * Project language type
  *
  * @author John Ahlroos
+ * @since 1.2
  */
 enum ProjectType {
 
