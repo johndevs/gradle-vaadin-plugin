@@ -37,7 +37,7 @@ plugins {
  **********************************************************************************************************************/
 
 defaultTasks 'jar'
-group = "fi.jasoft.plugin"
+group = "com.devsoap.plugin"
 version = project.hasProperty('BUILD_VERSION') ? getProperty('BUILD_VERSION') : 'SNAPSHOT-'+ new Date().format('yyyyMMdd')
 archivesBaseName ='gradle-vaadin-plugin'
 sourceCompatibility = 1.8
@@ -74,7 +74,7 @@ dependencies {
     compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
 
     // Sass compilation with libSass
-    compile 'io.bit3:jsass:5.3.0'
+    compile "io.bit3:jsass:${project.property('jsass.version')}"
 
     deploy 'org.apache.maven.wagon:wagon-ssh:2.2'
 
@@ -97,52 +97,14 @@ idea {
 
 /***********************************************************************************************************************
  *
- * Sources
- *
- **********************************************************************************************************************/
-sourceSets {
-    ast {
-        groovy {
-            srcDirs = ['src/ast']
-        }
-    }
-}
-
-/***********************************************************************************************************************
- *
  * Compilation
  *
  **********************************************************************************************************************/
 
 /**
- * Compiles the AST transforms. These must be compiled before the main sources are compiled so the AST transforms
- * can be applied.
- */
-task compileGroovyAstTransforms(type: GroovyCompile) {
-    groovyOptions.with {
-        fork = true
-        keepStubs = false
-        fileExtensions = ["groovy"]
-    }
-    source = sourceSets.ast.groovy.srcDirs
-    classpath = sourceSets.main.compileClasspath
-    destinationDir = sourceSets.ast.output.classesDir
-}
-
-/**
- * Compiles the sources
- */
-compileGroovy {
-    dependsOn compileGroovyAstTransforms
-    classpath += files(sourceSets.ast.output.classesDir)
-}
-
-/**
  * Compiles the tests
  */
 compileTestGroovy {
-    dependsOn compileGroovyAstTransforms
-    classpath += files(sourceSets.ast.output.classesDir)
     classpath += configurations.proxyTest
 }
 
@@ -199,8 +161,8 @@ jar {
 task sourcesJar(type: Jar) {
     from sourceSets.main.allSource
     classifier = 'sources'
-    include 'fi/**/*.groovy'
-    include 'fi/**/*.java'
+    include 'com/**/*.groovy'
+    include 'com/**/*.java'
 }
 
 /**
@@ -221,7 +183,6 @@ artifacts {
  * Configure test phase only to run ordinary unit tests.
  */
 test {
-    classpath += files(sourceSets.ast.output.classesDir)
     testLogging {
         exceptionFormat "full"
     }
@@ -232,7 +193,6 @@ test {
  * Run integration tests with a different tasks so they are only run when running check
  */
 task integrationTest(type:Test, dependsOn:['test','jar']) {
-    classpath += files(sourceSets.ast.output.classesDir)
     testLogging {
         exceptionFormat "full"
         showStandardStreams = true
@@ -240,6 +200,7 @@ task integrationTest(type:Test, dependsOn:['test','jar']) {
     include '**/integration/**'
     exclude '**/integration/*ProxyTest*'
     systemProperty 'integrationTestProjectVersion', version
+    maxParallelForks = Runtime.runtime.availableProcessors() > 1 ? Runtime.runtime.availableProcessors() - 1 : 1
 }
 check.dependsOn 'integrationTest'
 
@@ -250,7 +211,6 @@ task proxyTest(type:Test, dependsOn: ['test','jar']) {
     def oldClassPath = classpath
     classpath = configurations.proxyTest
     classpath += oldClassPath
-    classpath += files(sourceSets.ast.output.classesDir)
     testLogging {
         exceptionFormat "full"
         showStandardStreams = true
@@ -265,11 +225,11 @@ check.dependsOn 'proxyTest'
  * Code formatting configurations with Codenarc
  */
 codenarc{
-    toolVersion = '0.25.1'
+    toolVersion = '0.27.0'
     configFile = rootProject.file('config/codenarc/ruleset.groovy')
     maxPriority1Violations = 0
     maxPriority2Violations = 0
-    maxPriority3Violations = 700
+    maxPriority3Violations = 500
     codenarcTest {
         configFile = rootProject.file('config/codenarc/ruleset-test.groovy')
     }
@@ -284,31 +244,17 @@ codenarc{
 pluginBundle {
     website = 'https://github.com/johndevs/gradle-vaadin-plugin/wiki'
     vcsUrl = 'https://github.com/johndevs/gradle-vaadin-plugin'
-    description = '''
-        Build Vaadin applications with Gradle!
-
-        This plugin has been deprecated, please use https://plugins.gradle.org/plugin/com.devsoap.plugin.vaadin instead.
-    '''.stripIndent()
-    tags = ['vaadin', 'deprecated']
+    description = 'Build Vaadin applications with Gradle!'
+    tags = ['vaadin', 'java', 'groovy', 'kotlin']
     plugins {
         vaadinPlugin {
-            id = 'fi.jasoft.plugin.vaadin'
-            displayName = 'Gradle Vaadin plugin (Deprecated)'
-        }
-        vaadinGroovyPlugin {
-            id = 'fi.jasoft.plugin.vaadin.groovy'
-            displayName = 'Gradle Vaadin Groovy plugin (Deprecated)'
-            description = '''
-                Build Vaadin applications with Groovy and Gradle!
-
-                This plugin has been deprecated, please use https://plugins.gradle.org/plugin/com.devsoap.plugin.vaadin instead.
-             '''.stripIndent()
-            tags = ['vaadin', 'groovy', 'deprecated']
+            id = 'com.devsoap.plugin.vaadin'
+            displayName = 'Gradle Vaadin plugin'
         }
     }
 
     mavenCoordinates {
-        groupId = 'fi.jasoft.plugin'
+        groupId = 'com.devsoap.plugin'
         artifactId = 'gradle-vaadin-plugin'
     }
 }
@@ -319,5 +265,5 @@ pluginBundle {
  *
  **********************************************************************************************************************/
 task wrapper(type: Wrapper) {
-    gradleVersion = '3.0'
+    gradleVersion = '4.0'
 }

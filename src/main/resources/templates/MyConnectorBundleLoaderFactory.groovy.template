@@ -1,0 +1,49 @@
+package ${packageName}
+
+import com.google.gwt.core.ext.typeinfo.JClassType
+import com.vaadin.server.widgetsetutils.ConnectorBundleLoaderFactory
+import com.vaadin.shared.ui.Connect
+import com.vaadin.shared.ui.Connect.LoadStyle
+
+class ${className} extends ConnectorBundleLoaderFactory {
+
+    private static final List<Class> eagerComponents = []
+    static {
+
+        // Add your eager components here...
+        // eagerComponents << VerticalLayout
+
+    }
+
+    private static final List<Class> deferredComponents = []
+    static {
+
+        // Add your deferred components here...
+        // deferredComponents << VerticalLayout
+    }
+
+    private static final List<Class> lazyComponents = []
+    static {
+
+        // Add your lazy components here...
+        // lazyComponents << VerticalLayout
+    }
+
+    @Override
+    protected LoadStyle getLoadStyle(JClassType connectorType) {
+        Connect annotation = connectorType.getAnnotation(Connect)
+        Class componentClass = annotation.value()
+
+        if (eagerComponents.contains(componentClass)) {
+            return LoadStyle.EAGER
+
+        } else if (deferredComponents.contains(componentClass)) {
+            return LoadStyle.DEFERRED
+
+        } else if (lazyComponents.contains(componentClass)) {
+            return LoadStyle.LAZY
+        }
+
+        return super.getLoadStyle(connectorType)
+    }
+}
