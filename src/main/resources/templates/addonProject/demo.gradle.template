@@ -1,10 +1,10 @@
 plugins {
     // Uncomment this if Vaadin plugin is not applied in the parent module
-    // id "fi.jasoft.plugin.vaadin" version "${pluginVersion}"
+    // id "com.devsoap.plugin.vaadin" version "${pluginVersion}"
 }
 
 // Apply the Vaadin plugin
-apply plugin: 'fi.jasoft.plugin.vaadin'
+apply plugin: 'com.devsoap.plugin.vaadin'
 
 // Demo depends on the addon
 dependencies {

@@ -1,0 +1,16 @@
+package ${designPackage}
+
+import com.vaadin.ui.Notification
+
+/**
+ * Implementation file for ${designName}Design
+ */
+class ${designName} extends ${designName}Design {
+
+	${designName}() {
+		/*
+		 * Attach logic to button
+		 */
+		myButton.addClickListener { Notification.show('Button clicked!') }
+	}
+}

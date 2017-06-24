@@ -117,8 +117,8 @@ ruleset {
     NestedForLoop
     PrivateFieldCouldBeFinal
     PublicInstanceField
-    ReturnsNullInsteadOfEmptyArray
-    ReturnsNullInsteadOfEmptyCollection
+    //ReturnsNullInsteadOfEmptyArray
+    //ReturnsNullInsteadOfEmptyCollection
     SimpleDateFormatMissingLocale
     StatelessSingleton
     ToStringReturnsNull

@@ -5,5 +5,4 @@
 *.ipr
 *.iws
 src/main/resources/META-INF/maven/
-.sass-cache
 local.properties

@@ -3,11 +3,11 @@ plugins {
     id "maven"
 
     // Uncomment this if Vaadin plugin is not applied in the parent module
-    // id "fi.jasoft.plugin.vaadin" version "${pluginVersion}"
+    // id "com.devsoap.plugin.vaadin" version "${pluginVersion}"
 }
 
 // Apply the Vaadin plugin
-apply plugin: 'fi.jasoft.plugin.vaadin'
+apply plugin: 'com.devsoap.plugin.vaadin'
 
 // Specify a version for the addon, this can also be done in the
 // parent build.gradle if you want the version to be the same for all projects
@@ -23,13 +23,11 @@ artifacts {
 }
 
 // Vaadin configuration
-vaadin {
+vaadinAddon {
     // Addon metadata for the Vaadin Directory
-    addon {
-      author '${author}'
-      license '${license}'
-      title '${title}'
-    }
+    author '${author}'
+    license '${license}'
+    title '${title}'
 }
 
 // Creates the addon POM for the directory
