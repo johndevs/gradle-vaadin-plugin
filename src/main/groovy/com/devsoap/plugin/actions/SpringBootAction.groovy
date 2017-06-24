@@ -30,6 +30,9 @@ import org.gradle.api.tasks.javadoc.Javadoc
 
 /**
  * Actions applied when the Spring Boot plugin as added to the build
+ *
+ * @author John Ahlroos
+ * @since 1.2
  */
 class SpringBootAction extends PluginAction {
 
@@ -67,15 +70,13 @@ class SpringBootAction extends PluginAction {
         }
     }
 
-    @PackageScope
-    static configureBootRun(Task task) {
+    private static configureBootRun(Task task) {
         Project project = task.project
         task.classpath = Util.getWarClasspath(project)
         task.classpath = task.classpath + (project.configurations[GradleVaadinPlugin.CONFIGURATION_SPRING_BOOT])
     }
 
-    @PackageScope
-    static configureJar(Task task) {
+    private static configureJar(Task task) {
         Project project = task.project
         if (isJarProject(project)) {
             Jar jar = (Jar) task
@@ -88,15 +89,13 @@ class SpringBootAction extends PluginAction {
         }
     }
 
-    @PackageScope
-    static configureJavadoc(Task task) {
+    private static configureJavadoc(Task task) {
         Project project = task.project
         Javadoc javadoc = (Javadoc) task
         javadoc.classpath = javadoc.classpath + (project.configurations[GradleVaadinPlugin.CONFIGURATION_SPRING_BOOT])
     }
 
-    @PackageScope
-    static boolean isJarProject(Project project) {
+    private static boolean isJarProject(Project project) {
         String layout = project.extensions.findByName('springBoot').layout
         if (!layout) {
             // Default is jar

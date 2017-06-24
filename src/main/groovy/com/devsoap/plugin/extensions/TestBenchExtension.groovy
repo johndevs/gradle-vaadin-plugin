@@ -19,15 +19,18 @@ import org.gradle.api.Project
 import org.gradle.api.provider.PropertyState
 
 /**
- * Configuration options for Testbench
+ * Configuration options for Vaadin Testbench
+ *
+ * @author John Ahlroos
+ * @since 1.2
  */
 class TestBenchExtension {
 
     static final String NAME = 'vaadinTestbench'
 
-    final PropertyState<Boolean> enabled
-    final PropertyState<String> version
-    final PropertyState<Boolean> runApplication
+    private final PropertyState<Boolean> enabled
+    private final PropertyState<String> version
+    private final PropertyState<Boolean> runApplication
 
     TestBenchExtension(Project project) {
         enabled = project.property(Boolean)

@@ -19,7 +19,10 @@ import groovy.transform.CompileStatic
 import org.gradle.util.SingleMessageLogger
 
 /**
- * Logger for displaying messages to user
+ * Logger for displaying (nagging) messages to user
+ *
+ * @author John Ahlroos
+ * @since 1.1
  */
 @CompileStatic
 class MessageLogger {

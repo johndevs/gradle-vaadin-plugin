@@ -19,9 +19,10 @@ import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.bundling.Jar
 
 /**
- * Build the Javadoc jar
+ * Builds the Javadoc jar
  *
  * @author John Ahlroos
+ * @since 1.1
  */
 @CacheableTask
 class BuildJavadocJarTask extends Jar {

@@ -37,28 +37,37 @@ import java.util.jar.JarInputStream
  * Compiles the SASS theme into CSS
  *
  * @author John Ahlroos
+ * @since 1.0
  */
 @CacheableTask
 class CompileThemeTask extends DefaultTask {
 
     static final String NAME = 'vaadinThemeCompile'
 
-    static final String STYLES_SCSS_PATTERN = '**/styles.scss'
-    static final String STYLES_CSS_FILE = STYLES_CSS
-    static final String CLASSPATH_SWITCH = '-cp'
-    static final String RUBY_MAIN_CLASS = 'org.jruby.Main'
-    static final String COMPASS_COMPILER = 'compass'
-    static final String LIBSASS_COMPILER = 'libsass'
-    static final String VAADIN_COMPILER = 'vaadin'
+    /**
+     * Main CSS file
+     */
     static final String STYLES_CSS = 'styles.css'
-    static final String STYLES_SCSS = 'styles.scss'
 
-    final PropertyState<String> themesDirectory = project.property(String)
-    final PropertyState<String> compiler = project.property(String)
-    final PropertyState<Boolean> compress = project.property(Boolean)
-    final PropertyState<Boolean> useClasspathJar = project.property(Boolean)
+    /**
+     * File pattern for searching for all styles.scss files recursively
+     */
+    static final String STYLES_SCSS_PATTERN = '**/styles.scss'
 
-/**
+    private static final String CLASSPATH_SWITCH = '-cp'
+    private static final String RUBY_MAIN_CLASS = 'org.jruby.Main'
+    private static final String COMPASS_COMPILER = 'compass'
+    private static final String LIBSASS_COMPILER = 'libsass'
+    private static final String VAADIN_COMPILER = 'vaadin'
+
+    private static final String STYLES_SCSS = 'styles.scss'
+
+    private final PropertyState<String> themesDirectory = project.property(String)
+    private final PropertyState<String> compiler = project.property(String)
+    private final PropertyState<Boolean> compress = project.property(Boolean)
+    private final PropertyState<Boolean> useClasspathJar = project.property(Boolean)
+
+    /**
      * Creates a new theme compilation task
      */
     CompileThemeTask() {
@@ -74,7 +83,7 @@ class CompileThemeTask extends DefaultTask {
             inputs.dir themesDirectory
             inputs.files(project.fileTree(dir:themesDirectory, include : '**/*.scss').collect())
             outputs.files(project.fileTree(dir:themesDirectory, include:STYLES_SCSS_PATTERN).collect {
-                File theme -> new File(new File(theme.parent), STYLES_CSS_FILE)
+                File theme -> new File(new File(theme.parent), STYLES_CSS)
             })
 
             // Add classpath jar
@@ -215,10 +224,10 @@ class CompileThemeTask extends DefaultTask {
 
             def start = System.currentTimeMillis()
 
-            def Process process
+            Process process
             switch (project.vaadinThemeCompile.compiler) {
                 case VAADIN_COMPILER:
-                    File targetCss = new File(dir, STYLES_CSS_FILE)
+                    File targetCss = new File(dir, STYLES_CSS)
                     if (compileThemeTask.getThemesDirectory()) {
                         File sourceScss = Paths.get(unpackedThemesDir.canonicalPath, dir.name, theme.name).toFile()
                         process = executeVaadinSassCompiler(project, sourceScss, targetCss)
@@ -252,7 +261,7 @@ class CompileThemeTask extends DefaultTask {
             long time = (System.currentTimeMillis()-start)/1000
             if (result != 0 || failed ) {
                 // Cleanup possible css file
-                new File(dir, STYLES_CSS_FILE).delete()
+                new File(dir, STYLES_CSS).delete()
                 throw new BuildActionFailureException('Theme compilation failed. See error log for details.', null)
             } else if ( isRecompile ) {
                 project.logger.lifecycle("Theme was recompiled in $time seconds")
@@ -274,7 +283,7 @@ class CompileThemeTask extends DefaultTask {
      * @return
      *      the process that runs the compiler
      */
-    static Process executeVaadinSassCompiler(Project project, File themeDir, File targetCSSFile) {
+    private static Process executeVaadinSassCompiler(Project project, File themeDir, File targetCSSFile) {
         def compileProcess = [Util.getJavaBinary(project)]
         compileProcess += [CLASSPATH_SWITCH,  Util.getCompileClassPathOrJar(project).asPath]
         compileProcess += 'com.vaadin.sass.SassCompiler'
@@ -290,7 +299,7 @@ class CompileThemeTask extends DefaultTask {
      * @return
      *      the directory where the gem was installed
      */
-    static File installCompassGem(Project project) {
+    private static File installCompassGem(Project project) {
         File gemsDir = Paths.get(project.buildDir.canonicalPath, 'jruby', 'gems').toFile()
         if ( !gemsDir.exists() ) {
             gemsDir.mkdirs()
@@ -325,7 +334,7 @@ class CompileThemeTask extends DefaultTask {
      * @return
      *      returns the directory where the themes has been unpacked
      */
-    static File unpackThemes(Project project) {
+    private static File unpackThemes(Project project) {
         // Unpack Vaadin and addon themes
         File unpackedVaadinDir = project.file("$project.buildDir/VAADIN")
         File unpackedThemesDir = project.file("$unpackedVaadinDir/themes")
@@ -398,7 +407,8 @@ class CompileThemeTask extends DefaultTask {
      * @return
      *      the process that runs the compiler
      */
-    static Process executeCompassSassCompiler(Project project, File gemsDir, File unpackedThemesDir, File themeDir) {
+    private static Process executeCompassSassCompiler(Project project, File gemsDir, File unpackedThemesDir,
+                                                      File themeDir) {
         File themePath = new File(unpackedThemesDir, themeDir.name)
 
         String compassCompile = '-S compass compile '
@@ -422,7 +432,7 @@ class CompileThemeTask extends DefaultTask {
         ], project.buildDir)
     }
 
-    static Process executeLibSassCompiler(Project project, File themeDir, File unpackedThemesDir) {
+    private static Process executeLibSassCompiler(Project project, File themeDir, File unpackedThemesDir) {
 
         File stylesScss = new File(themeDir, STYLES_SCSS)
         File stylesCss = new File(themeDir, STYLES_CSS)

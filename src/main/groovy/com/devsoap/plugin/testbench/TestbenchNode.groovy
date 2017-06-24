@@ -19,22 +19,46 @@ import com.devsoap.plugin.Util
 import com.devsoap.plugin.extensions.TestBenchNodeExtension
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
+import org.gradle.api.provider.PropertyState
 
 /**
  * Represents a Testbench Node
  *
  * @author John Ahlroos
+ * @since 1.1
  */
 class TestbenchNode {
 
     private final Project project
 
-    private process
+    private Process process
+
+    private final PropertyState<String> host
+    private final PropertyState<Integer> port
+    private final PropertyState<String> hub
+    private final PropertyState<List<Map>> browsers
 
     TestbenchNode(Project project) {
         this.project = project
+
+        TestBenchNodeExtension extension = project.extensions.getByType(TestBenchNodeExtension)
+
+        host = project.property(String)
+        host.set(extension.hostProvider)
+
+        port = project.property(Integer)
+        port.set(extension.portProvider)
+
+        hub = project.property(String)
+        hub.set(extension.hubProvider)
+
+        browsers = project.property(List)
+        browsers.set(extension.browsersProvider)
     }
 
+    /**
+     * Starts the Testbench Node
+     */
     void start() {
         TestBenchNodeExtension nodeExtension = project.extensions.getByType(TestBenchNodeExtension)
         String host = nodeExtension.host
@@ -45,30 +69,30 @@ class TestbenchNode {
         File logDir = project.file('build/testbench/')
         logDir.mkdirs()
 
-        FileCollection cp = project.configurations['vaadin-testbench'] + Util.getClassPath(project)
+        FileCollection cp = project.configurations['vaadin-testbench'] + Util.getWarClasspath(project)
 
-        process = [Util.getJavaBinary(project)]
+        List processList = [Util.getJavaBinary(project)]
 
-        process.add('-cp')
-        process.add(cp.getAsPath())
+        processList.add('-cp')
+        processList.add(cp.getAsPath())
 
-        process.add('org.openqa.grid.selenium.GridLauncher')
+        processList.add('org.openqa.grid.selenium.GridLauncher')
 
-        process.add('-role')
-        process.add('node')
+        processList.add('-role')
+        processList.add('node')
 
-        process.add('-hub')
-        process.add(hub)
+        processList.add('-hub')
+        processList.add(hub)
 
-        process.add('-host')
-        process.add(host)
+        processList.add('-host')
+        processList.add(host)
 
-        process.add('-port')
-        process.add(port.toString())
+        processList.add('-port')
+        processList.add(port.toString())
 
         for ( browser in browsers ) {
-            process.add('-browser')
-            process.add(browser.inject([]) { result, entry ->
+            processList.add('-browser')
+            processList.add(browser.inject([]) { result, entry ->
                 result << "${entry.key}=${entry.value}"
             }.join(','))
         }
@@ -90,6 +114,9 @@ class TestbenchNode {
 
     }
 
+    /**
+     * Terminates the Testbench node
+     */
     void terminate() {
         process.in.close()
         process.out.close()
@@ -98,5 +125,61 @@ class TestbenchNode {
         process = null
 
         project.logger.lifecycle("Testbench node terminated.")
+    }
+
+    /**
+     * Get the hostname or IP address
+     */
+    String getHost() {
+        host.get()
+    }
+
+    /**
+     * Set the hostname or IP address
+     */
+    void setHost(String host) {
+        this.host.set(host)
+    }
+
+    /**
+     * Get the port
+     */
+    Integer getPort() {
+        port.get()
+    }
+
+    /**
+     * Set the port
+     */
+    void setPort(Integer port) {
+        this.port.set(port)
+    }
+
+    /**
+     * Get the hub IP address
+     */
+    String getHub() {
+        hub.get()
+    }
+
+    /**
+     * Set the hub IP address
+     */
+    void setHub(String hub) {
+        this.hub.set(hub)
+    }
+
+    /**
+     * Get the enabled browsers map. See TestBenchNodeExtension for details.
+     */
+    List<Map> getBrowsers() {
+        browsers.get()
+    }
+
+    /**
+     * Set the enabled browsers map. See TestBenchNodeExtension for details.
+     */
+    void setBrowsers(List<Map> browsers) {
+        this.browsers.set(browsers)
     }
 }

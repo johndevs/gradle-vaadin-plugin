@@ -26,6 +26,7 @@ import org.gradle.api.tasks.TaskAction
  * Runs GWT DevMode
  *
  * @author John Ahlroos
+ * @since 1.0
  * @deprecated Replaced by SuperDevMode
  */
 @Deprecated
@@ -33,26 +34,25 @@ class DevModeTask extends DefaultTask {
 
     public static final String NAME = 'vaadinDevMode'
 
-    Process devModeProcess
+    private Process devModeProcess
+    private ApplicationServer serverInstance
 
-    def serverInstance
+    private final PropertyState<String> server = project.property(String)
+    private final PropertyState<Boolean> debug = project.property(Boolean)
+    private final PropertyState<Integer> debugPort = project.property(Integer)
+    private final PropertyState<List<String>> jvmArgs = project.property(List)
+    private final PropertyState<Boolean> serverRestart = project.property(Boolean)
+    private final PropertyState<Integer> serverPort = project.property(Integer)
+    private final PropertyState<Boolean> themeAutoRecompile = project.property(Boolean)
+    private final PropertyState<Boolean> openInBrowser = project.property(Boolean)
+    private final PropertyState<String> classesDir = project.property(String)
+    private final PropertyState<Boolean> noserver = project.property(Boolean)
+    private final PropertyState<String> bindAddress = project.property(String)
+    private final PropertyState<Integer> codeServerPort = project.property(Integer)
+    private final PropertyState<List<String>> extraArgs = project.property(List)
+    private final PropertyState<String> logLevel = project.property(String)
 
-    final PropertyState<String> server = project.property(String)
-    final PropertyState<Boolean> debug = project.property(Boolean)
-    final PropertyState<Integer> debugPort = project.property(Integer)
-    final PropertyState<List<String>> jvmArgs = project.property(List)
-    final PropertyState<Boolean> serverRestart = project.property(Boolean)
-    final PropertyState<Integer> serverPort = project.property(Integer)
-    final PropertyState<Boolean> themeAutoRecompile = project.property(Boolean)
-    final PropertyState<Boolean> openInBrowser = project.property(Boolean)
-    final PropertyState<String> classesDir = project.property(String)
-    final PropertyState<Boolean> noserver = project.property(Boolean)
-    final PropertyState<String> bindAddress = project.property(String)
-    final PropertyState<Integer> codeServerPort = project.property(Integer)
-    final PropertyState<List<String>> extraArgs = project.property(List)
-    final PropertyState<String> logLevel = project.property(String)
-
-    def cleanupThread = new Thread({
+    private Thread cleanupThread = new Thread({
         if ( devModeProcess ) {
             devModeProcess.destroy()
             devModeProcess = null
@@ -90,6 +90,9 @@ class DevModeTask extends DefaultTask {
         logLevel.set('INFO')
     }
 
+    /**
+     * Starts the server and runs the DevMode server
+     */
     @TaskAction
     void run() {
         if ( !Util.getWidgetset(project) ) {
@@ -109,7 +112,7 @@ class DevModeTask extends DefaultTask {
         }
     }
 
-    protected void runDevelopmentMode() {
+    private void runDevelopmentMode() {
         def classpath = Util.getClientCompilerClassPath(project)
         RunTask runTask = project.tasks.getByName(RunTask.NAME)
 

@@ -29,7 +29,6 @@ import com.devsoap.plugin.tasks.CreateWidgetsetGeneratorTask
 import com.devsoap.plugin.tasks.UpdateWidgetsetTask
 import com.devsoap.plugin.testbench.TestbenchHub
 import com.devsoap.plugin.testbench.TestbenchNode
-import groovy.transform.PackageScope
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.plugins.JavaPlugin
@@ -40,11 +39,25 @@ import java.nio.file.Paths
 
 /**
  * Actions applied when the java plugin is added to the build
+ *
+ * @author John Ahlroos
+ * @since 1.2
  */
 class JavaPluginAction extends PluginAction {
 
+    /**
+     * The testbench hub instance
+     */
     TestbenchHub testbenchHub
+
+    /**
+     * The testbench node instance
+     */
     TestbenchNode testbenchNode
+
+    /**
+     * The application server instance
+     */
     ApplicationServer testbenchAppServer
 
     @Override
@@ -104,8 +117,7 @@ class JavaPluginAction extends PluginAction {
         }
     }
 
-    @PackageScope
-    static ensureWidgetsetGeneratorExists(Task task) {
+    private static ensureWidgetsetGeneratorExists(Task task) {
         CompileWidgetsetTask compileWidgetsetTask = task.project.tasks.getByName(CompileWidgetsetTask.NAME)
         String generator = compileWidgetsetTask.widgetsetGenerator
         if ( generator != null ) {
@@ -120,8 +132,7 @@ class JavaPluginAction extends PluginAction {
         }
     }
 
-    @PackageScope
-    static configureAddonMetadata(Task task) {
+    private static configureAddonMetadata(Task task) {
         Project project = task.project
         CompileWidgetsetTask compileWidgetsetTask = project.tasks.getByName(CompileWidgetsetTask.NAME)
 
@@ -167,7 +178,7 @@ class JavaPluginAction extends PluginAction {
         Map attributes = [:]
         attributes['Vaadin-Package-Version'] = 1
         attributes['Implementation-Version'] = project.version
-        attributes['Built-By'] = "Gradle Vaadin Plugin ${GradleVaadinPlugin.PLUGIN_VERSION}"
+        attributes['Built-By'] = "Gradle Vaadin Plugin ${GradleVaadinPlugin.version}"
         if ( widgetset ) {
             attributes['Vaadin-Widgetsets'] = widgetset
         }
@@ -186,8 +197,7 @@ class JavaPluginAction extends PluginAction {
         task.manifest.attributes(attributes)
     }
 
-    @PackageScope
-    static configureTest(Task task, JavaPluginAction listener) {
+    private static configureTest(Task task, JavaPluginAction listener) {
         Project project = task.project
         TestBenchExtension tb = project.extensions.getByType(TestBenchExtension)
 
@@ -214,8 +224,7 @@ class JavaPluginAction extends PluginAction {
         }
     }
 
-    @PackageScope
-    static terminateTestbench(JavaPluginAction listener) {
+    private static terminateTestbench(JavaPluginAction listener) {
         if ( listener.testbenchAppServer ) {
             listener.testbenchAppServer.terminate()
             listener.testbenchAppServer = null
@@ -232,8 +241,7 @@ class JavaPluginAction extends PluginAction {
         }
     }
 
-    @PackageScope
-    static configureJavadoc(Task task) {
+    private static configureJavadoc(Task task) {
         Project project = task.project
         task.source = Util.getMainSourceSet(project)
         if ( project.configurations.findByName(GradleVaadinPlugin.CONFIGURATION_JAVADOC) ) {
@@ -245,8 +253,7 @@ class JavaPluginAction extends PluginAction {
         task.options.addStringOption('sourcepath', '')
     }
 
-    @PackageScope
-    static File getManifest(Task task) {
+    private static File getManifest(Task task) {
         Project project = task.project
         List sources = Util.getMainSourceSet(project).srcDirs.asList()
         sources.addAll(project.sourceSets.main.resources.srcDirs.asList())

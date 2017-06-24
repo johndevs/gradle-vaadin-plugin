@@ -28,19 +28,23 @@ import org.gradle.api.tasks.TaskAction
  * Creates the widgetset generated class
  *
  * @author John Ahlroos
+ * @since 1.0
  */
 class CreateWidgetsetGeneratorTask extends DefaultTask {
 
-    public static final String NAME = 'vaadinCreateWidgetsetGenerator'
+    static final String NAME = 'vaadinCreateWidgetsetGenerator'
 
     private static final String DOT = '.'
 
-    public CreateWidgetsetGeneratorTask() {
+    CreateWidgetsetGeneratorTask() {
         description = "Creates a new widgetset generator for optimizing the widgetset"
     }
 
+    /**
+     * Creates the widgetset generator class
+     */
     @TaskAction
-    def run() {
+    void run() {
         if ( !project.vaadinCompile.widgetset ) {
             throw new GradleException("No widgetset found. Please define a widgetset " +
                     "using the vaadinCompile.widgetset property.")
@@ -48,8 +52,7 @@ class CreateWidgetsetGeneratorTask extends DefaultTask {
         makeWidgetsetGeneratorClass()
     }
 
-    @PackageScope
-    def makeWidgetsetGeneratorClass() {
+    private File makeWidgetsetGeneratorClass() {
         File javaDir = Util.getMainSourceSet(project).srcDirs.first()
 
         CompileWidgetsetTask compileWidgetsetTask = project.tasks.getByName(CompileWidgetsetTask.NAME)
@@ -83,19 +86,24 @@ class CreateWidgetsetGeneratorTask extends DefaultTask {
         substitutions['packageName'] = pkg
         substitutions['className'] = filename
 
+        File targetFile
         switch (Util.getProjectType(project)) {
             case ProjectType.JAVA:
-                TemplateUtil.writeTemplate('MyConnectorBundleLoaderFactory.java', dir,
+                targetFile = TemplateUtil.writeTemplate('MyConnectorBundleLoaderFactory.java', dir,
                         "${filename}.java", substitutions)
                 break
             case ProjectType.GROOVY:
-                TemplateUtil.writeTemplate('MyConnectorBundleLoaderFactory.groovy', dir,
+                targetFile = TemplateUtil.writeTemplate('MyConnectorBundleLoaderFactory.groovy', dir,
                         "${filename}.groovy", substitutions)
                 break
             case ProjectType.KOTLIN:
-                TemplateUtil.writeTemplate('MyConnectorBundleLoaderFactory.kt', dir,
+                targetFile = TemplateUtil.writeTemplate('MyConnectorBundleLoaderFactory.kt', dir,
                         "${filename}.kt", substitutions)
                 break
+            default:
+                throw new GradleException("No template found for project type ${Util.getProjectType(project)}")
         }
+
+        targetFile
     }
 }

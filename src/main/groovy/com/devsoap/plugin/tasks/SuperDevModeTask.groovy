@@ -27,31 +27,31 @@ import org.gradle.api.tasks.TaskAction
  * Runs the GWT codeserver as well as runs the application in SuperDevMode mode.
  *
  * @author John Ahlroos
+ * @since 1.0
  */
 class SuperDevModeTask extends DefaultTask {
 
     static final String NAME = 'vaadinSuperDevMode'
 
-    Process codeserverProcess = null
+    private Process codeserverProcess
+    private ApplicationServer serverInstance
 
-    ApplicationServer serverInstance = null
+    private final PropertyState<String> server = project.property(String)
+    private final PropertyState<Boolean> debug = project.property(Boolean)
+    private final PropertyState<Integer> debugPort = project.property(Integer)
+    private final PropertyState<List<String>> jvmArgs = project.property(List)
+    private final PropertyState<Boolean> serverRestart = project.property(Boolean)
+    private final PropertyState<Integer> serverPort = project.property(Integer)
+    private final PropertyState<Boolean> themeAutoRecompile = project.property(Boolean)
+    private final PropertyState<Boolean> openInBrowser = project.property(Boolean)
+    private final PropertyState<String> classesDir = project.property(String)
+    private final PropertyState<Boolean> noserver = project.property(Boolean)
+    private final PropertyState<String> bindAddress = project.property(String)
+    private final PropertyState<Integer> codeServerPort = project.property(Integer)
+    private final PropertyState<List<String>> extraArgs = project.property(List)
+    private final PropertyState<String> logLevel = project.property(String)
 
-    final PropertyState<String> server = project.property(String)
-    final PropertyState<Boolean> debug = project.property(Boolean)
-    final PropertyState<Integer> debugPort = project.property(Integer)
-    final PropertyState<List<String>> jvmArgs = project.property(List)
-    final PropertyState<Boolean> serverRestart = project.property(Boolean)
-    final PropertyState<Integer> serverPort = project.property(Integer)
-    final PropertyState<Boolean> themeAutoRecompile = project.property(Boolean)
-    final PropertyState<Boolean> openInBrowser = project.property(Boolean)
-    final PropertyState<String> classesDir = project.property(String)
-    final PropertyState<Boolean> noserver = project.property(Boolean)
-    final PropertyState<String> bindAddress = project.property(String)
-    final PropertyState<Integer> codeServerPort = project.property(Integer)
-    final PropertyState<List<String>> extraArgs = project.property(List)
-    final PropertyState<String> logLevel = project.property(String)
-
-    def cleanupThread = new Thread({
+    private Thread cleanupThread = new Thread({
         if ( codeserverProcess ) {
             codeserverProcess.destroy()
             codeserverProcess = null
@@ -91,12 +91,14 @@ class SuperDevModeTask extends DefaultTask {
         logLevel.set('INFO')
     }
 
+    /**
+     * Run the SDM server and application server
+     */
     @TaskAction
-    def run() {
+    void run() {
         if ( !Util.getWidgetset(project) ) {
             throw new GradleException("No widgetset found in project.")
         }
-
 
         if(getNoserver()){
             runCodeServer {
@@ -112,7 +114,7 @@ class SuperDevModeTask extends DefaultTask {
         }
     }
 
-    def runCodeServer(Closure readyClosure) {
+    private void runCodeServer(Closure readyClosure) {
         File javaDir = Util.getMainSourceSet(project).srcDirs.iterator().next()
         File widgetsetsDir = Util.getWidgetsetDirectory(project)
         widgetsetsDir.mkdirs()

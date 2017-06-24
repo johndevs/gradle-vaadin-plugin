@@ -71,9 +71,10 @@ class Util {
     private static final String JAVA_BIN_NAME = 'java'
     private static final String GWT_MODULE_POSTFIX = '.gwt.xml'
     private static final String CLIENT_PACKAGE_NAME = 'client'
-    public static final String APP_WIDGETSET = 'AppWidgetset'
-    public static final String VAADIN_SERVER_ARTIFACT = 'vaadin-server'
-    public static final int VAADIN_SEVEN_MAJOR_VERSION = 7
+
+    static final String APP_WIDGETSET = 'AppWidgetset'
+    static final String VAADIN_SERVER_ARTIFACT = 'vaadin-server'
+    static final int VAADIN_SEVEN_MAJOR_VERSION = 7
 
     /**
      * Get the compile time classpath of a project

@@ -44,6 +44,7 @@ import java.util.logging.Level
  * Base class for application servers
  *
  * @author John Ahlroos
+ * @since 1.0
  */
 abstract class ApplicationServer {
 
@@ -97,12 +98,31 @@ abstract class ApplicationServer {
         this.browserParameters = browserParameters
     }
 
+    /**
+     * Get the runner name. This is a fully qualified name of the class that will run the server.
+     */
     abstract String getServerRunner()
 
+    /**
+     * Get the server name. This is the descriptive name of the server
+     */
     abstract String getServerName()
 
+    /**
+     * Get the string token that when appearing in the log marks the server as started and ready to serve the Vaadin
+     * application.
+     */
     abstract String getSuccessfullyStartedLogToken()
 
+    /**
+     * Configures the needed dependencies for the service
+     *
+     * @param projectDependencies
+     *      the project dependency handler where the dependencies will be injected
+     *
+     * @param dependencies
+     *      The dependency set where the dependencies will be injected
+     */
     abstract void defineDependecies(DependencyHandler projectDependencies, DependencySet dependencies)
 
     /**
@@ -202,6 +222,16 @@ abstract class ApplicationServer {
         parameters.add(buildDir.absolutePath)
     }
 
+    /**
+     * Starts the server
+     *
+     * @param firstStart
+     *      is this an initial start. <code>false</code> if the server is restarted.
+     * @param stopAfterStart
+     *      Should the server stop immediately after start. This is mostly used for tests.
+     * @return
+     *      <code>true</code> if the server started successfully.
+     */
     boolean start(boolean firstStart=false, boolean stopAfterStart=false) {
         if ( process ) {
             project.logger.error('Server is already running.')
@@ -222,8 +252,17 @@ abstract class ApplicationServer {
         }
     }
 
-    @PackageScope
-    boolean executeServer(List appServerProcess, boolean firstStart=false) {
+    /**
+     * Executes the server process and starts watching directories for changes
+     *
+     * @param appServerProcess
+     *      the server process to execute
+     * @param firstStart
+     *      is this the first execution of the server
+     * @return
+     *      <code>true</code> if the server started successfully.
+     */
+    protected boolean executeServer(List appServerProcess, boolean firstStart=false) {
         project.logger.debug("Running server with the command: "+appServerProcess)
         process = appServerProcess.execute([], project.buildDir)
 
@@ -251,8 +290,15 @@ abstract class ApplicationServer {
         true
     }
 
-    @PackageScope
-    void monitorLog(boolean firstStart=false, boolean stopAfterStart=false) {
+    /**
+     * Monitor the log for tokens
+     *
+     * @param firstStart
+     *      is this the first execution of the server
+     * @param stopAfterStart
+     *      <code>true</code> if the server should stop right after it has started.
+     */
+    protected void monitorLog(boolean firstStart=false, boolean stopAfterStart=false) {
         Util.logProcess(project, process, "${serverName}.log") { line ->
             if ( line.contains(successfullyStartedLogToken) ) {
                 if ( firstStart ) {
@@ -284,8 +330,10 @@ abstract class ApplicationServer {
         }
     }
 
-    @PackageScope
-    void openBrowser() {
+    /**
+     * Open the users browser and point it the running server
+     */
+    protected void openBrowser() {
         RunTask runTask = project.tasks.getByName(RunTask.NAME)
         // Build browser GET parameters
         String paramString = ''
@@ -305,8 +353,13 @@ abstract class ApplicationServer {
         Util.openBrowser((Project)project, "http://localhost:${(Integer)runTask.serverPort}/${paramString}")
     }
 
-    @PackageScope
-    void startAndBlock(boolean stopAfterStart=false) {
+    /**
+     * Start the server and block the process until the process is killed
+     *
+     * @param stopAfterStart
+     *      <code>true</code> if the server should stop right after it has started.
+     */
+    protected void startAndBlock(boolean stopAfterStart=false) {
         def firstStart = true
 
         while(true) {
@@ -348,19 +401,30 @@ abstract class ApplicationServer {
         }
     }
 
+    /**
+     * Terminate the server if it is running.
+     */
     void terminate() {
         process?.destroy()
         process = null
         project.logger.info("Application server terminated.")
     }
 
+    /**
+     * Reload the server if it is running.
+     */
     void reload() {
         reloadInProgress = true
         terminate()
     }
 
-    @PackageScope
-    static void watchClassDirectoryForChanges(final ApplicationServer server) {
+    /**
+     * Watch the class directory for changes and restart the server if changes occur
+     *
+     * @param server
+     *      the server instance to restart
+     */
+    protected static void watchClassDirectoryForChanges(final ApplicationServer server) {
         Project project = server.project
 
         final RunTask RUNTASK = project.tasks.getByName(RunTask.NAME)
@@ -393,8 +457,13 @@ abstract class ApplicationServer {
         }
     }
 
-    @PackageScope
-    static void watchThemeDirectoryForChanges(final ApplicationServer server) {
+    /**
+     * Watch the theme directory for changes and restart the server if changes occur
+     *
+     * @param server
+     *      the server instance to restart
+     */
+    protected static void watchThemeDirectoryForChanges(final ApplicationServer server) {
         Project project = server.project
         CompileThemeTask compileThemeTask = project.tasks.getByName(CompileThemeTask.NAME)
         final RunTask RUNTASK = project.tasks.getByName(RunTask.NAME)

@@ -21,22 +21,38 @@ import groovy.transform.Canonical
 import org.apache.commons.lang.StringUtils
 
 /**
- * Created by john on 9/12/16.
+ * Create a Vaadin component from a component template
+ *
+ * @author John Ahlroos
+ * @since 1.1
  */
 @Canonical
 class ComponentCreator implements Runnable {
 
-    static final String DOT = '.'
-    static final String SERVER_PACKAGE = 'server'
-    static final String CLIENT_PACKAGE = 'client'
+    private static final String DOT = '.'
+    private static final String SERVER_PACKAGE = 'server'
+    private static final String CLIENT_PACKAGE = 'client'
 
+    /**
+     * Widgetset name
+     */
     String widgetset = Util.APP_WIDGETSET
+
+    /**
+     * Java source directory
+     */
     File javaDir
+
+    /**
+     * Component name
+     */
     String componentName
 
+    /**
+     * Creates the Vaadin component
+     */
     @Override
     void run() {
-
         String widgetsetPackagePath
         String widgetsetPackage
         if ( widgetset.contains(DOT) ) {

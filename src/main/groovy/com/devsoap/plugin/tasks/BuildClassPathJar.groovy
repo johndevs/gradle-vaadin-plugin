@@ -28,12 +28,13 @@ import org.gradle.api.tasks.bundling.Jar
  * Builds a classpath jar used by external java processes.
  *
  * @author John Ahlroos
+ * @since 1.1
  */
 class BuildClassPathJar extends Jar {
 
     public static final String NAME = 'vaadinClassPathJar'
 
-    final PropertyState<Boolean> useClassPathJar = project.property(Boolean)
+    private final PropertyState<Boolean> useClassPathJar = project.property(Boolean)
 
     BuildClassPathJar() {
         description = 'Creates a Jar with the project classpath'
@@ -57,24 +58,21 @@ class BuildClassPathJar extends Jar {
     }
 
     /**
-     * Is this task enabled
-     * @return
+     * Is classpath jar enabled
      */
     Boolean getUseClassPathJar() {
         useClassPathJar.get()
     }
 
     /**
-     * Is this task enabled
-     * @return
+     * Is classpath jar enabled
      */
     void setUseClassPathJar(Boolean enabled) {
         useClassPathJar.set(enabled)
     }
 
     /**
-     * Is this task enabled
-     * @return
+     * Is classpath jar enabled
      */
     void setUseClassPathJar(Provider<Boolean> enabled) {
         useClassPathJar.set(enabled)

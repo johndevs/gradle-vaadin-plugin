@@ -22,6 +22,9 @@ import org.gradle.api.Project
 
 /**
  * Actions applied to project when idea plugin is applied
+ *
+ * @author John Ahlroos
+ * @since 1.2
  */
 class IdeaPluginAction extends PluginAction {
 
@@ -77,8 +80,7 @@ class IdeaPluginAction extends PluginAction {
      * @param test
      *      is the configuration a test dependency
      */
-    @PackageScope
-    static void addConfigurationToProject(Project project, String conf, boolean test=false) {
+    private static void addConfigurationToProject(Project project, String conf, boolean test=false) {
         def scopes = project.idea.module.scopes
         if ( test ) {
             scopes.TEST.plus += [project.configurations[conf]]

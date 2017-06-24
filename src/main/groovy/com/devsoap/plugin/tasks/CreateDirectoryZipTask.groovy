@@ -21,6 +21,7 @@ import org.gradle.api.tasks.bundling.Zip
  * Creates a Zip archive that is compatible with Vaadin Directory
  *
  * @author John Ahlroos
+ * @since 1.0
  */
 class CreateDirectoryZipTask extends Zip {
 

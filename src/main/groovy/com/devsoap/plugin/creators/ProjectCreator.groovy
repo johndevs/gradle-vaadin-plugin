@@ -22,7 +22,10 @@ import groovy.transform.Canonical
 import groovy.transform.PackageScope
 
 /**
- * Created by john on 9/12/16.
+ * Creates a new Vaadin project using pre-defined templates
+ *
+ * @author John Ahlroos
+ * @since 1.1
  */
 @Canonical
 class ProjectCreator implements Runnable {
@@ -31,21 +34,80 @@ class ProjectCreator implements Runnable {
     private static final String APPLICATION_PACKAGE_KEY = 'applicationPackage'
     private static final String WIDGETSET_KEY = 'widgetset'
 
-    private String applicationName
-    private String applicationPackage
-    private String widgetsetFQN
-    private boolean pushSupported = true
-    private boolean widgetsetCDN = false
-    private boolean addonStylesSupported = true
-    private ProjectType projectType = ProjectType.JAVA
-    private File javaDir
-    private File resourceDir
-    private String templateDir
-    private List<String> uiImports = []
-    private Map<String, String> uiSubstitutions = [:]
-    private List<String> uiAnnotations = []
-    private Map<String, String> servletSubstitutions = [:]
+    /**
+     * The application name
+     */
+    String applicationName
 
+    /**
+     * The application base package
+     */
+    String applicationPackage
+
+    /**
+     * The fully qualified widgetset name. This will be used to determine the application package if no package has been
+     * provided. If a package name has been provided then this should use that as the base package.
+     */
+    String widgetsetFQN
+
+    /**
+     * Is push supported in the project. By default true.
+     */
+    boolean pushSupported = true
+
+    /**
+     * Will the project use the Vaadin widgetset CDN. By default false.
+     */
+    boolean widgetsetCDN = false
+
+    /**
+     * Are addon styles supported. By default true.
+     */
+    boolean addonStylesSupported = true
+
+    /**
+     * The type of project that will be created. By default a Java project.
+     */
+    ProjectType projectType = ProjectType.JAVA
+
+    /**
+     * The java source directory
+     */
+    File javaDir
+
+    /**
+     * The resource source directory
+     */
+    File resourceDir
+
+    /**
+     * The tempalte directory
+     */
+    String templateDir
+
+    /**
+     * import statements added to the UI class
+     */
+    List<String> uiImports = []
+
+    /**
+     * Substitution values in the UI class
+     */
+    Map<String, String> uiSubstitutions = [:]
+
+    /**
+     * Annotations added to the UI class
+     */
+    List<String> uiAnnotations = []
+
+    /**
+     * Substitution values in the Servlet class
+     */
+    Map<String, String> servletSubstitutions = [:]
+
+    /**
+     * Creates a new project
+     */
     @Override
     void run() {
 
@@ -56,8 +118,7 @@ class ProjectCreator implements Runnable {
         makeBeansXML()
     }
 
-    @PackageScope
-    File makeUIClass() {
+    private File makeUIClass() {
 
         uiSubstitutions[APPLICATION_NAME_KEY] = applicationName
         uiSubstitutions[APPLICATION_PACKAGE_KEY] = applicationPackage
@@ -124,8 +185,7 @@ class ProjectCreator implements Runnable {
         uiClass
     }
 
-    @PackageScope
-    File makeServletClass() {
+    private File makeServletClass() {
 
         servletSubstitutions[APPLICATION_NAME_KEY] = applicationName
         servletSubstitutions[APPLICATION_PACKAGE_KEY] = applicationPackage
@@ -164,20 +224,17 @@ class ProjectCreator implements Runnable {
         servletClass
     }
 
-    @PackageScope
-    File makeBeansXML() {
+    private File makeBeansXML() {
         TemplateUtil.writeTemplate("$templateDir/beans.xml", metaInfDir, 'beans.xml')
     }
 
-    @PackageScope
-    File getUIDir() {
+    private File getUIDir() {
         File uidir = new File(javaDir, TemplateUtil.convertFQNToFilePath(applicationPackage))
         uidir.mkdirs()
         uidir
     }
 
-    @PackageScope
-    File getMetaInfDir() {
+    private File getMetaInfDir() {
         File metaInf = new File(resourceDir, 'META-INF')
         metaInf.mkdirs()
         metaInf

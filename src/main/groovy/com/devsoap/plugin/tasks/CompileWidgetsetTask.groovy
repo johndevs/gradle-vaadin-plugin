@@ -21,7 +21,9 @@ import com.devsoap.plugin.TemplateUtil
 import com.devsoap.plugin.Util
 
 import com.devsoap.plugin.extensions.WidgetsetCDNExtension
+import groovy.transform.Memoized
 import groovy.transform.PackageScope
+import groovyx.net.http.AuthConfig
 import groovyx.net.http.ContentType
 import groovyx.net.http.HttpResponseDecorator
 import groovyx.net.http.RESTClient
@@ -30,6 +32,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.PropertyState
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.TaskAction
 
@@ -43,42 +46,43 @@ import java.util.zip.ZipInputStream
  * Compiles the Vaadin Widgetsets
  *
  * @author John Ahlroos
+ * @since 1.0
  */
 @CacheableTask
 class CompileWidgetsetTask extends DefaultTask {
 
     static final NAME = 'vaadinCompile'
 
-    static final WIDGETSET_CDN_URL = 'https://wsc.vaadin.com/'
-    static final String PUBLIC_FOLDER_PATTERN = '**/*/public/**/*.*'
-    static final String GWT_MODULE_XML_PATTERN = '**/*/*.gwt.xml'
+    private static final WIDGETSET_CDN_URL = 'https://wsc.vaadin.com/'
 
-    final PropertyState<String> style = project.property(String)
-    final PropertyState<Integer> optimize = project.property(Integer)
-    final PropertyState<Boolean> logEnabled = project.property(Boolean)
-    final PropertyState<String> logLevel = project.property(String)
-    final PropertyState<Integer> localWorkers = project.property(Integer)
-    final PropertyState<Boolean> draftCompile = project.property(Boolean)
-    final PropertyState<Boolean> strict = project.property(Boolean)
-    final PropertyState<String> userAgent = project.property(String)
-    final PropertyState<List<String>> jvmArgs = project.property(List)
-    final PropertyState<List<String>> extraArgs = project.property(List)
-    final PropertyState<List<String>> sourcePaths = project.property(List)
-    final PropertyState<Boolean> collapsePermutations = project.property(Boolean)
-    final PropertyState<List<String>> extraInherits = project.property(List)
-    final PropertyState<Boolean> gwtSdkFirstInClasspath = project.property(Boolean)
-    final PropertyState<String> outputDirectory = project.property(String)
-    final PropertyState<Boolean> widgetsetCDN = project.property(Boolean)
-    final PropertyState<Boolean> profiler = project.property(Boolean)
-    final PropertyState<Boolean> manageWidgetset = project.property(Boolean)
-    final PropertyState<String> widgetset = project.property(String)
-    final PropertyState<String> widgetsetGenerator = project.property(String)
+    private final PropertyState<String> style = project.property(String)
+    private final PropertyState<Integer> optimize = project.property(Integer)
+    private final PropertyState<Boolean> logEnabled = project.property(Boolean)
+    private final PropertyState<String> logLevel = project.property(String)
+    private final PropertyState<Integer> localWorkers = project.property(Integer)
+    private final PropertyState<Boolean> draftCompile = project.property(Boolean)
+    private final PropertyState<Boolean> strict = project.property(Boolean)
+    private final PropertyState<String> userAgent = project.property(String)
+    private final PropertyState<List<String>> jvmArgs = project.property(List)
+    private final PropertyState<List<String>> extraArgs = project.property(List)
+    private final PropertyState<List<String>> sourcePaths = project.property(List)
+    private final PropertyState<Boolean> collapsePermutations = project.property(Boolean)
+    private final PropertyState<List<String>> extraInherits = project.property(List)
+    private final PropertyState<Boolean> gwtSdkFirstInClasspath = project.property(Boolean)
+    private final PropertyState<String> outputDirectory = project.property(String)
+    private final PropertyState<Boolean> widgetsetCDN = project.property(Boolean)
+    private final PropertyState<Boolean> profiler = project.property(Boolean)
+    private final PropertyState<Boolean> manageWidgetset = project.property(Boolean)
+    private final PropertyState<String> widgetset = project.property(String)
+    private final PropertyState<String> widgetsetGenerator = project.property(String)
 
-    final WidgetsetCDNExtension widgetsetCDNConfig =  extensions.create(WidgetsetCDNExtension.NAME,
-            WidgetsetCDNExtension, project)
+    private final PropertyState<Boolean> proxyEnabled = project.property(Boolean)
+    private final PropertyState<Integer> proxyPort = project.property(Integer)
+    private final PropertyState<String> proxyScheme = project.property(String)
+    private final PropertyState<String> proxyHost = project.property(String)
+    private final PropertyState<AuthConfig> proxyAuth = project.property(AuthConfig)
 
-    @PackageScope
-    def queryWidgetsetRequest = { version, style ->
+    private Closure<Map> queryWidgetsetRequest = { version, style ->
         Set addons = Util.findAddonsInProject(project)
         project.logger.info("Querying widgetset with addons $addons")
 
@@ -97,11 +101,10 @@ class CompileWidgetsetTask extends DefaultTask {
         ]
     }
 
-    /**
+    /*
      * HTTP POST request sent to CDN for downloading a widgetset.
      */
-    @PackageScope
-    def downloadWidgetsetRequest = { version, style ->
+    private Closure<Map> downloadWidgetsetRequest = { version, style ->
         [
             path: '/api/compiler/download',
             body: [
@@ -114,11 +117,10 @@ class CompileWidgetsetTask extends DefaultTask {
         ]
     }
 
-    /**
+    /*
      * Called by the downloadWidgetsetRequest once the response with the zipped contents arrive
      */
-    @PackageScope
-    def writeWidgetsetToFileSystem = { HttpResponseDecorator response, ZipInputStream zipStream ->
+    private Closure<Void> writeWidgetsetToFileSystem = { HttpResponseDecorator response, ZipInputStream zipStream ->
 
         // Check for redirect
         if ( response.status == 307 ) {
@@ -231,22 +233,26 @@ class CompileWidgetsetTask extends DefaultTask {
             inputs.files(project.configurations[GradleVaadinPlugin.CONFIGURATION_CLIENT])
 
             // Monitor changes in client side classes and resources
+            String publicFolderPattern = '**/*/public/**/*.*'
+            String gwtModulePattern = '**/*/*.gwt.xml'
+            String clientPackagePattern = '**/*/client/**/*.java'
+            String sharedPackagePattern = '**/*/shared/**/*.java'
             project.sourceSets.main.java.srcDirs.each {
-                inputs.files(project.fileTree(it.absolutePath).include('**/*/client/**/*.java'))
-                inputs.files(project.fileTree(it.absolutePath).include('**/*/shared/**/*.java'))
-                inputs.files(project.fileTree(it.absolutePath).include(PUBLIC_FOLDER_PATTERN))
-                inputs.files(project.fileTree(it.absolutePath).include(GWT_MODULE_XML_PATTERN))
+                inputs.files(project.fileTree(it.absolutePath).include(clientPackagePattern))
+                inputs.files(project.fileTree(it.absolutePath).include(sharedPackagePattern))
+                inputs.files(project.fileTree(it.absolutePath).include(publicFolderPattern))
+                inputs.files(project.fileTree(it.absolutePath).include(gwtModulePattern))
             }
 
             //Monitor changes in resources
             project.sourceSets.main.resources.srcDirs.each {
-                inputs.files(project.fileTree(it.absolutePath).include(PUBLIC_FOLDER_PATTERN))
-                inputs.files(project.fileTree(it.absolutePath).include(GWT_MODULE_XML_PATTERN))
+                inputs.files(project.fileTree(it.absolutePath).include(publicFolderPattern))
+                inputs.files(project.fileTree(it.absolutePath).include(gwtModulePattern))
             }
 
             // Add classpath jar
             if ( project.vaadin.useClassPathJar ) {
-                BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
+                BuildClassPathJar pathJarTask = project.tasks.getByName(BuildClassPathJar.NAME)
                 inputs.file(pathJarTask.archivePath)
             }
 
@@ -258,8 +264,11 @@ class CompileWidgetsetTask extends DefaultTask {
         }
     }
 
+    /**
+     * Compiles the widgetset either remotely or locally
+     */
     @TaskAction
-    def run() {
+    void run() {
         if ( getWidgetsetCDN() ) {
             compileRemotely()
             return
@@ -269,236 +278,6 @@ class CompileWidgetsetTask extends DefaultTask {
         if ( widgetset ) {
             compileLocally(widgetset)
         }
-    }
-
-    /**
-     * Compiles the widgetset on the remote CDN
-     */
-    @PackageScope compileRemotely() {
-
-        // Ensure widgetset directory exists
-        Util.getWidgetsetDirectory(project).mkdirs()
-
-        def timeout = TimeUnit.MINUTES.toMillis(5)
-
-        while(true) {
-            def widgetsetInfo = queryRemoteWidgetset()
-            def status = widgetsetInfo.status as String
-            switch(status) {
-                case 'NOT_FOUND':
-                case 'UNKNOWN':
-                case 'ERROR':
-                    throw new GradleException("Failed to compile widgetset with CDN with the status $status")
-                case 'QUEUED':
-                case 'COMPILING':
-                case 'COMPILED':
-                    logger.info("Widgetset is compiling with status $status. " +
-                            "Waiting 10 seconds and querying again.")
-                    int timeoutInterval = TimeUnit.SECONDS.toMillis(10)
-                    if ( timeout > 0 ) {
-                        sleep(timeoutInterval)
-                        timeout -= timeoutInterval
-                    } else {
-                        throw new GradleException('Waiting for widgetset to compile timed out. ' +
-                                'Please try again at a later time.')
-                    }
-                    break
-                case 'AVAILABLE':
-                    logger.info('Widgetset is available, downloading...')
-                    downloadWidgetset()
-                    return
-            }
-        }
-    }
-
-    /**
-     * Compiles the widgetset locally
-     */
-    @PackageScope compileLocally(String widgetset = Util.getWidgetset(project)) {
-
-        // Re-create directory
-        Util.getWidgetsetDirectory(project).mkdirs()
-
-        FileCollection classpath = Util.getCompileClassPathOrJar(project)
-
-        // Add client dependencies missing from the classpath jar
-        classpath += Util.getClientCompilerClassPath(project).filter { File file ->
-            if ( file.name.endsWith('.jar') ) {
-                // Add GWT compiler + deps
-                if ( file.name.startsWith('vaadin-client' ) ||
-                        file.name.startsWith('vaadin-shared') ||
-                        file.name.startsWith('vaadin-compatibility-client') ||
-                        file.name.startsWith('vaadin-compatibility-shared') ||
-                        file.name.startsWith('validation-api')) {
-                    return true
-                }
-
-                // Addons with client side widgetset
-                JarFile jar = new JarFile(file.absolutePath)
-
-                if ( !jar.manifest ) {
-                    return false
-                }
-
-                Attributes attributes = jar.manifest.mainAttributes
-                return attributes.getValue('Vaadin-Widgetsets')
-            }
-            true
-        }
-
-        // Ensure gwt sdk libs are in the correct order
-        if ( getGwtSdkFirstInClasspath() ) {
-            classpath = Util.moveGwtSdkFirstInClasspath(project, classpath)
-        }
-
-        def widgetsetCompileProcess = [Util.getJavaBinary(project)]
-
-        if ( getJvmArgs() ) {
-            widgetsetCompileProcess += getJvmArgs() as List
-        }
-
-        widgetsetCompileProcess += ['-cp',  classpath.asPath]
-
-        widgetsetCompileProcess += ["-Dgwt.persistentunitcachedir=${project.buildDir.canonicalPath}"]
-
-        widgetsetCompileProcess += 'com.google.gwt.dev.Compiler'
-
-        widgetsetCompileProcess += ['-style', getStyle()]
-        widgetsetCompileProcess += ['-optimize', getOptimize()]
-        widgetsetCompileProcess += ['-war', Util.getWidgetsetDirectory(project).canonicalPath]
-        widgetsetCompileProcess += ['-logLevel', getLogLevel()]
-        widgetsetCompileProcess += ['-localWorkers', getLocalWorkers()]
-        widgetsetCompileProcess += ['-workDir', project.buildDir.canonicalPath + File.separator + 'tmp']
-
-        if ( getDraftCompile() ) {
-            widgetsetCompileProcess += '-draftCompile'
-        }
-
-        if ( getStrict() ) {
-            widgetsetCompileProcess += '-strict'
-        }
-
-        if ( getExtraArgs() ) {
-            widgetsetCompileProcess += getExtraArgs() as List
-        }
-
-        widgetsetCompileProcess += widgetset
-
-        def Process process = widgetsetCompileProcess.execute([], project.buildDir)
-        def failed = false
-        Util.logProcess(project, process, 'widgetset-compile.log') { String output ->
-            // Monitor log for errors
-            if ( output.trim().startsWith('[ERROR]') ) {
-                failed = true
-                return false
-            }
-            true
-        }
-
-        // Block
-        def result = process.waitFor()
-
-        /*
-         * Compiler generates an extra WEB-INF folder into the widgetsets folder. Remove it.
-         */
-        new File(Util.getWidgetsetDirectory(project), 'WEB-INF').deleteDir()
-
-        if ( failed || result != 0 ) {
-            // Terminate build
-            throw new GradleException('Widgetset failed to compile. See error log.')
-        }
-    }
-
-    /**
-     * Queries the CDN fro a widgetset
-     *
-     * @return
-     *      Returns the status json
-     */
-    @PackageScope queryRemoteWidgetset() {
-        logger.info("Querying widgetset for Vaadin "+Util.getResolvedVaadinVersion(project))
-        def client = new RESTClient(WIDGETSET_CDN_URL)
-        configureClient(client)
-
-        def request = queryWidgetsetRequest(
-                Util.getResolvedVaadinVersion(project),
-                getStyle()
-        )
-        def response = client.post(request)
-        response.data
-    }
-
-    /**
-     * Downloads the widgetset from the CDN
-     *
-     * @return
-     *      Returns a stream with the widgetset files
-     */
-    @PackageScope ZipInputStream downloadWidgetset() {
-        makeClient(WIDGETSET_CDN_URL).post(downloadWidgetsetRequest(
-            Util.getResolvedVaadinVersion(project),
-            getStyle()
-        ), writeWidgetsetToFileSystem)
-    }
-
-    /**
-     * Uses a GET request to download the zip
-     * @param url
-     *      the full URL of the zip archive
-     * @return
-     */
-    @PackageScope ZipInputStream downloadWidgetsetZip(String url) {
-        makeClient(url).get([:], writeWidgetsetToFileSystem)
-    }
-
-    /**
-     * Creates a new Rest client
-     * @param url
-     *      the base url of the client
-     * @return
-     *      the client
-     */
-    @PackageScope RESTClient makeClient(String url) {
-        RESTClient client = new RESTClient(url)
-        client.headers['User-Agent'] = getUA()
-        client.headers['Accept'] = 'application/x-zip'
-        client.parser.'application/x-zip' = { response ->
-            new ZipInputStream(response.entity.content)
-        }
-        client.parser.'application/zip' = { response ->
-            new ZipInputStream(response.entity.content)
-        }
-        configureClient(client)
-        client
-    }
-
-    @PackageScope configureClient(RESTClient client) {
-
-        // Proxy support
-        if(widgetsetCDNConfig.proxyEnabled) {
-            client.ignoreSSLIssues()
-            client.setProxy(
-                    widgetsetCDNConfig.proxyHost,
-                    widgetsetCDNConfig.proxyPort,
-                    widgetsetCDNConfig.proxyScheme
-            )
-            if(widgetsetCDNConfig.proxyAuth) {
-                client.setAuthConfig(widgetsetCDNConfig.proxyAuth)
-            }
-        }
-    }
-
-    @PackageScope static String getUA() {
-        StringBuilder ua = new StringBuilder('VWSCDN-1.0.gradle (')
-        ua.append(
-                System.properties
-                .subMap(['os.name', 'os.arch', 'os.version', 'java.runtime.name', 'java.version'])
-                .values()
-                .join('/')
-        )
-        ua.append(';')
-        ua.append(DigestUtils.md5Hex(System.properties['user.name']))
-        ua.toString()
     }
 
     /**
@@ -779,5 +558,343 @@ class CompileWidgetsetTask extends DefaultTask {
      */
     void setWidgetsetGenerator(String generator) {
         widgetsetGenerator.set(generator)
+    }
+
+    /**
+     * Should the widgetset compiler use a proxy
+     */
+    Boolean getProxyEnabled() {
+        proxyEnabled.get()
+    }
+
+    /**
+     * Should the widgetset compiler use a proxy
+     */
+    void setProxyEnabled(Boolean proxyEnabled) {
+        this.proxyEnabled.set(proxyEnabled)
+    }
+
+    /**
+     * Should the widgetset compiler use a proxy
+     */
+    void setProxyEnabled(Provider<Boolean> proxyEnabled) {
+        this.proxyEnabled.set(proxyEnabled)
+    }
+
+    /**
+     * The proxy port
+     */
+    Integer getProxyPort() {
+        proxyPort.get()
+    }
+
+    /**
+     * The proxy port
+     */
+    void setProxyPort(Integer proxyPort) {
+        this.proxyPort.set(proxyPort)
+    }
+
+    /**
+     * The proxy port
+     */
+    void setProxyPort(Provider<Integer> proxyPort) {
+        this.proxyPort.set(proxyPort)
+    }
+
+    /**
+     * The proxy scheme
+     */
+    String getProxyScheme() {
+        proxyScheme.get()
+    }
+
+    /**
+     * The proxy scheme
+     */
+    void setProxyScheme(String proxyScheme) {
+        this.proxyScheme.set(proxyScheme)
+    }
+
+    /**
+     * The proxy scheme
+     */
+    void setProxyScheme(Provider<String> proxyScheme) {
+        this.proxyScheme.set(proxyScheme)
+    }
+
+    /**
+     * The proxy url
+     */
+    String getProxyHost() {
+        proxyHost.get()
+    }
+
+    /**
+     * The proxy url
+     */
+    void setProxyHost(String proxyHost) {
+        this.proxyHost.set(proxyHost)
+    }
+
+    /**
+     * The proxy url
+     */
+    void setProxyHost(Provider<String> proxyHost) {
+        this.proxyHost.set(proxyHost)
+    }
+
+    /**
+     * Proxy authentication configuration
+     */
+    AuthConfig getProxyAuth() {
+        proxyAuth.getOrNull()
+    }
+
+    /**
+     * Proxy authentication configuration
+     */
+    void setProxyAuth(AuthConfig proxyAuth) {
+        this.proxyAuth.set(proxyAuth)
+    }
+
+    /**
+     * Proxy authentication configuration
+     */
+    void setProxyAuth(Provider<AuthConfig> proxyAuth) {
+        this.proxyAuth.set(proxyAuth)
+    }
+
+    /*
+     * Creates a new Rest client
+     *
+     * @param url
+     *      the base url of the client
+     * @return
+     *      the client
+     */
+    private RESTClient makeClient(String url) {
+        RESTClient client = new RESTClient(url)
+        client.headers['User-Agent'] = getUA()
+        client.headers['Accept'] = 'application/x-zip'
+        client.parser.'application/x-zip' = { response ->
+            new ZipInputStream(response.entity.content)
+        }
+        client.parser.'application/zip' = { response ->
+            new ZipInputStream(response.entity.content)
+        }
+        configureClient(client)
+        client
+    }
+
+    /*
+     * Configures the client with properties from the extension
+     *
+     * @param extension
+     *      the extension to get the properties from
+     * @param client
+     *      the REST client
+     */
+    private void configureClient(RESTClient client) {
+        if(getProxyEnabled()) {
+            client.ignoreSSLIssues()
+            client.setProxy(getProxyHost(), getProxyPort(), getProxyScheme())
+            if(getProxyAuth()) {
+                client.setAuthConfig(getProxyAuth())
+            }
+        }
+    }
+
+    /*
+     * Get the User-Agent for the Gradle client
+     */
+    @Memoized
+    private static String getUA() {
+        StringBuilder ua = new StringBuilder("VWSCDN-1.0.gradle-${GradleVaadinPlugin.version} (")
+        ua.append(
+                System.properties
+                        .subMap(['os.name', 'os.arch', 'os.version', 'java.runtime.name', 'java.version'])
+                        .values()
+                        .join('/')
+        )
+        ua.append(';')
+        ua.append(DigestUtils.md5Hex(System.properties['user.name']?.toString()))
+        ua.toString()
+    }
+
+
+    /*
+     * Compiles the widgetset on the remote CDN
+     */
+    private void compileRemotely() {
+
+        // Ensure widgetset directory exists
+        Util.getWidgetsetDirectory(project).mkdirs()
+
+        long timeout = TimeUnit.MINUTES.toMillis(5)
+
+        while(true) {
+            Map widgetsetInfo = queryRemoteWidgetset()
+            String status = widgetsetInfo.status as String
+            switch(status) {
+                case 'NOT_FOUND':
+                case 'UNKNOWN':
+                case 'ERROR':
+                    throw new GradleException("Failed to compile widgetset with CDN with the status $status")
+                case 'QUEUED':
+                case 'COMPILING':
+                case 'COMPILED':
+                    logger.info("Widgetset is compiling with status $status. " +
+                            "Waiting 10 seconds and querying again.")
+                    long timeoutInterval = TimeUnit.SECONDS.toMillis(10)
+                    if ( timeout > 0 ) {
+                        sleep(timeoutInterval)
+                        timeout -= timeoutInterval
+                    } else {
+                        throw new GradleException('Waiting for widgetset to compile timed out. ' +
+                                'Please try again at a later time.')
+                    }
+                    break
+                case 'AVAILABLE':
+                    logger.info('Widgetset is available, downloading...')
+                    downloadWidgetset()
+                    return
+            }
+        }
+    }
+
+    /*
+     * Compiles the widgetset locally
+     */
+    private void compileLocally(String widgetset = Util.getWidgetset(project)) {
+
+        // Re-create directory
+        Util.getWidgetsetDirectory(project).mkdirs()
+
+        FileCollection classpath = Util.getCompileClassPathOrJar(project)
+
+        // Add client dependencies missing from the classpath jar
+        classpath += Util.getClientCompilerClassPath(project).filter { File file ->
+            if ( file.name.endsWith('.jar') ) {
+                // Add GWT compiler + deps
+                if ( file.name.startsWith('vaadin-client' ) ||
+                        file.name.startsWith('vaadin-shared') ||
+                        file.name.startsWith('vaadin-compatibility-client') ||
+                        file.name.startsWith('vaadin-compatibility-shared') ||
+                        file.name.startsWith('validation-api')) {
+                    return true
+                }
+
+                // Addons with client side widgetset
+                JarFile jar = new JarFile(file.absolutePath)
+
+                if ( !jar.manifest ) {
+                    return false
+                }
+
+                Attributes attributes = jar.manifest.mainAttributes
+                return attributes.getValue('Vaadin-Widgetsets')
+            }
+            true
+        }
+
+        // Ensure gwt sdk libs are in the correct order
+        if ( getGwtSdkFirstInClasspath() ) {
+            classpath = Util.moveGwtSdkFirstInClasspath(project, classpath)
+        }
+
+        List widgetsetCompileProcess = [Util.getJavaBinary(project)]
+
+        if ( getJvmArgs() ) {
+            widgetsetCompileProcess += getJvmArgs() as List
+        }
+
+        widgetsetCompileProcess += ['-cp',  classpath.asPath]
+
+        widgetsetCompileProcess += ["-Dgwt.persistentunitcachedir=${project.buildDir.canonicalPath}"]
+
+        widgetsetCompileProcess += 'com.google.gwt.dev.Compiler'
+
+        widgetsetCompileProcess += ['-style', getStyle()]
+        widgetsetCompileProcess += ['-optimize', getOptimize()]
+        widgetsetCompileProcess += ['-war', Util.getWidgetsetDirectory(project).canonicalPath]
+        widgetsetCompileProcess += ['-logLevel', getLogLevel()]
+        widgetsetCompileProcess += ['-localWorkers', getLocalWorkers()]
+        widgetsetCompileProcess += ['-workDir', project.buildDir.canonicalPath + File.separator + 'tmp']
+
+        if ( getDraftCompile() ) {
+            widgetsetCompileProcess += '-draftCompile'
+        }
+
+        if ( getStrict() ) {
+            widgetsetCompileProcess += '-strict'
+        }
+
+        if ( getExtraArgs() ) {
+            widgetsetCompileProcess += getExtraArgs() as List
+        }
+
+        widgetsetCompileProcess += widgetset
+
+        Process process = widgetsetCompileProcess.execute([], project.buildDir)
+        boolean failed = false
+        Util.logProcess(project, process, 'widgetset-compile.log') { String output ->
+            // Monitor log for errors
+            if ( output.trim().startsWith('[ERROR]') ) {
+                failed = true
+                return false
+            }
+            true
+        }
+
+        // Block
+        int result = process.waitFor()
+
+        /*
+         * Compiler generates an extra WEB-INF folder into the widgetsets folder. Remove it.
+         */
+        new File(Util.getWidgetsetDirectory(project), 'WEB-INF').deleteDir()
+
+        if ( failed || result != 0 ) {
+            // Terminate build
+            throw new GradleException('Widgetset failed to compile. See error log.')
+        }
+    }
+
+    /*
+     * Queries the CDN fro a widgetset
+     */
+    private Map queryRemoteWidgetset() {
+        logger.info('Querying widgetset for Vaadin ' + Util.getResolvedVaadinVersion(project))
+        RESTClient client = new RESTClient(WIDGETSET_CDN_URL)
+
+        configureClient(client)
+
+        Map request = queryWidgetsetRequest(Util.getResolvedVaadinVersion(project), getStyle())
+        HttpResponseDecorator response = client.post(request)
+        response.data as Map
+    }
+
+    /*
+     * Downloads the widgetset from the CDN
+     *
+     * @return
+     *      Returns a stream with the widgetset files
+     */
+    private void downloadWidgetset() {
+        makeClient(WIDGETSET_CDN_URL).post(downloadWidgetsetRequest(
+                Util.getResolvedVaadinVersion(project),
+                getStyle()
+        ), writeWidgetsetToFileSystem)
+    }
+
+    /*
+     * Uses a GET request to download the zip
+     *
+     * @param url
+     *      the full URL of the zip archive
+     */
+    protected void downloadWidgetsetZip(String url) {
+        makeClient(url).get([:], writeWidgetsetToFileSystem)
     }
 }

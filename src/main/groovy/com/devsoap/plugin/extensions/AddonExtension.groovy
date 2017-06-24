@@ -21,30 +21,18 @@ import org.gradle.api.provider.Provider
 
 /**
  * Configuration options for addon projects
+ *
+ * @author John Ahlroos
+ * @since 1.2
  */
 class AddonExtension {
 
     static final String NAME = 'vaadinAddon'
 
-    /**
-     * the author of the addon
-     */
-    final PropertyState<String> author
-
-    /**
-     * The licence for the addon
-     */
-    final PropertyState<String> license
-
-    /**
-     * The title of the addon as it should appear in the directory
-     */
-    final PropertyState<String> title
-
-    /**
-     * Array of paths (eg. /VAADIN/addons/myaddon/myaddon.scss) to stylesheets packaged with the addon
-     */
-    final PropertyState<List<String>> styles
+    private final PropertyState<String> author
+    private final PropertyState<String> license
+    private final PropertyState<String> title
+    private final PropertyState<List<String>> styles
 
     AddonExtension(Project project) {
         author = project.property(String)

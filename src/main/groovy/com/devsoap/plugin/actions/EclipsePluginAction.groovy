@@ -25,6 +25,9 @@ import org.gradle.plugins.ide.eclipse.model.EclipseModel
 
 /**
  * Actions applied when the eclipse plugin is applied
+ *
+ * @author John Ahlroos
+ * @since 1.2
  */
 class EclipsePluginAction extends PluginAction {
 
@@ -72,7 +75,8 @@ class EclipsePluginAction extends PluginAction {
             cp.defaultOutputDir = project.file(runTask.classesDir)
         }
     }
-/**
+
+    /**
      * Adds a dependency configuration to the eclipse project classpath
      *
      * @param project
@@ -82,8 +86,7 @@ class EclipsePluginAction extends PluginAction {
      * @param deploy
      *      also add to wtp deployment assembly
      */
-    @PackageScope
-    static void addConfigurationToProject(Project project, String conf) {
+    private static void addConfigurationToProject(Project project, String conf) {
         EclipseModel eclipse = project.extensions.getByType(EclipseModel)
         EclipseClasspath cp = eclipse.classpath
         cp.plusConfigurations += [project.configurations[conf]]

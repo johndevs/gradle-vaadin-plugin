@@ -16,51 +16,65 @@
 package com.devsoap.plugin.testbench
 
 import com.devsoap.plugin.Util
+import com.devsoap.plugin.extensions.TestBenchExtension
+import com.devsoap.plugin.extensions.TestBenchHubExtension
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
+import org.gradle.api.provider.PropertyState
 
 /**
  * Represents a Testbench Hub
  *
  * @author John Ahlroos
+ * @since 1.1
  */
 class TestbenchHub {
 
     private final Project project
+    private Process process
 
-    private process
+    private final PropertyState<String> host
+    private final PropertyState<Integer> port
 
     TestbenchHub(Project project) {
         this.project = project
+
+        TestBenchHubExtension extension = project.extensions.getByType(TestBenchHubExtension)
+
+        host = project.property(String)
+        host.set(extension.hostProvider)
+
+        port = project.property(Integer)
+        port.set(extension.portProvider)
     }
 
-    public start() {
-
-        def host = project.vaadinTestbenchHub.host
-        def port = project.vaadinTestbenchHub.port
+    /**
+     * Starts the Testbench hub
+     */
+    void start() {
 
         File logDir = project.file('build/testbench/')
         logDir.mkdirs()
 
-        FileCollection cp = project.configurations['vaadin-testbench'] + Util.getClassPath(project)
+        FileCollection cp = project.configurations['vaadin-testbench'] + Util.getWarClasspath(project)
 
-        process = [Util.getJavaBinary(project)]
+        List processList = [Util.getJavaBinary(project)]
 
-        process.add('-cp')
-        process.add(cp.getAsPath())
+        processList.add('-cp')
+        processList.add(cp.getAsPath())
 
-        process.add('org.openqa.grid.selenium.GridLauncher')
-        process.add('-role')
-        process.add('hub')
+        processList.add('org.openqa.grid.selenium.GridLauncher')
+        processList.add('-role')
+        processList.add('hub')
 
-        process.add('-host')
-        process.add(host)
+        processList.add('-host')
+        processList.add(host.get())
 
-        process.add('-port')
-        process.add(port)
+        processList.add('-port')
+        processList.add(port.get().toString())
 
         // Execute server
-        process = process.execute([], project.buildDir)
+        process = processList.execute([], project.buildDir)
 
         if ( project.vaadin.logToConsole ) {
             process.consumeProcessOutput(System.out, System.out)
@@ -75,7 +89,10 @@ class TestbenchHub {
         project.logger.lifecycle("Testbench Hub started on http://$host:$port")
     }
 
-    public terminate() {
+    /**
+     * Terminates the testbench hub
+     */
+    void terminate() {
         process.in.close()
         process.out.close()
         process.err.close()
@@ -85,4 +102,31 @@ class TestbenchHub {
         project.logger.lifecycle("Testbench hub terminated")
     }
 
+    /**
+     * Get the hostname or IP address of the hub
+     */
+    String getHost() {
+        host.get()
+    }
+
+    /**
+     * Set the hostname or IP address of the hub
+     */
+    void setHost(String host) {
+        this.host.set(host)
+    }
+
+    /**
+     * Get the port of the hub
+     */
+    Integer getPort() {
+        port.get()
+    }
+
+    /**
+     * Set the port of the hub
+     */
+    void setPort(Integer port) {
+        this.port.set(port)
+    }
 }
