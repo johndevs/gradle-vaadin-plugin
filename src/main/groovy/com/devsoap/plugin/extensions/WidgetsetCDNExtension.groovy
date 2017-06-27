@@ -18,19 +18,20 @@ package com.devsoap.plugin.extensions
 import groovyx.net.http.AuthConfig
 import org.gradle.api.Project
 import org.gradle.api.provider.PropertyState
+import org.gradle.api.provider.Provider
 
 /**
- * Created by john on 1/19/17.
+ * Configuration class for Vaadin CDN
  */
 class WidgetsetCDNExtension {
 
-    static final String NAME = 'widgetsetCDNConfig'
+    static final String NAME = 'vaadinCDN'
 
-    final PropertyState<Boolean> proxyEnabled
-    final PropertyState<Integer> proxyPort
-    final PropertyState<String> proxyScheme
-    final PropertyState<String> proxyHost
-    final PropertyState<AuthConfig> proxyAuth
+    private final PropertyState<Boolean> proxyEnabled
+    private final PropertyState<Integer> proxyPort
+    private final PropertyState<String> proxyScheme
+    private final PropertyState<String> proxyHost
+    private final PropertyState<AuthConfig> proxyAuth
 
     WidgetsetCDNExtension(Project project){
         proxyEnabled = project.property(Boolean)
@@ -54,6 +55,13 @@ class WidgetsetCDNExtension {
     }
 
     /**
+     * Should the widgetset compiler use a proxy value provider
+     */
+    Provider<Boolean> getProxyEnabledProvider() {
+        proxyEnabled
+    }
+
+    /**
      * Should the widgetset compiler use a proxy
      */
     void setProxyEnabled(Boolean enabled) {
@@ -65,6 +73,13 @@ class WidgetsetCDNExtension {
      */
     Integer getProxyPort() {
         proxyPort.get()
+    }
+
+    /**
+     * The proxy port value provider
+     */
+    Provider<Integer> getProxyPortProvider() {
+        proxyPort
     }
 
     /**
@@ -84,6 +99,13 @@ class WidgetsetCDNExtension {
     /**
      * The proxy scheme
      */
+    Provider<String> getProxySchemeProvider() {
+        proxyScheme
+    }
+
+    /**
+     * The proxy scheme
+     */
     void setProxyScheme(String scheme) {
         proxyScheme.set(scheme)
     }
@@ -98,6 +120,13 @@ class WidgetsetCDNExtension {
     /**
      * The proxy url
      */
+    Provider<String> getProxyHostProvider() {
+        proxyHost
+    }
+
+    /**
+     * The proxy url
+     */
     void setProxyHost(String host) {
         proxyHost.set(host)
     }
@@ -107,6 +136,13 @@ class WidgetsetCDNExtension {
      */
     AuthConfig getProxyAuth() {
         proxyAuth.getOrNull()
+    }
+
+    /**
+     * Proxy authentication configuration
+     */
+    Provider<AuthConfig> getProxyAuthProvider() {
+        proxyAuth
     }
 
     /**

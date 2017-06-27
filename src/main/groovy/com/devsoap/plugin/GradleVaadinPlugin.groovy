@@ -29,7 +29,7 @@ import com.devsoap.plugin.extensions.TestBenchHubExtension
 import com.devsoap.plugin.extensions.TestBenchNodeExtension
 import com.devsoap.plugin.extensions.AddonExtension
 import com.devsoap.plugin.extensions.VaadinPluginExtension
-
+import com.devsoap.plugin.extensions.WidgetsetCDNExtension
 import com.devsoap.plugin.servers.ApplicationServer
 import com.devsoap.plugin.tasks.BuildClassPathJar
 import com.devsoap.plugin.tasks.BuildJavadocJarTask
@@ -168,6 +168,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
         project.extensions.create(TestBenchExtension.NAME, TestBenchExtension, project)
         project.extensions.create(TestBenchHubExtension.NAME, TestBenchHubExtension, project)
         project.extensions.create(TestBenchNodeExtension.NAME, TestBenchNodeExtension, project)
+        project.extensions.create(WidgetsetCDNExtension.NAME, WidgetsetCDNExtension, project)
 
         // Configure plugins
         new JavaPluginAction().apply(project)
@@ -514,7 +515,15 @@ class GradleVaadinPlugin implements Plugin<Project> {
         addTask(project, CreateWidgetsetGeneratorTask.NAME, CreateWidgetsetGeneratorTask,VAADIN_TASK_GROUP)
         addTask(project, CreateDesignTask.NAME, CreateDesignTask, VAADIN_TASK_GROUP)
 
-        addTask(project, CompileWidgetsetTask.NAME, CompileWidgetsetTask, VAADIN_TASK_GROUP)
+        addTask(project, CompileWidgetsetTask.NAME, CompileWidgetsetTask, VAADIN_TASK_GROUP) {
+            CompileWidgetsetTask task ->
+                WidgetsetCDNExtension cdn = project.extensions.getByType(WidgetsetCDNExtension)
+                task.proxyEnabled = cdn.proxyEnabledProvider
+                task.proxyAuth = cdn.proxyAuthProvider
+                task.proxyHost = cdn.proxyHostProvider
+                task.proxyScheme = cdn.proxySchemeProvider
+                task.proxyPort = cdn.proxyPortProvider
+        }
         addTask(project, DevModeTask.NAME, DevModeTask, VAADIN_TASK_GROUP)
         addTask(project, SuperDevModeTask.NAME, SuperDevModeTask, VAADIN_TASK_GROUP)
         addTask(project, CompileThemeTask.NAME, CompileThemeTask, VAADIN_TASK_GROUP) { CompileThemeTask task ->

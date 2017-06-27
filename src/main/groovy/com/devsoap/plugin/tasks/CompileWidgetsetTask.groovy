@@ -22,6 +22,7 @@ import com.devsoap.plugin.Util
 
 import com.devsoap.plugin.extensions.WidgetsetCDNExtension
 import groovy.transform.PackageScope
+import groovyx.net.http.AuthConfig
 import groovyx.net.http.ContentType
 import groovyx.net.http.HttpResponseDecorator
 import groovyx.net.http.RESTClient
@@ -30,6 +31,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.PropertyState
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.TaskAction
 
@@ -73,6 +75,12 @@ class CompileWidgetsetTask extends DefaultTask {
     final PropertyState<Boolean> manageWidgetset = project.property(Boolean)
     final PropertyState<String> widgetset = project.property(String)
     final PropertyState<String> widgetsetGenerator = project.property(String)
+
+    private final PropertyState<Boolean> proxyEnabled = project.property(Boolean)
+    private final PropertyState<Integer> proxyPort = project.property(Integer)
+    private final PropertyState<String> proxyScheme = project.property(String)
+    private final PropertyState<String> proxyHost = project.property(String)
+    private final PropertyState<AuthConfig> proxyAuth = project.property(AuthConfig)
 
     final WidgetsetCDNExtension widgetsetCDNConfig =  extensions.create(WidgetsetCDNExtension.NAME,
             WidgetsetCDNExtension, project)
@@ -473,17 +481,11 @@ class CompileWidgetsetTask extends DefaultTask {
     }
 
     @PackageScope configureClient(RESTClient client) {
-
-        // Proxy support
-        if(widgetsetCDNConfig.proxyEnabled) {
+        if(getProxyEnabled()) {
             client.ignoreSSLIssues()
-            client.setProxy(
-                    widgetsetCDNConfig.proxyHost,
-                    widgetsetCDNConfig.proxyPort,
-                    widgetsetCDNConfig.proxyScheme
-            )
-            if(widgetsetCDNConfig.proxyAuth) {
-                client.setAuthConfig(widgetsetCDNConfig.proxyAuth)
+            client.setProxy( getProxyHost(), getProxyPort(), getProxyScheme())
+            if(getProxyAuth()) {
+                client.authConfig = getProxyAuth()
             }
         }
     }
@@ -779,5 +781,110 @@ class CompileWidgetsetTask extends DefaultTask {
      */
     void setWidgetsetGenerator(String generator) {
         widgetsetGenerator.set(generator)
+    }
+
+    /**
+     * Should the widgetset compiler use a proxy
+     */
+    Boolean getProxyEnabled() {
+        proxyEnabled.get()
+    }
+
+    /**
+     * Should the widgetset compiler use a proxy
+     */
+    void setProxyEnabled(Boolean enabled) {
+        proxyEnabled.set(enabled)
+    }
+
+    /**
+     * Should the widgetset compiler use a proxy
+     */
+    void setProxyEnabled(Provider<Boolean> enabled) {
+        proxyEnabled.set(enabled)
+    }
+
+    /**
+     * The proxy port
+     */
+    Integer getProxyPort() {
+        proxyPort.get()
+    }
+
+    /**
+     * The proxy port
+     */
+    void setProxyPort(Integer port) {
+        proxyPort.set(port)
+    }
+
+    /**
+     * The proxy port
+     */
+    void setProxyPort(Provider<Integer> port) {
+        proxyPort.set(port)
+    }
+
+    /**
+     * The proxy scheme
+     */
+    String getProxyScheme() {
+        proxyScheme.get()
+    }
+
+    /**
+     * The proxy scheme
+     */
+    void setProxyScheme(String scheme) {
+        proxyScheme.set(scheme)
+    }
+
+    /**
+     * The proxy scheme
+     */
+    void setProxyScheme(Provider<String> scheme) {
+        proxyScheme.set(scheme)
+    }
+
+    /**
+     * The proxy url
+     */
+    String getProxyHost() {
+        proxyHost.get()
+    }
+
+    /**
+     * The proxy url
+     */
+    void setProxyHost(String host) {
+        proxyHost.set(host)
+    }
+
+    /**
+     * The proxy url
+     */
+    void setProxyHost(Provider<String> host) {
+        proxyHost.set(host)
+    }
+
+    /**
+     * Proxy authentication configuration
+     */
+    AuthConfig getProxyAuth() {
+        proxyAuth.getOrNull()
+    }
+
+    /**
+     * Proxy authentication configuration
+     */
+    void setProxyAuth(AuthConfig auth) {
+        proxyAuth.set(auth)
+    }
+
+    /**
+     * Proxy authentication configuration
+     */
+    void setProxyAuth(Provider<AuthConfig> auth) {
+        proxyAuth.set(auth)
     }
 }
