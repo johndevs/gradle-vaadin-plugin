@@ -28,6 +28,7 @@ plugins {
     id 'codenarc'
     id 'com.jfrog.bintray' version '1.6'
     id 'com.gradle.plugin-publish' version '0.9.1'
+    id 'checkstyle'
 }
 
 /***********************************************************************************************************************
@@ -230,9 +231,12 @@ task proxyTest(type:Test, dependsOn: ['test','jar']) {
 check.dependsOn 'proxyTest'
 
 
-/**
- * Code formatting configurations with Codenarc
- */
+/***********************************************************************************************************************
+ *
+ * Quality
+ *
+ ***********************************************************************************************************************/
+
 codenarc{
     toolVersion = '0.27.0'
     configFile = rootProject.file('config/codenarc/ruleset.groovy')
@@ -243,6 +247,22 @@ codenarc{
         configFile = rootProject.file('config/codenarc/ruleset-test.groovy')
     }
 }
+
+checkstyle {
+    configDir = rootProject.file('config/checkstyle')
+}
+
+plugins.withType(GroovyBasePlugin) {
+    sourceSets.all { sourceSet ->
+        task "${sourceSet.getTaskName('checkstyle', 'groovy')}"(type: Checkstyle) {
+            configFile = rootProject.file('config/checkstyle/checkstyle.xml')
+            source sourceSet.allGroovy
+            classpath = sourceSet.compileClasspath
+            reports.xml.destination rootProject.file("build/reports/checkstyle/${sourceSet.name}.xml")
+        }
+    }
+}
+
 
 /***********************************************************************************************************************
  *
