@@ -5,4 +5,9 @@
     <module name="RegexpHeader">
         <property name="headerFile" value="${config_loc}/required-header.txt"/>
     </module>
+    <module name="TreeWalker">
+        <module name="JavadocType">
+            <property name="authorFormat" value="\S"/>
+        </module>
+    </module>
 </module>
