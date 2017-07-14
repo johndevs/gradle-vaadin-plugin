@@ -22,8 +22,7 @@ import com.devsoap.plugin.actions.JavaPluginAction
 import com.devsoap.plugin.actions.SpringBootAction
 import com.devsoap.plugin.actions.VaadinPluginAction
 import com.devsoap.plugin.actions.WarPluginAction
-
-
+import com.devsoap.plugin.extensions.VaadinSpringBootExtension
 import com.devsoap.plugin.extensions.TestBenchExtension
 import com.devsoap.plugin.extensions.TestBenchHubExtension
 import com.devsoap.plugin.extensions.TestBenchNodeExtension
@@ -237,6 +236,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
         project.extensions.create(TestBenchExtension.NAME, TestBenchExtension, project)
         project.extensions.create(TestBenchHubExtension.NAME, TestBenchHubExtension, project)
         project.extensions.create(TestBenchNodeExtension.NAME, TestBenchNodeExtension, project)
+        project.extensions.create(VaadinSpringBootExtension.NAME, VaadinSpringBootExtension, project)
 
         // Configure plugins
         new JavaPluginAction().apply(project)
@@ -511,8 +511,12 @@ class GradleVaadinPlugin implements Plugin<Project> {
             conf.description = 'Libraries needed when running with Spring Boot'
             conf.defaultDependencies { dependencies ->
                 if(project.pluginManager.hasPlugin(SPRING_BOOT_PLUGIN)){
+                    String springBootStarterVersion = project
+                            .vaadinSpringBoot
+                            .starterVersion?:
+                            '2.+'
                     Dependency springBootStarter = projectDependencies.create(
-                            'com.vaadin:vaadin-spring-boot-starter:2.1.+')
+                            "com.vaadin:vaadin-spring-boot-starter:${springBootStarterVersion}")
                     dependencies.add(springBootStarter)
                 }
             }
