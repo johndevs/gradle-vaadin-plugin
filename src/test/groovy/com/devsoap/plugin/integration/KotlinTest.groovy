@@ -6,28 +6,14 @@ import org.junit.Test
 import java.nio.file.Paths
 
 import static org.junit.Assert.assertTrue
-import static org.junit.Assert.assertTrue
-import static org.junit.Assert.assertTrue
 
 /**
- * Created by john on 5/31/17.
+ * Tests Kotlin project creation and usage
  */
-class KotlinTest extends IntegrationTest {
+class KotlinTest extends KotlinIntegrationTest {
 
-    @Override
-    protected void applyThirdPartyPlugins(File buildFile) {
-        super.applyThirdPartyPlugins(buildFile)
-
-        buildFile << """
-           plugins {
-                id "org.jetbrains.kotlin.jvm" version "1.1.2-5"
-           }
-
-           dependencies {
-                compile "org.jetbrains.kotlin:kotlin-stdlib:1.1.2-5"
-           }
-
-        """.stripIndent()
+    KotlinTest(String kotlinVersion) {
+        super(kotlinVersion)
     }
 
     @Test void 'Create project'() {

@@ -109,7 +109,7 @@ class IntegrationTest {
             repositories {
                 flatDir dirs:file('$escapedDir')
             }
-        """
+        """.stripIndent()
     }
 
     protected void applyPlugin(File buildFile) {
