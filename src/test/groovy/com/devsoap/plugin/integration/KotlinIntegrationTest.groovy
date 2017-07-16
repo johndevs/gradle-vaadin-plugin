@@ -1,24 +1,16 @@
 package com.devsoap.plugin.integration
 
 import com.devsoap.plugin.extensions.VaadinPluginExtension
-import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
 
 /**
  * Base class for testing building projects with Kotlin and Kotlin DSL
  */
-@RunWith(Parameterized)
 class KotlinIntegrationTest extends IntegrationTest {
 
     final String kotlinVersion
 
     KotlinIntegrationTest(String kotlinVersion) {
         this.kotlinVersion = kotlinVersion
-    }
-
-    @Parameterized.Parameters(name = "Kotlin {0}")
-    static Collection<String> getKotlinVersions() {
-        [ '1.1.3-2']
     }
 
     @Override
@@ -35,10 +27,7 @@ class KotlinIntegrationTest extends IntegrationTest {
         buildFile.createNewFile()
 
         // Imports
-        buildFile << """
-            import $VaadinPluginExtension.canonicalName
-        """.stripIndent()
-
+        applyImports(buildFile)
 
         // Apply plugin to project
         buildFile << "buildscript {\n"
@@ -123,6 +112,12 @@ class KotlinIntegrationTest extends IntegrationTest {
              classpath("org.codehaus.groovy.modules.http-builder:http-builder:0.7.1")
              classpath("com.devsoap.plugin:gradle-vaadin-plugin:$projectVersion")
              classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
+        """.stripIndent()
+    }
+
+    protected void applyImports(File buildFile) {
+        buildFile << """
+            import $VaadinPluginExtension.canonicalName
         """.stripIndent()
     }
 }
