@@ -512,7 +512,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
             conf.defaultDependencies { dependencies ->
                 if(project.pluginManager.hasPlugin(SPRING_BOOT_PLUGIN)){
                     Dependency springBootStarter = projectDependencies.create(
-                            'com.vaadin:vaadin-spring-boot-starter:2.0-SNAPSHOT')
+                            'com.vaadin:vaadin-spring-boot-starter:2.1.+')
                     dependencies.add(springBootStarter)
                 }
             }
