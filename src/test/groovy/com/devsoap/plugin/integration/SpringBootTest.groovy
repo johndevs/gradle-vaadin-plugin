@@ -61,4 +61,13 @@ class SpringBootTest extends IntegrationTest {
                 '--dependency', 'vaadin-spring-boot-starter')
         assertTrue dependencyInfo.contains('com.vaadin:vaadin-spring-boot-starter:2.')
     }
+
+    @Test void 'Use custom Spring Boot starter version'() {
+        buildFile << "vaadinSpringBoot.starterVersion = '2.0.0'\n"
+
+        String dependencyInfo = runWithArguments('dependencyInsight',
+                '--configuration', GradleVaadinPlugin.CONFIGURATION_SPRING_BOOT,
+                '--dependency', 'vaadin-spring-boot-starter')
+        assertTrue dependencyInfo.contains('com.vaadin:vaadin-spring-boot-starter:2.0.0')
+    }
 }

@@ -22,7 +22,7 @@ import com.devsoap.plugin.actions.JavaPluginAction
 import com.devsoap.plugin.actions.SpringBootAction
 import com.devsoap.plugin.actions.VaadinPluginAction
 import com.devsoap.plugin.actions.WarPluginAction
-import com.devsoap.plugin.extensions.VaadinSpringBootExtension
+import com.devsoap.plugin.extensions.SpringBootExtension
 import com.devsoap.plugin.extensions.TestBenchExtension
 import com.devsoap.plugin.extensions.TestBenchHubExtension
 import com.devsoap.plugin.extensions.TestBenchNodeExtension
@@ -236,7 +236,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
         project.extensions.create(TestBenchExtension.NAME, TestBenchExtension, project)
         project.extensions.create(TestBenchHubExtension.NAME, TestBenchHubExtension, project)
         project.extensions.create(TestBenchNodeExtension.NAME, TestBenchNodeExtension, project)
-        project.extensions.create(VaadinSpringBootExtension.NAME, VaadinSpringBootExtension, project)
+        project.extensions.create(SpringBootExtension.NAME, SpringBootExtension, project)
 
         // Configure plugins
         new JavaPluginAction().apply(project)
@@ -511,12 +511,9 @@ class GradleVaadinPlugin implements Plugin<Project> {
             conf.description = 'Libraries needed when running with Spring Boot'
             conf.defaultDependencies { dependencies ->
                 if(project.pluginManager.hasPlugin(SPRING_BOOT_PLUGIN)){
-                    String springBootStarterVersion = project
-                            .vaadinSpringBoot
-                            .starterVersion?:
-                            '2.+'
+                    SpringBootExtension extension = project.extensions.getByType(SpringBootExtension)
                     Dependency springBootStarter = projectDependencies.create(
-                            "com.vaadin:vaadin-spring-boot-starter:${springBootStarterVersion}")
+                            "com.vaadin:vaadin-spring-boot-starter:${extension.starterVersion}")
                     dependencies.add(springBootStarter)
                 }
             }
