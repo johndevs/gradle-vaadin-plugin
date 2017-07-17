@@ -1,5 +1,6 @@
 package com.devsoap.plugin.integration
 
+import com.devsoap.plugin.GradleVaadinPlugin
 import org.junit.Test
 
 import static org.junit.Assert.assertFalse
@@ -52,5 +53,12 @@ class SpringBootTest extends IntegrationTest {
         assertTrue output.contains('Applying SpringBootAction')
         assertTrue output.contains('Applying WarPluginAction')
         assertTrue output.contains('Applying VaadinPluginAction')
+    }
+
+    @Test void 'Spring Boot Vaadin starter is included'() {
+        String dependencyInfo = runWithArguments('dependencyInsight',
+                '--configuration', GradleVaadinPlugin.CONFIGURATION_SPRING_BOOT,
+                '--dependency', 'vaadin-spring-boot-starter')
+        assertTrue dependencyInfo.contains('com.vaadin:vaadin-spring-boot-starter:2.')
     }
 }
