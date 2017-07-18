@@ -21,6 +21,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.PropertyState
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -33,8 +34,17 @@ class SuperDevModeTask extends DefaultTask {
 
     static final String NAME = 'vaadinSuperDevMode'
 
-    private Process codeserverProcess
-    private ApplicationServer serverInstance
+    /**
+     * The code server process running code server. Internal only, made public so cleanup thread can clean it up.
+     */
+    @Internal
+    Process codeserverProcess
+
+    /**
+     * The server instance of the running server. Internal only, made public so cleanup thread can clean it up.
+     */
+    @Internal
+    ApplicationServer serverInstance
 
     private final PropertyState<String> server = project.property(String)
     private final PropertyState<Boolean> debug = project.property(Boolean)
