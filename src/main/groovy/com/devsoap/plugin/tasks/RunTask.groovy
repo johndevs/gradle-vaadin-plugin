@@ -20,6 +20,7 @@ import com.devsoap.plugin.servers.ApplicationServer
 import org.gradle.api.DefaultTask
 import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.provider.PropertyState
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -32,7 +33,11 @@ class RunTask extends DefaultTask {
 
     static final String NAME = 'vaadinRun'
 
-    private ApplicationServer serverInstance
+    /**
+     * The server instance of the running server. Internal only, made public so cleanup thread can clean it up.
+     */
+    @Internal
+    ApplicationServer serverInstance
 
     /**
      * Should the server be stopped after it has been started

@@ -20,6 +20,7 @@ import com.devsoap.plugin.Util
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.provider.PropertyState
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -32,10 +33,19 @@ import org.gradle.api.tasks.TaskAction
 @Deprecated
 class DevModeTask extends DefaultTask {
 
-    public static final String NAME = 'vaadinDevMode'
+    static final String NAME = 'vaadinDevMode'
 
-    private Process devModeProcess
-    private ApplicationServer serverInstance
+    /**
+     * The development mode process. Internal only, made public so cleanup thread can clean it up.
+     */
+    @Internal
+    Process devModeProcess
+
+    /**
+     * The server instance of the running server. Internal only, made public so cleanup thread can clean it up.
+     */
+    @Internal
+    ApplicationServer serverInstance
 
     private final PropertyState<String> server = project.property(String)
     private final PropertyState<Boolean> debug = project.property(Boolean)
