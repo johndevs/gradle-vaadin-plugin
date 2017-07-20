@@ -17,6 +17,7 @@ package com.devsoap.plugin.tasks
 
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.bundling.Jar
+import org.gradle.api.tasks.javadoc.Javadoc
 
 /**
  * Builds the Javadoc jar
@@ -29,10 +30,14 @@ class BuildJavadocJarTask extends Jar {
 
     static final String NAME = 'vaadinJavadocJar'
 
+    private static final String JAVADOC_TASK_NAME = 'javadoc'
+
     BuildJavadocJarTask() {
         description = 'Creates a javadoc jar for the project'
-        classifier = 'javadoc'
-        dependsOn project.tasks.javadoc
-        from project.tasks.javadoc.destinationDir
+        classifier = JAVADOC_TASK_NAME
+        dependsOn JAVADOC_TASK_NAME
+        project.tasks.getByName(JAVADOC_TASK_NAME) { Javadoc task ->
+            from task.destinationDir
+        }
     }
 }

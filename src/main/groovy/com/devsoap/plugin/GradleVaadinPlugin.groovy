@@ -261,13 +261,6 @@ class GradleVaadinPlugin implements Plugin<Project> {
         new EclipsePluginAction().apply(project)
         new EclipseWtpPluginAction().apply(project)
 
-        // Utilities
-        def tasks = project.tasks
-        ArtifactHandler artifacts = project.artifacts
-        String archivesArtifactsName = 'archives'
-        artifacts.add(archivesArtifactsName, tasks[BuildSourcesJarTask.NAME])
-        artifacts.add(archivesArtifactsName, tasks[BuildJavadocJarTask.NAME])
-
         project.afterEvaluate { Project p ->
             String v = Util.getVaadinVersion(p)
             if ( v?.startsWith('6') ) {

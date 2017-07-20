@@ -32,7 +32,7 @@ import org.gradle.api.tasks.TaskAction
  */
 class CreateProjectTask extends DefaultTask {
 
-    static final NAME = 'vaadinCreateProject'
+    static final String NAME = 'vaadinCreateProject'
 
     private static final String DOT = '.'
 
