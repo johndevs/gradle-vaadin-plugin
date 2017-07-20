@@ -511,8 +511,12 @@ class GradleVaadinPlugin implements Plugin<Project> {
                 }
             }
 
+            // Needed so bootRepackage can include all dependencies in Jar
+            conf.extendsFrom(project.configurations['compile'], project.configurations['runtime'])
+
             sources.compileClasspath += conf
             testSources.compileClasspath += conf
+
         }
 
         // Ensure vaadin version is correct across configurations

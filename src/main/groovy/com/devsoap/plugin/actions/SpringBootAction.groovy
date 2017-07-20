@@ -38,6 +38,7 @@ class SpringBootAction extends PluginAction {
 
     private static final String BOOT_RUN_TASK = 'bootRun'
     private static final String BOOT_REPACKAGE_TASK = 'bootRepackage'
+    private static final String JAR_TASK = 'jar'
 
     @Override
     String getPluginId() {
@@ -49,8 +50,9 @@ class SpringBootAction extends PluginAction {
         super.execute(project)
 
         // bootRun should build the widgetset and theme
+        project.tasks.findByName(JAR_TASK).dependsOn(CompileWidgetsetTask.NAME, CompileThemeTask.NAME)
         project.tasks.findByName(BOOT_REPACKAGE_TASK).dependsOn(CompileWidgetsetTask.NAME, CompileThemeTask.NAME)
-        project.tasks.findByName(BOOT_RUN_TASK).dependsOn(BOOT_REPACKAGE_TASK)
+        project.tasks.findByName(BOOT_RUN_TASK).dependsOn(CompileWidgetsetTask.NAME, CompileThemeTask.NAME)
 
         // Delegate to bootRun if spring boot is present
         project.tasks.findByName(RunTask.NAME).dependsOn(BOOT_RUN_TASK)
@@ -63,7 +65,10 @@ class SpringBootAction extends PluginAction {
             case BOOT_RUN_TASK:
                 configureBootRun(task)
                 break
-            case 'jar':
+            case BOOT_REPACKAGE_TASK:
+                configureBootRepackage(task)
+                break
+            case JAR_TASK:
                 configureJar(task)
                 break
             case 'javadoc':
@@ -76,6 +81,10 @@ class SpringBootAction extends PluginAction {
         Project project = task.project
         task.classpath = Util.getWarClasspath(project)
         task.classpath = task.classpath + (project.configurations[GradleVaadinPlugin.CONFIGURATION_SPRING_BOOT])
+    }
+
+    private static configureBootRepackage(Task task) {
+        task.customConfiguration = GradleVaadinPlugin.CONFIGURATION_SPRING_BOOT
     }
 
     private static configureJar(Task task) {
@@ -101,7 +110,7 @@ class SpringBootAction extends PluginAction {
             // Default is jar
             return true
         }
-        layout.toLowerCase() == 'jar'
+        layout.toLowerCase() == JAR_TASK
     }
 
 }
