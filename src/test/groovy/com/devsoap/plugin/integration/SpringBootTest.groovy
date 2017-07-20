@@ -39,6 +39,8 @@ class SpringBootTest extends IntegrationTest {
         assertTrue output.contains('Applying SpringBootAction')
         assertFalse output.contains('Applying WarPluginAction')
         assertTrue output.contains('Applying VaadinPluginAction')
+
+        assertTrue output.contains('Spring boot present, not applying WAR plugin by default.')
     }
 
     @Test void 'War is built if applied'() {
@@ -53,6 +55,8 @@ class SpringBootTest extends IntegrationTest {
         assertTrue output.contains('Applying SpringBootAction')
         assertTrue output.contains('Applying WarPluginAction')
         assertTrue output.contains('Applying VaadinPluginAction')
+
+        assertTrue output.contains('Spring boot present, not applying WAR plugin by default.')
     }
 
     @Test void 'Spring Boot Vaadin starter is included'() {

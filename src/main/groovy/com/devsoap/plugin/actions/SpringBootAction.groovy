@@ -36,7 +36,8 @@ import org.gradle.api.tasks.javadoc.Javadoc
  */
 class SpringBootAction extends PluginAction {
 
-    static final String BOOT_RUN_TASK = 'bootRun'
+    private static final String BOOT_RUN_TASK = 'bootRun'
+    private static final String BOOT_REPACKAGE_TASK = 'bootRepackage'
 
     @Override
     String getPluginId() {
@@ -48,7 +49,8 @@ class SpringBootAction extends PluginAction {
         super.execute(project)
 
         // bootRun should build the widgetset and theme
-        project.tasks.findByName(BOOT_RUN_TASK).dependsOn(CompileWidgetsetTask.NAME, CompressCssTask.NAME)
+        project.tasks.findByName(BOOT_REPACKAGE_TASK).dependsOn(CompileWidgetsetTask.NAME, CompileThemeTask.NAME)
+        project.tasks.findByName(BOOT_RUN_TASK).dependsOn(BOOT_REPACKAGE_TASK)
 
         // Delegate to bootRun if spring boot is present
         project.tasks.findByName(RunTask.NAME).dependsOn(BOOT_RUN_TASK)
@@ -82,10 +84,8 @@ class SpringBootAction extends PluginAction {
             Jar jar = (Jar) task
             // Include app theme + compiled widget as well as classes into our jar
             jar.from(Util.getWebAppDirectory(project))
-            // Compile theme and widgetset before creating jar
-            jar.dependsOn(CompileWidgetsetTask.NAME, CompileThemeTask.NAME)
             // Sprinkle some spring boot sugar on the jar to make it runnable
-            jar.finalizedBy(project.tasks.findByName('bootRepackage'))
+            jar.finalizedBy(project.tasks.findByName(BOOT_REPACKAGE_TASK))
         }
     }
 

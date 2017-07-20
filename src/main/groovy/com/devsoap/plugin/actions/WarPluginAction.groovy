@@ -40,16 +40,18 @@ class WarPluginAction extends PluginAction {
     @Override
     void apply(Project project) {
         super.apply(project)
-        if (!springBootPresent) {
+        if (!isSpringBootPresent(project)) {
             // Apply the WAR plugin if spring boot is not present
             project.plugins.apply(WarPlugin)
+        } else {
+            project.logger.info('Spring boot present, not applying WAR plugin by default.')
         }
     }
 
     @Override
     protected void execute(Project project) {
         super.execute(project)
-        War war = (War) project.tasks.getByName(WarPlugin.WAR_TASK_NAME)
+        War war = (War) project.tasks.getByName(pluginId)
         war.dependsOn(CompileWidgetsetTask.NAME)
         war.dependsOn(CompileThemeTask.NAME)
     }
@@ -58,7 +60,7 @@ class WarPluginAction extends PluginAction {
     protected void beforeTaskExecuted(Task task) {
         super.beforeTaskExecuted(task)
         switch (task.name) {
-            case 'war':
+            case pluginId:
                 configureWAR(task)
                 break
         }
@@ -73,12 +75,13 @@ class WarPluginAction extends PluginAction {
         }
     }
 
-    private boolean isSpringBootPresent() {
-        try {
-            getClass().classLoader.loadClass('org.springframework.boot.gradle.plugin.SpringBootPlugin')
-            return true
-        } catch (ClassNotFoundException e) {
-            return false
-        }
+    /**
+     * Is Spring Boot present in the project
+     *
+     * @param project
+     *      the project to check
+     */
+    static boolean isSpringBootPresent(Project project) {
+        project.extensions.findByName('springBoot')
     }
 }
