@@ -15,6 +15,8 @@
  */
 package com.devsoap.plugin.tasks
 
+import com.devsoap.plugin.ProjectType
+import com.devsoap.plugin.Util
 import org.gradle.api.tasks.bundling.Zip
 
 /**
@@ -28,18 +30,23 @@ class CreateDirectoryZipTask extends Zip {
     static final String NAME = 'vaadinAddonZip'
 
     CreateDirectoryZipTask() {
-
         description = 'Creates an addon Zip archive compatible with Vaadin Directory.'
 
         // Zip includes addon jar + sources + javadoc jars
-        from([project.tasks[BuildJavadocJarTask.NAME], project.tasks[BuildSourcesJarTask.NAME], project.tasks.jar]) {
-            into('libs')
-        }
+        from ({
+            if(Util.getProjectType(project) == ProjectType.JAVA) {
+                [project.tasks[BuildJavadocJarTask.NAME], project.tasks[BuildSourcesJarTask.NAME], project.tasks.jar]
+            } else {
+                [project.tasks[BuildSourcesJarTask.NAME], project.tasks.jar]
+            }
+        }) { into'libs' }
 
         // Include javadoc as files
-        from(project.tasks.javadoc.destinationDir) {
-            into('javadoc')
-        }
+        from ({
+            if (Util.getProjectType(project) == ProjectType.JAVA) {
+                return project.tasks.javadoc.destinationDir
+            }
+        }) { into 'javadoc'}
 
         // Include metadata
         from('build/tmp/zip')
