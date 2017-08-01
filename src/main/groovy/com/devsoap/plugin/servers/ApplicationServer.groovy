@@ -181,6 +181,8 @@ abstract class ApplicationServer {
             parameters.add('-ea')
         }
 
+        parameters.add("-Djava.io.tmpdir=${runTask.temporaryDir.canonicalPath}")
+
         parameters.add('-cp')
         parameters.add(classPath.asPath)
 
