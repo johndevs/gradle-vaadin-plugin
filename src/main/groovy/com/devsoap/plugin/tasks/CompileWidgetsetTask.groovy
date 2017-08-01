@@ -813,6 +813,8 @@ class CompileWidgetsetTask extends DefaultTask {
 
         widgetsetCompileProcess += ["-Dgwt.persistentunitcachedir=${project.buildDir.canonicalPath}"]
 
+        widgetsetCompileProcess += ["-Djava.io.tmpdir=${temporaryDir.canonicalPath}"]
+
         widgetsetCompileProcess += 'com.google.gwt.dev.Compiler'
 
         widgetsetCompileProcess += ['-style', getStyle()]

@@ -55,6 +55,8 @@ class CompileThemeTask extends DefaultTask {
     static final String STYLES_SCSS_PATTERN = '**/styles.scss'
 
     private static final String CLASSPATH_SWITCH = '-cp'
+    private static final String TEMPDIR_SWITCH = '-Djava.io.tmpdir'
+
     private static final String RUBY_MAIN_CLASS = 'org.jruby.Main'
     private static final String COMPASS_COMPILER = 'compass'
     private static final String LIBSASS_COMPILER = 'libsass'
@@ -284,7 +286,11 @@ class CompileThemeTask extends DefaultTask {
      *      the process that runs the compiler
      */
     private static Process executeVaadinSassCompiler(Project project, File themeDir, File targetCSSFile) {
+
+        CompileThemeTask compileThemeTask = project.tasks.getByName(CompileThemeTask.NAME)
+
         def compileProcess = [Util.getJavaBinary(project)]
+        compileProcess += ["$TEMPDIR_SWITCH=${compileThemeTask.temporaryDir.canonicalPath}"]
         compileProcess += [CLASSPATH_SWITCH,  Util.getCompileClassPathOrJar(project).asPath]
         compileProcess += 'com.vaadin.sass.SassCompiler'
         compileProcess += [themeDir.canonicalPath, targetCSSFile.canonicalPath]
@@ -420,7 +426,10 @@ class CompileThemeTask extends DefaultTask {
 
         project.logger.info("Compiling $themePath with compass compiler")
 
+        CompileThemeTask compileThemeTask = project.tasks.getByName(CompileThemeTask.NAME)
+
         def compileProcess = [Util.getJavaBinary(project)]
+        compileProcess += ["$TEMPDIR_SWITCH=${compileThemeTask.temporaryDir.canonicalPath}"]
         compileProcess += [CLASSPATH_SWITCH,  Util.getCompileClassPathOrJar(project).asPath]
         compileProcess += RUBY_MAIN_CLASS
         compileProcess += compassCompile.tokenize()
@@ -439,7 +448,10 @@ class CompileThemeTask extends DefaultTask {
 
         project.logger.info("Compiling $themeDir with libsass compiler")
 
+        CompileThemeTask compileThemeTask = project.tasks.getByName(CompileThemeTask.NAME)
+
         def compileProcess = [Util.getJavaBinary(project)]
+        compileProcess += ["$TEMPDIR_SWITCH=${compileThemeTask.temporaryDir.canonicalPath}"]
         compileProcess += [CLASSPATH_SWITCH,  Util.getCompileClassPathOrJar(project).asPath]
         compileProcess += 'com.devsoap.plugin.LibSassCompiler'
         compileProcess += [stylesScss.canonicalPath, stylesCss.canonicalPath, unpackedThemesDir.canonicalPath]

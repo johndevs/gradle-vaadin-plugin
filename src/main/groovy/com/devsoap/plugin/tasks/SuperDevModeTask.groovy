@@ -132,6 +132,7 @@ class SuperDevModeTask extends DefaultTask {
         FileCollection classpath = Util.getClientCompilerClassPath(project)
 
         List superdevmodeProcess = [Util.getJavaBinary(project)]
+        superdevmodeProcess += ["-Djava.io.tmpdir=${temporaryDir.canonicalPath}"]
         superdevmodeProcess += ['-cp', classpath.asPath]
         superdevmodeProcess += 'com.google.gwt.dev.codeserver.CodeServer'
         superdevmodeProcess += ['-bindAddress', getBindAddress()]

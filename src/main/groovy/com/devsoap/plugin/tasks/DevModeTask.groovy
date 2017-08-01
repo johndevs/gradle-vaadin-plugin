@@ -141,6 +141,7 @@ class DevModeTask extends DefaultTask {
         widgetsetDir.mkdirs()
 
         List devmodeProcess = [Util.getJavaBinary(project)]
+        devmodeProcess += ["-Djava.io.tmpdir=${temporaryDir.canonicalPath}"]
         devmodeProcess += ['-cp', classpath.asPath]
         devmodeProcess += 'com.google.gwt.dev.DevMode'
         devmodeProcess += Util.getWidgetset(project)
