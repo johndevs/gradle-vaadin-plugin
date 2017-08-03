@@ -97,6 +97,15 @@ class CreateThemeTest extends IntegrationTest {
         assertFalse 'Compiled theme should not exist', stylesCSS.exists()
     }
 
+    @Test void 'Use custom JVM args'() {
+        buildFile << """
+            vaadinThemeCompile{ 
+                jvmArgs = ['-Dfoo.bar=baz'] 
+        }""".stripIndent()
+
+        assertThemeCreatedAndCompiled()
+    }
+
     private void assertThemeCreatedAndCompiled(String themeName=null) {
         if ( themeName ) {
             runWithArguments(CreateThemeTask.NAME, "--name=$themeName")

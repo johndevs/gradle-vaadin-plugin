@@ -68,6 +68,7 @@ class CompileThemeTask extends DefaultTask {
     private final PropertyState<String> compiler = project.property(String)
     private final PropertyState<Boolean> compress = project.property(Boolean)
     private final PropertyState<Boolean> useClasspathJar = project.property(Boolean)
+    private final PropertyState<List<String>> jvmArgs = project.property(List)
 
     /**
      * Creates a new theme compilation task
@@ -178,6 +179,20 @@ class CompileThemeTask extends DefaultTask {
         useClasspathJar.set(enabled)
     }
 
+    /**
+     * Extra jvm arguments passed the JVM running the compiler
+     */
+    String[] getJvmArgs() {
+        jvmArgs.present ? jvmArgs.get().toArray(new String[jvmArgs.get().size()]) : null
+    }
+
+    /**
+     * Extra jvm arguments passed the JVM running the compiler
+     */
+    void setJvmArgs(String... args) {
+        jvmArgs.set(Arrays.asList(args))
+    }
+
     @TaskAction
     void exec() {
         compile(project)
@@ -286,10 +301,13 @@ class CompileThemeTask extends DefaultTask {
      *      the process that runs the compiler
      */
     private static Process executeVaadinSassCompiler(Project project, File themeDir, File targetCSSFile) {
-
         CompileThemeTask compileThemeTask = project.tasks.getByName(CompileThemeTask.NAME)
 
         def compileProcess = [Util.getJavaBinary(project)]
+        if ( compileThemeTask.getJvmArgs() ) {
+            compileProcess += compileThemeTask.getJvmArgs() as List
+        }
+
         compileProcess += ["$TEMPDIR_SWITCH=${compileThemeTask.temporaryDir.canonicalPath}"]
         compileProcess += [CLASSPATH_SWITCH,  Util.getCompileClassPathOrJar(project).asPath]
         compileProcess += 'com.vaadin.sass.SassCompiler'
@@ -428,7 +446,11 @@ class CompileThemeTask extends DefaultTask {
 
         CompileThemeTask compileThemeTask = project.tasks.getByName(CompileThemeTask.NAME)
 
-        def compileProcess = [Util.getJavaBinary(project)]
+        List compileProcess = [Util.getJavaBinary(project)]
+        if ( compileThemeTask.getJvmArgs() ) {
+            compileProcess += compileThemeTask.getJvmArgs() as List
+        }
+
         compileProcess += ["$TEMPDIR_SWITCH=${compileThemeTask.temporaryDir.canonicalPath}"]
         compileProcess += [CLASSPATH_SWITCH,  Util.getCompileClassPathOrJar(project).asPath]
         compileProcess += RUBY_MAIN_CLASS
@@ -450,7 +472,11 @@ class CompileThemeTask extends DefaultTask {
 
         CompileThemeTask compileThemeTask = project.tasks.getByName(CompileThemeTask.NAME)
 
-        def compileProcess = [Util.getJavaBinary(project)]
+        List compileProcess = [Util.getJavaBinary(project)]
+        if ( compileThemeTask.getJvmArgs() ) {
+            compileProcess += compileThemeTask.getJvmArgs() as List
+        }
+
         compileProcess += ["$TEMPDIR_SWITCH=${compileThemeTask.temporaryDir.canonicalPath}"]
         compileProcess += [CLASSPATH_SWITCH,  Util.getCompileClassPathOrJar(project).asPath]
         compileProcess += 'com.devsoap.plugin.LibSassCompiler'
