@@ -676,10 +676,8 @@ class Util {
             if(isResolvable(project, conf)){
                 conf.allDependencies.each { Dependency dependency ->
                     if (dependency.name.startsWith(artifactName)) {
-                        version = conf.resolvedConfiguration
-                                .resolvedArtifacts
-                                .find { it.name == artifactName }
-                                .moduleVersion.id.version
+                        version = conf.resolvedConfiguration.resolvedArtifacts
+                                .find { it.name == artifactName }?.moduleVersion?.id?.version
                     }
                 }
             }

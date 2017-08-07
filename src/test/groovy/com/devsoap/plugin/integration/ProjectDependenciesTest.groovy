@@ -1,7 +1,10 @@
 package com.devsoap.plugin.integration
 
+import com.devsoap.plugin.tasks.CompileWidgetsetTask
 import com.devsoap.plugin.tasks.CreateProjectTask
 import org.junit.Test
+
+import java.util.concurrent.TimeUnit
 
 import static org.junit.Assert.assertFalse
 import static org.junit.Assert.assertTrue
@@ -10,6 +13,17 @@ import static org.junit.Assert.assertTrue
  * Tests the injected dependencies
  */
 class ProjectDependenciesTest extends IntegrationTest {
+
+    @Override
+    protected void applyThirdPartyPlugins(File buildFile) {
+        super.applyThirdPartyPlugins(buildFile)
+
+        buildFile << """
+            plugins {
+                id "de.undercouch.download" version "3.2.0"
+            }
+        """.stripIndent()
+    }
 
     @Test void 'Project has Vaadin extension'() {
 
@@ -229,5 +243,22 @@ class ProjectDependenciesTest extends IntegrationTest {
         def result = runWithArguments('testMavenCentralLocal')
         assertTrue result, result.contains( 'Has Maven Central')
         assertTrue result, result.contains( 'Has Maven Local')
+    }
+
+    @Test void 'Dependency without version'() {
+        buildFile << """
+            String lib = 'libs/qrcode-2.1.jar'
+            dependencies {
+                 compile files(lib)
+            }
+            task downloadFile(type: de.undercouch.gradle.tasks.download.Download) {
+                src 'http://vaadin.com/nexus/content/repositories/vaadin-addons/' +
+                    'org/vaadin/addons/qrcode/2.1/qrcode-2.1.jar'
+                dest lib
+            }
+        """.stripIndent()
+
+        runWithArguments(CreateProjectTask.NAME, 'downloadFile')
+        runWithArguments('vaadinCompile')
     }
 }
