@@ -9,6 +9,7 @@ import java.util.jar.JarFile
 
 import static org.junit.Assert.assertFalse
 import static org.junit.Assert.assertNotNull
+import static org.junit.Assert.assertNull
 import static org.junit.Assert.assertTrue
 
 /**
@@ -83,32 +84,9 @@ class SpringBootTest extends IntegrationTest {
     @Test void 'Validate Spring Boot executable jar'() {
         buildFile << "vaadinCompile.widgetset = 'com.example.springboottest.MyWidgetset'\n"
 
-        runWithArguments(CreateProjectTask.NAME, '--name=SpringBootTest')
+        configureSpringBootProject()
 
-        File packageDir = Paths.get(projectDir.root.canonicalPath,
-                'src', 'main', 'java', 'com', 'example', 'springboottest').toFile()
-
-        File servlet = new File(packageDir, 'SpringBootTestServlet.java')
-        servlet.delete()
-
-        File ui = new File(packageDir, 'SpringBootTestUI.java')
-        ui.delete()
-
-        File appUI = new File(packageDir, 'MyAppUI.java')
-        appUI.text = getClass().getResource('/templates/SpringBootUI.java.template').text
-
-        File app = new File(packageDir, 'SpringBootApplication.java')
-        app.text = getClass().getResource('/templates/SpringBootApplication.java.template').text
-
-        buildFile << "springBoot.mainClass = 'com.example.springboottest.SpringBootApplication'\n"
-
-        runWithArguments('clean', 'bootRepackage')
-
-        File jarFile = Paths.get(projectDir.root.canonicalPath,
-                'build', 'libs', projectDir.root.name+'.jar').toFile()
-        assertTrue 'jar did not exist', jarFile.exists()
-
-        JarFile jar = new JarFile(jarFile)
+        JarFile jar = getSpringBootJar()
 
         // Libs
         assertNotNull 'vaadin-server not found in jar',
@@ -135,5 +113,49 @@ class SpringBootTest extends IntegrationTest {
                         'BOOT-INF/classes/com/example/springboottest/SpringBootApplication.class')}
         assertNotNull 'Spring Boot loader not found in jar',
                 jar.entries().find { it.name.startsWith('org/springframework/boot/loader/')}
+    }
+
+    @Test void 'Vaadin push dependencies are included'() {
+        configureSpringBootProject()
+        JarFile jar = getSpringBootJar()
+        assertNull 'vaadin-push should not be found in jar',
+                jar.entries().find { it.name.startsWith('BOOT-INF/lib/vaadin-push')}
+
+        buildFile << "vaadin.push = true\n"
+
+        jar = getSpringBootJar()
+        assertNotNull 'vaadin-push not found in jar',
+                jar.entries().find { it.name.startsWith('BOOT-INF/lib/vaadin-push')}
+    }
+
+    private JarFile getSpringBootJar() {
+        runWithArguments('clean', 'bootRepackage')
+
+        File jarFile = Paths.get(projectDir.root.canonicalPath,
+                'build', 'libs', projectDir.root.name+'.jar').toFile()
+        assertTrue 'jar did not exist', jarFile.exists()
+
+        new JarFile(jarFile)
+    }
+
+    private void configureSpringBootProject() {
+        runWithArguments(CreateProjectTask.NAME, '--name=SpringBootTest')
+
+        File packageDir = Paths.get(projectDir.root.canonicalPath,
+                'src', 'main', 'java', 'com', 'example', 'springboottest').toFile()
+
+        File servlet = new File(packageDir, 'SpringBootTestServlet.java')
+        servlet.delete()
+
+        File ui = new File(packageDir, 'SpringBootTestUI.java')
+        ui.delete()
+
+        File appUI = new File(packageDir, 'MyAppUI.java')
+        appUI.text = getClass().getResource('/templates/SpringBootUI.java.template').text
+
+        File app = new File(packageDir, 'SpringBootApplication.java')
+        app.text = getClass().getResource('/templates/SpringBootApplication.java.template').text
+
+        buildFile << "springBoot.mainClass = 'com.example.springboottest.SpringBootApplication'\n"
     }
 }
