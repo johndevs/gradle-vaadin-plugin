@@ -512,11 +512,14 @@ class GradleVaadinPlugin implements Plugin<Project> {
             }
 
             // Needed so bootRepackage can include all dependencies in Jar
-            conf.extendsFrom(project.configurations['compile'], project.configurations['runtime'])
+            conf.extendsFrom(
+                    project.configurations['compile'],
+                    project.configurations['runtime'],
+                    project.configurations[CONFIGURATION_PUSH]
+            )
 
             sources.compileClasspath += conf
             testSources.compileClasspath += conf
-
         }
 
         // Ensure vaadin version is correct across configurations
@@ -542,7 +545,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
         }
 
         config.resolutionStrategy.eachDependency({ DependencyResolveDetails details ->
-            def whitelist = [
+            List<String> whitelist = [
                     'com.vaadin:vaadin-client',
                     'com.vaadin:vaadin-client-compiled',
                     'com.vaadin:vaadin-client-compiler',
