@@ -673,9 +673,10 @@ class Util {
     static String getResolvedArtifactVersion(Project project, String artifactName, String defaultVersion=null) {
         String version = defaultVersion
         project.configurations.each { Configuration conf ->
-            if(isResolvable(project, conf)){
+            if(isResolvable(project, conf) && conf.state == Configuration.State.RESOLVED){
                 conf.allDependencies.each { Dependency dependency ->
                     if (dependency.name.startsWith(artifactName)) {
+                        // Calling resolvedConfiguration triggers resolution, be aware
                         version = conf.resolvedConfiguration.resolvedArtifacts
                                 .find { it.name == artifactName }?.moduleVersion?.id?.version
                     }
@@ -1051,7 +1052,7 @@ class Util {
      */
     @Memoized
     static boolean isResolvable(Project project, Configuration configuration) {
-        hasNonResolvableConfigurations(project) ? configuration.isCanBeResolved() : true
+        hasNonResolvableConfigurations(project) ? configuration.canBeResolved: true
     }
 
     /**
