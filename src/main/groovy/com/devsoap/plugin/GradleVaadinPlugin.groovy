@@ -17,6 +17,7 @@ package com.devsoap.plugin
 
 import com.devsoap.plugin.actions.EclipsePluginAction
 import com.devsoap.plugin.actions.EclipseWtpPluginAction
+import com.devsoap.plugin.actions.GrettyAction
 import com.devsoap.plugin.actions.IdeaPluginAction
 import com.devsoap.plugin.actions.JavaPluginAction
 import com.devsoap.plugin.actions.SpringBootAction
@@ -257,6 +258,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
         // Configure plugins that depends on tasks
         new SpringBootAction().apply(project)
+        new GrettyAction().apply(project)
         new IdeaPluginAction().apply(project)
         new EclipsePluginAction().apply(project)
         new EclipseWtpPluginAction().apply(project)
