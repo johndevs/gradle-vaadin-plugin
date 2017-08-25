@@ -404,8 +404,13 @@ class GradleVaadinPlugin implements Plugin<Project> {
         configurations.create(CONFIGURATION_RUN_SERVER) { conf ->
             conf.description = 'Libraries for running the embedded server'
             conf.defaultDependencies { dependencies ->
-                if(WarPluginAction.isSpringBootPresent(project)) {
+                if(SpringBootAction.isSpringBootPresent(project)) {
                     // No server runner is needed, spring boot will run the project
+                    return
+                }
+
+                if(GrettyAction.isGrettyPresent(project)) {
+                    // No server runner is needed, gretty will run the project
                     return
                 }
 
@@ -419,10 +424,10 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
                 // Add server dependencies
                 ApplicationServer.get(project, [:]).defineDependecies(projectDependencies, dependencies)
-            }
 
-            if(configurations.findByName(WarPlugin.PROVIDED_RUNTIME_CONFIGURATION_NAME)){
-                conf.extendsFrom(configurations.findByName(WarPlugin.PROVIDED_RUNTIME_CONFIGURATION_NAME))
+                if(configurations.findByName(WarPlugin.PROVIDED_RUNTIME_CONFIGURATION_NAME)){
+                    conf.extendsFrom(configurations.findByName(WarPlugin.PROVIDED_RUNTIME_CONFIGURATION_NAME))
+                }
             }
         }
 
@@ -505,21 +510,20 @@ class GradleVaadinPlugin implements Plugin<Project> {
         configurations.create(CONFIGURATION_SPRING_BOOT) { conf ->
             conf.description = 'Libraries needed when running with Spring Boot'
             conf.defaultDependencies { dependencies ->
-                if(project.pluginManager.hasPlugin(SPRING_BOOT_PLUGIN)){
+                if(SpringBootAction.isSpringBootPresent(project)){
                     SpringBootExtension extension = project.extensions.getByType(SpringBootExtension)
                     Dependency springBootStarter = projectDependencies.create(
                             "com.vaadin:vaadin-spring-boot-starter:${extension.starterVersion}")
                     dependencies.add(springBootStarter)
+
+                    // Needed so bootRepackage can include all dependencies in Jar
+                    conf.extendsFrom(
+                            project.configurations['compile'],
+                            project.configurations['runtime'],
+                            project.configurations[CONFIGURATION_PUSH]
+                    )
                 }
             }
-
-            // Needed so bootRepackage can include all dependencies in Jar
-            conf.extendsFrom(
-                    project.configurations['compile'],
-                    project.configurations['runtime'],
-                    project.configurations[CONFIGURATION_PUSH]
-            )
-
             sources.compileClasspath += conf
             testSources.compileClasspath += conf
         }

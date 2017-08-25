@@ -40,7 +40,7 @@ class WarPluginAction extends PluginAction {
     @Override
     void apply(Project project) {
         super.apply(project)
-        if (!isSpringBootPresent(project)) {
+        if (!SpringBootAction.isSpringBootPresent(project)) {
             // Apply the WAR plugin if spring boot is not present
             project.plugins.apply(WarPlugin)
         } else {
@@ -73,15 +73,5 @@ class WarPluginAction extends PluginAction {
         if ( task.project.vaadin.manageDependencies ) {
             war.classpath = Util.getWarClasspath(task.project).files
         }
-    }
-
-    /**
-     * Is Spring Boot present in the project
-     *
-     * @param project
-     *      the project to check
-     */
-    static boolean isSpringBootPresent(Project project) {
-        project.extensions.findByName('springBoot')
     }
 }

@@ -31,6 +31,7 @@ class GrettyAction extends PluginAction{
 
     private static final String GRETTY_CONFIGURATION = 'gretty'
     private static final String GRETTY_RUN_TASK = 'appRun'
+    private static final String GRETTY_EXTENSION = GRETTY_CONFIGURATION
 
     @Override
     String getPluginId() {
@@ -61,5 +62,15 @@ class GrettyAction extends PluginAction{
                 project.dependencies.add(GRETTY_CONFIGURATION, "$it.group:$it.name:$it.version")
             }
         }
+    }
+
+    /**
+     * Is Gretty present in the project
+     *
+     * @param project
+     *      the project to check
+     */
+    static boolean isGrettyPresent(Project project) {
+        project.extensions.findByName(GRETTY_EXTENSION)
     }
 }
