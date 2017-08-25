@@ -28,6 +28,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.DependencySet
 import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.file.FileCollection
+import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.SourceSetContainer
@@ -198,8 +199,8 @@ abstract class ApplicationServer {
         File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
         parameters.add(webAppDir.canonicalPath + File.separator)
 
-        SourceSetContainer sourceSets = project.sourceSets
-        SourceSet mainSourceSet = sourceSets.main
+        JavaPluginConvention java = project.convention.getPlugin(JavaPluginConvention)
+        SourceSet mainSourceSet = java.sourceSets.getByName('main')
 
         List<File> classesDirs = new ArrayList<>(mainSourceSet.output.classesDirs.toList())
         File resourcesDir = mainSourceSet.output.resourcesDir
@@ -434,6 +435,7 @@ abstract class ApplicationServer {
         if ( RUNTASK.classesDir && project.file(RUNTASK.classesDir).exists() ) {
             classesDirs.add(project.file(RUNTASK.classesDir))
         }
+
 
         classesDirs.addAll(project.sourceSets.main.output.classesDirs.toList())
 

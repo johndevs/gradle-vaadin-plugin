@@ -16,9 +16,13 @@
 package com.devsoap.plugin.actions
 
 import com.devsoap.plugin.GradleVaadinPlugin
+import com.devsoap.plugin.Util
 import com.devsoap.plugin.tasks.RunTask
 import groovy.transform.PackageScope
 import org.gradle.api.Project
+import org.gradle.api.file.SourceDirectorySet
+import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.tasks.SourceSet
 
 /**
  * Actions applied to project when idea plugin is applied
@@ -61,8 +65,8 @@ class IdeaPluginAction extends PluginAction {
             module.inheritOutputDirs = false
             RunTask runTask = project.tasks.getByName(RunTask.NAME)
             if ( runTask.classesDir == null ) {
-                module.outputDir = project.sourceSets.main.output.classesDir
-                module.testOutputDir = project.sourceSets.test.output.classesDir
+                module.outputDir = Util.getMainSourceSet(project).outputDir
+                module.testOutputDir = Util.getMainTestSourceSet(project).outputDir
             } else {
                 module.outputDir = project.file(runTask.classesDir)
                 module.testOutputDir = project.file(runTask.classesDir)
