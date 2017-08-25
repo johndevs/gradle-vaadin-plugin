@@ -39,6 +39,7 @@ class SpringBootAction extends PluginAction {
     private static final String BOOT_RUN_TASK = 'bootRun'
     private static final String BOOT_REPACKAGE_TASK = 'bootRepackage'
     private static final String JAR_TASK = 'jar'
+    private static final String SPRING_BOOT_EXTENSION = 'springBoot'
 
     @Override
     String getPluginId() {
@@ -105,12 +106,22 @@ class SpringBootAction extends PluginAction {
     }
 
     private static boolean isJarProject(Project project) {
-        String layout = project.extensions.findByName('springBoot').layout
+        String layout = project.extensions.findByName(SPRING_BOOT_EXTENSION).layout
         if (!layout) {
             // Default is jar
             return true
         }
         layout.toLowerCase() == JAR_TASK
+    }
+
+    /**
+     * Is Spring Boot present in the project
+     *
+     * @param project
+     *      the project to check
+     */
+    static boolean isSpringBootPresent(Project project) {
+        project.extensions.findByName(SPRING_BOOT_EXTENSION)
     }
 
 }
