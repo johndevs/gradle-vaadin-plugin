@@ -66,11 +66,18 @@ class CreateProjectTask extends DefaultTask {
     void run() {
         CompileWidgetsetTask compileWidgetsetTask = project.tasks.getByName(CompileWidgetsetTask.NAME)
 
+        String widgetset
+        if(widgetsetFQN) {
+            widgetset = widgetsetFQN
+        } else if(compileWidgetsetTask.widgetset) {
+            widgetset = compileWidgetsetTask.widgetset
+        }
+
         new ProjectCreator(
                 applicationName:resolveApplicationName(),
                 applicationPackage:resolveApplicationPackage(),
                 widgetsetCDN: compileWidgetsetTask.widgetsetCDN,
-                widgetsetFQN:widgetsetFQN,
+                widgetsetFQN:widgetset,
                 pushSupported:Util.isPushSupportedAndEnabled(project),
                 addonStylesSupported:Util.isAddonStylesSupported(project),
                 javaDir:Util.getMainSourceSet(project).srcDirs.first(),

@@ -804,7 +804,7 @@ class Util {
      */
     @Memoized
     static String getVaadinVersion(Project project) {
-        project.vaadin.version ?: '8.0.+'
+        project.vaadin.version ?: pluginProperties.getProperty('vaadin.defaultVersion')
     }
 
     /**
