@@ -16,7 +16,7 @@
 package com.devsoap.plugin.tasks
 
 import com.devsoap.plugin.Util
-
+import com.devsoap.plugin.actions.SpringBootAction
 import com.devsoap.plugin.creators.ProjectCreator
 import com.devsoap.plugin.creators.ThemeCreator
 import groovy.transform.PackageScope
@@ -76,7 +76,8 @@ class CreateProjectTask extends DefaultTask {
                 javaDir:Util.getMainSourceSet(project).srcDirs.first(),
                 resourceDir:project.sourceSets.main.resources.srcDirs.iterator().next(),
                 templateDir: 'simpleProject',
-                projectType: Util.getProjectType(project)
+                projectType: Util.getProjectType(project),
+                bootEnabled: SpringBootAction.isSpringBootPresent(project)
         ).run()
 
         new ThemeCreator(
