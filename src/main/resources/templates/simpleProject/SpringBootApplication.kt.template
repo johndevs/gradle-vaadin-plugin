@@ -1,0 +1,10 @@
+package ${applicationPackage}
+
+import org.springframework.boot.SpringApplication
+
+@org.springframework.boot.autoconfigure.SpringBootApplication
+open class ${applicationName}Application { }
+
+fun main(args: Array<String>) {
+    SpringApplication.run(${applicationName}Application::class.java, *args)
+}

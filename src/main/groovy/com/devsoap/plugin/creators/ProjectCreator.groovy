@@ -106,6 +106,17 @@ class ProjectCreator implements Runnable {
     Map<String, String> servletSubstitutions = [:]
 
     /**
+     * Spring boot substitutions
+     */
+    Map<String,String> bootSubstitutions = [:]
+
+    /**
+     * Generate spring boot files
+     */
+    boolean bootEnabled = false
+
+
+    /**
      * Creates a new project
      */
     @Override
@@ -113,9 +124,13 @@ class ProjectCreator implements Runnable {
 
         makeUIClass()
 
-        makeServletClass()
-
         makeBeansXML()
+
+        if(bootEnabled) {
+            makeSpringBootApplicationClass()
+        } else {
+            makeServletClass()
+        }
     }
 
     private File makeUIClass() {
@@ -132,11 +147,19 @@ class ProjectCreator implements Runnable {
             uiImports.add('com.vaadin.annotations.Theme')
         }
 
+        if(bootEnabled) {
+            uiImports.add('com.vaadin.spring.annotation.SpringUI')
+        }
+
         uiSubstitutions['imports'] = uiImports
 
         // Annotations
         if ( pushSupported ) {
             uiAnnotations.add('Push')
+        }
+
+        if(bootEnabled) {
+            uiAnnotations.add('SpringUI')
         }
 
         if ( addonStylesSupported ) {
@@ -226,6 +249,32 @@ class ProjectCreator implements Runnable {
 
     private File makeBeansXML() {
         TemplateUtil.writeTemplate("$templateDir/beans.xml", metaInfDir, 'beans.xml')
+    }
+
+    private File makeSpringBootApplicationClass() {
+
+        bootSubstitutions[APPLICATION_NAME_KEY] = applicationName
+        bootSubstitutions[APPLICATION_PACKAGE_KEY] = applicationPackage
+
+        File applicationClass
+        switch (projectType) {
+            case ProjectType.GROOVY:
+                TemplateUtil.writeTemplate("$templateDir/SpringBootApplication.groovy",
+                        UIDir, "${applicationName}Application.groovy", bootSubstitutions)
+                applicationClass = new File(UIDir, "${applicationName}Application.groovy")
+                break
+            case ProjectType.KOTLIN:
+                TemplateUtil.writeTemplate("$templateDir/SpringBootApplication.kt",
+                        UIDir, "${applicationName}Application.kt", bootSubstitutions)
+                applicationClass = new File(UIDir, "${applicationName}Application.kt")
+                break
+            case ProjectType.JAVA:
+                TemplateUtil.writeTemplate("$templateDir/SpringBootApplication.java",
+                        UIDir, "${applicationName}Application.java", bootSubstitutions)
+                applicationClass = new File(UIDir, "${applicationName}Application.java")
+        }
+
+        applicationClass
     }
 
     private File getUIDir() {
