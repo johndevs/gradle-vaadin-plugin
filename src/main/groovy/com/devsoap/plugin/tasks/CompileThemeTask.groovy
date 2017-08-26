@@ -387,7 +387,8 @@ class CompileThemeTask extends DefaultTask {
                                 def mf = jarStream.manifest
                                 def attributes = mf?.mainAttributes
                                 String value = attributes?.getValue(themesAttribute)
-                                Boolean themesValue = attributes?.getValue(bundleName) == 'vaadin-themes'
+                                Boolean themesValue = attributes?.getValue(bundleName) in ['vaadin-themes',
+                                                                                           'Vaadin Themes'] //since 8.1
                                 if ( value || themesValue ) {
                                     project.logger.info("Unpacking $file")
                                     project.copy {
