@@ -61,7 +61,11 @@ class SuperDevModeTask extends DefaultTask {
     private final PropertyState<List<String>> extraArgs = project.property(List)
     private final PropertyState<String> logLevel = project.property(String)
 
-    private Thread cleanupThread = new Thread({
+    /**
+     * Intern cleanup thread for when the JVM terminates. Needs to be public so it can be accessed from another thread.
+     */
+    @Internal
+    final Thread cleanupThread = new Thread({
         if ( codeserverProcess ) {
             codeserverProcess.destroy()
             codeserverProcess = null
