@@ -425,6 +425,11 @@ class GradleVaadinPlugin implements Plugin<Project> {
                 // Add server dependencies
                 ApplicationServer.get(project, [:]).defineDependecies(projectDependencies, dependencies)
 
+                // Add spring-reloaded for hotswapping
+                Dependency springLoaded = projectDependencies.create(
+                        "org.springframework:springloaded:${Util.pluginProperties.get('spring.loaded.version')}")
+                dependencies.add(springLoaded)
+
                 if(configurations.findByName(WarPlugin.PROVIDED_RUNTIME_CONFIGURATION_NAME)){
                     conf.extendsFrom(configurations.findByName(WarPlugin.PROVIDED_RUNTIME_CONFIGURATION_NAME))
                 }

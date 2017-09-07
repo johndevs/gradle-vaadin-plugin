@@ -16,6 +16,7 @@
 package com.devsoap.plugin
 
 import groovy.transform.CompileStatic
+import org.codehaus.groovy.runtime.StackTraceUtils
 import org.gradle.util.SingleMessageLogger
 
 /**
@@ -41,6 +42,18 @@ class MessageLogger {
      */
     static nagUserOfDiscontinuedProperty(String propertyName, String advice) {
         SingleMessageLogger.nagUserWith("The $propertyName property ${getDeprecationMessage()}. $advice")
+    }
+
+    /**
+     * Nag to user about deprecated property using a Throwable
+     *
+     * @param throwable
+     *      the throwable containing the method stacktrace as well as message
+     */
+    static nagUserOfDiscontinuedProperty(Throwable throwable) {
+        nagUserOfDiscontinuedProperty(
+                StackTraceUtils.sanitize(throwable).stackTrace[1].methodName,
+                throwable.message)
     }
 
     /**
