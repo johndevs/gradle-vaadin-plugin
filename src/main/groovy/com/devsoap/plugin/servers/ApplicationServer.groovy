@@ -17,7 +17,7 @@ package com.devsoap.plugin.servers
 
 import com.devsoap.plugin.GradleVaadinPlugin
 import com.devsoap.plugin.Util
-
+import com.devsoap.plugin.extensions.VaadinPluginExtension
 import com.devsoap.plugin.tasks.BuildClassPathJar
 import com.devsoap.plugin.tasks.CompileThemeTask
 import com.devsoap.plugin.tasks.CompressCssTask
@@ -51,7 +51,7 @@ abstract class ApplicationServer {
 
     private static final String JAR_FILE_POSTFIX = '.jar'
     private static final String AMPERSAND = '&'
-    private static final String RELOADING_SERVER_MESSAGE = 'Reloading server...'
+    private static final String MAIN_SOURCE_SET_NAME = 'main'
 
     /**
      * Creates a new application server
@@ -63,8 +63,7 @@ abstract class ApplicationServer {
      * @return
      *      returns the application server
      */
-    static ApplicationServer get(Project project,
-                                 Map browserParameters = [:]) {
+    static ApplicationServer get(Project project, Map browserParameters = [:]) {
         RunTask runTask = project.tasks.getByName(RunTask.NAME)
         switch(runTask.server) {
             case PayaraApplicationServer.NAME:
@@ -77,8 +76,6 @@ abstract class ApplicationServer {
     }
 
     Process process
-
-    boolean reloadInProgress = false
 
     final Project project
 
@@ -134,7 +131,8 @@ abstract class ApplicationServer {
      */
     FileCollection getClassPath() {
         FileCollection cp
-        if ( project.vaadin.useClassPathJar ) {
+        VaadinPluginExtension vaadin = project.extensions.getByType(VaadinPluginExtension)
+        if ( vaadin.useClassPathJar ) {
             BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
             cp = project.files(pathJarTask.archivePath)
         } else {
@@ -153,7 +151,7 @@ abstract class ApplicationServer {
      *      the classpath file
      */
     File makeClassPathFile(File buildDir) {
-        def buildClasspath = new File(buildDir, 'classpath.txt')
+        File buildClasspath = new File(buildDir, 'classpath.txt')
         buildClasspath.text = Util.getWarClasspath(project)
                 .filter { it.file && it.canonicalFile.name.endsWith(JAR_FILE_POSTFIX)}
                 .join(";")
@@ -177,6 +175,18 @@ abstract class ApplicationServer {
             parameters.add("-Xrunjdwp:transport=dt_socket,address=${runTask.debugPort},server=y,suspend=n")
         }
 
+        // Spring (re-)loaded
+        File springLoaded = classPath.find {it.name.startsWith('springloaded')}
+        if(springLoaded) {
+            project.logger.info("Using Spring Loaded found from ${springLoaded}")
+            parameters.add("-javaagent:${springLoaded.canonicalPath}")
+            parameters.add('-noverify')
+        } else {
+            project.logger.warn("Spring Loaded jar not found in vaadin-run-server configuration. Dynamic " +
+                    "reloading disabled.")
+        }
+
+
         // JVM options
         if ( runTask.debug ) {
             parameters.add('-ea')
@@ -193,22 +203,8 @@ abstract class ApplicationServer {
 
         // Program args
         parameters.add(serverRunner)
-
         parameters.add(runTask.serverPort.toString())
-
-        File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir
         parameters.add(webAppDir.canonicalPath + File.separator)
-
-        JavaPluginConvention java = project.convention.getPlugin(JavaPluginConvention)
-        SourceSet mainSourceSet = java.sourceSets.getByName('main')
-
-        List<File> classesDirs = new ArrayList<>(mainSourceSet.output.classesDirs.toList())
-        File resourcesDir = mainSourceSet.output.resourcesDir
-        if ( runTask.classesDir ) {
-            classesDirs.add(0, project.file(runTask.classesDir))
-            resourcesDir = project.file(runTask.classesDir)
-        }
-
         parameters.add(classesDirs.collect { it.canonicalPath + File.separator}.join(','))
         parameters.add(resourcesDir.canonicalPath + File.separator)
 
@@ -228,14 +224,12 @@ abstract class ApplicationServer {
     /**
      * Starts the server
      *
-     * @param firstStart
-     *      is this an initial start. <code>false</code> if the server is restarted.
      * @param stopAfterStart
      *      Should the server stop immediately after start. This is mostly used for tests.
      * @return
      *      <code>true</code> if the server started successfully.
      */
-    boolean start(boolean firstStart=false, boolean stopAfterStart=false) {
+    boolean start(boolean stopAfterStart=false) {
         if ( process ) {
             project.logger.error('Server is already running.')
             return false
@@ -250,9 +244,52 @@ abstract class ApplicationServer {
         def buildDir = new File(project.buildDir, serverName)
         makeClassPathFile(buildDir)
 
-        if ( executeServer(appServerProcess, firstStart) ) {
-            monitorLog(firstStart, stopAfterStart)
+        if ( executeServer(appServerProcess) ) {
+            monitorLog(stopAfterStart)
         }
+    }
+
+    /**
+     * Get the class directory directories.
+     *
+     * @return
+     *      a list of class directories
+     */
+    protected List<File> getClassesDirs() {
+        JavaPluginConvention java = project.convention.getPlugin(JavaPluginConvention)
+        SourceSet mainSourceSet = java.sourceSets.getByName(MAIN_SOURCE_SET_NAME)
+        List<File> classesDirs = new ArrayList<>(mainSourceSet.output.classesDirs.toList())
+        RunTask runTask = project.tasks.getByName(RunTask.NAME)
+        if ( runTask.classesDir ) {
+            classesDirs.add(0, project.file(runTask.classesDir))
+        }
+        classesDirs.findAll{ it.exists() }
+    }
+
+    /**
+     * Get the resource directory where project resources are located
+     *
+     * @return
+     *      the root directory for resources
+     */
+    protected File getResourcesDir() {
+        JavaPluginConvention java = project.convention.getPlugin(JavaPluginConvention)
+        SourceSet mainSourceSet = java.sourceSets.getByName(MAIN_SOURCE_SET_NAME)
+        RunTask runTask = project.tasks.getByName(RunTask.NAME)
+        if ( runTask.classesDir ) {
+            return project.file(runTask.classesDir)
+        }
+        mainSourceSet.output.resourcesDir
+    }
+
+    /**
+     * Get the web application dir where widgetset and theme are located
+     *
+     * @return
+     *      the root directory of the web app
+     */
+    protected File getWebAppDir() {
+        project.convention.getPlugin(WarPluginConvention).webAppDir
     }
 
     /**
@@ -260,12 +297,10 @@ abstract class ApplicationServer {
      *
      * @param appServerProcess
      *      the server process to execute
-     * @param firstStart
-     *      is this the first execution of the server
      * @return
      *      <code>true</code> if the server started successfully.
      */
-    protected boolean executeServer(List appServerProcess, boolean firstStart=false) {
+    protected boolean executeServer(List appServerProcess) {
         project.logger.debug("Running server with the command: "+appServerProcess)
         process = appServerProcess.execute([], project.buildDir)
 
@@ -276,18 +311,22 @@ abstract class ApplicationServer {
 
         // Watch for changes in classes
         RunTask runTask = project.tasks.getByName(RunTask.NAME)
-        if ( firstStart && runTask.serverRestart ) {
-            def self = this
-            GradleVaadinPlugin.THREAD_POOL.submit {
-                watchClassDirectoryForChanges(self)
-            }
-        }
 
         // Watch for changes in theme
-        if ( firstStart && runTask.themeAutoRecompile ) {
-            def self = this
+        def self = this
+        if (runTask.themeAutoRecompile ) {
+            CompileThemeTask compileThemeTask = project.tasks.getByName(CompileThemeTask.NAME)
             GradleVaadinPlugin.THREAD_POOL.submit {
-                watchThemeDirectoryForChanges(self)
+                watchThemeDirectoryForChanges(self) {
+
+                    // Recompile theme
+                    CompileThemeTask.compile(project, true)
+
+                    // Recompress theme
+                    if(compileThemeTask.compress){
+                        CompressCssTask.compress(project, true)
+                    }
+                }
             }
         }
         true
@@ -296,31 +335,25 @@ abstract class ApplicationServer {
     /**
      * Monitor the log for tokens
      *
-     * @param firstStart
-     *      is this the first execution of the server
      * @param stopAfterStart
      *      <code>true</code> if the server should stop right after it has started.
      */
-    protected void monitorLog(boolean firstStart=false, boolean stopAfterStart=false) {
+    protected void monitorLog(boolean stopAfterStart=false) {
         Util.logProcess(project, process, "${serverName}.log") { line ->
             if ( line.contains(successfullyStartedLogToken) ) {
-                if ( firstStart ) {
-                    RunTask runTask = project.tasks.getByName(RunTask.NAME)
-                    def resultStr = "Application running on http://localhost:${runTask.serverPort} "
-                    if ( runTask.debug ) {
-                        resultStr += "(debugger on ${runTask.debugPort})"
-                    }
-                    project.logger.lifecycle(resultStr)
-                    project.logger.lifecycle('Press [Ctrl+C] to terminate server...')
+                RunTask runTask = project.tasks.getByName(RunTask.NAME)
+                def resultStr = "Application running on http://localhost:${runTask.serverPort} "
+                if ( runTask.debug ) {
+                    resultStr += "(debugger on ${runTask.debugPort})"
+                }
+                project.logger.lifecycle(resultStr)
+                project.logger.lifecycle('Press [Ctrl+C] to terminate server...')
 
-                    if ( stopAfterStart ) {
-                        terminate()
-                        return false
-                    } else if ( runTask.openInBrowser ) {
-                        openBrowser()
-                    }
-                } else {
-                    project.logger.lifecycle("Server reload complete.")
+                if ( stopAfterStart ) {
+                    terminate()
+                    return false
+                } else if ( runTask.openInBrowser ) {
+                    openBrowser()
                 }
             }
 
@@ -363,28 +396,26 @@ abstract class ApplicationServer {
      *      <code>true</code> if the server should stop right after it has started.
      */
     protected void startAndBlock(boolean stopAfterStart=false) {
-        def firstStart = true
-
         while(true) {
             // Keep main loop running so runTask does not end. Task
             // shutdownhook will terminate server
 
-            if ( process != null ) {
+            if (process) {
                 // Process has not been terminated
                 project.logger.warn("Server process was not terminated cleanly before re-loading")
                 break
             }
 
             // Start server
-            start(firstStart, stopAfterStart)
-            firstStart = false
+            start(stopAfterStart)
 
             // Wait until server process calls destroy()
             def exitCode = process.waitFor()
-            if ( !reloadInProgress && exitCode != 0 ) {
+            if (exitCode != 0 ) {
                 terminate()
                 if(!stopAfterStart){
-                    if(project.vaadin.logToConsole){
+                    VaadinPluginExtension vaadin = project.extensions.findByType(VaadinPluginExtension)
+                    if(vaadin.logToConsole){
                         throw new GradleException("Server process terminated with exit code $exitCode. " +
                                 "See console output for further details (use --info for more details).")
                     } else {
@@ -394,13 +425,11 @@ abstract class ApplicationServer {
                 }
             }
 
-            RunTask runTask = project.tasks.getByName(RunTask.NAME)
-            if ( !runTask.serverRestart || stopAfterStart ) {
+            if (stopAfterStart ) {
                 // Auto-refresh turned off
                 break
             }
 
-            reloadInProgress = false
         }
     }
 
@@ -414,20 +443,12 @@ abstract class ApplicationServer {
     }
 
     /**
-     * Reload the server if it is running.
-     */
-    void reload() {
-        reloadInProgress = true
-        terminate()
-    }
-
-    /**
      * Watch the class directory for changes and restart the server if changes occur
      *
      * @param server
      *      the server instance to restart
      */
-    protected static void watchClassDirectoryForChanges(final ApplicationServer server) {
+    protected static void watchClassDirectoryForChanges(final ApplicationServer server, Closure exec) {
         Project project = server.project
 
         final RunTask RUNTASK = project.tasks.getByName(RunTask.NAME)
@@ -435,7 +456,6 @@ abstract class ApplicationServer {
         if ( RUNTASK.classesDir && project.file(RUNTASK.classesDir).exists() ) {
             classesDirs.add(project.file(RUNTASK.classesDir))
         }
-
 
         classesDirs.addAll(project.sourceSets.main.output.classesDirs.toList())
 
@@ -445,15 +465,11 @@ abstract class ApplicationServer {
             ScheduledFuture currentTask
             if(dir.exists()) {
                 Util.watchDirectoryForChanges(project, dir, { WatchKey key, WatchEvent event ->
-                    if (server.process && RUNTASK.serverRestart ) {
+                    if (server.process) {
                         if ( currentTask ) {
                             currentTask.cancel(true)
                         }
-                        currentTask = executor.schedule({
-                            // Force restart of server
-                            project.logger.lifecycle(RELOADING_SERVER_MESSAGE)
-                            server.reload()
-                        }, 1 , TimeUnit.SECONDS)
+                        currentTask = executor.schedule(exec, 1 , TimeUnit.SECONDS)
                     }
                     true
                 })
@@ -467,10 +483,8 @@ abstract class ApplicationServer {
      * @param server
      *      the server instance to restart
      */
-    protected static void watchThemeDirectoryForChanges(final ApplicationServer server) {
+    protected static void watchThemeDirectoryForChanges(final ApplicationServer server, Closure exec) {
         Project project = server.project
-        CompileThemeTask compileThemeTask = project.tasks.getByName(CompileThemeTask.NAME)
-        final RunTask RUNTASK = project.tasks.getByName(RunTask.NAME)
 
         File themesDir = Util.getThemesDirectory(project)
         if ( themesDir.exists() ) {
@@ -482,23 +496,7 @@ abstract class ApplicationServer {
                     if ( currentTask ) {
                         currentTask.cancel(true)
                     }
-                    currentTask = executor.schedule({
-
-                        // Recompile theme
-                        CompileThemeTask.compile(project, true)
-
-                        // Recompress theme
-                        if(compileThemeTask.compress){
-                            CompressCssTask.compress(project, true)
-                        }
-
-                        // Restart
-                        if ( RUNTASK.serverRestart && server.process ) {
-                            // Force restart of serverInstance
-                            project.logger.lifecycle(RELOADING_SERVER_MESSAGE)
-                            server.reload()
-                        }
-                    }, 1 , TimeUnit.SECONDS)
+                    currentTask = executor.schedule(exec, 1 , TimeUnit.SECONDS)
                 }
                 true
             })

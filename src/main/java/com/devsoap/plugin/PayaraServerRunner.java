@@ -41,15 +41,8 @@ public class PayaraServerRunner {
     // Usage: 'PayaraServerRunner [port] [webbappdir] [classesdir] [resourcesdir] [LogLevel] [name] [workdir]'
     public static void main(String[] args) throws Exception {
         int port = Integer.parseInt(args[0]);
-        String webAppDir = args[1];
-        List<String> classesDirs = Arrays.asList(args[2].split(","));
-        String resourcesDir = args[3];
         Level logLevel = Level.parse(args[4]);
-        String name = args[5];
         String workdir = args[6];
-
-        String[] dependencies = new String(Files.readAllBytes(Paths.get(workdir + "/classpath.txt")),
-                StandardCharsets.UTF_8).split(";");
 
         LOGGER.log(Level.CONFIG, "Configuring logger log levels to "+logLevel);
 
@@ -73,48 +66,12 @@ public class PayaraServerRunner {
             GlassFish glassfish = runtime.newGlassFish(glassfishProperties);
             glassfish.start();
 
-            LOGGER.log(Level.INFO, "Payara started, assembling web application");
-
             Deployer deployer = glassfish.getDeployer();
-            ScatteredArchive archive = new ScatteredArchive(
-                    name,
-                    ScatteredArchive.Type.WAR,
-                    new File(webAppDir));
 
-            classesDirs.forEach(dir -> {
-                File classes = new File(dir);
-                if(classes.exists()){
-                    try {
-                        archive.addClassPath(classes);
-                        LOGGER.log(Level.INFO, "Added class dir "+ dir);
-                    } catch (IOException e) {
-                        LOGGER.log(Level.SEVERE, "Failed to add class dir " + dir, e);
-                    }
-                }
-            });
+            File work = new File(workdir);
+            File explodedWar = new File(work, "war");
 
-            File resources = new File(resourcesDir);
-            if(resources.exists()) {
-                archive.addClassPath(new File(resourcesDir));
-                LOGGER.log(Level.INFO, "Added "+ resourcesDir);
-            }
-
-            for(String dependency : dependencies){
-                File jar = new File(dependency);
-                if(jar.exists()){
-                    archive.addClassPath(new File(dependency));
-                }
-            }
-            LOGGER.log(Level.INFO, "Added dependencies listed in "+ Paths.get(workdir + "/classpath.txt"));
-
-            String tmp = System.getProperty("java.io.tmpdir");
-            System.setProperty("java.io.tmpdir", workdir);
-            URI archiveURI = archive.toURI();
-            System.setProperty("java.io.tmpdir", tmp);
-
-            deployer.deploy(archiveURI, "--contextroot=");
-
-            LOGGER.log(Level.INFO, "Web application located at "+archiveURI+" deployed.");
+            deployer.deploy(explodedWar, "--contextroot=");
 
         } catch (Exception ex){
             LOGGER.log(Level.SEVERE, "Failed to start Payara server", ex);

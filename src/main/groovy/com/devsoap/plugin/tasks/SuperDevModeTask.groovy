@@ -15,6 +15,7 @@
  */
 package com.devsoap.plugin.tasks
 
+import com.devsoap.plugin.MessageLogger
 import com.devsoap.plugin.servers.ApplicationServer
 import com.devsoap.plugin.Util
 import org.gradle.api.DefaultTask
@@ -50,7 +51,6 @@ class SuperDevModeTask extends DefaultTask {
     private final PropertyState<Boolean> debug = project.property(Boolean)
     private final PropertyState<Integer> debugPort = project.property(Integer)
     private final PropertyState<List<String>> jvmArgs = project.property(List)
-    private final PropertyState<Boolean> serverRestart = project.property(Boolean)
     private final PropertyState<Integer> serverPort = project.property(Integer)
     private final PropertyState<Boolean> themeAutoRecompile = project.property(Boolean)
     private final PropertyState<Boolean> openInBrowser = project.property(Boolean)
@@ -93,7 +93,6 @@ class SuperDevModeTask extends DefaultTask {
         debug.set(true)
         debugPort.set(8000)
         jvmArgs.set(null)
-        serverRestart.set(true)
         serverPort.set(8080)
         themeAutoRecompile.set(true)
         openInBrowser.set(true)
@@ -177,7 +176,7 @@ class SuperDevModeTask extends DefaultTask {
      * Default server is payara.
      */
     String getServer() {
-        serverInstance.get()
+        this.server.get()
     }
 
     /**
@@ -191,7 +190,7 @@ class SuperDevModeTask extends DefaultTask {
      * Default server is payara.
      */
     void setServer(String server) {
-        this.serverInstance.set(server)
+        this.server.set(server)
     }
 
     /**
@@ -238,16 +237,24 @@ class SuperDevModeTask extends DefaultTask {
 
     /**
      * Should the server restart after every change.
+     *
+     * @deprecated No longer in use since JVM hotswapping was taken into use in 1.2.4
      */
+    @Deprecated
     Boolean getServerRestart() {
-        serverRestart.get()
+        MessageLogger.nagUserOfDiscontinuedProperty(new Throwable(RunTask.SERVER_RESTART_DEPRECATED_MESSAGE))
+        false
     }
 
     /**
      * Should the server restart after every change.
+     *
+     * @deprecated No longer in use since JVM hotswapping was taken into use in 1.2.4
      */
+    @Deprecated
     void setServerRestart(Boolean restart) {
-        serverRestart.set(restart)
+        MessageLogger.nagUserOfDiscontinuedProperty(new Throwable(RunTask.SERVER_RESTART_DEPRECATED_MESSAGE))
+        restart
     }
 
     /**
