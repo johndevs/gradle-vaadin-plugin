@@ -109,6 +109,7 @@ class MultimoduleWidgetsetThemeTest extends MultiProjectIntegrationTest {
         File manifest = Paths.get(projectDir.root.canonicalPath,
                 'build', 'tmp', 'vaadinClassPathJar', 'MANIFEST.MF').toFile()
         assertTrue 'Manifest did not exist', manifest.exists()
-        assertTrue 'Manifest did not include module', manifest.text.contains('theme-module-1.jar')
+        assertTrue 'Manifest did not include module. Manifest:\n'+manifest.text,
+                manifest.text.contains('theme-module-1.jar')
     }
 }
