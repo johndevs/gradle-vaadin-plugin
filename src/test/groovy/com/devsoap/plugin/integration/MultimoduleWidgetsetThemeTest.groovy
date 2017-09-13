@@ -8,6 +8,7 @@ import org.junit.Test
 
 import java.nio.file.Paths
 import java.util.concurrent.TimeUnit
+import java.util.jar.Manifest
 
 import static org.junit.Assert.assertTrue
 
@@ -109,7 +110,12 @@ class MultimoduleWidgetsetThemeTest extends MultiProjectIntegrationTest {
         File manifest = Paths.get(projectDir.root.canonicalPath,
                 'build', 'tmp', 'vaadinClassPathJar', 'MANIFEST.MF').toFile()
         assertTrue 'Manifest did not exist', manifest.exists()
-        assertTrue 'Manifest did not include module. Manifest:\n'+manifest.text,
-                manifest.text.contains('theme-module-1.jar')
+
+        manifest.withDataInputStream { stream ->
+            Manifest m = new Manifest(stream)
+            String cp = m.mainAttributes.getValue("Class-Path")
+            assertTrue cp.contains('theme-module-1.jar')
+        }
+
     }
 }
