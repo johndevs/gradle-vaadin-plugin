@@ -812,6 +812,7 @@ class CompileWidgetsetTask extends DefaultTask {
         widgetsetCompileProcess += ['-cp',  classpath.asPath]
 
         widgetsetCompileProcess += ["-Dgwt.persistentunitcachedir=${project.buildDir.canonicalPath}"]
+        widgetsetCompileProcess += ["-Dgwt.forceVersionCheckURL=foobar"]
 
         widgetsetCompileProcess += ["-Djava.io.tmpdir=${temporaryDir.canonicalPath}"]
 
