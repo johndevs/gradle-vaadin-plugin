@@ -774,14 +774,19 @@ class CompileWidgetsetTask extends DefaultTask {
         FileCollection classpath = Util.getCompileClassPathOrJar(project)
 
         // Add client dependencies missing from the classpath jar
-        classpath += Util.getClientCompilerClassPath(project).filter { File file ->
+        classpath += Util.getClientCompilerClassPath(project)
+
+        // Filter out needed dependencies
+        classpath = classpath.filter { File file ->
             if ( file.name.endsWith('.jar') ) {
                 // Add GWT compiler + deps
-                if ( file.name.startsWith('vaadin-client' ) ||
+                if (file.name.startsWith('vaadin-server') ||
+                        file.name.startsWith('vaadin-client' ) ||
                         file.name.startsWith('vaadin-shared') ||
+                        file.name.startsWith('vaadin-compatibility-server') ||
                         file.name.startsWith('vaadin-compatibility-client') ||
                         file.name.startsWith('vaadin-compatibility-shared') ||
-                        file.name.startsWith('validation-api')) {
+                        file.name.startsWith('validation-api-1.0')) {
                     return true
                 }
 
