@@ -1,6 +1,7 @@
 package com.devsoap.plugin.integration
 
 import com.devsoap.plugin.tasks.CompileWidgetsetTask
+import com.devsoap.plugin.tasks.CreateComponentTask
 import com.devsoap.plugin.tasks.CreateProjectTask
 import org.junit.Test
 
@@ -122,11 +123,43 @@ class CompileWidgetsetTest extends IntegrationTest {
 
         runWithArguments(CreateProjectTask.NAME)
 
-        def result = runWithArguments('--info', CompileWidgetsetTask.NAME)
+        String result = runWithArguments('--info', CompileWidgetsetTask.NAME)
 
         assertFalse result, result.contains('Detected widgetset com.example.MyWidgetset')
         assertTrue result, result.contains('Compiling module com.example.MyWidgetset')
         assertTrue result, result.contains('Linking succeeded')
     }
 
+    @Test void 'Compile with upgraded validation-jar'() {
+        buildFile << """
+            dependencies {
+                compile 'javax.validation:validation-api:1.1.0.Final'              
+            }
+            vaadinCompile.widgetset = 'com.example.MyWidgetset'
+        """
+
+        runWithArguments(CreateProjectTask.NAME)
+
+        String result = runWithArguments('--info', CompileWidgetsetTask.NAME)
+
+        assertFalse result, result.contains('Detected widgetset com.example.MyWidgetset')
+        assertTrue result, result.contains('Compiling module com.example.MyWidgetset')
+        assertTrue result, result.contains('Linking succeeded')
+    }
+
+    @Test void 'Compile with client sources'() {
+        buildFile << """            
+            vaadinCompile.widgetset = 'com.example.MyWidgetset'
+        """
+
+        runWithArguments(CreateProjectTask.NAME)
+
+        runWithArguments(CreateComponentTask.NAME, '--name=MyLabel')
+
+        String result = runWithArguments('--info', CompileWidgetsetTask.NAME)
+
+        assertFalse result, result.contains('Detected widgetset com.example.MyWidgetset')
+        assertTrue result, result.contains('Compiling module com.example.MyWidgetset')
+        assertTrue result, result.contains('Linking succeeded')
+    }
 }
