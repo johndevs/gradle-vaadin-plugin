@@ -162,4 +162,21 @@ class CompileWidgetsetTest extends IntegrationTest {
         assertTrue result, result.contains('Compiling module com.example.MyWidgetset')
         assertTrue result, result.contains('Linking succeeded')
     }
+
+    @Test void 'Compile with client sources and classpath jar'() {
+        buildFile << """            
+            vaadinCompile.widgetset = 'com.example.MyWidgetset'
+            vaadin.useClassPathJar = true
+        """
+
+        runWithArguments(CreateProjectTask.NAME)
+
+        runWithArguments(CreateComponentTask.NAME, '--name=MyLabel')
+
+        String result = runWithArguments('--info', CompileWidgetsetTask.NAME)
+
+        assertFalse result, result.contains('Detected widgetset com.example.MyWidgetset')
+        assertTrue result, result.contains('Compiling module com.example.MyWidgetset')
+        assertTrue result, result.contains('Linking succeeded')
+    }
 }
