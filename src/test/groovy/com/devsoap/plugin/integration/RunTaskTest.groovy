@@ -72,6 +72,16 @@ class RunTaskTest extends IntegrationTest {
         assertServerRunning output
     }
 
+    @Test void 'Spring Loaded with classpath jar'() {
+        buildFile << """
+            vaadin.useClassPathJar true
+        """.stripIndent()
+
+        def output = runWithArguments('--info', CreateProjectTask.NAME, RunTask.NAME, '--stopAfterStart')
+        assertFalse(output, output.contains('Spring Loaded jar not found'))
+        assertTrue(output, output.contains('Using Spring Loaded found from'))
+    }
+
     private void assertServerRunning(String output) {
         assertTrue output, output.contains('Application running on ')
     }
