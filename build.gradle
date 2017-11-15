@@ -26,7 +26,7 @@ plugins {
     id 'maven'
     id 'idea'
     id 'codenarc'
-    id 'com.gradle.plugin-publish' version '0.9.7'
+    id 'com.gradle.plugin-publish' version '0.9.9'
     id 'checkstyle'
 }
 
@@ -76,13 +76,13 @@ dependencies {
     // Sass compilation with libSass
     compile "io.bit3:jsass:${project.property('jsass.version')}"
 
-    deploy 'org.apache.maven.wagon:wagon-ssh:2.2'
+    deploy 'org.apache.maven.wagon:wagon-ssh:3.0'
 
     testCompile gradleTestKit()
     testCompile 'junit:junit:4.12'
 
     // ProxyTest needs its own special configuration to avoid conflicts
-    proxyTest ('org.mock-server:mockserver-netty:3.10.4') {
+    proxyTest ('org.mock-server:mockserver-netty:3.11') {
         exclude group:'ch.qos.logback'
     }
     project.configurations.proxyTest.exclude group: 'fish.payara.extras'
