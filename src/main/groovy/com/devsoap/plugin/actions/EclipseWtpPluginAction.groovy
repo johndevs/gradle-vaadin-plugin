@@ -56,6 +56,7 @@ class EclipseWtpPluginAction extends PluginAction {
         addConfigurationToProject(project, GradleVaadinPlugin.CONFIGURATION_TESTBENCH)
         addConfigurationToProject(project, GradleVaadinPlugin.CONFIGURATION_THEME)
         addConfigurationToProject(project, GradleVaadinPlugin.CONFIGURATION_SPRING_BOOT)
+        addConfigurationToProject(project, GradleVaadinPlugin.CONFIGURATION_CLIENT_COMPILE)
     }
 
     /**

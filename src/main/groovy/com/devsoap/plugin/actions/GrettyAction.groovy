@@ -51,6 +51,10 @@ class GrettyAction extends PluginAction{
             project.dependencies.add(GRETTY_CONFIGURATION, "$it.group:$it.name:$it.version")
         }
 
+        project.configurations[GradleVaadinPlugin.CONFIGURATION_CLIENT_COMPILE].dependencies.each {
+            project.dependencies.add(GRETTY_CONFIGURATION, "$it.group:$it.name:$it.version")
+        }
+
         if (!Util.getWidgetset(project)) {
             project.configurations[GradleVaadinPlugin.CONFIGURATION_CLIENT].dependencies.each {
                 project.dependencies.add(GRETTY_CONFIGURATION, "$it.group:$it.name:$it.version")

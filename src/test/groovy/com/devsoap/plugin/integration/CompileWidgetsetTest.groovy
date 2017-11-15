@@ -35,10 +35,8 @@ class CompileWidgetsetTest extends IntegrationTest {
         """
         runWithArguments(CreateProjectTask.NAME)
 
-        def result = runWithArguments('--info', CompileWidgetsetTask.NAME)
-        assertFalse result, result.contains('Detected widgetset com.example.MyWidgetset')
-        assertTrue result, result.contains('Compiling module com.example.MyWidgetset')
-        assertTrue result, result.contains('Linking succeeded')
+        String result = runWithArguments('--info', CompileWidgetsetTask.NAME)
+        assertCompilationSucceeded(result)
     }
 
     @Test void 'No Widgetset defined, but addons exist in project'() {
@@ -103,10 +101,8 @@ class CompileWidgetsetTest extends IntegrationTest {
 
         runWithArguments(CreateProjectTask.NAME)
 
-        def result = runWithArguments('--info', CompileWidgetsetTask.NAME)
-        assertFalse result, result.contains('Detected widgetset com.example.MyWidgetset')
-        assertTrue result, result.contains('Compiling module com.example.MyWidgetset')
-        assertTrue result, result.contains('Linking succeeded')
+        String result = runWithArguments('--info', CompileWidgetsetTask.NAME)
+        assertCompilationSucceeded(result)
     }
 
     @Test void 'Compile with legacy dependencies and classpath jar'(){
@@ -124,10 +120,7 @@ class CompileWidgetsetTest extends IntegrationTest {
         runWithArguments(CreateProjectTask.NAME)
 
         String result = runWithArguments('--info', CompileWidgetsetTask.NAME)
-
-        assertFalse result, result.contains('Detected widgetset com.example.MyWidgetset')
-        assertTrue result, result.contains('Compiling module com.example.MyWidgetset')
-        assertTrue result, result.contains('Linking succeeded')
+        assertCompilationSucceeded(result)
     }
 
     @Test void 'Compile with upgraded validation-jar'() {
@@ -141,10 +134,7 @@ class CompileWidgetsetTest extends IntegrationTest {
         runWithArguments(CreateProjectTask.NAME)
 
         String result = runWithArguments('--info', CompileWidgetsetTask.NAME)
-
-        assertFalse result, result.contains('Detected widgetset com.example.MyWidgetset')
-        assertTrue result, result.contains('Compiling module com.example.MyWidgetset')
-        assertTrue result, result.contains('Linking succeeded')
+        assertCompilationSucceeded(result)
     }
 
     @Test void 'Compile with client sources'() {
@@ -157,10 +147,7 @@ class CompileWidgetsetTest extends IntegrationTest {
         runWithArguments(CreateComponentTask.NAME, '--name=MyLabel')
 
         String result = runWithArguments('--info', CompileWidgetsetTask.NAME)
-
-        assertFalse result, result.contains('Detected widgetset com.example.MyWidgetset')
-        assertTrue result, result.contains('Compiling module com.example.MyWidgetset')
-        assertTrue result, result.contains('Linking succeeded')
+        assertCompilationSucceeded(result)
     }
 
     @Test void 'Compile with client sources and classpath jar'() {
@@ -174,7 +161,25 @@ class CompileWidgetsetTest extends IntegrationTest {
         runWithArguments(CreateComponentTask.NAME, '--name=MyLabel')
 
         String result = runWithArguments('--info', CompileWidgetsetTask.NAME)
+        assertCompilationSucceeded(result)
+    }
 
+    @Test void 'Compile with third-party non-vaadin addon dependency'() {
+        buildFile << """
+            vaadin.version = "7.7.7"
+            dependencies {
+                vaadinCompile "org.vaadin.addon:v-leaflet:0.5.7"
+            }
+            vaadinCompile.widgetset = 'com.example.MyWidgetset'
+        """
+
+        runWithArguments(CreateProjectTask.NAME)
+
+        String result = runWithArguments('--info', CompileWidgetsetTask.NAME)
+        assertCompilationSucceeded(result)
+    }
+
+    private static void assertCompilationSucceeded(String result) {
         assertFalse result, result.contains('Detected widgetset com.example.MyWidgetset')
         assertTrue result, result.contains('Compiling module com.example.MyWidgetset')
         assertTrue result, result.contains('Linking succeeded')
