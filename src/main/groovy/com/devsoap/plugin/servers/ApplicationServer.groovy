@@ -176,16 +176,18 @@ abstract class ApplicationServer {
         }
 
         // Spring (re-)loaded
-        File springLoaded = classPath.find {it.name.startsWith('springloaded')}
+        File springLoaded = project.configurations[GradleVaadinPlugin.CONFIGURATION_RUN_SERVER]
+                .resolvedConfiguration.files.find {it.name.startsWith('springloaded')}
         if(springLoaded) {
             project.logger.info("Using Spring Loaded found from ${springLoaded}")
             parameters.add("-javaagent:${springLoaded.canonicalPath}")
             parameters.add('-noverify')
         } else {
-            project.logger.warn("Spring Loaded jar not found in vaadin-run-server configuration. Dynamic " +
-                    "reloading disabled.")
+            project.logger.warn(
+                "Spring Loaded jar not found in $GradleVaadinPlugin.CONFIGURATION_RUN_SERVER configuration. " +
+                "Dynamic reloading disabled."
+            )
         }
-
 
         // JVM options
         if ( runTask.debug ) {
