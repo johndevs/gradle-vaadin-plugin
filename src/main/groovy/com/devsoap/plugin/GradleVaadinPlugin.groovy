@@ -133,6 +133,11 @@ class GradleVaadinPlugin implements Plugin<Project> {
     static final String CONFIGURATION_THEME = 'vaadin-theme-compiler'
 
     /**
+     * The configuration name for extra vaadin dependencies on the compilation classpath
+     */
+    static final String CONFIGURATION_CLIENT_COMPILE = 'vaadinCompile'
+
+    /**
      * The task group name for Vaadin generic tasks
      */
     static final String VAADIN_TASK_GROUP = 'Vaadin'
@@ -380,6 +385,14 @@ class GradleVaadinPlugin implements Plugin<Project> {
             testSources.runtimeClasspath += conf
         }
 
+        configurations.create(CONFIGURATION_CLIENT_COMPILE) { conf ->
+            conf.description = "Extra libraries to be added to the widgetset compile classpath"
+
+            sources.compileClasspath += conf
+            testSources.compileClasspath += conf
+            testSources.runtimeClasspath += conf
+        }
+
         configurations.create(CONFIGURATION_JAVADOC) { conf ->
             conf.description = 'Libraries for compiling JavaDoc for a Vaadin project.'
             conf.defaultDependencies { dependencies ->
@@ -525,7 +538,8 @@ class GradleVaadinPlugin implements Plugin<Project> {
                     conf.extendsFrom(
                             project.configurations['compile'],
                             project.configurations['runtime'],
-                            project.configurations[CONFIGURATION_PUSH]
+                            project.configurations[CONFIGURATION_PUSH],
+                            project.configurations[CONFIGURATION_CLIENT_COMPILE]
                     )
                 }
             }

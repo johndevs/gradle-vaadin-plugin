@@ -111,11 +111,23 @@ class WARArchiveTest extends IntegrationTest {
             compileOnly 'commons-lang:commons-lang:2.6'
             providedCompile 'commons-lang:commons-lang:2.6'
         }
-        """
+        """.stripIndent()
 
         // Adding provided and runtime dependencies should result in the same WAR as when
         // none of those dependencies are added
         'Project with no dependencies'()
+    }
+
+    @Test void 'Vaadin addons in vaadinCompile are added to war'() {
+        buildFile << """
+        dependencies {
+            vaadinCompile 'commons-lang:commons-lang:2.6'
+        }
+        """.stripIndent()
+
+        runWithArguments('war')
+
+        assertFilesInFolder(warFile, ["commons-lang-2.6.jar"], 'WEB-INF/lib', true)
     }
 
     private static List<ZipEntry> getFilesInFolder(ZipFile archive, String folder) {

@@ -31,6 +31,7 @@ import org.apache.commons.codec.digest.DigestUtils
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
+import org.gradle.api.invocation.Gradle
 import org.gradle.api.provider.PropertyState
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.CacheableTask
@@ -51,7 +52,7 @@ import java.util.zip.ZipInputStream
 @CacheableTask
 class CompileWidgetsetTask extends DefaultTask {
 
-    static final NAME = 'vaadinCompile'
+    static final String NAME = 'vaadinCompile'
 
     private static final WIDGETSET_CDN_URL = 'https://wsc.vaadin.com/'
 
@@ -231,6 +232,7 @@ class CompileWidgetsetTask extends DefaultTask {
             */
             inputs.files(project.configurations.compile)
             inputs.files(project.configurations[GradleVaadinPlugin.CONFIGURATION_CLIENT])
+            inputs.files(project.configurations[GradleVaadinPlugin.CONFIGURATION_CLIENT_COMPILE])
 
             // Monitor changes in client side classes and resources
             String publicFolderPattern = '**/*/public/**/*.*'
@@ -771,42 +773,8 @@ class CompileWidgetsetTask extends DefaultTask {
         // Re-create directory
         Util.getWidgetsetDirectory(project).mkdirs()
 
-        FileCollection classpath = Util.getCompileClassPathOrJar(project)
-
         // Add client dependencies missing from the classpath jar
-        classpath += Util.getClientCompilerClassPath(project)
-
-        // Filter out needed dependencies
-        classpath = classpath.filter { File file ->
-            if ( file.name.endsWith('.jar') ) {
-                // Add GWT compiler + deps
-                if (file.name.startsWith('vaadin-server') ||
-                        file.name.startsWith('vaadin-client' ) ||
-                        file.name.startsWith('vaadin-shared') ||
-                        file.name.startsWith('vaadin-compatibility-server') ||
-                        file.name.startsWith('vaadin-compatibility-client') ||
-                        file.name.startsWith('vaadin-compatibility-shared') ||
-                        file.name.startsWith('validation-api-1.0')) {
-                    return true
-                }
-
-                // Addons with client side widgetset
-                JarFile jar = new JarFile(file.absolutePath)
-
-                if ( !jar.manifest ) {
-                    return false
-                }
-
-                Attributes attributes = jar.manifest.mainAttributes
-                return attributes.getValue('Vaadin-Widgetsets')
-            }
-            true
-        }
-
-        // Ensure gwt sdk libs are in the correct order
-        if ( getGwtSdkFirstInClasspath() ) {
-            classpath = Util.moveGwtSdkFirstInClasspath(project, classpath)
-        }
+        FileCollection classpath = Util.getClientCompilerClassPath(project)
 
         List widgetsetCompileProcess = [Util.getJavaBinary(project)]
 

@@ -53,6 +53,7 @@ class IdeaPluginAction extends PluginAction {
         addConfigurationToProject(project, GradleVaadinPlugin.CONFIGURATION_TESTBENCH, true)
         addConfigurationToProject(project, GradleVaadinPlugin.CONFIGURATION_THEME)
         addConfigurationToProject(project, GradleVaadinPlugin.CONFIGURATION_SPRING_BOOT)
+        addConfigurationToProject(project, GradleVaadinPlugin.CONFIGURATION_CLIENT_COMPILE)
     }
 
     @Override

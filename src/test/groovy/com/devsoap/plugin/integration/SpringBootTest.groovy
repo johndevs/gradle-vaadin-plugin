@@ -128,6 +128,21 @@ class SpringBootTest extends IntegrationTest {
                 jar.entries().find { it.name.startsWith('BOOT-INF/lib/vaadin-push')}
     }
 
+    @Test void 'Vaadin compile dependencies are included'() {
+        configureSpringBootProject()
+        JarFile jar = getSpringBootJar()
+
+        buildFile << """
+        dependencies {
+            vaadinCompile 'commons-lang:commons-lang:2.6'
+        }
+        """.stripIndent()
+
+        jar = getSpringBootJar()
+        assertNotNull 'vaadinCompile dependency not found in jar',
+                jar.entries().find { it.name.startsWith('BOOT-INF/lib/commons-lang-2.6')}
+    }
+
     private JarFile getSpringBootJar() {
         runWithArguments('clean', 'bootRepackage')
 

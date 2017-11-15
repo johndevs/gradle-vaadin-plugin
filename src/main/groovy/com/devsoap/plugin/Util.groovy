@@ -34,7 +34,6 @@ import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileVisitDetails
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.logging.LogLevel
-import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.SourceSet
@@ -53,6 +52,7 @@ import java.nio.file.WatchKey
 import java.nio.file.WatchService
 import java.nio.file.attribute.BasicFileAttributes
 import java.util.jar.Attributes
+import java.util.jar.JarFile
 import java.util.jar.JarInputStream
 import java.util.jar.Manifest
 import java.util.regex.Pattern
@@ -74,10 +74,18 @@ class Util {
     private static final String JAVA_BIN_NAME = 'java'
     private static final String GWT_MODULE_POSTFIX = '.gwt.xml'
     private static final String CLIENT_PACKAGE_NAME = 'client'
+    private static final String VAADIN_CLIENT_DENDENCY = 'vaadin-client'
+    private static final String VAADIN_SHARED_DEPENDENCY = 'vaadin-shared'
+    private static final String VAADIN_COMP_SERVER_DEPENDENCY = 'vaadin-compatibility-server'
+    private static final String VAADIN_COMP_CLIENT_DEPENDENCY = 'vaadin-compatibility-client'
+    private static final String VAADIN_COMP_SHARED_DEPENDENCY = 'vaadin-compatibility-shared'
+    private static final String VALIDATION_API_DEPENDENCY = 'validation-api-1.0'
+    private static final String JAR_EXTENSION = '.jar'
 
     static final String APP_WIDGETSET = 'AppWidgetset'
-    static final String VAADIN_SERVER_ARTIFACT = 'vaadin-server'
     static final int VAADIN_SEVEN_MAJOR_VERSION = 7
+    static final String VAADIN_SERVER_DEPENDENCY = 'vaadin-server'
+
 
     /**
      * Get the compile time classpath of a project
@@ -140,7 +148,38 @@ class Util {
             collection += project.files(dir)
         }
 
-        if ( project.vaadinCompile.gwtSdkFirstInClasspath ) {
+        // Filter out needed dependencies
+        collection = collection.filter { File file ->
+            if ( file.name.endsWith(JAR_EXTENSION) ) {
+
+                // Add GWT compiler + deps
+                if (file.name.startsWith(VAADIN_SERVER_DEPENDENCY) ||
+                        file.name.startsWith(VAADIN_CLIENT_DENDENCY) ||
+                        file.name.startsWith(VAADIN_SHARED_DEPENDENCY) ||
+                        file.name.startsWith(VAADIN_COMP_SERVER_DEPENDENCY) ||
+                        file.name.startsWith(VAADIN_COMP_CLIENT_DEPENDENCY) ||
+                        file.name.startsWith(VAADIN_COMP_SHARED_DEPENDENCY) ||
+                        file.name.startsWith(VALIDATION_API_DEPENDENCY)) {
+                    return true
+                }
+
+                // Addons with client side widgetset
+                JarFile jar = new JarFile(file.absolutePath)
+                if ( !jar.manifest ) {
+                    return false
+                }
+
+                Attributes attributes = jar.manifest.mainAttributes
+                return attributes.getValue('Vaadin-Widgetsets')
+            }
+            true
+        }
+
+        // Add additional dependencies directly to classpath
+        collection += project.configurations[GradleVaadinPlugin.CONFIGURATION_CLIENT_COMPILE]
+
+        // Ensure gwt sdk libs are in the correct order
+        if (  project.vaadinCompile.gwtSdkFirstInClasspath ) {
             collection = moveGwtSdkFirstInClasspath(project, collection)
         }
 
@@ -657,7 +696,7 @@ class Util {
      */
     @Memoized
     static String getResolvedVaadinVersion(Project project) {
-        getResolvedArtifactVersion(project, VAADIN_SERVER_ARTIFACT, project.vaadin.version)
+        getResolvedArtifactVersion(project, VAADIN_SERVER_DEPENDENCY, project.vaadin.version)
     }
 
     /**
@@ -702,7 +741,7 @@ class Util {
         boolean isLegacyProject = false
         project.configurations.all.each { Configuration conf ->
             conf.allDependencies.each { Dependency dependency ->
-                if(dependency.group == 'com.vaadin' && dependency.name == 'vaadin-compatibility-client'){
+                if(dependency.group == 'com.vaadin' && dependency.name == VAADIN_COMP_CLIENT_DEPENDENCY){
                     isLegacyProject = true
                 }
             }
@@ -737,13 +776,13 @@ class Util {
 
                 } else if (isResolvable(project, conf)){
                     conf.files(dependency).each { File file ->
-                        if (file.file && file.name.endsWith('.jar')) {
+                        if (file.file && file.name.endsWith(JAR_EXTENSION)) {
                             file.withInputStream { InputStream stream ->
                                 JarInputStream jarStream = new JarInputStream(stream)
                                 Manifest mf = jarStream.getManifest()
                                 Attributes attributes = mf?.mainAttributes
                                 if (attributes?.getValue(attribute)) {
-                                    if (!dependency.name.startsWith('vaadin-client')) {
+                                    if (!dependency.name.startsWith(VAADIN_CLIENT_DENDENCY)) {
                                         if (includeFile) {
                                             addons << [
                                                     groupId   : dependency.group,
@@ -831,6 +870,9 @@ class Util {
         if ( !project.vaadinCompile.widgetsetCDN && !getWidgetset(project) ) {
             classpath += project.configurations[GradleVaadinPlugin.CONFIGURATION_CLIENT]
         }
+
+        // Include addons
+        classpath += project.configurations[GradleVaadinPlugin.CONFIGURATION_CLIENT_COMPILE]
 
         // Include runtime dependencies
         classpath += project.configurations.runtime
