@@ -3,6 +3,8 @@ package com.devsoap.plugin.integration
 import com.devsoap.plugin.GradleVaadinPlugin
 import com.devsoap.plugin.tasks.CreateProjectTask
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 
 import java.nio.file.Paths
 import java.util.jar.JarFile
@@ -15,18 +17,33 @@ import static org.junit.Assert.assertTrue
 /**
  * Created by john on 4/29/17.
  */
+@RunWith(Parameterized)
 class SpringBootTest extends IntegrationTest {
+
+    private String springBootVersion
+
+    SpringBootTest(String springBootVersion) {
+        this.springBootVersion = springBootVersion
+    }
+
+    @Parameterized.Parameters(name = "Spring Boot {0}")
+    static Collection<String> getSpringBootVersions() {
+        [ '1.5.3.RELEASE', '2.0.0.M7']
+    }
 
     @Override
     protected void applyBuildScriptRepositories(File buildFile) {
         super.applyBuildScriptRepositories(buildFile)
-        buildFile << "maven { url 'https://plugins.gradle.org/m2/' }\n"
+        buildFile << """
+                maven { url 'https://plugins.gradle.org/m2/'}
+                maven { url 'https://repo.spring.io/libs-snapshot'}
+        """.stripMargin()
     }
 
     @Override
     protected void applyBuildScriptClasspathDependencies(File buildFile) {
         super.applyBuildScriptClasspathDependencies(buildFile)
-        buildFile << "classpath 'org.springframework.boot:spring-boot-gradle-plugin:1.5.3.RELEASE'\n"
+        buildFile << "classpath 'org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}'\n"
     }
 
     @Override
@@ -89,30 +106,22 @@ class SpringBootTest extends IntegrationTest {
         JarFile jar = getSpringBootJar()
 
         // Libs
-        assertNotNull 'vaadin-server not found in jar',
-                jar.entries().find { it.name.startsWith('BOOT-INF/lib/vaadin-server')}
-        assertNotNull 'spring-boot-starter not found in jar',
-                jar.entries().find { it.name.startsWith('BOOT-INF/lib/spring-boot-starter')}
-        assertNotNull 'vaadin-spring-boot not found in jar',
-                jar.entries().find { it.name.startsWith('BOOT-INF/lib/vaadin-spring-boot')}
+        assertJarContents(jar, 'vaadin-server not found in jar', 'BOOT-INF/lib/vaadin-server')
+        assertJarContents(jar, 'spring-boot-starter not found in jar', 'BOOT-INF/lib/spring-boot-starter')
+        assertJarContents(jar, 'vaadin-spring-boot not found in jar', 'BOOT-INF/lib/vaadin-spring-boot')
 
         // Static resources
-        assertNotNull 'Widgetset not found in jar',
-                jar.entries().find { it.name.startsWith(
-                        'BOOT-INF/classes/VAADIN/widgetsets/com.example.springboottest.MyWidgetset/')
-                }
-        assertNotNull 'Theme not found in jar',
-                jar.entries().find { it.name.startsWith('BOOT-INF/classes/VAADIN/themes/SpringBootTest/')}
+        assertJarContents(jar, 'Widgetset not found in jar',
+                'BOOT-INF/classes/VAADIN/widgetsets/com.example.springboottest.MyWidgetset/')
+        assertJarContents(jar, 'Theme not found in jar', 'BOOT-INF/classes/VAADIN/themes/SpringBootTest/')
 
         // Classes
-        assertNotNull 'UI not found in jar',
-                jar.entries().find { it.name.startsWith(
-                        'BOOT-INF/classes/com/example/springboottest/MyAppUI.class')}
-        assertNotNull 'App not found in jar',
-                jar.entries().find { it.name.startsWith(
-                        'BOOT-INF/classes/com/example/springboottest/SpringBootApplication.class')}
-        assertNotNull 'Spring Boot loader not found in jar',
-                jar.entries().find { it.name.startsWith('org/springframework/boot/loader/')}
+        assertJarContents(jar, 'UI not found in jar',
+                'BOOT-INF/classes/com/example/springboottest/MyAppUI.class')
+
+        assertJarContents(jar, 'App not found in jar',
+                'BOOT-INF/classes/com/example/springboottest/SpringBootApplication.class')
+        assertJarContents(jar, 'Spring Boot loader not found in jar', 'org/springframework/boot/loader/')
     }
 
     @Test void 'Vaadin push dependencies are included'() {
@@ -124,13 +133,11 @@ class SpringBootTest extends IntegrationTest {
         buildFile << "vaadin.push = true\n"
 
         jar = getSpringBootJar()
-        assertNotNull 'vaadin-push not found in jar',
-                jar.entries().find { it.name.startsWith('BOOT-INF/lib/vaadin-push')}
+        assertJarContents(jar, 'vaadin-push not found in jar','BOOT-INF/lib/vaadin-push')
     }
 
     @Test void 'Vaadin compile dependencies are included'() {
         configureSpringBootProject()
-        JarFile jar = getSpringBootJar()
 
         buildFile << """
         dependencies {
@@ -138,13 +145,17 @@ class SpringBootTest extends IntegrationTest {
         }
         """.stripIndent()
 
-        jar = getSpringBootJar()
-        assertNotNull 'vaadinCompile dependency not found in jar',
-                jar.entries().find { it.name.startsWith('BOOT-INF/lib/commons-lang-2.6')}
+        JarFile jar = getSpringBootJar()
+        assertJarContents(jar, 'vaadinCompile dependency not found in jar','BOOT-INF/lib/commons-lang-2.6')
+    }
+
+    private static void assertJarContents(JarFile jar, String message, String path) {
+        assertNotNull message + "\n" + jar.entries().collect {it.name}.collect().join("\n"),
+                jar.entries().find { it.name.startsWith(path)}
     }
 
     private JarFile getSpringBootJar() {
-        runWithArguments('clean', 'bootRepackage')
+        runWithArguments('clean', springBoot1 ? 'bootRepackage': 'assemble')
 
         File jarFile = Paths.get(projectDir.root.canonicalPath,
                 'build', 'libs', projectDir.root.name+'.jar').toFile()
@@ -171,6 +182,14 @@ class SpringBootTest extends IntegrationTest {
         File app = new File(packageDir, 'SpringBootApplication.java')
         app.text = getClass().getResource('/templates/SpringBootApplication.java.template').text
 
-        buildFile << "springBoot.mainClass = 'com.example.springboottest.SpringBootApplication'\n"
+        if(springBoot1){
+            buildFile << "springBoot.mainClass = 'com.example.springboottest.SpringBootApplication'\n"
+        } else {
+            buildFile << "bootJar.mainClassName = 'com.example.springboottest.SpringBootApplication'\n"
+        }
+    }
+
+    private boolean isSpringBoot1() {
+        springBootVersion.startsWith("1")
     }
 }
