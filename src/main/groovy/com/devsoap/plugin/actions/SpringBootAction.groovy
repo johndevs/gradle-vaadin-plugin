@@ -37,9 +37,15 @@ import org.gradle.api.tasks.javadoc.Javadoc
 class SpringBootAction extends PluginAction {
 
     private static final String BOOT_RUN_TASK = 'bootRun'
-    private static final String BOOT_REPACKAGE_TASK = 'bootRepackage'
-    private static final String JAR_TASK = 'jar'
     private static final String SPRING_BOOT_EXTENSION = 'springBoot'
+    private static final String JAR_TASK = 'jar'
+
+    // Spring Boot 1.x
+    private static final String BOOT_REPACKAGE_TASK = 'bootRepackage'
+
+    // Spring Boot 2.x
+    private static final String BOOT_JAR = 'bootJar'
+    private static final String BOOT_WAR = 'bootWar'
 
     @Override
     String getPluginId() {
@@ -52,7 +58,11 @@ class SpringBootAction extends PluginAction {
 
         // bootRun should build the widgetset and theme
         project.tasks.findByName(JAR_TASK).dependsOn(CompileWidgetsetTask.NAME, CompileThemeTask.NAME)
-        project.tasks.findByName(BOOT_REPACKAGE_TASK).dependsOn(CompileWidgetsetTask.NAME, CompileThemeTask.NAME)
+
+        project.tasks.findByName(BOOT_REPACKAGE_TASK)?.dependsOn(CompileWidgetsetTask.NAME, CompileThemeTask.NAME)
+        project.tasks.findByName(BOOT_JAR)?.dependsOn(CompileWidgetsetTask.NAME, CompileThemeTask.NAME)
+        project.tasks.findByName(BOOT_WAR)?.dependsOn(CompileWidgetsetTask.NAME, CompileThemeTask.NAME)
+
         project.tasks.findByName(BOOT_RUN_TASK).dependsOn(CompileWidgetsetTask.NAME, CompileThemeTask.NAME)
 
         // Delegate to bootRun if spring boot is present
@@ -72,6 +82,9 @@ class SpringBootAction extends PluginAction {
             case JAR_TASK:
                 configureJar(task)
                 break
+            case BOOT_JAR:
+                configureBootJar(task)
+                break
             case 'javadoc':
                 configureJavadoc(task)
                 break
@@ -88,14 +101,32 @@ class SpringBootAction extends PluginAction {
         task.customConfiguration = GradleVaadinPlugin.CONFIGURATION_SPRING_BOOT
     }
 
+    private static configureBootJar(Task task) {
+        Jar jar = (Jar) task
+        Project project = task.project
+
+        jar.from(Util.getWebAppDirectory(project)) {
+            it.into('BOOT-INF/classes')
+        }
+
+        // Spring Boot 2.x does not support customConfiguration, need to add the jars manually
+        jar.from(project.configurations[GradleVaadinPlugin.CONFIGURATION_SPRING_BOOT]){
+            it.into('BOOT-INF/lib')
+        }
+    }
+
     private static configureJar(Task task) {
         Project project = task.project
         if (isJarProject(project)) {
             Jar jar = (Jar) task
-            // Include app theme + compiled widget as well as classes into our jar
-            jar.from(Util.getWebAppDirectory(project))
-            // Sprinkle some spring boot sugar on the jar to make it runnable
-            jar.finalizedBy(project.tasks.findByName(BOOT_REPACKAGE_TASK))
+
+            // Only do this for Spring Boot 1.x projects, 2.x uses bootJar
+            if(jar.enabled && project.tasks.findByName(BOOT_REPACKAGE_TASK)) {
+                // Include app theme + compiled widget as well as classes into our jar
+                jar.from(Util.getWebAppDirectory(project))
+                // Sprinkle some spring boot sugar on the jar to make it runnable
+                jar.finalizedBy(project.tasks.findByName(BOOT_REPACKAGE_TASK))
+            }
         }
     }
 
@@ -106,12 +137,16 @@ class SpringBootAction extends PluginAction {
     }
 
     private static boolean isJarProject(Project project) {
-        String layout = project.extensions.findByName(SPRING_BOOT_EXTENSION).layout
-        if (!layout) {
-            // Default is jar
-            return true
+        def springExtension = project.extensions.findByName(SPRING_BOOT_EXTENSION)
+        if(springExtension.hasProperty('layout')){
+            String layout = project.extensions.findByName(SPRING_BOOT_EXTENSION).layout
+            if (!layout) {
+                // Default is jar
+                return true
+            }
+            layout.toLowerCase() == JAR_TASK
         }
-        layout.toLowerCase() == JAR_TASK
+        true
     }
 
     /**
