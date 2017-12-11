@@ -17,6 +17,8 @@ package com.devsoap.plugin.tasks
 
 import com.devsoap.plugin.GradleVaadinPlugin
 import com.devsoap.plugin.Util
+import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.ResolvedConfiguration
 import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.artifacts.configurations.DefaultConfiguration
 import org.gradle.api.internal.file.CompositeFileCollection
@@ -41,20 +43,16 @@ class BuildClassPathJar extends Jar {
         classifier = 'classpath'
         dependsOn 'classes'
         onlyIf { getUseClassPathJar() }
+    }
 
-        project.afterEvaluate {
-
-            DefaultConfiguration serverConf = project.configurations
-                    .getByName(GradleVaadinPlugin.CONFIGURATION_RUN_SERVER)
-            FileCollection classPath = Util.getCompileClassPath(project)
-            CompositeFileCollection files = (serverConf + classPath)
-
-            inputs.files(files)
-
-            manifest.attributes('Class-Path':files.collect { File file ->
-                file.toURI().toString()
-            }.join(' '))
+    @Override
+    protected void copy() {
+        Set<File> files = Util.getCompileClassPath(project).files +
+                project.configurations[GradleVaadinPlugin.CONFIGURATION_RUN_SERVER].files
+        manifest {
+            it.attributes('Class-Path':files.collect { File file -> file.toURI().toString() }.join(' '))
         }
+        super.copy()
     }
 
     /**

@@ -358,6 +358,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
         configurations.create(CONFIGURATION_CLIENT) { conf ->
             conf.description = 'Libraries needed for compiling the widgetset.'
             conf.defaultDependencies { dependencies ->
+
                 if ( !project.vaadinCompile.widgetsetCDN ) {
                     if ( !Util.getWidgetset(project) ) {
                         Dependency widgetsetCompiled = projectDependencies.create(
@@ -632,7 +633,8 @@ class GradleVaadinPlugin implements Plugin<Project> {
     private static void applyVaadinUtilityTasks(Project project) {
         addTask(project, BuildSourcesJarTask.NAME, BuildSourcesJarTask, VAADIN_UTIL_TASK_GROUP)
         addTask(project, BuildJavadocJarTask.NAME, BuildJavadocJarTask, VAADIN_UTIL_TASK_GROUP)
-        addTask(project, BuildClassPathJar.NAME, BuildClassPathJar, VAADIN_UTIL_TASK_GROUP) { BuildClassPathJar task ->
+        addTask(project, BuildClassPathJar.NAME, BuildClassPathJar, VAADIN_UTIL_TASK_GROUP) {
+            BuildClassPathJar task ->
             task.useClassPathJar = project.extensions.getByType(VaadinPluginExtension).useClassPathJarProvider
         }
         addTask(project, VersionCheckTask.NAME, VersionCheckTask, VAADIN_UTIL_TASK_GROUP)
