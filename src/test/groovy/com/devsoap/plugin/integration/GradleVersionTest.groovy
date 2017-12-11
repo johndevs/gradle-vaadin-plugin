@@ -19,7 +19,7 @@ class GradleVersionTest extends IntegrationTest {
 
     @Parameterized.Parameters(name = "Gradle {0}")
     static Collection<String> getGradleVersions() {
-        [ '4.0', '4.1', '4.2']
+        [ '4.0', '4.1', '4.2', '4.3', '4.4']
     }
 
     @Override

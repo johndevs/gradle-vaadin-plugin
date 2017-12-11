@@ -767,37 +767,38 @@ class Util {
         Attributes.Name attribute = new Attributes.Name(byAttribute)
 
         project.configurations.all.each { Configuration conf ->
-            conf.allDependencies.each { Dependency dependency ->
-                if (dependency in ProjectDependency) {
-                    Project dependentProject = ((ProjectDependency) dependency).dependencyProject
-                    if (!(dependentProject in scannedProjects)) {
-                        addons.addAll(findAddonsInProject(dependentProject, byAttribute, includeFile, scannedProjects))
-                    }
-
-                } else if (isResolvable(project, conf)){
-                    conf.files(dependency).each { File file ->
-                        if (file.file && file.name.endsWith(JAR_EXTENSION)) {
-                            file.withInputStream { InputStream stream ->
-                                JarInputStream jarStream = new JarInputStream(stream)
-                                Manifest mf = jarStream.getManifest()
-                                Attributes attributes = mf?.mainAttributes
-                                if (attributes?.getValue(attribute)) {
-                                    if (!dependency.name.startsWith(VAADIN_CLIENT_DENDENCY)) {
-                                        if (includeFile) {
-                                            addons << [
-                                                    groupId   : dependency.group,
-                                                    artifactId: dependency.name,
-                                                    version   : getResolvedArtifactVersion(project,
-                                                            dependency.name, dependency.version),
-                                                    file      : file
-                                            ]
-                                        } else {
-                                            addons << [
-                                                    groupId   : dependency.group,
-                                                    artifactId: dependency.name,
-                                                    version   : getResolvedArtifactVersion(project,
-                                                            dependency.name, dependency.version)
-                                            ]
+            if(conf.name != GradleVaadinPlugin.CONFIGURATION_CLIENT){
+                conf.allDependencies.each { Dependency dependency ->
+                    if (dependency in ProjectDependency) {
+                        Project dependentProject = ((ProjectDependency) dependency).dependencyProject
+                        if (!(dependentProject in scannedProjects)) {
+                            addons.addAll(findAddonsInProject(dependentProject, byAttribute, includeFile, scannedProjects))
+                        }
+                    } else if (isResolvable(project, conf)){
+                        conf.files(dependency).each { File file ->
+                            if (file.file && file.name.endsWith(JAR_EXTENSION)) {
+                                file.withInputStream { InputStream stream ->
+                                    JarInputStream jarStream = new JarInputStream(stream)
+                                    Manifest mf = jarStream.getManifest()
+                                    Attributes attributes = mf?.mainAttributes
+                                    if (attributes?.getValue(attribute)) {
+                                        if (!dependency.name.startsWith(VAADIN_CLIENT_DENDENCY)) {
+                                            if (includeFile) {
+                                                addons << [
+                                                        groupId   : dependency.group,
+                                                        artifactId: dependency.name,
+                                                        version   : getResolvedArtifactVersion(project,
+                                                                dependency.name, dependency.version),
+                                                        file      : file
+                                                ]
+                                            } else {
+                                                addons << [
+                                                        groupId   : dependency.group,
+                                                        artifactId: dependency.name,
+                                                        version   : getResolvedArtifactVersion(project,
+                                                                dependency.name, dependency.version)
+                                                ]
+                                            }
                                         }
                                     }
                                 }
