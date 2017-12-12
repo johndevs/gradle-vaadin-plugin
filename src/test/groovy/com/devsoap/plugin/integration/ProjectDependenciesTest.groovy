@@ -29,10 +29,12 @@ class ProjectDependenciesTest extends IntegrationTest {
 
         buildFile << """
             import com.devsoap.plugin.extensions.VaadinPluginExtension
-            task testProperties << {
-                println 'Has Vaadin property ' + project.hasProperty('vaadin')
-                println 'Has Vaadin extension ' + (project.extensions.getByName('vaadin') != null)
-                println 'Has Vaadin type ' + (project.extensions.getByType(VaadinPluginExtension) != null)
+            task testProperties {
+                doLast {
+                    println 'Has Vaadin property ' + project.hasProperty('vaadin')
+                    println 'Has Vaadin extension ' + (project.extensions.getByName('vaadin') != null)
+                    println 'Has Vaadin type ' + (project.extensions.getByType(VaadinPluginExtension) != null)
+                }
             }
         """.stripIndent()
 
@@ -45,16 +47,18 @@ class ProjectDependenciesTest extends IntegrationTest {
     @Test void 'Project has Vaadin configurations'() {
 
         buildFile << """
-            task testConfigurations << {
-                def confs = project.configurations
-
-                println 'Server configuration ' + confs.hasProperty('vaadin-server')
-                println 'Client configuration ' + confs.hasProperty('vaadin-client')
-                println 'Javadoc configuration ' + confs.hasProperty('vaadin-javadoc')
-
-                println 'Testbench configuration ' + !confs.getByName('vaadin-testbench').dependencies.empty
-                println 'Push configuration ' + !confs.getByName('vaadin-push').dependencies.empty
-                println 'Groovy configuration ' + confs.hasProperty('vaadin-groovy')
+            task testConfigurations {
+                doLast {
+                    def confs = project.configurations
+    
+                    println 'Server configuration ' + confs.hasProperty('vaadin-server')
+                    println 'Client configuration ' + confs.hasProperty('vaadin-client')
+                    println 'Javadoc configuration ' + confs.hasProperty('vaadin-javadoc')
+    
+                    println 'Testbench configuration ' + !confs.getByName('vaadin-testbench').dependencies.empty
+                    println 'Push configuration ' + !confs.getByName('vaadin-push').dependencies.empty
+                    println 'Groovy configuration ' + confs.hasProperty('vaadin-groovy')
+                }
             }
         """.stripIndent()
 
@@ -71,18 +75,20 @@ class ProjectDependenciesTest extends IntegrationTest {
     @Test void 'Project has Vaadin repositories'() {
 
         buildFile << """
-            task testRepositories << {
-                def repositories = [
-                    'Vaadin addons',
-                    'Vaadin snapshots'
-                ]
-
-                repositories.each {
-                    if ( !project.repositories.hasProperty(it) ) {
-                        println 'Repository missing '+it
+            task testRepositories {
+                doLast {
+                    def repositories = [
+                        'Vaadin addons',
+                        'Vaadin snapshots'
+                    ]
+    
+                    repositories.each {
+                        if ( !project.repositories.hasProperty(it) ) {
+                            println 'Repository missing '+it
+                        }
                     }
                 }
-            }
+            }    
         """.stripIndent()
 
         def result = runWithArguments('testRepositories')
@@ -92,13 +98,15 @@ class ProjectDependenciesTest extends IntegrationTest {
     @Test void 'Project has pre-compiled widgetset'() {
 
         buildFile << """
-            task hasWidgetset << {
-                def confs = project.configurations
-                def client = confs.getByName('vaadin-client')
-                println 'Has client dependency ' + !client.dependencies.empty
-                println 'Has client-compiled dependency ' + !client.dependencies.findAll {
-                    it.name == 'vaadin-client-compiled'
-                }.empty
+            task hasWidgetset {
+                doLast {
+                    def confs = project.configurations
+                    def client = confs.getByName('vaadin-client')
+                    println 'Has client dependency ' + !client.dependencies.empty
+                    println 'Has client-compiled dependency ' + !client.dependencies.findAll {
+                        it.name == 'vaadin-client-compiled'
+                    }.empty
+                }
             }
          """.stripIndent()
 
@@ -114,14 +122,16 @@ class ProjectDependenciesTest extends IntegrationTest {
                widgetset 'com.example.TestWidgetset'
             }
 
-            task testClientDependencies << {
-                def confs = project.configurations
-                def client = confs.getByName('vaadin-client')
-                println 'Has client dependency ' + !client.dependencies.empty
-                println 'Has client-compiled dependency ' +  !client.dependencies.findAll {
-                    it.name == 'vaadin-client-compiled'
-                }.empty
-            }
+            task testClientDependencies {
+                doLast {
+                    def confs = project.configurations
+                    def client = confs.getByName('vaadin-client')
+                    println 'Has client dependency ' + !client.dependencies.empty
+                    println 'Has client-compiled dependency ' +  !client.dependencies.findAll {
+                        it.name == 'vaadin-client-compiled'
+                    }.empty
+                }
+            }    
         """.stripIndent()
 
         def result = runWithArguments('testClientDependencies')
@@ -131,13 +141,15 @@ class ProjectDependenciesTest extends IntegrationTest {
 
     @Test void 'Client dependencies added when widgetset is automatically detected'() {
         buildFile << """
-            task testClientDependencies << {
-                def confs = project.configurations
-                def client = confs.getByName('vaadin-server')
-                println 'Has client dependency ' + !client.dependencies.empty
-                println 'Has client-compiled dependency ' +  !client.dependencies.findAll {
-                    it.name == 'vaadin-client-compiled'
-                }.empty
+            task testClientDependencies {
+                doLast {
+                    def confs = project.configurations
+                    def client = confs.getByName('vaadin-server')
+                    println 'Has client dependency ' + !client.dependencies.empty
+                    println 'Has client-compiled dependency ' +  !client.dependencies.findAll {
+                        it.name == 'vaadin-client-compiled'
+                    }.empty
+                }
             }
         """.stripIndent()
 
@@ -159,17 +171,19 @@ class ProjectDependenciesTest extends IntegrationTest {
                 widgetset 'com.example.TestWidgetset'
             }
 
-            task verifyVaadinVersion << {
-                def server = project.configurations.getByName('vaadin-server')
-                server.dependencies.each {
-                    if ( it.group.equals('com.vaadin') ) {
-                        println 'Vaadin Server ' + it.version
+            task verifyVaadinVersion {
+                doLast {
+                    def server = project.configurations.getByName('vaadin-server')
+                    server.dependencies.each {
+                        if ( it.group.equals('com.vaadin') ) {
+                            println 'Vaadin Server ' + it.version
+                        }
                     }
-                }
-                def client = project.configurations.getByName('vaadin-client')
-                client.dependencies.each {
-                    if ( it.group.equals('com.vaadin') ) {
-                        println 'Vaadin Client ' + it.version
+                    def client = project.configurations.getByName('vaadin-client')
+                    client.dependencies.each {
+                        if ( it.group.equals('com.vaadin') ) {
+                            println 'Vaadin Client ' + it.version
+                        }
                     }
                 }
             }
@@ -187,12 +201,14 @@ class ProjectDependenciesTest extends IntegrationTest {
                 enabled true
             }
 
-            task verifyTestbenchPresent << {
-                def confs = project.configurations
-                println 'Testbench configuration ' + confs.hasProperty('vaadin-testbench')
-
-                def testbench = confs.getByName('vaadin-testbench')
-                println 'Testbench artifacts ' + !testbench.empty
+            task verifyTestbenchPresent {
+                doLast {
+                    def confs = project.configurations
+                    println 'Testbench configuration ' + confs.hasProperty('vaadin-testbench')
+    
+                    def testbench = confs.getByName('vaadin-testbench')
+                    println 'Testbench artifacts ' + !testbench.empty
+                }
             }
         """.stripIndent()
 
@@ -212,14 +228,15 @@ class ProjectDependenciesTest extends IntegrationTest {
                 compile 'com.vaadin:vaadin-spring-boot:+'
             }
 
-            task evaluateVersionBlacklist << {
-                project.configurations.compile.dependencies.each {
-                    if ( it.version.equals(project.vaadin.version) ) {
-                        println 'Version blacklist failed for ' + it
+            task evaluateVersionBlacklist {
+                doLast {
+                    project.configurations.compile.dependencies.each {
+                        if ( it.version.equals(project.vaadin.version) ) {
+                            println 'Version blacklist failed for ' + it
+                        }
                     }
                 }
             }
-
         """.stripIndent()
 
         def result = runWithArguments('evaluateVersionBlacklist')
@@ -229,13 +246,15 @@ class ProjectDependenciesTest extends IntegrationTest {
     @Test void 'Maven Central/Local are included'() {
 
         buildFile << """
-            task testMavenCentralLocal << {
-                def repos = project.repositories
-                if ( repos.hasProperty(ArtifactRepositoryContainer.DEFAULT_MAVEN_CENTRAL_REPO_NAME) ) {
-                    println 'Has Maven Central'
-                }
-                if ( repos.hasProperty(ArtifactRepositoryContainer.DEFAULT_MAVEN_LOCAL_REPO_NAME) ) {
-                    println 'Has Maven Local'
+            task testMavenCentralLocal {
+                doLast {
+                    def repos = project.repositories
+                    if ( repos.hasProperty(ArtifactRepositoryContainer.DEFAULT_MAVEN_CENTRAL_REPO_NAME) ) {
+                        println 'Has Maven Central'
+                    }
+                    if ( repos.hasProperty(ArtifactRepositoryContainer.DEFAULT_MAVEN_LOCAL_REPO_NAME) ) {
+                        println 'Has Maven Local'
+                    }
                 }
             }
         """.stripIndent()

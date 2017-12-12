@@ -22,18 +22,20 @@ class TaskConfigurationsTest extends IntegrationTest {
         buildFile << """
             apply plugin: 'eclipse-wtp'
 
-            task verifyEclipseClassPath(dependsOn: 'eclipseClasspath') << {
-                def classpath = project.eclipse.classpath
-                println 'Download sources ' +  classpath.downloadSources
-                println 'Eclipse output dir ' + project.vaadinRun.classesDir
-
-                def confs = project.configurations
-                println 'Server in classpath ' + (confs.getByName('vaadin-server') in classpath.plusConfigurations)
-                println 'Client in classpath ' + (confs.getByName('vaadin-client') in classpath.plusConfigurations)
-
-                def natures = project.eclipse.project.natures
-                println 'Springsource nature ' + ('org.springsource.ide.eclipse.gradle.core.nature' in natures)
-            }
+            task verifyEclipseClassPath(dependsOn: 'eclipseClasspath') {
+                doLast {
+                    def classpath = project.eclipse.classpath
+                    println 'Download sources ' +  classpath.downloadSources
+                    println 'Eclipse output dir ' + project.vaadinRun.classesDir
+    
+                    def confs = project.configurations
+                    println 'Server in classpath ' + (confs.getByName('vaadin-server') in classpath.plusConfigurations)
+                    println 'Client in classpath ' + (confs.getByName('vaadin-client') in classpath.plusConfigurations)
+    
+                    def natures = project.eclipse.project.natures
+                    println 'Springsource nature ' + ('org.springsource.ide.eclipse.gradle.core.nature' in natures)
+                }
+            }    
         """.stripIndent()
 
         def result = runWithArguments('verifyEclipseClassPath')
@@ -53,12 +55,14 @@ class TaskConfigurationsTest extends IntegrationTest {
 
             vaadinRun.classesDir 'custom/dir'
 
-            task verifyOutputDir(dependsOn:'eclipseClasspath') << {
-                println project.eclipse.classpath.defaultOutputDir
-                println project.file('custom/dir')
-                println 'Default output dir is set to eclipseOutputDir ' +
-                    (project.eclipse.classpath.defaultOutputDir == project.file('custom/dir'))
-            }
+            task verifyOutputDir(dependsOn:'eclipseClasspath') {
+                doLast {
+                    println project.eclipse.classpath.defaultOutputDir
+                    println project.file('custom/dir')
+                    println 'Default output dir is set to eclipseOutputDir ' +
+                        (project.eclipse.classpath.defaultOutputDir == project.file('custom/dir'))
+                }
+            }    
         """.stripIndent()
 
         def result = runWithArguments('verifyOutputDir')
@@ -74,13 +78,14 @@ class TaskConfigurationsTest extends IntegrationTest {
                enabled true                
             }
 
-            task verifyTestbenchDependency(dependsOn: 'eclipseClasspath') << {
-                def confs = project.configurations
-                def classpath = project.eclipse.classpath
-                println 'Testbench on classpath ' +
-                    (confs.getByName('vaadin-testbench') in classpath.plusConfigurations)
+            task verifyTestbenchDependency(dependsOn: 'eclipseClasspath') {
+                doLast {
+                    def confs = project.configurations
+                    def classpath = project.eclipse.classpath
+                    println 'Testbench on classpath ' +
+                        (confs.getByName('vaadin-testbench') in classpath.plusConfigurations)
+                }
             }
-
         """.stripIndent()
 
         def result = runWithArguments('verifyTestbenchDependency')
@@ -92,12 +97,13 @@ class TaskConfigurationsTest extends IntegrationTest {
         buildFile << """
             apply plugin: 'eclipse-wtp'
 
-            task verifyWTP(dependsOn:eclipseWtpComponent) << {
-                def confs = project.configurations
-                println 'Server in components ' +
-                    (confs.getByName('vaadin-server') in project.eclipse.wtp.component.plusConfigurations)
+            task verifyWTP(dependsOn:eclipseWtpComponent) {
+                doLast {
+                    def confs = project.configurations
+                    println 'Server in components ' +
+                        (confs.getByName('vaadin-server') in project.eclipse.wtp.component.plusConfigurations)
+                }
             }
-
         """.stripIndent()
 
         def result = runWithArguments('verifyWTP')
@@ -110,17 +116,18 @@ class TaskConfigurationsTest extends IntegrationTest {
         buildFile << """
             apply plugin: 'eclipse-wtp'
 
-            task verifyWTP(dependsOn:eclipseWtpFacet) << {
-                def facets = project.eclipse.wtp.facet.facets
-                def JavaVersion javaVersion = project.sourceCompatibility
-                println 'Vaadin Facet version ' + (facets.find {
-                    it.name=='com.vaadin.integration.eclipse.core'
-                }.version)
-                println 'jst.web Facet version ' + (facets.find { it.name=='jst.web'}.version)
-                println 'Java Facet version equals sourceCompatibility ' +
-                    (javaVersion.toString() == facets.find { it.name=='java'}.version)
+            task verifyWTP(dependsOn:eclipseWtpFacet) {
+                doLast {
+                    def facets = project.eclipse.wtp.facet.facets
+                    def JavaVersion javaVersion = project.sourceCompatibility
+                    println 'Vaadin Facet version ' + (facets.find {
+                        it.name=='com.vaadin.integration.eclipse.core'
+                    }.version)
+                    println 'jst.web Facet version ' + (facets.find { it.name=='jst.web'}.version)
+                    println 'Java Facet version equals sourceCompatibility ' +
+                        (javaVersion.toString() == facets.find { it.name=='java'}.version)
+                }
             }
-
         """.stripIndent()
 
         def result = runWithArguments('verifyWTP')
@@ -134,23 +141,24 @@ class TaskConfigurationsTest extends IntegrationTest {
         buildFile << """
             apply plugin: 'idea'
 
-            task verifyIdeaModule(dependsOn: 'ideaModule') << {
-
-                def module = project.idea.module
-                println 'Module and Project name is equal ' + (project.name == module.name)
-                println 'Output dir is classes dir ' +
-                    (project.sourceSets.main.output.classesDir == module.outputDir)
-                println 'Test output dir is classes dir ' +
-                    (project.sourceSets.test.output.classesDir == module.testOutputDir)
-
-                println 'Download Javadoc ' + module.downloadJavadoc
-                println 'Download Sources ' + module.downloadSources
-
-                def conf = project.configurations
-                def scopes = module.scopes
-                println 'Server configuration included ' + (conf.getByName('vaadin-server') in scopes.COMPILE.plus)
-                println 'Client configuration included ' + (conf.getByName('vaadin-client') in scopes.COMPILE.plus)
-            }
+            task verifyIdeaModule(dependsOn: 'ideaModule') {
+                doLast {
+                    def module = project.idea.module
+                    println 'Module and Project name is equal ' + (project.name == module.name)
+                    println 'Output dir is classes dir ' +
+                        (project.sourceSets.main.output.classesDir == module.outputDir)
+                    println 'Test output dir is classes dir ' +
+                        (project.sourceSets.test.output.classesDir == module.testOutputDir)
+    
+                    println 'Download Javadoc ' + module.downloadJavadoc
+                    println 'Download Sources ' + module.downloadSources
+    
+                    def conf = project.configurations
+                    def scopes = module.scopes
+                    println 'Server configuration included ' + (conf.getByName('vaadin-server') in scopes.COMPILE.plus)
+                    println 'Client configuration included ' + (conf.getByName('vaadin-client') in scopes.COMPILE.plus)
+                }
+            }    
         """.stripIndent()
 
         def result = runWithArguments('verifyIdeaModule')
@@ -174,12 +182,14 @@ class TaskConfigurationsTest extends IntegrationTest {
                 enabled true
              }
 
-             task verifyTestBench(dependsOn: 'ideaModule') << {
-                def conf = project.configurations
-                def module = project.idea.module
-                def scopes = module.scopes
-                println 'Test configuration has testbench ' + (conf.getByName('vaadin-testbench') in scopes.TEST.plus)
-             }
+             task verifyTestBench(dependsOn: 'ideaModule') {
+                 doLast {
+                    def conf = project.configurations
+                    def module = project.idea.module
+                    def scopes = module.scopes
+                    println 'Test configuration has testbench ' + (conf.getByName('vaadin-testbench') in scopes.TEST.plus)
+                 }
+             }    
         """.stripIndent()
 
         def result = runWithArguments('verifyTestBench')
@@ -196,13 +206,14 @@ class TaskConfigurationsTest extends IntegrationTest {
                 push true
             }
 
-            task verifyPush(dependsOn: 'ideaModule') << {
-                def conf = project.configurations
-                def module = project.idea.module
-                def scopes = module.scopes
-                println 'Compile configuration has push ' + (conf.getByName('vaadin-push') in scopes.COMPILE.plus)
+            task verifyPush(dependsOn: 'ideaModule') {
+                doLast {
+                    def conf = project.configurations
+                    def module = project.idea.module
+                    def scopes = module.scopes
+                    println 'Compile configuration has push ' + (conf.getByName('vaadin-push') in scopes.COMPILE.plus)
+                }
             }
-
         """.stripIndent()
 
         def result = runWithArguments('verifyPush')
@@ -218,11 +229,13 @@ class TaskConfigurationsTest extends IntegrationTest {
                 widgetsetGenerator 'com.example.WidgetsetGenerator'
              }
 
-             task verifyWidgetsetGenerator(dependsOn:compileJava) << {
-                def generatorFile = file('src/main/java/com/example/WidgetsetGenerator.java')
-                println generatorFile
-                println 'Generator File was created ' + generatorFile.exists()
-             }
+             task verifyWidgetsetGenerator(dependsOn:compileJava) {
+                 doLast {
+                    def generatorFile = file('src/main/java/com/example/WidgetsetGenerator.java')
+                    println generatorFile
+                    println 'Generator File was created ' + generatorFile.exists()
+                 }
+             }    
         """.stripIndent()
 
         def result = runWithArguments('verifyWidgetsetGenerator')
@@ -271,14 +284,16 @@ class TaskConfigurationsTest extends IntegrationTest {
                 author 'test-author'
             }
 
-            task verifyAddonJarManifest(dependsOn: 'jar') << {
-                def attributes = project.tasks.jar.manifest.attributes
-                println 'Vaadin-Widgetsets ' + attributes['Vaadin-Widgetsets']
-                println 'Implementation-Title ' + attributes['Implementation-Title']
-                println 'Implementation-Version ' + attributes['Implementation-Version']
-                println 'Implementation-Vendor ' + attributes['Implementation-Vendor']
-                println 'Vaadin-License-Title ' + attributes['Vaadin-License-Title']
-                println 'Vaadin-Package-Version ' + attributes['Vaadin-Package-Version']
+            task verifyAddonJarManifest(dependsOn: 'jar') {
+                doLast {
+                    def attributes = project.tasks.jar.manifest.attributes
+                    println 'Vaadin-Widgetsets ' + attributes['Vaadin-Widgetsets']
+                    println 'Implementation-Title ' + attributes['Implementation-Title']
+                    println 'Implementation-Version ' + attributes['Implementation-Version']
+                    println 'Implementation-Vendor ' + attributes['Implementation-Vendor']
+                    println 'Vaadin-License-Title ' + attributes['Vaadin-License-Title']
+                    println 'Vaadin-Package-Version ' + attributes['Vaadin-Package-Version']
+                }
             }
         """.stripIndent()
 
@@ -305,18 +320,20 @@ class TaskConfigurationsTest extends IntegrationTest {
                 author 'test-author'
             }
 
-            task verifyAddonZipManifest(dependsOn: '${CreateDirectoryZipTask.NAME}') << {
-                def manifestFile = project.file('build/tmp/zip/META-INF/MANIFEST.MF')
-                println 'Zip manifest exists ' + manifestFile.exists()
-
-                def manifest = new java.util.jar.Manifest()
-                manifest.read(new ByteArrayInputStream(manifestFile.text.bytes))
-
-                def attributes = manifest.mainAttributes
-                attributes.entrySet().each { entry ->
-                    println entry.key.toString() + ' ' + entry.value.toString()
+            task verifyAddonZipManifest(dependsOn: '${CreateDirectoryZipTask.NAME}') {
+                doLast {
+                    def manifestFile = project.file('build/tmp/zip/META-INF/MANIFEST.MF')
+                    println 'Zip manifest exists ' + manifestFile.exists()
+    
+                    def manifest = new java.util.jar.Manifest()
+                    manifest.read(new ByteArrayInputStream(manifestFile.text.bytes))
+    
+                    def attributes = manifest.mainAttributes
+                    attributes.entrySet().each { entry ->
+                        println entry.key.toString() + ' ' + entry.value.toString()
+                    }
                 }
-            }
+            }    
         """.stripIndent()
 
         def result = runWithArguments('verifyAddonZipManifest')
