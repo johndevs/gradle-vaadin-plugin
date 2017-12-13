@@ -17,11 +17,6 @@ package com.devsoap.plugin.tasks
 
 import com.devsoap.plugin.GradleVaadinPlugin
 import com.devsoap.plugin.Util
-import org.gradle.api.artifacts.Configuration
-import org.gradle.api.artifacts.ResolvedConfiguration
-import org.gradle.api.file.FileCollection
-import org.gradle.api.internal.artifacts.configurations.DefaultConfiguration
-import org.gradle.api.internal.file.CompositeFileCollection
 import org.gradle.api.provider.PropertyState
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.bundling.Jar
@@ -43,6 +38,9 @@ class BuildClassPathJar extends Jar {
         classifier = 'classpath'
         dependsOn 'classes'
         onlyIf { getUseClassPathJar() }
+
+        inputs.files project.configurations[GradleVaadinPlugin.CONFIGURATION_RUN_SERVER]
+        inputs.files Util.getCompileClassPath(project)
     }
 
     @Override
