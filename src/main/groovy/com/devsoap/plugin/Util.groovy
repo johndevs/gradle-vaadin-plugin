@@ -267,20 +267,6 @@ class Util {
     }
 
     /**
-     * Does the selected Vaadin version support push
-     *
-     * @param project
-     *      The project to check
-     * @return true if push is supported
-     */
-    @Memoized
-    static isPushSupported(Project project) {
-        VersionNumber version = VersionNumber.parse(getResolvedVaadinVersion(project))
-        version.major > VAADIN_SEVEN_MAJOR_VERSION ||
-                (version.major == VAADIN_SEVEN_MAJOR_VERSION && version.minor > 0)
-    }
-
-    /**
      * Is push supported and enabled in the project
      *
      * @param project
@@ -288,43 +274,9 @@ class Util {
      * @return  true if push is supported and enabled
      */
     @Memoized
-    static isPushSupportedAndEnabled(Project project) {
-        isPushSupported(project) && project.vaadin.push
-    }
-
-    /**
-     * Does the project support addon SCSS styles
-     *
-     * @param project
-     *      the project to check the support for
-     * @return
-     *      <code>true</code> if addon styles are supported
-     */
-    @Memoized
-    static boolean isAddonStylesSupported(Project project) {
-        VersionNumber version = VersionNumber.parse(getResolvedVaadinVersion(project))
-        version.major > VAADIN_SEVEN_MAJOR_VERSION ||
-                (version.major == VAADIN_SEVEN_MAJOR_VERSION && version.minor > 0)
-    }
-
-    /**
-     * Is the theme dependency needed for the project themes to compile
-     *
-     * @param project
-     *      the project to check
-     * @return
-     *      <code>true</code> if theme dependency is needed
-     */
-    @Memoized
-    static boolean isThemeDependencyNeeded(Project project) {
-        VersionNumber version = VersionNumber.parse(getResolvedVaadinVersion(project))
-        if ( version.major == VAADIN_SEVEN_MAJOR_VERSION && version.minor in [0, 1] ) {
-            // In Vaadin 7.0 and 7.1 the compiler was shipped as a non-transitive dependency
-            return true
-        }
-
-        // Since Vaadin 8 the theme compiler is by default not included
-        version.major >= 8
+    static isPushEnabled(Project project) {
+        VaadinPluginExtension vaadin = project.extensions[VaadinPluginExtension.NAME]
+        vaadin.push
     }
 
     /**
@@ -689,18 +641,19 @@ class Util {
      * For example, if the version has been defined as 7.x and the real latest Vaadin 7
      * version that is releases is 7.3.10 then this method will return 7.3.10.
      *
+     * Note: This will resolve the CONFIGURATION_SERVER configuration
+     *
      * @param project
-     *      The project to get the Vadin version for
+     *      The project to get the Vaadin version for
      * @return
      *      The resolved Vaadin version
      */
     @Memoized
     static String getResolvedVaadinVersion(Project project) {
-        VaadinPluginExtension vaadin = project.extensions[VaadinPluginExtension.NAME]
         getResolvedArtifactVersion(project,
                 project.configurations[GradleVaadinPlugin.CONFIGURATION_SERVER],
                 VAADIN_SERVER_DEPENDENCY,
-                vaadin.version)
+                getVaadinVersion(project))
     }
 
     /**
@@ -882,7 +835,7 @@ class Util {
         classpath += project.configurations.runtime
 
         // Include push dependencies if enabled
-        if ( isPushSupportedAndEnabled(project) ) {
+        if ( isPushEnabled(project) ) {
             classpath += project.configurations[GradleVaadinPlugin.CONFIGURATION_PUSH]
         }
 
