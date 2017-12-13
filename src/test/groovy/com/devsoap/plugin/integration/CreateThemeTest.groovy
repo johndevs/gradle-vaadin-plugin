@@ -127,13 +127,13 @@ class CreateThemeTest extends IntegrationTest {
         assertTrue "$themeDir does not exist", themeDir.exists()
 
         def addons = Paths.get(themeDir.canonicalPath, 'addons.scss').toFile()
-        assertTrue themeDir.list().toArrayString(), addons.exists()
+        assertTrue 'addons.scss does not exist in ' + themeDir.list().toArrayString(), addons.exists()
 
         def theme = Paths.get(themeDir.canonicalPath, themeName.toLowerCase()+'.scss').toFile()
-        assertTrue themeDir.list().toArrayString(), theme.exists()
+        assertTrue themeName.toLowerCase()+'.scss does not exist in ' + themeDir.list().toArrayString(), theme.exists()
 
         def styles = Paths.get(themeDir.canonicalPath, 'styles.scss').toFile()
-        assertTrue themeDir.list().toArrayString(), styles.exists()
+        assertTrue 'styles.scss does not exist in ' + themeDir.list().toArrayString(), styles.exists()
     }
 
     private static void assertCompiledThemeInDirectory(File directory, String themeName) {
