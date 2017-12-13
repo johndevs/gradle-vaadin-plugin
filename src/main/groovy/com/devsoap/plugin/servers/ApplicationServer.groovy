@@ -22,7 +22,6 @@ import com.devsoap.plugin.tasks.BuildClassPathJar
 import com.devsoap.plugin.tasks.CompileThemeTask
 import com.devsoap.plugin.tasks.CompressCssTask
 import com.devsoap.plugin.tasks.RunTask
-import groovy.transform.PackageScope
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.DependencySet
@@ -31,7 +30,6 @@ import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.SourceSet
-import org.gradle.api.tasks.SourceSetContainer
 
 import java.nio.file.WatchEvent
 import java.nio.file.WatchKey

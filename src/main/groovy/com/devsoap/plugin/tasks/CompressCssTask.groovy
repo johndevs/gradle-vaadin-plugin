@@ -16,7 +16,6 @@
 package com.devsoap.plugin.tasks
 
 import com.devsoap.plugin.Util
-
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.FileTree

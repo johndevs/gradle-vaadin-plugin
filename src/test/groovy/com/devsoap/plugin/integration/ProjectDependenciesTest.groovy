@@ -171,16 +171,20 @@ class ProjectDependenciesTest extends IntegrationTest {
                 widgetset 'com.example.TestWidgetset'
             }
 
-            task verifyVaadinVersion {
+            task verifyVaadinVersion << {
                 doLast {
                     def server = project.configurations.getByName('vaadin-server')
+                    println 'server:'
                     server.dependencies.each {
+                        println it
                         if ( it.group.equals('com.vaadin') ) {
                             println 'Vaadin Server ' + it.version
                         }
                     }
                     def client = project.configurations.getByName('vaadin-client')
+                    println 'client:'
                     client.dependencies.each {
+                        println it
                         if ( it.group.equals('com.vaadin') ) {
                             println 'Vaadin Client ' + it.version
                         }

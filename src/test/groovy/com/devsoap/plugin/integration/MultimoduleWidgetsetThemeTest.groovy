@@ -10,6 +10,7 @@ import java.nio.file.Paths
 import java.util.concurrent.TimeUnit
 import java.util.jar.Manifest
 
+import static org.junit.Assert.assertNotNull
 import static org.junit.Assert.assertTrue
 
 /**
@@ -114,6 +115,7 @@ class MultimoduleWidgetsetThemeTest extends MultiProjectIntegrationTest {
         manifest.withDataInputStream { stream ->
             Manifest m = new Manifest(stream)
             String cp = m.mainAttributes.getValue("Class-Path")
+            assertNotNull 'Attribute Class-Path not found in attributes '+m.mainAttributes, cp
             assertTrue cp.contains('theme-module-1.jar')
         }
 

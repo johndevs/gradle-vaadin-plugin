@@ -19,7 +19,6 @@ import com.devsoap.plugin.Util
 import com.devsoap.plugin.actions.SpringBootAction
 import com.devsoap.plugin.creators.ProjectCreator
 import com.devsoap.plugin.creators.ThemeCreator
-import groovy.transform.PackageScope
 import org.gradle.api.DefaultTask
 import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.tasks.TaskAction

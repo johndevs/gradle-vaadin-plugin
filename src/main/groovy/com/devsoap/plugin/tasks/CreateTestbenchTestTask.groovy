@@ -18,8 +18,6 @@ package com.devsoap.plugin.tasks
 import com.devsoap.plugin.ProjectType
 import com.devsoap.plugin.TemplateUtil
 import com.devsoap.plugin.Util
-
-import groovy.transform.PackageScope
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.internal.tasks.options.Option

@@ -16,7 +16,6 @@
 package com.devsoap.plugin.servers
 
 import com.devsoap.plugin.Util
-
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.DependencySet

@@ -16,7 +16,6 @@
 package com.devsoap.plugin.actions
 
 import com.devsoap.plugin.GradleVaadinPlugin
-
 import com.devsoap.plugin.TemplateUtil
 import com.devsoap.plugin.Util
 import com.devsoap.plugin.extensions.AddonExtension

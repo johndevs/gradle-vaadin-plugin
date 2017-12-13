@@ -16,8 +16,8 @@
 package com.devsoap.plugin.tasks
 
 import com.devsoap.plugin.MessageLogger
-import com.devsoap.plugin.servers.ApplicationServer
 import com.devsoap.plugin.Util
+import com.devsoap.plugin.servers.ApplicationServer
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.provider.PropertyState

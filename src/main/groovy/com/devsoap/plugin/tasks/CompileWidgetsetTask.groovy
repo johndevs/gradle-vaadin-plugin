@@ -19,10 +19,7 @@ import com.devsoap.plugin.GradleVaadinPlugin
 import com.devsoap.plugin.ProjectType
 import com.devsoap.plugin.TemplateUtil
 import com.devsoap.plugin.Util
-
-import com.devsoap.plugin.extensions.WidgetsetCDNExtension
 import groovy.transform.Memoized
-import groovy.transform.PackageScope
 import groovyx.net.http.AuthConfig
 import groovyx.net.http.ContentType
 import groovyx.net.http.HttpResponseDecorator
@@ -31,15 +28,12 @@ import org.apache.commons.codec.digest.DigestUtils
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
-import org.gradle.api.invocation.Gradle
 import org.gradle.api.provider.PropertyState
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.TaskAction
 
 import java.util.concurrent.TimeUnit
-import java.util.jar.Attributes
-import java.util.jar.JarFile
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 

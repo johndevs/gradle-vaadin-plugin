@@ -16,7 +16,6 @@
 package com.devsoap.plugin.testbench
 
 import com.devsoap.plugin.Util
-import com.devsoap.plugin.extensions.TestBenchExtension
 import com.devsoap.plugin.extensions.TestBenchHubExtension
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection

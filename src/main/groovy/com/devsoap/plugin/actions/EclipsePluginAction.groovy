@@ -18,7 +18,6 @@ package com.devsoap.plugin.actions
 import com.devsoap.plugin.GradleVaadinPlugin
 import com.devsoap.plugin.Util
 import com.devsoap.plugin.tasks.RunTask
-import groovy.transform.PackageScope
 import org.gradle.api.Project
 import org.gradle.plugins.ide.eclipse.model.EclipseClasspath
 import org.gradle.plugins.ide.eclipse.model.EclipseModel

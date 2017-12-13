@@ -15,17 +15,13 @@
  */
 package com.devsoap.plugin;
 
-import org.glassfish.embeddable.*;
-import org.glassfish.embeddable.archive.ScatteredArchive;
+import org.glassfish.embeddable.BootstrapProperties;
+import org.glassfish.embeddable.Deployer;
+import org.glassfish.embeddable.GlassFish;
+import org.glassfish.embeddable.GlassFishProperties;
+import org.glassfish.embeddable.GlassFishRuntime;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
