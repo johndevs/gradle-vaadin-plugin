@@ -61,7 +61,7 @@ class GrettyAction extends PluginAction{
             }
         }
 
-        if (Util.isPushSupportedAndEnabled(project)){
+        if (Util.isPushEnabled(project)){
             project.configurations[GradleVaadinPlugin.CONFIGURATION_PUSH].dependencies.each {
                 project.dependencies.add(GRETTY_CONFIGURATION, "$it.group:$it.name:$it.version")
             }

@@ -1,10 +1,7 @@
 package com.devsoap.plugin.integration
 
-import com.devsoap.plugin.tasks.CompileWidgetsetTask
 import com.devsoap.plugin.tasks.CreateProjectTask
 import org.junit.Test
-
-import java.util.concurrent.TimeUnit
 
 import static org.junit.Assert.assertFalse
 import static org.junit.Assert.assertTrue
@@ -101,10 +98,11 @@ class ProjectDependenciesTest extends IntegrationTest {
             task hasWidgetset {
                 doLast {
                     def confs = project.configurations
-                    def client = confs.getByName('vaadin-client')
-                    println 'Has client dependency ' + !client.dependencies.empty
-                    println 'Has client-compiled dependency ' + !client.dependencies.findAll {
-                        it.name == 'vaadin-client-compiled'
+                    def client = confs.getByName('vaadin-client').resolvedConfiguration
+                    def artifacts = client.resolvedArtifacts
+                    println 'Has client dependency ' + !artifacts.empty
+                    println 'Has client-compiled dependency ' + !artifacts.findAll {
+                        it.moduleVersion.id.name == 'vaadin-client-compiled'
                     }.empty
                 }
             }
@@ -125,10 +123,11 @@ class ProjectDependenciesTest extends IntegrationTest {
             task testClientDependencies {
                 doLast {
                     def confs = project.configurations
-                    def client = confs.getByName('vaadin-client')
-                    println 'Has client dependency ' + !client.dependencies.empty
-                    println 'Has client-compiled dependency ' +  !client.dependencies.findAll {
-                        it.name == 'vaadin-client-compiled'
+                    def client = confs.getByName('vaadin-client').resolvedConfiguration
+                    def artifacts = client.resolvedArtifacts
+                    println 'Has client dependency ' + !artifacts.empty
+                    println 'Has client-compiled dependency ' +  !artifacts.findAll {
+                        it.moduleVersion.id.name == 'vaadin-client-compiled'
                     }.empty
                 }
             }    
@@ -144,10 +143,11 @@ class ProjectDependenciesTest extends IntegrationTest {
             task testClientDependencies {
                 doLast {
                     def confs = project.configurations
-                    def client = confs.getByName('vaadin-server')
-                    println 'Has client dependency ' + !client.dependencies.empty
-                    println 'Has client-compiled dependency ' +  !client.dependencies.findAll {
-                        it.name == 'vaadin-client-compiled'
+                    def client = confs.getByName('vaadin-server').resolvedConfiguration
+                    def artifacts = client.resolvedArtifacts
+                    println 'Has client dependency ' + !artifacts.empty
+                    println 'Has client-compiled dependency ' +  !artifacts.findAll {
+                        it.moduleVersion.id.name == 'vaadin-client-compiled'
                     }.empty
                 }
             }
@@ -171,22 +171,20 @@ class ProjectDependenciesTest extends IntegrationTest {
                 widgetset 'com.example.TestWidgetset'
             }
 
-            task verifyVaadinVersion << {
+            task verifyVaadinVersion {
                 doLast {
-                    def server = project.configurations.getByName('vaadin-server')
+                    def server = project.configurations.getByName('vaadin-server').resolvedConfiguration
                     println 'server:'
-                    server.dependencies.each {
-                        println it
-                        if ( it.group.equals('com.vaadin') ) {
-                            println 'Vaadin Server ' + it.version
+                    server.resolvedArtifacts.each {              
+                        if ( it.moduleVersion.id.group.equals('com.vaadin') ) {
+                            println 'Vaadin Server ' + it.moduleVersion.id.version
                         }
                     }
-                    def client = project.configurations.getByName('vaadin-client')
+                    def client = project.configurations.getByName('vaadin-client').resolvedConfiguration
                     println 'client:'
-                    client.dependencies.each {
-                        println it
-                        if ( it.group.equals('com.vaadin') ) {
-                            println 'Vaadin Client ' + it.version
+                    client.resolvedArtifacts.each {
+                        if ( it.moduleVersion.id.group.equals('com.vaadin') ) {
+                            println 'Vaadin Client ' + it.moduleVersion.id.version
                         }
                     }
                 }

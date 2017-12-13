@@ -113,8 +113,7 @@ class CreateAddonProjectTask extends DefaultTask {
                 templateDir:TEMPLATE_DIRECTORY,
                 uiImports: ["server.${componentName.toLowerCase()}.$componentName"],
                 uiSubstitutions: ['addonComponentType' : componentName],
-                pushSupported:Util.isPushSupportedAndEnabled(project),
-                addonStylesSupported:Util.isAddonStylesSupported(project),
+                pushSupported:Util.isPushEnabled(project),
                 projectType: Util.getProjectType(project)
         ).run()
 

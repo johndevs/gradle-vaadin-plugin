@@ -59,11 +59,6 @@ class ProjectCreator implements Runnable {
     boolean widgetsetCDN = false
 
     /**
-     * Are addon styles supported. By default true.
-     */
-    boolean addonStylesSupported = true
-
-    /**
      * The type of project that will be created. By default a Java project.
      */
     ProjectType projectType = ProjectType.JAVA
@@ -141,9 +136,7 @@ class ProjectCreator implements Runnable {
             uiImports.add('com.vaadin.annotations.Push')
         }
 
-        if ( addonStylesSupported ) {
-            uiImports.add('com.vaadin.annotations.Theme')
-        }
+        uiImports.add('com.vaadin.annotations.Theme')
 
         if(bootEnabled) {
             uiImports.add('com.vaadin.spring.annotation.SpringUI')
@@ -160,17 +153,15 @@ class ProjectCreator implements Runnable {
             uiAnnotations.add('SpringUI')
         }
 
-        if ( addonStylesSupported ) {
-            switch (projectType) {
-                case ProjectType.GROOVY:
-                    uiAnnotations.add("Theme('${applicationName}')")
-                    break
-                case ProjectType.KOTLIN:
-                    uiAnnotations.add("Theme(\"${applicationName}\")")
-                    break
-                case ProjectType.JAVA:
-                    uiAnnotations.add("Theme(\"${applicationName}\")")
-            }
+        switch (projectType) {
+            case ProjectType.GROOVY:
+                uiAnnotations.add("Theme('${applicationName}')")
+                break
+            case ProjectType.KOTLIN:
+                uiAnnotations.add("Theme(\"${applicationName}\")")
+                break
+            case ProjectType.JAVA:
+                uiAnnotations.add("Theme(\"${applicationName}\")")
         }
 
         uiSubstitutions['annotations'] = uiAnnotations

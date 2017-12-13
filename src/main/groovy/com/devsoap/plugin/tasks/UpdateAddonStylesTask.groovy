@@ -40,7 +40,6 @@ class UpdateAddonStylesTask extends DefaultTask {
     UpdateAddonStylesTask() {
         dependsOn('classes', BuildClassPathJar.NAME)
         description = 'Updates the addons.scss file with addon styles.'
-        onlyIf { Util.isAddonStylesSupported(project) }
 
         project.afterEvaluate {
 
@@ -66,9 +65,6 @@ class UpdateAddonStylesTask extends DefaultTask {
      */
     @TaskAction
     void run() {
-        if ( !Util.isAddonStylesSupported(project) ) {
-            return
-        }
 
         File themesDir = Util.getThemesDirectory(project)
         themesDir.mkdirs()
