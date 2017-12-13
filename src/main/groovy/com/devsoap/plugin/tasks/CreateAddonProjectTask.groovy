@@ -18,7 +18,6 @@ package com.devsoap.plugin.tasks
 import com.devsoap.plugin.GradleVaadinPlugin
 import com.devsoap.plugin.TemplateUtil
 import com.devsoap.plugin.Util
-
 import com.devsoap.plugin.creators.AddonThemeCreator
 import com.devsoap.plugin.creators.ComponentCreator
 import com.devsoap.plugin.creators.ProjectCreator

@@ -23,11 +23,11 @@ import com.devsoap.plugin.actions.JavaPluginAction
 import com.devsoap.plugin.actions.SpringBootAction
 import com.devsoap.plugin.actions.VaadinPluginAction
 import com.devsoap.plugin.actions.WarPluginAction
+import com.devsoap.plugin.extensions.AddonExtension
 import com.devsoap.plugin.extensions.SpringBootExtension
 import com.devsoap.plugin.extensions.TestBenchExtension
 import com.devsoap.plugin.extensions.TestBenchHubExtension
 import com.devsoap.plugin.extensions.TestBenchNodeExtension
-import com.devsoap.plugin.extensions.AddonExtension
 import com.devsoap.plugin.extensions.VaadinPluginExtension
 import com.devsoap.plugin.extensions.WidgetsetCDNExtension
 import com.devsoap.plugin.servers.ApplicationServer
@@ -54,7 +54,6 @@ import com.devsoap.plugin.tasks.SuperDevModeTask
 import com.devsoap.plugin.tasks.UpdateAddonStylesTask
 import com.devsoap.plugin.tasks.UpdateWidgetsetTask
 import com.devsoap.plugin.tasks.VersionCheckTask
-
 import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.InvalidUserDataException
@@ -67,7 +66,6 @@ import org.gradle.api.artifacts.DependencyResolveDetails
 import org.gradle.api.artifacts.DependencySet
 import org.gradle.api.artifacts.DependencySubstitutions
 import org.gradle.api.artifacts.ModuleVersionSelector
-import org.gradle.api.artifacts.dsl.ArtifactHandler
 import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.invocation.Gradle

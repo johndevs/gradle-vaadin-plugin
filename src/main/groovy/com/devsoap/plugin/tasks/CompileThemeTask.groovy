@@ -16,7 +16,6 @@
 package com.devsoap.plugin.tasks
 
 import com.devsoap.plugin.Util
-
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -33,6 +32,7 @@ import org.gradle.tooling.BuildActionFailureException
 import java.nio.file.Paths
 import java.util.jar.Attributes
 import java.util.jar.JarInputStream
+
 /**
  * Compiles the SASS theme into CSS
  *

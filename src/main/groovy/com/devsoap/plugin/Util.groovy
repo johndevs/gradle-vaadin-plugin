@@ -15,7 +15,6 @@
  */
 package com.devsoap.plugin
 
-
 import com.devsoap.plugin.extensions.VaadinPluginExtension
 import com.devsoap.plugin.tasks.BuildClassPathJar
 import com.devsoap.plugin.tasks.CompileThemeTask
@@ -39,7 +38,7 @@ import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.SourceSet
 import org.gradle.util.VersionNumber
 
-import java.awt.Desktop
+import java.awt.*
 import java.nio.file.FileSystems
 import java.nio.file.FileVisitResult
 import java.nio.file.Files
@@ -51,6 +50,7 @@ import java.nio.file.WatchEvent
 import java.nio.file.WatchKey
 import java.nio.file.WatchService
 import java.nio.file.attribute.BasicFileAttributes
+import java.util.List
 import java.util.jar.Attributes
 import java.util.jar.JarFile
 import java.util.jar.JarInputStream

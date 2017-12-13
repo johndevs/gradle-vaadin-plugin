@@ -17,9 +17,7 @@ package com.devsoap.plugin.creators
 
 import com.devsoap.plugin.ProjectType
 import com.devsoap.plugin.TemplateUtil
-
 import groovy.transform.Canonical
-import groovy.transform.PackageScope
 
 /**
  * Creates a new Vaadin project using pre-defined templates

@@ -17,24 +17,21 @@ package com.devsoap.plugin.tasks
 
 import com.devsoap.plugin.TemplateUtil
 import com.devsoap.plugin.Util
-
 import groovy.transform.PackageScope
 import groovy.util.logging.Log
 import org.apache.commons.lang.StringUtils
-
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.TaskAction
-import org.gradle.api.Task
 
 import java.util.jar.Attributes
 import java.util.jar.JarInputStream
-
 
 /**
  * Updates the GWT module XML file with correct imports

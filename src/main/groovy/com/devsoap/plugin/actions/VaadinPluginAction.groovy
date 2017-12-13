@@ -18,7 +18,6 @@ package com.devsoap.plugin.actions
 import com.devsoap.plugin.GradleVaadinPlugin
 import com.devsoap.plugin.extensions.AddonExtension
 import com.devsoap.plugin.tasks.CreateDirectoryZipTask
-import groovy.transform.PackageScope
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.invocation.Gradle

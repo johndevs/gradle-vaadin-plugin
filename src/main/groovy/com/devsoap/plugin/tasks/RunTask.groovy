@@ -17,7 +17,6 @@ package com.devsoap.plugin.tasks
 
 import com.devsoap.plugin.MessageLogger
 import com.devsoap.plugin.servers.ApplicationServer
-import org.codehaus.groovy.runtime.StackTraceUtils
 import org.gradle.api.DefaultTask
 import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.provider.PropertyState
