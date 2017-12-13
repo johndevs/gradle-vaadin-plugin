@@ -696,14 +696,21 @@ class Util {
      */
     @Memoized
     static String getResolvedVaadinVersion(Project project) {
-        getResolvedArtifactVersion(project, VAADIN_SERVER_DEPENDENCY, project.vaadin.version)
+        VaadinPluginExtension vaadin = project.extensions[VaadinPluginExtension.NAME]
+        getResolvedArtifactVersion(project,
+                project.configurations[GradleVaadinPlugin.CONFIGURATION_SERVER],
+                VAADIN_SERVER_DEPENDENCY,
+                vaadin.version)
     }
 
     /**
-     * Resolves the real artifact version from a meta version (for example 1.2.+)
+     * Resolves the real artifact version from a meta version (for example 1.2.+). Note that this will try to resolve
+     * the configuration to get the artifact.
      *
      * @param project
      *      the projecct
+     * @param conf
+     *      the configuration to resolve
      * @param artifactName
      *      the artifact name
      * @param defaultVersion
@@ -712,18 +719,14 @@ class Util {
      *      returns the resolved version or if the artifact could not be found, the default version
      */
     @Memoized
-    static String getResolvedArtifactVersion(Project project, String artifactName, String defaultVersion=null) {
+    static String getResolvedArtifactVersion(Project project, Configuration conf, String artifactName, String defaultVersion=null) {
         String version = defaultVersion
-        project.configurations.each { Configuration conf ->
-            if(isResolvable(project, conf) && conf.state == Configuration.State.RESOLVED){
-                conf.allDependencies.each { Dependency dependency ->
-                    if (dependency.name.startsWith(artifactName)) {
-                        // Calling resolvedConfiguration triggers resolution, be aware
-                        version = conf.resolvedConfiguration.resolvedArtifacts
-                                .find { it.name == artifactName }?.moduleVersion?.id?.version
-                    }
-                }
-            }
+        if(isResolvable(project, conf)){
+            // Calling resolvedConfiguration triggers resolution, be aware
+            version = conf.resolvedConfiguration.resolvedArtifacts
+                    .find { it.name == artifactName }?.moduleVersion?.id?.version
+        } else {
+            project.logger.warn("Failed to get artifact version from non-resolvable configuration $conf")
         }
         version
     }
@@ -787,7 +790,7 @@ class Util {
                                                 addons << [
                                                         groupId   : dependency.group,
                                                         artifactId: dependency.name,
-                                                        version   : getResolvedArtifactVersion(project,
+                                                        version   : getResolvedArtifactVersion(project, conf,
                                                                 dependency.name, dependency.version),
                                                         file      : file
                                                 ]
@@ -795,7 +798,7 @@ class Util {
                                                 addons << [
                                                         groupId   : dependency.group,
                                                         artifactId: dependency.name,
-                                                        version   : getResolvedArtifactVersion(project,
+                                                        version   : getResolvedArtifactVersion(project, conf,
                                                                 dependency.name, dependency.version)
                                                 ]
                                             }
@@ -959,7 +962,7 @@ class Util {
             return java.canonicalPath
         }
 
-        // Fallback to Java on PATH with a warning§
+        // Fallback to Java on PATH with a warning
         project.logger.warn('Could not determine where the Java JRE is located, is JAVA_HOME set?')
         JAVA_BIN_NAME
     }
