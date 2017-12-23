@@ -4,7 +4,12 @@ pipeline {
   }
 
   parameters {
-     string(defaultValue: '1.0-SNAPSHOT-${BUILD_NUMBER}', description: 'Build version', name: 'buildVersion')
+     string(name: 'buildVersion',  description: 'Build version', defaultValue: '1.0-SNAPSHOT-${BUILD_NUMBER}')
+  }
+
+  environment {
+     GRADLE_PUBLISH_KEY = credentials('GRADLE_PUBLISH_KEY')
+     GRADLE_PUBLISH_SECRET = credentials('GRADLE_PUBLISH_SECRET')
   }
 
   stages {
@@ -16,7 +21,7 @@ pipeline {
 
     stage('Publish') {
       steps {
-        sh "./gradlew publishPlugins -PBUILD_VERSION=${params.buildVersion}"
+        sh "./gradlew publishPlugins -PBUILD_VERSION=${params.buildVersion} -Pgradle.publish.key=${env.GRADLE_PUBLISH_KEY} -Pgradle.publish.secret=${env.GRADLE_PUBLISH_SECRET}"
         archiveArtifacts artifacts: '**/files/build/libs/*.jar', fingerprint: true
       }
     }
