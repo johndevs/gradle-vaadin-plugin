@@ -4,7 +4,12 @@ pipeline {
   }
 
   parameters {
-     string(defaultValue: '1.0-SNAPSHOT-${BUILD_NUMBER}', description: 'Build version', name: 'buildVersion')
+     string(name: 'buildVersion',  description: 'Build version', defaultValue: '1.0-SNAPSHOT-${BUILD_NUMBER}')
+  }
+
+  environment {
+     gradle.publish.key=credentials('GRADLE_PUBLISH_KEY')
+     gradle.publish.secret=credentials('GRADLE_PUBLISH_SECRET')
   }
 
   stages {
