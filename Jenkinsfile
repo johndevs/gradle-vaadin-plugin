@@ -5,11 +5,13 @@ pipeline {
 
   parameters {
      string(name: 'buildVersion',  description: 'Build version', defaultValue: '1.0-SNAPSHOT-${BUILD_NUMBER}')
+     // choices are a string of newline separated values https://issues.jenkins-ci.org/browse/JENKINS-41180
+     choice(name: 'publish', choices: 'true\nfalse', description: 'Should the build be published to the Plugin Portal', defaultValue:'false')
   }
 
   environment {
-     gradle.publish.key=credentials('GRADLE_PUBLISH_KEY')
-     gradle.publish.secret=credentials('GRADLE_PUBLISH_SECRET')
+     GRADLE_PUBLISH_KEY = credentials('GRADLE_PUBLISH_KEY')
+     GRADLE_PUBLISH_SECRET = credentials('GRADLE_PUBLISH_SECRET')
   }
 
   stages {
@@ -20,8 +22,11 @@ pipeline {
     }
 
     stage('Publish') {
-      steps {
-        sh "./gradlew publishPlugins -PBUILD_VERSION=${params.buildVersion}"
+      when {                
+        expression { params.publish == 'true' }
+      }
+      steps {     
+        sh "./gradlew publishPlugins -PBUILD_VERSION=${params.buildVersion} -Pgradle.publish.key=${env.GRADLE_PUBLISH_KEY} -Pgradle.publish.secret=${env.GRADLE_PUBLISH_SECRET}"
         archiveArtifacts artifacts: '**/files/build/libs/*.jar', fingerprint: true
       }
     }
