@@ -6,7 +6,7 @@ pipeline {
   parameters {
      string(name: 'buildVersion',  description: 'Build version', defaultValue: '1.0-SNAPSHOT-${BUILD_NUMBER}')
      // choices are a string of newline separated values https://issues.jenkins-ci.org/browse/JENKINS-41180
-     choice(name: 'publish', choices: 'true\nfalse', description: 'Should the build be published to the Plugin Portal', defaultValue:'false')
+     booleanParam(name: 'publish', description: 'Should the build be published to the Plugin Portal', defaultValue: false)
   }
 
   environment {
