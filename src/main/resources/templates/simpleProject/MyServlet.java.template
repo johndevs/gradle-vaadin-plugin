@@ -2,7 +2,6 @@ package ${applicationPackage};
 
 import javax.servlet.annotation.WebInitParam;
 import javax.servlet.annotation.WebServlet;
-import com.vaadin.server.VaadinServlet;
 
 @WebServlet(
     asyncSupported=${asyncEnabled},
@@ -12,4 +11,4 @@ import com.vaadin.server.VaadinServlet;
             "@WebInitParam(name=\"${name}\", value=\"${value}\")"
         }).join(',\n\t') %>
     })
-public class ${applicationName}Servlet extends VaadinServlet { }
+public class ${applicationName}Servlet extends com.vaadin.server.VaadinServlet { }
