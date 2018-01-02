@@ -179,7 +179,7 @@ artifacts {
 groovydoc {
     docTitle = "Gradle Vaadin Plugin $version API"
     windowTitle = "Gradle Vaadin Plugin Version $version"
-    footer = "Gradle Vaadin Plugin is maintained by <a href=\"https://github.com/johndevs/\">@johndevs</a>. Copyright © 2017"
+    footer = "Gradle Vaadin Plugin is maintained by <a href=\"https://github.com/johndevs/\">@johndevs</a>. Copyright © 2018"
 }
 
 /***********************************************************************************************************************
