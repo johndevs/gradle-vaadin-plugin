@@ -823,9 +823,10 @@ class Util {
         // Include server dependencies
         classpath += project.configurations[GradleVaadinPlugin.CONFIGURATION_SERVER]
 
-        // Include client if no widgetset to provide pre-compiled widgetset
-        if ( !project.vaadinCompile.widgetsetCDN && !getWidgetset(project) ) {
-            classpath += project.configurations[GradleVaadinPlugin.CONFIGURATION_CLIENT]
+        // Exclude pre-compiled widgetset if compiled widgetset exists
+        if ( project.vaadinCompile.widgetsetCDN || getWidgetset(project) ) {
+            classpath = classpath.filter { file ->
+                !(file.name.startsWith('vaadin') && file.name.contains('client-compiled'))}
         }
 
         // Include addons
