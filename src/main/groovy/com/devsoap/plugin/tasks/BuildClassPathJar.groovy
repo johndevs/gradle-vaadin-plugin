@@ -17,6 +17,7 @@ package com.devsoap.plugin.tasks
 
 import com.devsoap.plugin.GradleVaadinPlugin
 import com.devsoap.plugin.Util
+import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.PropertyState
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.bundling.Jar
@@ -40,13 +41,17 @@ class BuildClassPathJar extends Jar {
         onlyIf { getUseClassPathJar() }
 
         inputs.files project.configurations[GradleVaadinPlugin.CONFIGURATION_RUN_SERVER]
+        inputs.files project.configurations[GradleVaadinPlugin.CONFIGURATION_THEME]
         inputs.files Util.getCompileClassPath(project)
     }
 
     @Override
     protected void copy() {
-        Set<File> files = Util.getCompileClassPath(project).files +
-                project.configurations[GradleVaadinPlugin.CONFIGURATION_RUN_SERVER].files
+        FileCollection files = (Util.getWarClasspath(project) +
+                project.configurations[GradleVaadinPlugin.CONFIGURATION_RUN_SERVER] +
+                project.configurations[GradleVaadinPlugin.CONFIGURATION_THEME]
+                )
+                .filter { it.file && it.canonicalFile.name.endsWith('.jar')}
         manifest {
             it.attributes('Class-Path':files.collect { File file -> file.toURI().toString() }.join(' '))
         }
