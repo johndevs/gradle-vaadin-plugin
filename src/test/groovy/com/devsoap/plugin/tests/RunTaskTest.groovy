@@ -3,6 +3,7 @@ package com.devsoap.plugin.tests
 import com.devsoap.plugin.categories.RunProject
 import com.devsoap.plugin.tasks.CreateProjectTask
 import com.devsoap.plugin.tasks.RunTask
+import org.gradle.testkit.runner.GradleRunner
 import org.junit.Rule
 import org.junit.Test
 import org.junit.experimental.categories.Category
@@ -24,7 +25,7 @@ import static org.junit.Assert.assertTrue
 class RunTaskTest extends IntegrationTest {
 
     @Rule
-    public Timeout timeout = new Timeout(1, TimeUnit.MINUTES)
+    public Timeout timeout = new Timeout(5, TimeUnit.MINUTES)
 
     final String server
 
@@ -40,11 +41,22 @@ class RunTaskTest extends IntegrationTest {
     @Override
     void setup() {
         super.setup()
-        buildFile << "vaadinRun.server = '$server'\n"
+        int port = freePort
+        println "Running server on port $port"
+        buildFile << """
+        vaadinRun {
+            debug false
+            server '$server'
+            serverPort $port
+            themeAutoRecompile false
+        }
+        """.stripMargin()
     }
 
     @Test void 'Run server'() {
-        def output = runWithArguments('--info', CreateProjectTask.NAME, RunTask.NAME, '--stopAfterStart')
+        runWithArguments(CreateProjectTask.NAME)
+        def output = runWithArguments('--info', RunTask.NAME, '--stopAfterStart')
+
         assertTrue output, output.contains("Starting $server")
         assertServerRunning output
     }
@@ -60,14 +72,16 @@ class RunTaskTest extends IntegrationTest {
             }
         """
 
-        def output = runWithArguments(CreateProjectTask.NAME, RunTask.NAME, '--stopAfterStart')
-        assertServerRunning output
+        runWithArguments(CreateProjectTask.NAME)
+        def output = runWithArguments(RunTask.NAME, '--stopAfterStart')
 
+        assertServerRunning output
         assertFalse output, output.contains('The defined classesDir does not contain any classes')
     }
 
     @Test void 'Run with debug flag'() {
-        def output = runWithArguments('--debug', CreateProjectTask.NAME, RunTask.NAME, '--stopAfterStart')
+        runWithArguments(CreateProjectTask.NAME)
+        def output = runWithArguments('--info', RunTask.NAME, '--stopAfterStart')
         assertServerRunning output
     }
 
@@ -78,7 +92,9 @@ class RunTaskTest extends IntegrationTest {
                 compile 'org.slf4j:slf4j-api:1.7.21'
             }
         """.stripIndent()
-        def output = runWithArguments('--debug', CreateProjectTask.NAME, RunTask.NAME, '--stopAfterStart')
+
+        runWithArguments(CreateProjectTask.NAME)
+        def output = runWithArguments('--info', RunTask.NAME, '--stopAfterStart')
         assertServerRunning output
     }
 
@@ -87,12 +103,18 @@ class RunTaskTest extends IntegrationTest {
             vaadin.useClassPathJar true
         """.stripIndent()
 
-        def output = runWithArguments('--debug', CreateProjectTask.NAME, RunTask.NAME, '--stopAfterStart')
+        runWithArguments(CreateProjectTask.NAME)
+
+        def output = runWithArguments('--debug', RunTask.NAME, '--stopAfterStart')
         assertFalse(output, output.contains('Spring Loaded jar not found'))
         assertTrue(output, output.contains('Using Spring Loaded found from'))
     }
 
     private void assertServerRunning(String output) {
         assertTrue output, output.contains('Application running on ')
+    }
+
+    private int getFreePort() {
+        new ServerSocket(0).getLocalPort()
     }
 }
