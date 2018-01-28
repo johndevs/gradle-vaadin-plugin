@@ -1,9 +1,12 @@
-package com.devsoap.plugin.integration
+package com.devsoap.plugin.tests
 
+import com.devsoap.plugin.categories.ThemeCompile
+import com.devsoap.plugin.categories.WidgetsetCompile
 import com.devsoap.plugin.tasks.CompileWidgetsetTask
 import com.devsoap.plugin.tasks.CreateComponentTask
 import com.devsoap.plugin.tasks.CreateProjectTask
 import org.junit.Test
+import org.junit.experimental.categories.Category
 
 import java.nio.file.Paths
 
@@ -21,6 +24,7 @@ class CompileWidgetsetTest extends IntegrationTest {
         assertFalse result, result.contains('Compiling module')
     }
 
+    @Category(WidgetsetCompile)
     @Test void 'No widgetset defined, automatic widgetset detected and compiled'() {
         runWithArguments(CreateProjectTask.NAME, '--widgetset=com.example.MyWidgetset')
         def result = runWithArguments('--info', CompileWidgetsetTask.NAME)
@@ -29,6 +33,7 @@ class CompileWidgetsetTest extends IntegrationTest {
         assertTrue result, result.contains('Linking succeeded')
     }
 
+    @Category(WidgetsetCompile)
     @Test void 'Widgetset defined, manual widgetset detected and compiled'() {
         buildFile << """
             vaadinCompile.widgetset = 'com.example.MyWidgetset'
@@ -39,6 +44,7 @@ class CompileWidgetsetTest extends IntegrationTest {
         assertCompilationSucceeded(result)
     }
 
+    @Category(WidgetsetCompile)
     @Test void 'No Widgetset defined, but addons exist in project'() {
         buildFile << """
             dependencies {
@@ -89,6 +95,7 @@ class CompileWidgetsetTest extends IntegrationTest {
 
     }
 
+    @Category(WidgetsetCompile)
     @Test void 'Compile with legacy dependencies'(){
         buildFile << """
             dependencies {
@@ -105,6 +112,7 @@ class CompileWidgetsetTest extends IntegrationTest {
         assertCompilationSucceeded(result)
     }
 
+    @Category(WidgetsetCompile)
     @Test void 'Compile with legacy dependencies and classpath jar'(){
         buildFile << """
             dependencies {
@@ -123,6 +131,7 @@ class CompileWidgetsetTest extends IntegrationTest {
         assertCompilationSucceeded(result)
     }
 
+    @Category(WidgetsetCompile)
     @Test void 'Compile with upgraded validation-jar'() {
         buildFile << """
             dependencies {
@@ -137,6 +146,7 @@ class CompileWidgetsetTest extends IntegrationTest {
         assertCompilationSucceeded(result)
     }
 
+    @Category(WidgetsetCompile)
     @Test void 'Compile with client sources'() {
         buildFile << """            
             vaadinCompile.widgetset = 'com.example.MyWidgetset'
@@ -150,6 +160,7 @@ class CompileWidgetsetTest extends IntegrationTest {
         assertCompilationSucceeded(result)
     }
 
+    @Category(WidgetsetCompile)
     @Test void 'Compile with client sources and classpath jar'() {
         buildFile << """            
             vaadinCompile.widgetset = 'com.example.MyWidgetset'
@@ -164,6 +175,7 @@ class CompileWidgetsetTest extends IntegrationTest {
         assertCompilationSucceeded(result)
     }
 
+    @Category(WidgetsetCompile)
     @Test void 'Compile with third-party non-vaadin addon dependency'() {
         buildFile << """
             vaadin.version = "7.7.7"

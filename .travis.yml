@@ -1,7 +1,14 @@
 language: groovy
 jdk:
   - oraclejdk8
-script: ./gradlew --stacktrace check
+env:
+  - TEST_CATEGORY=uncategorizedTests
+  - TEST_CATEGORY=widgetsetCompileTests
+  - TEST_CATEGORY=themeCompileTests
+  - TEST_CATEGORY=fullCompileTests
+  - TEST_CATEGORY=runProjectTests
+  - TEST_CATEGORY=proxyTest
+script: "./gradlew --stacktrace check -PTEST_CATEGORY=$TEST_CATEGORY"
 branches:
   only:
     - "master"

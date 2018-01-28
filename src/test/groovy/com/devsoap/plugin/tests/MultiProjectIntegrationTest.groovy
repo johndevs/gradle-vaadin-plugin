@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.devsoap.plugin.integration
+package com.devsoap.plugin.tests
 /**
- * Base for integration tests which has modules with vaadin projects
+ * Base for tests tests which has modules with vaadin projects
  */
 class MultiProjectIntegrationTest extends IntegrationTest {
 

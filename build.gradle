@@ -42,6 +42,9 @@ version = project.hasProperty('BUILD_VERSION') ? getProperty('BUILD_VERSION') : 
 archivesBaseName ='gradle-vaadin-plugin'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
+ext {
+    testCategory = project.hasProperty('TEST_CATEGORY') ? getProperty('TEST_CATEGORY') : null
+}
 
 /***********************************************************************************************************************
  *
@@ -50,6 +53,10 @@ targetCompatibility = 1.8
  **********************************************************************************************************************/
 repositories{
 	mavenCentral()
+    maven { // FIXME For Junit 4.13-SNAPSHOT, remove when released
+        name 'JBoss'
+        url 'https://repository.jboss.org/'
+    }
 }
 
 configurations {
@@ -79,7 +86,7 @@ dependencies {
     deploy 'org.apache.maven.wagon:wagon-ssh:2.2'
 
     testCompile gradleTestKit()
-    testCompile 'junit:junit:4.12'
+    testCompile 'junit:junit:4.13-SNAPSHOT'
 
     // ProxyTest needs its own special configuration to avoid conflicts
     proxyTest ('org.mock-server:mockserver-netty:3.10.4') {
@@ -192,26 +199,77 @@ groovydoc {
  * Configure test phase only to run ordinary unit tests.
  */
 test {
-    testLogging {
-        exceptionFormat "full"
-    }
-    exclude '**/integration/**'
+    exclude '**/tests/**'
 }
 
 /**
  * Run integration tests with a different tasks so they are only run when running check
  */
-task integrationTest(type:Test, dependsOn:['test','jar']) {
+task uncategorizedTests(type:Test, dependsOn:['test','jar']) {
     testLogging {
         exceptionFormat "full"
         showStandardStreams = true
     }
-    include '**/integration/**'
-    exclude '**/integration/*ProxyTest*'
+    useJUnit {
+        excludeCategories 'com.devsoap.plugin.categories.WidgetsetCompile'
+        excludeCategories 'com.devsoap.plugin.categories.ThemeCompile'
+        excludeCategories 'com.devsoap.plugin.categories.WidgetsetAndThemeCompile'
+        excludeCategories 'com.devsoap.plugin.categories.RunProject'
+    }
+    exclude  '**/tests/*ProxyTest*'
     systemProperty 'integrationTestProjectVersion', version
     maxParallelForks = Runtime.runtime.availableProcessors() > 1 ? Runtime.runtime.availableProcessors() - 1 : 1
 }
-check.dependsOn 'integrationTest'
+
+task widgetsetCompileTests(type:Test, dependsOn:['test','jar']) {
+    testLogging {
+        exceptionFormat "full"
+        showStandardStreams = true
+    }
+    useJUnit {
+        includeCategories 'com.devsoap.plugin.categories.WidgetsetCompile'
+        excludeCategories 'com.devsoap.plugin.categories.ThemeCompile'
+    }
+    systemProperty 'integrationTestProjectVersion', version
+    maxParallelForks = Runtime.runtime.availableProcessors() > 1 ? Runtime.runtime.availableProcessors() - 1 : 1
+}
+
+task themeCompileTests(type:Test, dependsOn:['test','jar']) {
+    testLogging {
+        exceptionFormat "full"
+        showStandardStreams = true
+    }
+    useJUnit {
+        excludeCategories 'com.devsoap.plugin.categories.WidgetsetCompile'
+        includeCategories 'com.devsoap.plugin.categories.ThemeCompile'
+    }
+    systemProperty 'integrationTestProjectVersion', version
+    maxParallelForks = Runtime.runtime.availableProcessors() > 1 ? Runtime.runtime.availableProcessors() - 1 : 1
+}
+
+task fullCompileTests(type:Test, dependsOn:['test','jar']) {
+    testLogging {
+        exceptionFormat "full"
+        showStandardStreams = true
+    }
+    useJUnit {
+        includeCategories 'com.devsoap.plugin.categories.WidgetsetAndThemeCompile'
+    }
+    systemProperty 'integrationTestProjectVersion', version
+    maxParallelForks = Runtime.runtime.availableProcessors() > 1 ? Runtime.runtime.availableProcessors() - 1 : 1
+}
+
+task runProjectTests(type:Test, dependsOn:['test','jar']) {
+    testLogging {
+        exceptionFormat "full"
+        showStandardStreams = true
+    }
+    useJUnit {
+        includeCategories 'com.devsoap.plugin.categories.RunProject'
+    }
+    systemProperty 'integrationTestProjectVersion', version
+    maxParallelForks = Runtime.runtime.availableProcessors() > 1 ? Runtime.runtime.availableProcessors() - 1 : 1
+}
 
 /**
  * Runs proxy integration test that needs special configuration
@@ -224,10 +282,20 @@ task proxyTest(type:Test, dependsOn: ['test','jar']) {
         exceptionFormat "full"
         showStandardStreams = true
     }
-    include  '**/integration/*ProxyTest*'
+    include  '**/tests/*ProxyTest*'
     systemProperty 'integrationTestProjectVersion', version
 }
-check.dependsOn 'proxyTest'
+
+if(!ext.testCategory) {
+    check.dependsOn 'uncategorizedTests'
+    check.dependsOn 'widgetsetCompileTests'
+    check.dependsOn 'themeCompileTests'
+    check.dependsOn 'fullCompileTests'
+    check.dependsOn 'runProjectTests'
+    check.dependsOn 'proxyTest'
+} else{
+    check.dependsOn ext.testCategory
+}
 
 
 /***********************************************************************************************************************

@@ -1,7 +1,9 @@
-package com.devsoap.plugin.integration
+package com.devsoap.plugin.tests
 
+import com.devsoap.plugin.categories.WidgetsetAndThemeCompile
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.Test
+import org.junit.experimental.categories.Category
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
@@ -9,6 +11,7 @@ import org.junit.runners.Parameterized
  * Smoke test for different gradle versions
  */
 @RunWith(Parameterized)
+@Category(WidgetsetAndThemeCompile)
 class GradleVersionTest extends IntegrationTest {
 
     final String gradleVersion

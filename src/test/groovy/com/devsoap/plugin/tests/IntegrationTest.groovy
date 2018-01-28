@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.devsoap.plugin.integration
+package com.devsoap.plugin.tests
 
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.After
@@ -24,7 +24,7 @@ import org.junit.rules.TemporaryFolder
 import java.nio.file.Paths
 
 /**
- * Base class for integration tests
+ * Base class for tests tests
  */
 class IntegrationTest {
 

@@ -13,15 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.devsoap.plugin.integration
+package com.devsoap.plugin.tests
 
+import com.devsoap.plugin.categories.WidgetsetCompile
 import org.junit.Test
+import org.junit.experimental.categories.Category
 
 /**
  * Tests the extension configurations added to the project
  */
 class PluginExtensionConfigurationTest extends MultiProjectIntegrationTest {
 
+    @Category(WidgetsetCompile)
     @Test void 'Extension configurations are applied to sub projects'() {
         makeProject('project1')
         makeProject('project2')

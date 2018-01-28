@@ -1,8 +1,10 @@
-package com.devsoap.plugin.integration
+package com.devsoap.plugin.tests
 
+import com.devsoap.plugin.categories.RunProject
 import com.devsoap.plugin.tasks.CreateProjectTask
 import com.devsoap.plugin.tasks.RunTask
 import org.junit.Test
+import org.junit.experimental.categories.Category
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
@@ -14,6 +16,7 @@ import static org.junit.Assert.assertTrue
  * Created by john on 18.1.2016.
  */
 @RunWith(Parameterized)
+@Category(RunProject)
 class RunTaskTest extends IntegrationTest {
 
     final String server

@@ -1,4 +1,4 @@
-package com.devsoap.plugin.integration
+package com.devsoap.plugin.tests
 
 import com.devsoap.plugin.tasks.UpdateWidgetsetTask
 import org.junit.Test
