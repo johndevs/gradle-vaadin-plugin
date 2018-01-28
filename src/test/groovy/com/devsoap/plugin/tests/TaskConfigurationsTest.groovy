@@ -1,8 +1,10 @@
-package com.devsoap.plugin.integration
+package com.devsoap.plugin.tests
 
+import com.devsoap.plugin.categories.WidgetsetCompile
 import com.devsoap.plugin.tasks.CreateDirectoryZipTask
 import org.junit.Ignore
 import org.junit.Test
+import org.junit.experimental.categories.Category
 
 import static org.junit.Assert.assertTrue
 import static org.junit.Assert.assertFalse
@@ -121,7 +123,7 @@ class TaskConfigurationsTest extends IntegrationTest {
                     def facets = project.eclipse.wtp.facet.facets
                     def JavaVersion javaVersion = project.sourceCompatibility
                     println 'Vaadin Facet version ' + (facets.find {
-                        it.name=='com.vaadin.integration.eclipse.core'
+                        it.name=='com.vaadin.tests.eclipse.core'
                     }.version)
                     println 'jst.web Facet version ' + (facets.find { it.name=='jst.web'}.version)
                     println 'Java Facet version equals sourceCompatibility ' +
@@ -243,6 +245,7 @@ class TaskConfigurationsTest extends IntegrationTest {
         assertTrue result, result.contains('Generator File was created true')
     }
 
+    @Category(WidgetsetCompile)
     @Test void 'Compile with a widgetset generator'() {
         buildFile << """
              vaadinCompile {

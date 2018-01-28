@@ -1,8 +1,10 @@
-package com.devsoap.plugin.integration
+package com.devsoap.plugin.tests
 
 import com.devsoap.plugin.GradleVaadinPlugin
+import com.devsoap.plugin.categories.WidgetsetCompile
 import com.devsoap.plugin.tasks.CreateProjectTask
 import org.junit.Test
+import org.junit.experimental.categories.Category
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 

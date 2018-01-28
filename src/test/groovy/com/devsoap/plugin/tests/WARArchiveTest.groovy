@@ -1,7 +1,9 @@
-package com.devsoap.plugin.integration
+package com.devsoap.plugin.tests
 
+import com.devsoap.plugin.categories.WidgetsetAndThemeCompile
 import org.junit.Assert
 import org.junit.Test
+import org.junit.experimental.categories.Category
 
 import java.nio.file.Paths
 import java.util.zip.ZipEntry
@@ -26,6 +28,7 @@ class WARArchiveTest extends IntegrationTest {
         assertTrue output.contains('Applying WarPluginAction')
     }
 
+    @Category(WidgetsetAndThemeCompile)
     @Test void 'Project with no dependencies'() {
 
         runWithArguments('war')
@@ -50,6 +53,7 @@ class WARArchiveTest extends IntegrationTest {
         assertFilesInFolder(warFile, FILES_IN_WEBINF_LIB, 'WEB-INF/lib')
     }
 
+    @Category(WidgetsetAndThemeCompile)
     @Test void 'Project with widgetset'() {
         buildFile << "vaadinCompile.widgetset = 'com.example.TestWidgetset'\n"
 
@@ -74,6 +78,7 @@ class WARArchiveTest extends IntegrationTest {
         assertFilesInFolder(warFile, FILES_IN_WEBINF_LIB, 'WEB-INF/lib')
     }
 
+    @Category(WidgetsetAndThemeCompile)
     @Test void 'Project theme is included in archive'() {
 
         runWithArguments('vaadinCreateProject')
@@ -91,6 +96,7 @@ class WARArchiveTest extends IntegrationTest {
         assertFilesInFolder(warFile, THEME_FILES, "VAADIN/themes/${projectDir.root.name.capitalize()}".toString())
     }
 
+    @Category(WidgetsetAndThemeCompile)
     @Test void 'Project widgetset is included in archive'() {
 
         runWithArguments('vaadinCreateProject', '--widgetset=com.example.Widgetset')
@@ -118,6 +124,7 @@ class WARArchiveTest extends IntegrationTest {
         'Project with no dependencies'()
     }
 
+    @Category(WidgetsetAndThemeCompile)
     @Test void 'Vaadin addons in vaadinCompile are added to war'() {
         buildFile << """
         dependencies {

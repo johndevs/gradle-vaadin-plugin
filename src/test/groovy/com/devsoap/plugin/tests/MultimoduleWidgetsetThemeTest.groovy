@@ -1,10 +1,12 @@
-package com.devsoap.plugin.integration
+package com.devsoap.plugin.tests
 
+import com.devsoap.plugin.categories.WidgetsetCompile
 import com.devsoap.plugin.tasks.BuildClassPathJar
 import com.devsoap.plugin.tasks.CreateComponentTask
 import com.devsoap.plugin.tasks.CreateProjectTask
 import com.devsoap.plugin.tasks.CreateThemeTask
 import org.junit.Test
+import org.junit.experimental.categories.Category
 
 import java.nio.file.Paths
 import java.util.concurrent.TimeUnit
@@ -18,6 +20,7 @@ import static org.junit.Assert.assertTrue
  */
 class MultimoduleWidgetsetThemeTest extends MultiProjectIntegrationTest {
 
+    @Category(WidgetsetCompile)
     @Test void 'Multimodule project with shared widgetset and theme'() {
         File widgetsetModule = makeProject('widgetset-module')
         File widgetsetBuildFile = makeBuildFile(widgetsetModule)

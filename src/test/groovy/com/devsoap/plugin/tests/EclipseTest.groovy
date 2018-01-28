@@ -1,4 +1,4 @@
-package com.devsoap.plugin.integration
+package com.devsoap.plugin.tests
 
 import groovy.transform.Memoized
 import groovy.util.logging.Log

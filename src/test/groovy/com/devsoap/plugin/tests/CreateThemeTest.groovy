@@ -1,8 +1,10 @@
-package com.devsoap.plugin.integration
+package com.devsoap.plugin.tests
 
+import com.devsoap.plugin.categories.ThemeCompile
 import com.devsoap.plugin.tasks.CompileThemeTask
 import com.devsoap.plugin.tasks.CreateThemeTask
 import org.junit.Test
+import org.junit.experimental.categories.Category
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
@@ -14,6 +16,7 @@ import static org.junit.Assert.assertFalse
  * Created by john on 18.1.2016.
  */
 @RunWith(Parameterized)
+@Category(ThemeCompile)
 class CreateThemeTest extends IntegrationTest {
 
     final String themeCompiler
