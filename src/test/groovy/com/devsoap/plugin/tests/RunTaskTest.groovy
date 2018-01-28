@@ -3,10 +3,14 @@ package com.devsoap.plugin.tests
 import com.devsoap.plugin.categories.RunProject
 import com.devsoap.plugin.tasks.CreateProjectTask
 import com.devsoap.plugin.tasks.RunTask
+import org.junit.Rule
 import org.junit.Test
 import org.junit.experimental.categories.Category
+import org.junit.rules.Timeout
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
+
+import java.util.concurrent.TimeUnit
 
 import static org.junit.Assert.assertFalse
 import static org.junit.Assert.assertTrue
@@ -18,6 +22,9 @@ import static org.junit.Assert.assertTrue
 @RunWith(Parameterized)
 @Category(RunProject)
 class RunTaskTest extends IntegrationTest {
+
+    @Rule
+    public Timeout timeout = new Timeout(1, TimeUnit.MINUTES)
 
     final String server
 
@@ -80,7 +87,7 @@ class RunTaskTest extends IntegrationTest {
             vaadin.useClassPathJar true
         """.stripIndent()
 
-        def output = runWithArguments('--info', CreateProjectTask.NAME, RunTask.NAME, '--stopAfterStart')
+        def output = runWithArguments('--debug', CreateProjectTask.NAME, RunTask.NAME, '--stopAfterStart')
         assertFalse(output, output.contains('Spring Loaded jar not found'))
         assertTrue(output, output.contains('Using Spring Loaded found from'))
     }
