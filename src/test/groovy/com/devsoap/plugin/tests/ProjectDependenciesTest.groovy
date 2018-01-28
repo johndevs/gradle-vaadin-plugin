@@ -126,16 +126,12 @@ class ProjectDependenciesTest extends IntegrationTest {
                     def client = confs.getByName('vaadin-client').resolvedConfiguration
                     def artifacts = client.resolvedArtifacts
                     println 'Has client dependency ' + !artifacts.empty
-                    println 'Has client-compiled dependency ' +  !artifacts.findAll {
-                        it.moduleVersion.id.name == 'vaadin-client-compiled'
-                    }.empty
                 }
             }    
         """.stripIndent()
 
         def result = runWithArguments('testClientDependencies')
         assertTrue result, result.contains( 'Has client dependency true')
-        assertTrue result, result.contains( 'Has client-compiled dependency false')
     }
 
     @Test void 'Client dependencies added when widgetset is automatically detected'() {
@@ -146,9 +142,6 @@ class ProjectDependenciesTest extends IntegrationTest {
                     def client = confs.getByName('vaadin-server').resolvedConfiguration
                     def artifacts = client.resolvedArtifacts
                     println 'Has client dependency ' + !artifacts.empty
-                    println 'Has client-compiled dependency ' +  !artifacts.findAll {
-                        it.moduleVersion.id.name == 'vaadin-client-compiled'
-                    }.empty
                 }
             }
         """.stripIndent()
@@ -157,7 +150,6 @@ class ProjectDependenciesTest extends IntegrationTest {
 
         def result = runWithArguments('testClientDependencies')
         assertTrue result, result.contains( 'Has client dependency true')
-        assertTrue result, result.contains( 'Has client-compiled dependency false')
     }
 
     @Test void 'Vaadin version is resolved'() {

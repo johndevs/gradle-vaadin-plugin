@@ -346,6 +346,10 @@ class GradleVaadinPlugin implements Plugin<Project> {
                         "com.vaadin:vaadin-themes:${Util.getVaadinVersion(project)}")
                 dependencies.add(vaadinThemes)
 
+                Dependency widgetsetCompiled = projectDependencies.create(
+                        "com.vaadin:vaadin-client-compiled:${Util.getVaadinVersion(project)}")
+                dependencies.add(widgetsetCompiled)
+
                 applyServletApi(projectDependencies, dependencies)
             }
 
@@ -358,23 +362,21 @@ class GradleVaadinPlugin implements Plugin<Project> {
             conf.defaultDependencies { dependencies ->
 
                 if ( !project.vaadinCompile.widgetsetCDN ) {
-                    if ( !Util.getWidgetset(project) ) {
-                        Dependency widgetsetCompiled = projectDependencies.create(
-                                "com.vaadin:vaadin-client-compiled:${Util.getVaadinVersion(project)}")
-                        dependencies.add(widgetsetCompiled)
-                    } else {
-                        Dependency vaadinClient = projectDependencies.create(
-                                "com.vaadin:vaadin-client:${Util.getVaadinVersion(project)}")
-                        dependencies.add(vaadinClient)
+                    Dependency widgetsetCompiled = projectDependencies.create(
+                            "com.vaadin:vaadin-client-compiled:${Util.getVaadinVersion(project)}")
+                    dependencies.add(widgetsetCompiled)
 
-                        Dependency widgetsetCompiler = projectDependencies.create(
-                                "com.vaadin:vaadin-client-compiler:${Util.getVaadinVersion(project)}")
-                        dependencies.add(widgetsetCompiler)
+                    Dependency vaadinClient = projectDependencies.create(
+                            "com.vaadin:vaadin-client:${Util.getVaadinVersion(project)}")
+                    dependencies.add(vaadinClient)
 
-                        Dependency validationAPI = projectDependencies.create(
-                              "javax.validation:validation-api:${Util.pluginProperties.get(VALIDATION_API_VERSION)}")
-                        dependencies.add(validationAPI)
-                    }
+                    Dependency widgetsetCompiler = projectDependencies.create(
+                            "com.vaadin:vaadin-client-compiler:${Util.getVaadinVersion(project)}")
+                    dependencies.add(widgetsetCompiler)
+
+                    Dependency validationAPI = projectDependencies.create(
+                          "javax.validation:validation-api:${Util.pluginProperties.get(VALIDATION_API_VERSION)}")
+                    dependencies.add(validationAPI)
                 }
             }
 
