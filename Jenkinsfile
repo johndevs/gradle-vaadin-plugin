@@ -31,19 +31,25 @@ pipeline {
       }
     }
     
-    stage('Documentation') {
+    stage('Build Documentation') {
       when {                
         expression { params.documentation }
       }
       steps {
         sh "./gradlew groovydoc -PBUILD_VERSION=${params.buildVersion}"
-        sh "git checkout gh-pages"
-        sh "cp -r build/docs/groovydoc/* api"
-        sh "git add api"
-        sh "git commit -m 'Update Groovydoc for ${params.buildVersion}'"
-        sh "git push"
-        sh "git checkout master"
       }      
+    }
+    
+    stage('Publish Documentation') {
+      when {                
+        expression { params.documentation }
+      }
+      sh "git checkout gh-pages"
+      sh "cp -r build/docs/groovydoc/* api"
+      sh "git add api"
+      sh "git -c user.name='Jenkins' -c user.email='jenkins@devsoap.com' commit -m 'Update Groovydoc for ${params.buildVersion}'"
+      sh "git push"
+      sh "git checkout master"      
     }
 
     stage('Cleanup') {
