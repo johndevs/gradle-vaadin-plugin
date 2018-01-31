@@ -22,7 +22,7 @@ pipeline {
 
     stage('Publish') {
       when {                
-        expression { params.publish == 'true' }
+        expression { params.publish }
       }
       steps {     
         sh "./gradlew publishPlugins -PBUILD_VERSION=${params.buildVersion} -Pgradle.publish.key=${env.GRADLE_PUBLISH_KEY} -Pgradle.publish.secret=${env.GRADLE_PUBLISH_SECRET}"
