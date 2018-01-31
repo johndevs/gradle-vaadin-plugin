@@ -38,14 +38,6 @@ class GradleVersionTest extends IntegrationTest {
         test
     }
 
-    @Test void 'Run Project'() {
-        setupTest(new RunTaskTest('payara'){
-            protected GradleRunner setupRunner(File projectDir) {
-                return GradleVersionTest.this.setupRunner(projectDir)
-            }
-        }).'Run server'()
-    }
-
     @Test void 'Compile Widgetset'() {
         setupTest(new CompileWidgetsetTest(){
             protected GradleRunner setupRunner(File projectDir) {
