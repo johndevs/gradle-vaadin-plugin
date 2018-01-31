@@ -49,6 +49,7 @@ pipeline {
         sh "cp -r build/docs/groovydoc/* api"
         sh "git add api"
         sh "git -c user.name='Jenkins' -c user.email='jenkins@devsoap.com' commit -m 'Update Groovydoc for ${params.buildVersion}'"
+        sh "git tag -a ${params.buildVersion}-documentation"
         withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'GithubID', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]) {
              sh "https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/johndevs/gradle-vaadin-plugin.git"
         }
