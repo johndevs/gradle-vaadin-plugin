@@ -6,6 +6,8 @@ started by providing tasks for project, component and theme creation.
 
 [![Build Status](https://travis-ci.org/johndevs/gradle-vaadin-plugin.png?branch=master)](https://travis-ci.org/johndevs/gradle-vaadin-plugin)
 
+> This plugin is for Vaadin 7 and 8. For Vaadin 10 (Flow) see https://github.com/devsoap/gradle-vaadin-flow
+
 
 # Getting started
 To get started using the plugin have a look a the Gradle Vaadin Plugin Wiki at https://github.com/johndevs/gradle-vaadin-plugin/wiki
