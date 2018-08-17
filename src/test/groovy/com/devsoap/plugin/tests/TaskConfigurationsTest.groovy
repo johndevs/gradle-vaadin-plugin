@@ -189,7 +189,8 @@ class TaskConfigurationsTest extends IntegrationTest {
                     def conf = project.configurations
                     def module = project.idea.module
                     def scopes = module.scopes
-                    println 'Test configuration has testbench ' + (conf.getByName('vaadin-testbench') in scopes.TEST.plus)
+                    println 'Test configuration has testbench ' + 
+                        (conf.getByName('vaadin-testbench') in scopes.TEST.plus)
                  }
              }    
         """.stripIndent()
