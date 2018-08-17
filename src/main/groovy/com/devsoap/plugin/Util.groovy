@@ -672,7 +672,8 @@ class Util {
      *      returns the resolved version or if the artifact could not be found, the default version
      */
     @Memoized
-    static String getResolvedArtifactVersion(Project project, Configuration conf, String artifactName, String defaultVersion=null) {
+    static String getResolvedArtifactVersion(Project project, Configuration conf, String artifactName,
+                                             String defaultVersion=null) {
         String version = defaultVersion
         if(isResolvable(project, conf)){
             // Calling resolvedConfiguration triggers resolution, be aware
@@ -728,7 +729,8 @@ class Util {
                     if (dependency in ProjectDependency) {
                         Project dependentProject = ((ProjectDependency) dependency).dependencyProject
                         if (!(dependentProject in scannedProjects)) {
-                            addons.addAll(findAddonsInProject(dependentProject, byAttribute, includeFile, scannedProjects))
+                            addons.addAll(findAddonsInProject(dependentProject, byAttribute, includeFile,
+                                    scannedProjects))
                         }
                     } else if (isResolvable(project, conf)){
                         conf.files(dependency).each { File file ->
