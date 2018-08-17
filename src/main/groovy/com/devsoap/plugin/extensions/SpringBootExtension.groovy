@@ -34,12 +34,12 @@ class SpringBootExtension {
 
     SpringBootExtension(Project project) {
         starterVersion = project.property(String)
-        starterVersion.set('2.+')
+        starterVersion.set('3.+')
     }
 
     /**
      * The Vaadin Spring Boot Starter version to use. By
-     * default latest 2.x version.
+     * default latest 3.x version.
      */
     String getStarterVersion() {
         starterVersion.get()
@@ -47,7 +47,7 @@ class SpringBootExtension {
 
     /**
      * The Vaadin Spring Boot Starter version to use. By
-     * default latest 2.x version.
+     * default latest 3.x version.
      */
     String setStarterVersion(@NotNull String springBootStarterVersion) {
         this.starterVersion.set(springBootStarterVersion)
