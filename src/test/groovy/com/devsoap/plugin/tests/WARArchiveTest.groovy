@@ -37,7 +37,6 @@ class WARArchiveTest extends IntegrationTest {
         def final FILES_IN_WEBINF_LIB = [
                 'vaadin-server-7.6.4.jar',
                 'vaadin-themes-7.6.4.jar',
-                'javax.servlet-api-3.1.0.jar',
                 'vaadin-sass-compiler-0.9.13.jar',
                 'vaadin-shared-7.6.4.jar',
                 'jsoup-1.8.3.jar',
@@ -63,7 +62,6 @@ class WARArchiveTest extends IntegrationTest {
         def final FILES_IN_WEBINF_LIB = [
                 'vaadin-server-7.6.4.jar',
                 'vaadin-themes-7.6.4.jar',
-                'javax.servlet-api-3.1.0.jar',
                 'vaadin-sass-compiler-0.9.13.jar',
                 'vaadin-shared-7.6.4.jar',
                 'jsoup-1.8.3.jar',
