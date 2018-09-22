@@ -212,7 +212,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
         Gradle gradle = project.gradle
         VersionNumber version = VersionNumber.parse(gradle.gradleVersion)
-        VersionNumber requiredVersion = new VersionNumber(4, 0, 0, null)
+        VersionNumber requiredVersion = new VersionNumber(4, 3, 0, null)
         if ( version.baseVersion < requiredVersion ) {
             throw new UnsupportedVersionException("Your gradle version ($version) is too old. " +
                     "Plugin requires Gradle $requiredVersion+")
