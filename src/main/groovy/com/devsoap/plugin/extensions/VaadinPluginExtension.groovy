@@ -19,8 +19,7 @@ import com.devsoap.plugin.Util
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.Project
 import org.gradle.api.file.SourceDirectorySet
-import org.gradle.api.plugins.ExtraPropertiesExtension
-import org.gradle.api.provider.PropertyState
+import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 
 /**
@@ -35,28 +34,28 @@ class VaadinPluginExtension {
 
     private static final String VAADIN_VERSION_PROPERTY = 'vaadinVersion'
 
-    private final PropertyState<String> version
-    private final PropertyState<Boolean> manageDependencies
-    private final PropertyState<Boolean> manageRepositories
-    private final PropertyState<SourceDirectorySet> mainSourceSet
-    private final PropertyState<SourceDirectorySet> mainTestSourceSet
-    private final PropertyState<Boolean> push
-    private final PropertyState<Boolean> logToConsole
-    private final PropertyState<Boolean> useClassPathJar
+    private final Property<String> version
+    private final Property<Boolean> manageDependencies
+    private final Property<Boolean> manageRepositories
+    private final Property<SourceDirectorySet> mainSourceSet
+    private final Property<SourceDirectorySet> mainTestSourceSet
+    private final Property<Boolean> push
+    private final Property<Boolean> logToConsole
+    private final Property<Boolean> useClassPathJar
 
     private final Project project
 
     VaadinPluginExtension(Project project) {
         this.project = project
 
-        version = project.property(String)
-        manageDependencies = project.property(Boolean)
-        manageRepositories = project.property(Boolean)
-        mainSourceSet = project.property(SourceDirectorySet)
-        mainTestSourceSet = project.property(SourceDirectorySet)
-        push = project.property(Boolean)
-        logToConsole = project.property(Boolean)
-        useClassPathJar = project.property(Boolean)
+        version = project.objects.property(String)
+        manageDependencies = project.objects.property(Boolean)
+        manageRepositories = project.objects.property(Boolean)
+        mainSourceSet = project.objects.property(SourceDirectorySet)
+        mainTestSourceSet = project.objects.property(SourceDirectorySet)
+        push = project.objects.property(Boolean)
+        logToConsole = project.objects.property(Boolean)
+        useClassPathJar = project.objects.property(Boolean)
 
         version.set(null)
         manageDependencies.set(true)

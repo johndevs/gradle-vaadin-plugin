@@ -16,7 +16,7 @@
 package com.devsoap.plugin.extensions
 
 import org.gradle.api.Project
-import org.gradle.api.provider.PropertyState
+import org.gradle.api.provider.Property
 
 /**
  * Configuration options for Vaadin Testbench
@@ -28,14 +28,14 @@ class TestBenchExtension {
 
     static final String NAME = 'vaadinTestbench'
 
-    private final PropertyState<Boolean> enabled
-    private final PropertyState<String> version
-    private final PropertyState<Boolean> runApplication
+    private final Property<Boolean> enabled
+    private final Property<String> version
+    private final Property<Boolean> runApplication
 
     TestBenchExtension(Project project) {
-        enabled = project.property(Boolean)
-        version = project.property(String)
-        runApplication = project.property(Boolean)
+        enabled = project.objects.property(Boolean)
+        version = project.objects.property(String)
+        runApplication = project.objects.property(Boolean)
 
         enabled.set(false)
         version.set('5.0.+')

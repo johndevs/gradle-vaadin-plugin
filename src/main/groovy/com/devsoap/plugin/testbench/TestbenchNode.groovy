@@ -19,7 +19,7 @@ import com.devsoap.plugin.Util
 import com.devsoap.plugin.extensions.TestBenchNodeExtension
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
-import org.gradle.api.provider.PropertyState
+import org.gradle.api.provider.Property
 
 /**
  * Represents a Testbench Node
@@ -33,26 +33,26 @@ class TestbenchNode {
 
     private Process process
 
-    private final PropertyState<String> host
-    private final PropertyState<Integer> port
-    private final PropertyState<String> hub
-    private final PropertyState<List<Map>> browsers
+    private final Property<String> host
+    private final Property<Integer> port
+    private final Property<String> hub
+    private final Property<List<Map>> browsers
 
     TestbenchNode(Project project) {
         this.project = project
 
         TestBenchNodeExtension extension = project.extensions.getByType(TestBenchNodeExtension)
 
-        host = project.property(String)
+        host = project.objects.property(String)
         host.set(extension.hostProvider)
 
-        port = project.property(Integer)
+        port = project.objects.property(Integer)
         port.set(extension.portProvider)
 
-        hub = project.property(String)
+        hub = project.objects.property(String)
         hub.set(extension.hubProvider)
 
-        browsers = project.property(List)
+        browsers = project.objects.property(List)
         browsers.set(extension.browsersProvider)
     }
 

@@ -16,7 +16,7 @@
 package com.devsoap.plugin.extensions
 
 import org.gradle.api.Project
-import org.gradle.api.provider.PropertyState
+import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 
 /**
@@ -29,14 +29,14 @@ class TestBenchHubExtension {
 
     static final String NAME = 'vaadinTestbenchHub'
 
-    private final PropertyState<Boolean> enabled
-    private final PropertyState<String> host
-    private final PropertyState<Integer> port
+    private final Property<Boolean> enabled
+    private final Property<String> host
+    private final Property<Integer> port
 
     TestBenchHubExtension(Project project) {
-        enabled = project.property(Boolean)
-        host = project.property(String)
-        port = project.property(Integer)
+        enabled = project.objects.property(Boolean)
+        host = project.objects.property(String)
+        port = project.objects.property(Integer)
 
         enabled.set(false)
         host.set('localhost')

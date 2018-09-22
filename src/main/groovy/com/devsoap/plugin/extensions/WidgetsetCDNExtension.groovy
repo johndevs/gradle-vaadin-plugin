@@ -17,7 +17,7 @@ package com.devsoap.plugin.extensions
 
 import groovyx.net.http.AuthConfig
 import org.gradle.api.Project
-import org.gradle.api.provider.PropertyState
+import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 
 /**
@@ -30,18 +30,18 @@ class WidgetsetCDNExtension {
 
     static final String NAME = 'widgetsetCDNConfig'
 
-    private final PropertyState<Boolean> proxyEnabled
-    private final PropertyState<Integer> proxyPort
-    private final PropertyState<String> proxyScheme
-    private final PropertyState<String> proxyHost
-    private final PropertyState<AuthConfig> proxyAuth
+    private final Property<Boolean> proxyEnabled
+    private final Property<Integer> proxyPort
+    private final Property<String> proxyScheme
+    private final Property<String> proxyHost
+    private final Property<AuthConfig> proxyAuth
 
     WidgetsetCDNExtension(Project project){
-        proxyEnabled = project.property(Boolean)
-        proxyPort = project.property(Integer)
-        proxyScheme = project.property(String)
-        proxyHost = project.property(String)
-        proxyAuth = project.property(AuthConfig)
+        proxyEnabled = project.objects.property(Boolean)
+        proxyPort = project.objects.property(Integer)
+        proxyScheme = project.objects.property(String)
+        proxyHost = project.objects.property(String)
+        proxyAuth = project.objects.property(AuthConfig)
 
         proxyEnabled.set(false)
         proxyPort.set(Integer.parseInt(System.getProperty('http.proxyPort') ?: '-1'))

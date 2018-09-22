@@ -16,7 +16,7 @@
 package com.devsoap.plugin.extensions
 
 import org.gradle.api.Project
-import org.gradle.api.provider.PropertyState
+import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 
 /**
@@ -29,16 +29,16 @@ class AddonExtension {
 
     static final String NAME = 'vaadinAddon'
 
-    private final PropertyState<String> author
-    private final PropertyState<String> license
-    private final PropertyState<String> title
-    private final PropertyState<List<String>> styles
+    private final Property<String> author
+    private final Property<String> license
+    private final Property<String> title
+    private final Property<List<String>> styles
 
     AddonExtension(Project project) {
-        author = project.property(String)
-        license = project.property(String)
-        title = project.property(String)
-        styles = project.property(List)
+        author = project.objects.property(String)
+        license = project.objects.property(String)
+        title = project.objects.property(String)
+        styles = project.objects.property(List)
 
         author.set('')
         license.set('')
