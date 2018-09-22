@@ -15,9 +15,11 @@
  */
 package com.devsoap.plugin.extensions
 
+import com.devsoap.plugin.Util
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.Project
 import org.gradle.api.file.SourceDirectorySet
+import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.api.provider.PropertyState
 import org.gradle.api.provider.Provider
 
@@ -31,6 +33,8 @@ class VaadinPluginExtension {
 
     static final NAME = 'vaadin'
 
+    private static final String VAADIN_VERSION_PROPERTY = 'vaadinVersion'
+
     private final PropertyState<String> version
     private final PropertyState<Boolean> manageDependencies
     private final PropertyState<Boolean> manageRepositories
@@ -40,7 +44,11 @@ class VaadinPluginExtension {
     private final PropertyState<Boolean> logToConsole
     private final PropertyState<Boolean> useClassPathJar
 
+    private final Project project
+
     VaadinPluginExtension(Project project) {
+        this.project = project
+
         version = project.property(String)
         manageDependencies = project.property(Boolean)
         manageRepositories = project.property(Boolean)
@@ -64,7 +72,18 @@ class VaadinPluginExtension {
      * The vaadin version to use. By default latest Vaadin 7 version.
      */
     String getVersion() {
-        version.getOrNull()
+        // Use vaadin.version if set
+        if(version.isPresent()){
+            return version.get()
+        }
+
+        // else see if ext.vaadinVersion is set
+        if(project.ext.properties.containsKey(VAADIN_VERSION_PROPERTY)) {
+            return project.ext.get(VAADIN_VERSION_PROPERTY).toString()
+        }
+
+        // else fallback to default vaadin version
+        Util.pluginProperties.getProperty('vaadin.defaultVersion')
     }
 
     /**

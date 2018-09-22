@@ -19,6 +19,7 @@ import com.devsoap.plugin.Util
 import com.devsoap.plugin.actions.SpringBootAction
 import com.devsoap.plugin.creators.ProjectCreator
 import com.devsoap.plugin.creators.ThemeCreator
+import com.devsoap.plugin.extensions.VaadinPluginExtension
 import org.gradle.api.DefaultTask
 import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
@@ -72,6 +73,8 @@ class CreateProjectTask extends DefaultTask {
             widgetset = compileWidgetsetTask.widgetset
         }
 
+        VaadinPluginExtension vaadin = project.extensions.getByType(VaadinPluginExtension)
+
         new ProjectCreator(
                 applicationName:resolveApplicationName(),
                 applicationPackage:resolveApplicationPackage(),
@@ -88,7 +91,7 @@ class CreateProjectTask extends DefaultTask {
         new ThemeCreator(
                 themeName:resolveApplicationName(),
                 themesDirectory:Util.getThemesDirectory(project),
-                vaadinVersion:Util.getVaadinVersion(project)
+                vaadinVersion:vaadin.version
         ).run()
 
         UpdateWidgetsetTask.ensureWidgetPresent(project, widgetsetFQN)

@@ -311,10 +311,11 @@ class Util {
      */
     @Memoized
     static boolean isIE10UserAgentSupported(Project project) {
-        if ( getVaadinVersion(project) == PLUS ) {
+        VaadinPluginExtension vaadin = project.extensions.getByType(VaadinPluginExtension)
+        if ( vaadin.version == PLUS ) {
             return true
         }
-        VersionNumber version = VersionNumber.parse(getVaadinVersion(project))
+        VersionNumber version = VersionNumber.parse(vaadin.version)
         version.major > VAADIN_SEVEN_MAJOR_VERSION ||
                 (version.major == VAADIN_SEVEN_MAJOR_VERSION && version.minor > 0)
     }
@@ -650,10 +651,11 @@ class Util {
      */
     @Memoized
     static String getResolvedVaadinVersion(Project project) {
+        VaadinPluginExtension vaadin = project.extensions.getByType(VaadinPluginExtension)
         getResolvedArtifactVersion(project,
                 project.configurations[GradleVaadinPlugin.CONFIGURATION_SERVER],
                 VAADIN_SERVER_DEPENDENCY,
-                getVaadinVersion(project))
+                vaadin.version)
     }
 
     /**
@@ -790,19 +792,6 @@ class Util {
              }
         }
         clientPackage
-    }
-
-    /**
-     * Returns the defined Vaadin version or if no version is defined then it returns the default vaadin version.
-     *
-     * @param project
-     *      The project to get the version for
-     * @return
-     *      version as a string
-     */
-    @Memoized
-    static String getVaadinVersion(Project project) {
-        project.vaadin.version ?: pluginProperties.getProperty('vaadin.defaultVersion')
     }
 
     /**

@@ -17,6 +17,7 @@ package com.devsoap.plugin.tasks
 
 import com.devsoap.plugin.Util
 import com.devsoap.plugin.creators.ThemeCreator
+import com.devsoap.plugin.extensions.VaadinPluginExtension
 import org.gradle.api.DefaultTask
 import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
@@ -53,9 +54,11 @@ class CreateThemeTask extends DefaultTask {
             themeName = project.name
         }
 
+        VaadinPluginExtension vaadin = project.extensions.getByType(VaadinPluginExtension)
+
         new ThemeCreator(themeName:themeName,
                 themesDirectory:Util.getThemesDirectory(project),
-                vaadinVersion:Util.getVaadinVersion(project)
+                vaadinVersion:vaadin.version
         ).run()
     }
 }
