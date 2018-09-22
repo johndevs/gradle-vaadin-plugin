@@ -820,6 +820,9 @@ class Util {
                 !(file.name.startsWith('vaadin') && file.name.contains('client-compiled'))}
         }
 
+        // javax.servlet comes along with server conf, remove it
+        classpath = classpath.filter { file -> !(file.name.startsWith('javax.servlet-api')) }
+
         // Include addons
         classpath += project.configurations[GradleVaadinPlugin.CONFIGURATION_CLIENT_COMPILE]
 
@@ -839,6 +842,7 @@ class Util {
         if(project.configurations.findByName('providedRuntime')){
             classpath -= project.configurations.providedRuntime
         }
+
 
         // Ensure no duplicates
         classpath = project.files(classpath.files)
