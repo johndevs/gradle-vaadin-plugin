@@ -267,8 +267,8 @@ class GradleVaadinPlugin implements Plugin<Project> {
         new EclipseWtpPluginAction().apply(project)
 
         project.afterEvaluate { Project p ->
-            String v = Util.getVaadinVersion(p)
-            if ( v?.startsWith('6') ) {
+            VaadinPluginExtension vaadin = project.extensions.getByType(VaadinPluginExtension)
+            if ( vaadin.version?.startsWith('6') ) {
                 p.logger.error('Plugin no longer supports Vaadin 6, to use Vaadin 6 ' +
                         'apply an older version of the plugin.')
                 throw new InvalidUserDataException('Unsupported Vaadin version.')
@@ -338,16 +338,17 @@ class GradleVaadinPlugin implements Plugin<Project> {
         configurations.create(CONFIGURATION_SERVER) { conf ->
             conf.description = 'Libraries needed by Vaadin server side applications.'
             conf.defaultDependencies { dependencies ->
+                VaadinPluginExtension vaadin = project.extensions.getByType(VaadinPluginExtension)
                 Dependency vaadinServer = projectDependencies.create(
-                        "com.vaadin:vaadin-server:${Util.getVaadinVersion(project)}")
+                        "com.vaadin:vaadin-server:${vaadin.version}")
                 dependencies.add(vaadinServer)
 
                 Dependency vaadinThemes = projectDependencies.create(
-                        "com.vaadin:vaadin-themes:${Util.getVaadinVersion(project)}")
+                        "com.vaadin:vaadin-themes:${vaadin.version}}")
                 dependencies.add(vaadinThemes)
 
                 Dependency widgetsetCompiled = projectDependencies.create(
-                        "com.vaadin:vaadin-client-compiled:${Util.getVaadinVersion(project)}")
+                        "com.vaadin:vaadin-client-compiled:${vaadin.version}")
                 dependencies.add(widgetsetCompiled)
 
                 applyServletApi(projectDependencies, dependencies)
@@ -362,16 +363,18 @@ class GradleVaadinPlugin implements Plugin<Project> {
             conf.defaultDependencies { dependencies ->
 
                 if ( !project.vaadinCompile.widgetsetCDN ) {
+                    VaadinPluginExtension vaadin = project.extensions.getByType(VaadinPluginExtension)
+
                     Dependency widgetsetCompiled = projectDependencies.create(
-                            "com.vaadin:vaadin-client-compiled:${Util.getVaadinVersion(project)}")
+                            "com.vaadin:vaadin-client-compiled:${vaadin.version}")
                     dependencies.add(widgetsetCompiled)
 
                     Dependency vaadinClient = projectDependencies.create(
-                            "com.vaadin:vaadin-client:${Util.getVaadinVersion(project)}")
+                            "com.vaadin:vaadin-client:${vaadin.version}")
                     dependencies.add(vaadinClient)
 
                     Dependency widgetsetCompiler = projectDependencies.create(
-                            "com.vaadin:vaadin-client-compiler:${Util.getVaadinVersion(project)}")
+                            "com.vaadin:vaadin-client-compiler:${vaadin.version}")
                     dependencies.add(widgetsetCompiler)
 
                     Dependency validationAPI = projectDependencies.create(
@@ -403,12 +406,14 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
                 applyServletApi(projectDependencies, dependencies)
 
+                VaadinPluginExtension vaadin = project.extensions.getByType(VaadinPluginExtension)
+
                 Dependency widgetsetCompiler = projectDependencies.create(
-                        "com.vaadin:vaadin-client-compiler:${Util.getVaadinVersion(project)}")
+                        "com.vaadin:vaadin-client-compiler:${vaadin.version}")
                 dependencies.add(widgetsetCompiler)
 
                 Dependency push = projectDependencies.create(
-                        "com.vaadin:vaadin-push:${Util.getVaadinVersion(project)}")
+                        "com.vaadin:vaadin-push:${vaadin.version}")
                 dependencies.add(push)
             }
         }
@@ -451,11 +456,10 @@ class GradleVaadinPlugin implements Plugin<Project> {
         configurations.create(CONFIGURATION_PUSH) { conf ->
             conf.description = 'Libraries needed for using Vaadin Push features.'
             conf.defaultDependencies { dependencies ->
-
-
                 if ( Util.isPushEnabled(project) ) {
+                    VaadinPluginExtension vaadin = project.extensions.getByType(VaadinPluginExtension)
                     Dependency push = projectDependencies.create(
-                            "com.vaadin:vaadin-push:${Util.getVaadinVersion(project)}")
+                            "com.vaadin:vaadin-push:${vaadin.version}")
                     dependencies.add(push)
                 }
             }
@@ -582,7 +586,8 @@ class GradleVaadinPlugin implements Plugin<Project> {
             String name = dependency.name
 
             if ( "$group:$name".toString() in whitelist ) {
-                details.useVersion Util.getVaadinVersion(project)
+                VaadinPluginExtension vaadin = project.extensions.getByType(VaadinPluginExtension)
+                details.useVersion vaadin.version
             }
         } as Action<DependencyResolveDetails>)
     }

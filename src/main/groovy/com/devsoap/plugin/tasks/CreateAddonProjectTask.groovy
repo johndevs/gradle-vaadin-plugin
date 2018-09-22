@@ -22,6 +22,7 @@ import com.devsoap.plugin.creators.AddonThemeCreator
 import com.devsoap.plugin.creators.ComponentCreator
 import com.devsoap.plugin.creators.ProjectCreator
 import com.devsoap.plugin.creators.ThemeCreator
+import com.devsoap.plugin.extensions.VaadinPluginExtension
 import org.gradle.api.DefaultTask
 import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
@@ -104,6 +105,7 @@ class CreateAddonProjectTask extends DefaultTask {
         TemplateUtil.writeTemplate('addonProject/demo.gradle', demoDir, BUILD_FILE, substitutions)
 
         CompileWidgetsetTask compileWidgetsetTask = project.tasks.getByName(CompileWidgetsetTask.NAME)
+        VaadinPluginExtension vaadin = project.extensions.getByType(VaadinPluginExtension)
         new ProjectCreator(
                 applicationName:DEMO_APPLICATION_NAME,
                 applicationPackage: 'com.example.demo',
@@ -120,7 +122,7 @@ class CreateAddonProjectTask extends DefaultTask {
         new ThemeCreator(
                 themeName:DEMO_APPLICATION_NAME,
                 themesDirectory:new File(demoDir, 'src/main/webapp/VAADIN/themes'),
-                vaadinVersion:Util.getVaadinVersion(project)
+                vaadinVersion:vaadin.version
         ).run()
     }
 
