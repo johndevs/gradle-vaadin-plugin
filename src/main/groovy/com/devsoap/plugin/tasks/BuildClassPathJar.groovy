@@ -18,7 +18,7 @@ package com.devsoap.plugin.tasks
 import com.devsoap.plugin.GradleVaadinPlugin
 import com.devsoap.plugin.Util
 import org.gradle.api.file.FileCollection
-import org.gradle.api.provider.PropertyState
+import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.bundling.Jar
 
@@ -32,7 +32,7 @@ class BuildClassPathJar extends Jar {
 
     public static final String NAME = 'vaadinClassPathJar'
 
-    private final PropertyState<Boolean> useClassPathJar = project.property(Boolean)
+    private final Property<Boolean> useClassPathJar = project.objects.property(Boolean)
 
     BuildClassPathJar() {
         description = 'Creates a Jar with the project classpath'

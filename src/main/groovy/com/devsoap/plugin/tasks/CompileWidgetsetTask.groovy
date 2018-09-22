@@ -28,7 +28,7 @@ import org.apache.commons.codec.digest.DigestUtils
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
-import org.gradle.api.provider.PropertyState
+import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.TaskAction
@@ -50,32 +50,32 @@ class CompileWidgetsetTask extends DefaultTask {
 
     private static final WIDGETSET_CDN_URL = 'https://wsc.vaadin.com/'
 
-    private final PropertyState<String> style = project.property(String)
-    private final PropertyState<Integer> optimize = project.property(Integer)
-    private final PropertyState<Boolean> logEnabled = project.property(Boolean)
-    private final PropertyState<String> logLevel = project.property(String)
-    private final PropertyState<Integer> localWorkers = project.property(Integer)
-    private final PropertyState<Boolean> draftCompile = project.property(Boolean)
-    private final PropertyState<Boolean> strict = project.property(Boolean)
-    private final PropertyState<String> userAgent = project.property(String)
-    private final PropertyState<List<String>> jvmArgs = project.property(List)
-    private final PropertyState<List<String>> extraArgs = project.property(List)
-    private final PropertyState<List<String>> sourcePaths = project.property(List)
-    private final PropertyState<Boolean> collapsePermutations = project.property(Boolean)
-    private final PropertyState<List<String>> extraInherits = project.property(List)
-    private final PropertyState<Boolean> gwtSdkFirstInClasspath = project.property(Boolean)
-    private final PropertyState<String> outputDirectory = project.property(String)
-    private final PropertyState<Boolean> widgetsetCDN = project.property(Boolean)
-    private final PropertyState<Boolean> profiler = project.property(Boolean)
-    private final PropertyState<Boolean> manageWidgetset = project.property(Boolean)
-    private final PropertyState<String> widgetset = project.property(String)
-    private final PropertyState<String> widgetsetGenerator = project.property(String)
+    private final Property<String> style = project.objects.property(String)
+    private final Property<Integer> optimize = project.objects.property(Integer)
+    private final Property<Boolean> logEnabled = project.objects.property(Boolean)
+    private final Property<String> logLevel = project.objects.property(String)
+    private final Property<Integer> localWorkers = project.objects.property(Integer)
+    private final Property<Boolean> draftCompile = project.objects.property(Boolean)
+    private final Property<Boolean> strict = project.objects.property(Boolean)
+    private final Property<String> userAgent = project.objects.property(String)
+    private final Property<List<String>> jvmArgs = project.objects.property(List)
+    private final Property<List<String>> extraArgs = project.objects.property(List)
+    private final Property<List<String>> sourcePaths = project.objects.property(List)
+    private final Property<Boolean> collapsePermutations = project.objects.property(Boolean)
+    private final Property<List<String>> extraInherits = project.objects.property(List)
+    private final Property<Boolean> gwtSdkFirstInClasspath = project.objects.property(Boolean)
+    private final Property<String> outputDirectory = project.objects.property(String)
+    private final Property<Boolean> widgetsetCDN = project.objects.property(Boolean)
+    private final Property<Boolean> profiler = project.objects.property(Boolean)
+    private final Property<Boolean> manageWidgetset = project.objects.property(Boolean)
+    private final Property<String> widgetset = project.objects.property(String)
+    private final Property<String> widgetsetGenerator = project.objects.property(String)
 
-    private final PropertyState<Boolean> proxyEnabled = project.property(Boolean)
-    private final PropertyState<Integer> proxyPort = project.property(Integer)
-    private final PropertyState<String> proxyScheme = project.property(String)
-    private final PropertyState<String> proxyHost = project.property(String)
-    private final PropertyState<AuthConfig> proxyAuth = project.property(AuthConfig)
+    private final Property<Boolean> proxyEnabled = project.objects.property(Boolean)
+    private final Property<Integer> proxyPort = project.objects.property(Integer)
+    private final Property<String> proxyScheme = project.objects.property(String)
+    private final Property<String> proxyHost = project.objects.property(String)
+    private final Property<AuthConfig> proxyAuth = project.objects.property(AuthConfig)
 
     private Closure<Map> queryWidgetsetRequest = { version, style ->
         Set addons = Util.findAddonsInProject(project)

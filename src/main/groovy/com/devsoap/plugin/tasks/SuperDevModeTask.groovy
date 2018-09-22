@@ -21,7 +21,7 @@ import com.devsoap.plugin.servers.ApplicationServer
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
-import org.gradle.api.provider.PropertyState
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 
@@ -47,19 +47,19 @@ class SuperDevModeTask extends DefaultTask {
     @Internal
     ApplicationServer serverInstance
 
-    private final PropertyState<String> server = project.property(String)
-    private final PropertyState<Boolean> debug = project.property(Boolean)
-    private final PropertyState<Integer> debugPort = project.property(Integer)
-    private final PropertyState<List<String>> jvmArgs = project.property(List)
-    private final PropertyState<Integer> serverPort = project.property(Integer)
-    private final PropertyState<Boolean> themeAutoRecompile = project.property(Boolean)
-    private final PropertyState<Boolean> openInBrowser = project.property(Boolean)
-    private final PropertyState<String> classesDir = project.property(String)
-    private final PropertyState<Boolean> noserver = project.property(Boolean)
-    private final PropertyState<String> bindAddress = project.property(String)
-    private final PropertyState<Integer> codeServerPort = project.property(Integer)
-    private final PropertyState<List<String>> extraArgs = project.property(List)
-    private final PropertyState<String> logLevel = project.property(String)
+    private final Property<String> server = project.objects.property(String)
+    private final Property<Boolean> debug = project.objects.property(Boolean)
+    private final Property<Integer> debugPort = project.objects.property(Integer)
+    private final Property<List<String>> jvmArgs = project.objects.property(List)
+    private final Property<Integer> serverPort = project.objects.property(Integer)
+    private final Property<Boolean> themeAutoRecompile = project.objects.property(Boolean)
+    private final Property<Boolean> openInBrowser = project.objects.property(Boolean)
+    private final Property<String> classesDir = project.objects.property(String)
+    private final Property<Boolean> noserver = project.objects.property(Boolean)
+    private final Property<String> bindAddress = project.objects.property(String)
+    private final Property<Integer> codeServerPort = project.objects.property(Integer)
+    private final Property<List<String>> extraArgs = project.objects.property(List)
+    private final Property<String> logLevel = project.objects.property(String)
 
     /**
      * Intern cleanup thread for when the JVM terminates. Needs to be public so it can be accessed from another thread.

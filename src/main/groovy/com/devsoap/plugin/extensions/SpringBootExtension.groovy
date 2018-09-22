@@ -16,7 +16,7 @@
 package com.devsoap.plugin.extensions
 
 import org.gradle.api.Project
-import org.gradle.api.provider.PropertyState
+import org.gradle.api.provider.Property
 
 import javax.validation.constraints.NotNull
 
@@ -30,10 +30,10 @@ class SpringBootExtension {
 
     static final NAME = "vaadinSpringBoot"
 
-    private final PropertyState<String> starterVersion
+    private final Property<String> starterVersion
 
     SpringBootExtension(Project project) {
-        starterVersion = project.property(String)
+        starterVersion = project.objects.property(String)
         starterVersion.set('3.+')
     }
 

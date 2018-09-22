@@ -19,7 +19,7 @@ import com.devsoap.plugin.Util
 import com.devsoap.plugin.extensions.TestBenchHubExtension
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
-import org.gradle.api.provider.PropertyState
+import org.gradle.api.provider.Property
 
 /**
  * Represents a Testbench Hub
@@ -32,18 +32,18 @@ class TestbenchHub {
     private final Project project
     private Process process
 
-    private final PropertyState<String> host
-    private final PropertyState<Integer> port
+    private final Property<String> host
+    private final Property<Integer> port
 
     TestbenchHub(Project project) {
         this.project = project
 
         TestBenchHubExtension extension = project.extensions.getByType(TestBenchHubExtension)
 
-        host = project.property(String)
+        host = project.objects.property(String)
         host.set(extension.hostProvider)
 
-        port = project.property(Integer)
+        port = project.objects.property(Integer)
         port.set(extension.portProvider)
     }
 
