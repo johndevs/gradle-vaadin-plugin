@@ -344,7 +344,7 @@ class GradleVaadinPlugin implements Plugin<Project> {
                 dependencies.add(vaadinServer)
 
                 Dependency vaadinThemes = projectDependencies.create(
-                        "com.vaadin:vaadin-themes:${vaadin.version}}")
+                        "com.vaadin:vaadin-themes:${vaadin.version}")
                 dependencies.add(vaadinThemes)
 
                 Dependency widgetsetCompiled = projectDependencies.create(
