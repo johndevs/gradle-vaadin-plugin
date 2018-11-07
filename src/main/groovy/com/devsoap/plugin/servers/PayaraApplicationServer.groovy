@@ -121,7 +121,7 @@ class PayaraApplicationServer extends ApplicationServer {
     @Override
     void defineDependecies(DependencyHandler projectDependencies, DependencySet dependencies) {
         Dependency payaraWebProfile = projectDependencies.create(
-                "fish.payara.extras:payara-embedded-web:${Util.pluginProperties.getProperty('payara.version')}")
+                "fish.payara.extras:payara-micro:${Util.pluginProperties.getProperty('payara.version')}")
         dependencies.add(payaraWebProfile)
     }
 

@@ -75,7 +75,7 @@ dependencies {
     compile "org.eclipse.jetty:jetty-deploy:${project.property('jetty.version')}"
 
     //Payara application server
-    compile "fish.payara.extras:payara-embedded-web:${project.property('payara.version')}"
+    compile "fish.payara.extras:payara-micro:${project.property('payara.version')}"
 
     // For GET requests
     compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
@@ -83,10 +83,12 @@ dependencies {
     // Sass compilation with libSass
     compile "io.bit3:jsass:${project.property('jsass.version')}"
 
+    compile "javax.validation:validation-api:2.0.0.Final"
+
     deploy 'org.apache.maven.wagon:wagon-ssh:2.2'
 
     testCompile gradleTestKit()
-    testCompile 'junit:junit:4.13-SNAPSHOT'
+    testCompile 'junit:junit:4.12'
 
     // ProxyTest needs its own special configuration to avoid conflicts
     proxyTest ('org.mock-server:mockserver-netty:3.10.4') {

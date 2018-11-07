@@ -15,15 +15,12 @@
  */
 package com.devsoap.plugin;
 
-import org.glassfish.embeddable.BootstrapProperties;
-import org.glassfish.embeddable.Deployer;
-import org.glassfish.embeddable.GlassFish;
-import org.glassfish.embeddable.GlassFishProperties;
-import org.glassfish.embeddable.GlassFishRuntime;
-
 import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import fish.payara.micro.PayaraMicro;
+import fish.payara.micro.PayaraMicroRuntime;
 
 /**
  * Runner for payara
@@ -49,25 +46,16 @@ public class PayaraServerRunner {
         LOGGER.log(Level.INFO, "Starting Payara web server...");
 
         try {
-
-            BootstrapProperties bootstrap = new BootstrapProperties();
-
-            GlassFishRuntime runtime = GlassFishRuntime.bootstrap(bootstrap,
-                    PayaraServerRunner.class.getClass().getClassLoader());
-
-            GlassFishProperties glassfishProperties = new GlassFishProperties();
-            glassfishProperties.setPort("http-listener", port);
+            PayaraMicro micro = PayaraMicro.getInstance();
+            micro.setHttpPort(port);
             LOGGER.log(Level.INFO, "Running on port "+port);
-
-            GlassFish glassfish = runtime.newGlassFish(glassfishProperties);
-            glassfish.start();
-
-            Deployer deployer = glassfish.getDeployer();
 
             File work = new File(workdir);
             File explodedWar = new File(work, "war");
+//            PayaraMicro.setUpackedJarDir(explodedWar);
 
-            deployer.deploy(explodedWar, "--contextroot=");
+            PayaraMicroRuntime runtime = micro.bootstrap();
+            runtime.deploy(explodedWar);
 
         } catch (Exception ex){
             LOGGER.log(Level.SEVERE, "Failed to start Payara server", ex);
