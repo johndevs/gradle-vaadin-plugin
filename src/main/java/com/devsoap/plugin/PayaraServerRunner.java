@@ -52,7 +52,6 @@ public class PayaraServerRunner {
 
             File work = new File(workdir);
             File explodedWar = new File(work, "war");
-//            PayaraMicro.setUpackedJarDir(explodedWar);
 
             PayaraMicroRuntime runtime = micro.bootstrap();
             runtime.deploy(explodedWar);
