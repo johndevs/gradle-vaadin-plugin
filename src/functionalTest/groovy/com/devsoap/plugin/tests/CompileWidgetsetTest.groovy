@@ -1,6 +1,6 @@
 package com.devsoap.plugin.tests
 
-import com.devsoap.plugin.categories.ThemeCompile
+
 import com.devsoap.plugin.categories.WidgetsetCompile
 import com.devsoap.plugin.tasks.CompileWidgetsetTask
 import com.devsoap.plugin.tasks.CreateComponentTask

@@ -9,7 +9,6 @@ import org.junit.Test
 import org.junit.experimental.categories.Category
 
 import java.nio.file.Paths
-import java.util.concurrent.TimeUnit
 import java.util.jar.Manifest
 
 import static org.junit.Assert.assertNotNull

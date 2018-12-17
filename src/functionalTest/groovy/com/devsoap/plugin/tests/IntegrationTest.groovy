@@ -142,6 +142,6 @@ class IntegrationTest {
     }
 
     protected GradleRunner setupRunner(File projectDir = this.projectDir.root) {
-        GradleRunner.create().withProjectDir(projectDir)
+        GradleRunner.create().withProjectDir(projectDir).withPluginClasspath()
     }
 }
