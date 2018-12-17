@@ -28,7 +28,7 @@ class KotlinTest extends KotlinIntegrationTest {
 
     @Parameterized.Parameters(name = "Kotlin {0}")
     static Collection<String> getKotlinVersions() {
-        [ '1.1.3-2']
+        [ '1.3.11']
     }
 
     @Test void 'Create project'() {
@@ -44,7 +44,7 @@ class KotlinTest extends KotlinIntegrationTest {
         runWithArguments('classes')
 
         File classes = Paths.get(projectDir.root.canonicalPath,
-                'build', 'classes', 'java', 'main', 'com','example', 'helloworld').toFile()
+                'build', 'classes', 'kotlin', 'main', 'com','example', 'helloworld').toFile()
         assertTrue 'Classes should exist', classes.exists()
         assertTrue 'Servlet not compiled', new File(classes, 'HelloWorldServlet.class').exists()
         assertTrue 'UI not compiled', new File(classes, 'HelloWorldUI.class').exists()

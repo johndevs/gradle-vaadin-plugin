@@ -307,7 +307,7 @@ task proxyTest(type:Test, dependsOn: ['test','jar']) {
     include  '**/tests/*ProxyTest*'
     systemProperty 'integrationTestProjectVersion', version
     testClassesDirs = sourceSets.functionalTest.output.classesDirs
-    classpath += sourceSets.functionalTest.runtimeClasspath + configurations.proxyTest
+    classpath = configurations.proxyTest + sourceSets.functionalTest.runtimeClasspath
 }
 
 /**
@@ -348,7 +348,7 @@ codenarc{
     maxPriority2Violations = 0
     maxPriority3Violations = 500
     codenarcTest {
-        configFile = rootProject.file('config/codenarc/ruleset-test.groovy')
+        configFile = rootProject.file('config/codenarc/ruleset-functionalTest.groovy')
     }
 }
 

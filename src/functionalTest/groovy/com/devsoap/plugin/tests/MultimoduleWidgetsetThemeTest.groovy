@@ -38,6 +38,8 @@ class MultimoduleWidgetsetThemeTest extends MultiProjectIntegrationTest {
             jar.from 'src/main/webapp'
         """.stripIndent()
 
+        runWithArguments(":$widgetsetModule.name:$CreateComponentTask.NAME", '--name=MyLabel')
+
         File themeModule = makeProject('theme-module')
         File themeModuleBuildFile = makeBuildFile(themeModule)
         themeModuleBuildFile << """
@@ -50,6 +52,8 @@ class MultimoduleWidgetsetThemeTest extends MultiProjectIntegrationTest {
             jar.dependsOn 'vaadinThemeCompile'
             jar.from 'src/main/webapp'
         """.stripIndent()
+
+        runWithArguments(":$themeModule.name:$CreateThemeTask.NAME", '--name=AppTheme')
 
         File appModule = makeProject('app')
         File appBuildFile = makeBuildFile(appModule)
@@ -70,15 +74,13 @@ class MultimoduleWidgetsetThemeTest extends MultiProjectIntegrationTest {
             }
         """.stripIndent()
 
-        runWithArgumentsOnProject(themeModule, CreateThemeTask.NAME, '--name=AppTheme')
-        runWithArgumentsOnProject(widgetsetModule, CreateComponentTask.NAME, '--name=MyLabel')
-        runWithArguments("app:$CreateProjectTask.NAME")
+        runWithArguments(":app:$CreateProjectTask.NAME")
 
         // Remove generated theme from app
         Paths.get(appModule.canonicalPath, 'src', 'main', 'webapp').deleteDir()
 
         // Generate war
-        String result = runWithArguments('app:war')
+        String result = runWithArguments(':app:war')
         assertTrue result, result.contains('BUILD SUCCESSFUL')
     }
 
@@ -106,7 +108,7 @@ class MultimoduleWidgetsetThemeTest extends MultiProjectIntegrationTest {
             jar.from 'src/main/webapp'
         """.stripIndent()
 
-        runWithArgumentsOnProject(themeModule, CreateThemeTask.NAME, '--name=AppTheme')
+        runWithArguments("$themeModule.name:$CreateThemeTask.NAME", '--name=AppTheme')
         runWithArguments(CreateProjectTask.NAME)
         runWithArguments(BuildClassPathJar.NAME)
 

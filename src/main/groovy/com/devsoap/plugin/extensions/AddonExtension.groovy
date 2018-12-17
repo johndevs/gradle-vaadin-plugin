@@ -16,6 +16,7 @@
 package com.devsoap.plugin.extensions
 
 import org.gradle.api.Project
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 
@@ -32,13 +33,13 @@ class AddonExtension {
     private final Property<String> author
     private final Property<String> license
     private final Property<String> title
-    private final Property<List<String>> styles
+    private final ListProperty<String> styles
 
     AddonExtension(Project project) {
         author = project.objects.property(String)
         license = project.objects.property(String)
         title = project.objects.property(String)
-        styles = project.objects.property(List)
+        styles = project.objects.listProperty(String)
 
         author.set('')
         license.set('')
