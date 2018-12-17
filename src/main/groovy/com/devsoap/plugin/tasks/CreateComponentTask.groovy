@@ -18,7 +18,7 @@ package com.devsoap.plugin.tasks
 import com.devsoap.plugin.Util
 import com.devsoap.plugin.creators.ComponentCreator
 import org.gradle.api.DefaultTask
-import org.gradle.api.internal.tasks.options.Option
+import org.gradle.api.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
 
 /**

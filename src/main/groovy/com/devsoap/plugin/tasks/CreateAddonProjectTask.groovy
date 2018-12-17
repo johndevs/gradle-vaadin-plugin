@@ -24,7 +24,7 @@ import com.devsoap.plugin.creators.ProjectCreator
 import com.devsoap.plugin.creators.ThemeCreator
 import com.devsoap.plugin.extensions.VaadinPluginExtension
 import org.gradle.api.DefaultTask
-import org.gradle.api.internal.tasks.options.Option
+import org.gradle.api.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
 
 /**
