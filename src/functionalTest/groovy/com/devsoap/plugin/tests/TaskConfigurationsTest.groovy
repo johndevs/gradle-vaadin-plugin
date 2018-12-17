@@ -148,9 +148,9 @@ class TaskConfigurationsTest extends IntegrationTest {
                     def module = project.idea.module
                     println 'Module and Project name is equal ' + (project.name == module.name)
                     println 'Output dir is classes dir ' +
-                        (project.sourceSets.main.output.classesDir == module.outputDir)
+                        (project.sourceSets.main.java.outputDir == module.outputDir)
                     println 'Test output dir is classes dir ' +
-                        (project.sourceSets.test.output.classesDir == module.testOutputDir)
+                        (project.sourceSets.test.java.outputDir == module.testOutputDir)
     
                     println 'Download Javadoc ' + module.downloadJavadoc
                     println 'Download Sources ' + module.downloadSources

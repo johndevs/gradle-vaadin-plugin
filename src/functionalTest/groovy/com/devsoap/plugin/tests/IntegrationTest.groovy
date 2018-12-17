@@ -28,6 +28,11 @@ import java.nio.file.Paths
  */
 class IntegrationTest {
 
+    private static final List<String> DEFAULT_ARGS = [
+            '--stacktrace',
+            '--warning-mode', 'all'
+    ]
+
     @Rule
     public TemporaryFolder projectDir = new TemporaryFolder()
 
@@ -116,27 +121,22 @@ class IntegrationTest {
         buildFile << "apply plugin:com.devsoap.plugin.GradleVaadinPlugin\n"
     }
 
-    protected String runWithArgumentsOnProject(File projectDir, String... args) {
-        setupRunner(projectDir)
-                .withArguments((args as List) + ['--stacktrace'])
-                .build()
-                .output
-    }
-
     protected String runWithArguments(String... args) {
-        runWithArgumentsOnProject(projectDir.root, args)
+        GradleRunner runner = setupRunner(projectDir.root)
+                .withArguments( DEFAULT_ARGS + (args as List))
+        println "Running gradle ${runner.arguments.join(' ')}"
+        runner.build().output
     }
 
     protected String runFailureExpected() {
-        setupRunner()
-                .withArguments(['--stacktrace'])
-                .buildAndFail()
-                .output
+        GradleRunner runner = setupRunner().withArguments(DEFAULT_ARGS)
+        println "Running gradle ${runner.arguments.join(' ')}"
+        runner.buildAndFail().output
     }
 
     protected String runFailureExpected(String... args) {
         setupRunner()
-                .withArguments((args as List) + ['--stacktrace'])
+                .withArguments(DEFAULT_ARGS + (args as List))
                 .buildAndFail()
                 .output
     }

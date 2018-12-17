@@ -49,7 +49,7 @@ class MultiProjectIntegrationTest extends IntegrationTest {
 
     protected File makeProject(String name) {
         File projectDir = projectDir.newFolder(name)
-        settingsFile << "include '$name'\n"
+        settingsFile << "include ':$name'\n"
         projectDir
     }
 }

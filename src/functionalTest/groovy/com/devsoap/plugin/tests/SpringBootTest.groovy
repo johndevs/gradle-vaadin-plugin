@@ -113,14 +113,14 @@ class SpringBootTest extends IntegrationTest {
         // Static resources
         assertJarContents(jar, 'Widgetset not found in jar',
                 'BOOT-INF/classes/VAADIN/widgetsets/com.example.springboottest.MyWidgetset/')
-        assertJarContents(jar, 'Theme not found in jar', 'BOOT-INF/classes/VAADIN/themes/SpringBootTest/')
+        assertJarContents(jar, 'Theme not found in jar', 'BOOT-INF/classes/VAADIN/themes/MyApp/')
 
         // Classes
         assertJarContents(jar, 'UI not found in jar',
                 'BOOT-INF/classes/com/example/springboottest/MyAppUI.class')
 
         assertJarContents(jar, 'App not found in jar',
-                'BOOT-INF/classes/com/example/springboottest/SpringBootApplication.class')
+                'BOOT-INF/classes/com/example/springboottest/MyAppApplication.class')
         assertJarContents(jar, 'Spring Boot loader not found in jar', 'org/springframework/boot/loader/')
     }
 
@@ -165,27 +165,11 @@ class SpringBootTest extends IntegrationTest {
     }
 
     private void configureSpringBootProject() {
-        runWithArguments(CreateProjectTask.NAME, '--name=SpringBootTest')
-
-        File packageDir = Paths.get(projectDir.root.canonicalPath,
-                'src', 'main', 'java', 'com', 'example', 'springboottest').toFile()
-
-        File servlet = new File(packageDir, 'SpringBootTestServlet.java')
-        servlet.delete()
-
-        File ui = new File(packageDir, 'SpringBootTestUI.java')
-        ui.delete()
-
-        File appUI = new File(packageDir, 'MyAppUI.java')
-        appUI.text = getClass().getResource('/templates/SpringBootUI.java.template').text
-
-        File app = new File(packageDir, 'SpringBootApplication.java')
-        app.text = getClass().getResource('/templates/SpringBootApplication.java.template').text
-
+        runWithArguments(CreateProjectTask.NAME, '--package=com.example.springboottest', '--name=MyApp')
         if(springBoot1){
-            buildFile << "springBoot.mainClass = 'com.example.springboottest.SpringBootApplication'\n"
+            buildFile << "springBoot.mainClass = 'com.example.springboottest.MyAppApplication'\n"
         } else {
-            buildFile << "bootJar.mainClassName = 'com.example.springboottest.SpringBootApplication'\n"
+            buildFile << "bootJar.mainClassName = 'com.example.springboottest.MyAppApplication'\n"
         }
     }
 

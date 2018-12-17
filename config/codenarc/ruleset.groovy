@@ -116,7 +116,7 @@ ruleset {
     LocaleSetDefault
     NestedForLoop
     PrivateFieldCouldBeFinal
-    PublicInstanceField
+    //PublicInstanceField
     //ReturnsNullInsteadOfEmptyArray
     //ReturnsNullInsteadOfEmptyCollection
     SimpleDateFormatMissingLocale
@@ -266,12 +266,12 @@ ruleset {
     JUnitFailWithoutMessage
     JUnitLostTest
     JUnitPublicField
-    JUnitPublicNonTestMethod
-    JUnitPublicProperty
+    //JUnitPublicNonTestMethod
+    //JUnitPublicProperty
     JUnitSetUpCallsSuper
     JUnitStyleAssertions
     JUnitTearDownCallsSuper
-    JUnitTestMethodWithoutAssert
+    //JUnitTestMethodWithoutAssert
     JUnitUnnecessarySetUp
     JUnitUnnecessaryTearDown
     JUnitUnnecessaryThrowsException
@@ -304,7 +304,7 @@ ruleset {
     //FieldName
     InterfaceName
     InterfaceNameSameAsSuperInterface
-    MethodName
+    //MethodName
     ObjectOverrideMisspelledMethodName
     PackageName
     PackageNameMatchesFilePath
@@ -316,7 +316,7 @@ ruleset {
     FileCreateTempFile
     InsecureRandom
     //JavaIoPackageAccess
-    NonFinalPublicField
+    //NonFinalPublicField
     NonFinalSubclassOfSensitiveInterface
     ObjectFinalize
     PublicFinalizeMethod
