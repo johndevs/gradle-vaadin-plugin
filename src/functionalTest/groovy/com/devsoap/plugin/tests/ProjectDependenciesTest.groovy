@@ -237,7 +237,7 @@ class ProjectDependenciesTest extends IntegrationTest {
         assertFalse result, result.contains( 'Version blacklist failed for')
     }
 
-    @Test void 'Maven Central/Local are included'() {
+    @Test void 'Maven Central and Local are included'() {
 
         buildFile << """
             task testMavenCentralLocal {

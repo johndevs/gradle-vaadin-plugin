@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 package com.devsoap.plugin.tests
+
 /**
  * Base for tests tests which has modules with vaadin projects
  */

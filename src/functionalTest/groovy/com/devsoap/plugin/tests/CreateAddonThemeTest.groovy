@@ -3,7 +3,6 @@ package com.devsoap.plugin.tests
 import com.devsoap.plugin.tasks.CreateAddonThemeTask
 import org.junit.Assert
 import org.junit.Test
-import org.junit.experimental.categories.Category
 
 import java.nio.file.Paths
 

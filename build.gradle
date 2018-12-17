@@ -22,6 +22,7 @@ import org.apache.tools.ant.filters.ReplaceTokens
  *
  **********************************************************************************************************************/
 plugins {
+    id 'java-gradle-plugin'
     id 'groovy'
     id 'maven'
     id 'idea'
@@ -44,6 +45,26 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 ext {
     testCategory = project.hasProperty('TEST_CATEGORY') ? getProperty('TEST_CATEGORY') : null
+}
+
+
+/***********************************************************************************************************************
+ *
+ * Sources
+ *
+ **********************************************************************************************************************/
+
+sourceSets {
+    functionalTest {
+        groovy {
+            srcDir file('src/functionalTest/groovy')
+        }
+        resources {
+            srcDir file('src/functionalTest/resources')
+        }
+        compileClasspath += sourceSets.main.output + configurations.testRuntime
+        runtimeClasspath += output + compileClasspath
+    }
 }
 
 /***********************************************************************************************************************
@@ -111,7 +132,7 @@ idea {
 /**
  * Compiles the tests
  */
-compileTestGroovy {
+compileFunctionalTestGroovy {
     classpath += configurations.proxyTest
 }
 
@@ -195,12 +216,6 @@ groovydoc {
  *
  **********************************************************************************************************************/
 
-/**
- * Configure test phase only to run ordinary unit tests.
- */
-test {
-    exclude '**/tests/**'
-}
 
 /**
  * Run integration tests with a different tasks so they are only run when running check
@@ -219,6 +234,8 @@ task uncategorizedTests(type:Test, dependsOn:['test','jar']) {
     exclude  '**/tests/*ProxyTest*'
     systemProperty 'integrationTestProjectVersion', version
     maxParallelForks = Runtime.runtime.availableProcessors() > 1 ? Runtime.runtime.availableProcessors() - 1 : 1
+    testClassesDirs = sourceSets.functionalTest.output.classesDirs
+    classpath = sourceSets.functionalTest.runtimeClasspath
 }
 
 task widgetsetCompileTests(type:Test, dependsOn:['test','jar']) {
@@ -232,6 +249,8 @@ task widgetsetCompileTests(type:Test, dependsOn:['test','jar']) {
     }
     systemProperty 'integrationTestProjectVersion', version
     maxParallelForks = Runtime.runtime.availableProcessors() > 1 ? Runtime.runtime.availableProcessors() - 1 : 1
+    testClassesDirs = sourceSets.functionalTest.output.classesDirs
+    classpath = sourceSets.functionalTest.runtimeClasspath
 }
 
 task themeCompileTests(type:Test, dependsOn:['test','jar']) {
@@ -245,6 +264,8 @@ task themeCompileTests(type:Test, dependsOn:['test','jar']) {
     }
     systemProperty 'integrationTestProjectVersion', version
     maxParallelForks = Runtime.runtime.availableProcessors() > 1 ? Runtime.runtime.availableProcessors() - 1 : 1
+    testClassesDirs = sourceSets.functionalTest.output.classesDirs
+    classpath = sourceSets.functionalTest.runtimeClasspath
 }
 
 task fullCompileTests(type:Test, dependsOn:['test','jar']) {
@@ -257,6 +278,8 @@ task fullCompileTests(type:Test, dependsOn:['test','jar']) {
     }
     systemProperty 'integrationTestProjectVersion', version
     maxParallelForks = Runtime.runtime.availableProcessors() > 1 ? Runtime.runtime.availableProcessors() - 1 : 1
+    testClassesDirs = sourceSets.functionalTest.output.classesDirs
+    classpath = sourceSets.functionalTest.runtimeClasspath
 }
 
 task runProjectTests(type:Test, dependsOn:['test','jar']) {
@@ -269,21 +292,35 @@ task runProjectTests(type:Test, dependsOn:['test','jar']) {
     }
     systemProperty 'integrationTestProjectVersion', version
     maxParallelForks = Runtime.runtime.availableProcessors() > 1 ? Runtime.runtime.availableProcessors() - 1 : 1
+    testClassesDirs = sourceSets.functionalTest.output.classesDirs
+    classpath = sourceSets.functionalTest.runtimeClasspath
 }
 
 /**
  * Runs proxy integration test that needs special configuration
  */
 task proxyTest(type:Test, dependsOn: ['test','jar']) {
-    def oldClassPath = classpath
-    classpath = configurations.proxyTest
-    classpath += oldClassPath
     testLogging {
         exceptionFormat "full"
         showStandardStreams = true
     }
     include  '**/tests/*ProxyTest*'
     systemProperty 'integrationTestProjectVersion', version
+    testClassesDirs = sourceSets.functionalTest.output.classesDirs
+    classpath += sourceSets.functionalTest.runtimeClasspath + configurations.proxyTest
+}
+
+/**
+ * Runs all the tests. Use this with --tests filter to run filtered tests in Idea.
+ */
+task allTests(type:Test, dependsOn:['test','jar']) {
+    testLogging {
+        exceptionFormat "full"
+        showStandardStreams = true
+    }
+    systemProperty 'integrationTestProjectVersion', version
+    testClassesDirs = sourceSets.functionalTest.output.classesDirs
+    classpath = sourceSets.functionalTest.runtimeClasspath
 }
 
 if(!ext.testCategory) {
@@ -336,6 +373,15 @@ plugins.withType(GroovyBasePlugin) {
  * Deployment
  *
  ***********************************************************************************************************************/
+gradlePlugin {
+    testSourceSets sourceSets.test
+    plugins {
+        vaadinPlugin {
+            id = 'com.devsoap.plugin.vaadin'
+            implementationClass = 'com.devsoap.plugin.GradleVaadinPlugin'
+        }
+    }
+}
 
 pluginBundle {
     website = 'https://github.com/johndevs/gradle-vaadin-plugin/wiki'
@@ -344,7 +390,7 @@ pluginBundle {
     tags = ['vaadin', 'java', 'groovy', 'kotlin']
     plugins {
         vaadinPlugin {
-            id = 'com.devsoap.plugin.vaadin'
+            id = gradlePlugin.plugins.vaadinPlugin.id
             displayName = 'Gradle Vaadin plugin'
         }
     }
