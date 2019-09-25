@@ -1,6 +1,6 @@
 package com.devsoap.plugin.tests
 
-import com.devsoap.plugin.categories.WidgetsetCompile
+import com.devsoap.plugin.categories.WidgetsetAndThemeCompile
 import com.devsoap.plugin.tasks.BuildClassPathJar
 import com.devsoap.plugin.tasks.CreateComponentTask
 import com.devsoap.plugin.tasks.CreateProjectTask
@@ -17,9 +17,9 @@ import static org.junit.Assert.assertTrue
 /**
  * Created by john on 1/11/17.
  */
+@Category(WidgetsetAndThemeCompile)
 class MultimoduleWidgetsetThemeTest extends MultiProjectIntegrationTest {
 
-    @Category(WidgetsetCompile)
     @Test void 'Multimodule project with shared widgetset and theme'() {
         File widgetsetModule = makeProject('widgetset-module')
         File widgetsetBuildFile = makeBuildFile(widgetsetModule)

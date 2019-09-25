@@ -22,6 +22,7 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.file.FileTree
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.CacheableTask
@@ -68,7 +69,7 @@ class CompileThemeTask extends DefaultTask {
     private final Property<String> compiler = project.objects.property(String)
     private final Property<Boolean> compress = project.objects.property(Boolean)
     private final Property<Boolean> useClasspathJar = project.objects.property(Boolean)
-    private final Property<List<String>> jvmArgs = project.objects.property(List)
+    private final ListProperty<String> jvmArgs = project.objects.listProperty(String)
 
     /**
      * Creates a new theme compilation task

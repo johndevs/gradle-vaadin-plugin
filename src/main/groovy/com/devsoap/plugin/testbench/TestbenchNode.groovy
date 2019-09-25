@@ -19,6 +19,7 @@ import com.devsoap.plugin.Util
 import com.devsoap.plugin.extensions.TestBenchNodeExtension
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 
 /**
@@ -36,7 +37,7 @@ class TestbenchNode {
     private final Property<String> host
     private final Property<Integer> port
     private final Property<String> hub
-    private final Property<List<Map>> browsers
+    private final MapProperty<String, String> browsers
 
     TestbenchNode(Project project) {
         this.project = project
@@ -52,7 +53,7 @@ class TestbenchNode {
         hub = project.objects.property(String)
         hub.set(extension.hubProvider)
 
-        browsers = project.objects.property(List)
+        browsers = project.objects.mapProperty(String, String)
         browsers.set(extension.browsersProvider)
     }
 

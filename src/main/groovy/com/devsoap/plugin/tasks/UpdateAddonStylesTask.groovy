@@ -55,7 +55,7 @@ class UpdateAddonStylesTask extends DefaultTask {
             // Add classpath jar
             if ( project.vaadin.useClassPathJar ) {
                 BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
-                inputs.file(pathJarTask.archivePath)
+                inputs.file(new File(pathJarTask.destinationDirectory.get().asFile, pathJarTask.archiveFileName.get()))
             }
         }
     }

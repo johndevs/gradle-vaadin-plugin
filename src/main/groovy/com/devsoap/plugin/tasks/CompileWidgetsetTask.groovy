@@ -28,6 +28,7 @@ import org.apache.commons.codec.digest.DigestUtils
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.CacheableTask
@@ -58,11 +59,11 @@ class CompileWidgetsetTask extends DefaultTask {
     private final Property<Boolean> draftCompile = project.objects.property(Boolean)
     private final Property<Boolean> strict = project.objects.property(Boolean)
     private final Property<String> userAgent = project.objects.property(String)
-    private final Property<List<String>> jvmArgs = project.objects.property(List)
-    private final Property<List<String>> extraArgs = project.objects.property(List)
-    private final Property<List<String>> sourcePaths = project.objects.property(List)
+    private final ListProperty<String> jvmArgs = project.objects.listProperty(String)
+    private final ListProperty<String> extraArgs = project.objects.listProperty(String)
+    private final ListProperty<String> sourcePaths = project.objects.listProperty(String)
     private final Property<Boolean> collapsePermutations = project.objects.property(Boolean)
-    private final Property<List<String>> extraInherits = project.objects.property(List)
+    private final ListProperty<String> extraInherits = project.objects.listProperty(String)
     private final Property<Boolean> gwtSdkFirstInClasspath = project.objects.property(Boolean)
     private final Property<String> outputDirectory = project.objects.property(String)
     private final Property<Boolean> widgetsetCDN = project.objects.property(Boolean)
@@ -198,11 +199,11 @@ class CompileWidgetsetTask extends DefaultTask {
         draftCompile.set(true)
         strict.set(true)
         userAgent.set(null)
-        jvmArgs.set(null)
-        extraArgs.set(null)
+        jvmArgs.empty()
+        extraArgs.empty()
         sourcePaths.set(['client', 'shared'])
         collapsePermutations.set(true)
-        extraInherits.set(null)
+        extraInherits.empty()
         gwtSdkFirstInClasspath.set(true)
         outputDirectory.set(null)
         widgetsetCDN.set(false)
