@@ -16,6 +16,7 @@
 package com.devsoap.plugin.extensions
 
 import org.gradle.api.Project
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 
@@ -33,7 +34,7 @@ class TestBenchNodeExtension {
     private final Property<String> host
     private final Property<Integer> port
     private final Property<String> hub
-    private final Property<List<Map>> browsers
+    private final MapProperty<String, String> browsers
 
     TestBenchNodeExtension(Project project) {
 
@@ -41,13 +42,13 @@ class TestBenchNodeExtension {
         host = project.objects.property(String)
         port = project.objects.property(Integer)
         hub = project.objects.property(String)
-        browsers = project.objects.property(List)
+        browsers = project.objects.mapProperty(String, String)
 
         enabled.set(false)
         host.set('localhost')
         port.set(4445)
         hub.set('http://localhost:4444/grid/register')
-        browsers.set([])
+        browsers.empty()
     }
 
     /**

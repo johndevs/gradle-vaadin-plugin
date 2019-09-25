@@ -24,7 +24,7 @@ import org.apache.tools.ant.filters.ReplaceTokens
 plugins {
     id 'java-gradle-plugin'
     id 'groovy'
-    id 'maven'
+    id 'maven-publish'
     id 'idea'
     id 'codenarc'
     id 'com.gradle.plugin-publish' version '0.10.0'
@@ -74,10 +74,6 @@ sourceSets {
  **********************************************************************************************************************/
 repositories{
 	mavenCentral()
-    maven { // FIXME For Junit 4.13-SNAPSHOT, remove when released
-        name 'JBoss'
-        url 'https://repository.jboss.org/'
-    }
 }
 
 configurations {
@@ -86,28 +82,28 @@ configurations {
 }
 
 dependencies {
-    compile gradleApi()
-    compile localGroovy()
+    implementation gradleApi()
+    implementation localGroovy()
 
     // Jetty application server
-    compile "org.eclipse.jetty.aggregate:jetty-all:${project.property('jetty.version')}"
-    compile "org.eclipse.jetty:jetty-annotations:${project.property('jetty.version')}"
-    compile "org.eclipse.jetty:jetty-plus:${project.property('jetty.version')}"
-    compile "org.eclipse.jetty:jetty-deploy:${project.property('jetty.version')}"
+    implementation "org.eclipse.jetty.aggregate:jetty-all:${project.property('jetty.version')}"
+    implementation "org.eclipse.jetty:jetty-annotations:${project.property('jetty.version')}"
+    implementation "org.eclipse.jetty:jetty-plus:${project.property('jetty.version')}"
+    implementation "org.eclipse.jetty:jetty-deploy:${project.property('jetty.version')}"
 
     //Payara application server
-    compile "fish.payara.extras:payara-embedded-web:${project.property('payara.version')}"
+    implementation "fish.payara.extras:payara-embedded-web:${project.property('payara.version')}"
 
     // For GET requests
-    compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
+    implementation 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
 
     // Sass compilation with libSass
-    compile "io.bit3:jsass:${project.property('jsass.version')}"
+    implementation "io.bit3:jsass:${project.property('jsass.version')}"
 
     deploy 'org.apache.maven.wagon:wagon-ssh:2.2'
 
-    testCompile gradleTestKit()
-    testCompile 'junit:junit:4.13-SNAPSHOT'
+    testImplementation gradleTestKit()
+    testImplementation 'junit:junit:4.13-beta-3'
 
     // ProxyTest needs its own special configuration to avoid conflicts
     proxyTest ('org.mock-server:mockserver-netty:3.10.4') {
@@ -176,7 +172,7 @@ jar {
                 'Vaadin-Package-Version': 1,
                 'Vaadin-License-Title': 'Apache 2.0',
                 'Implementation-Title': 'Vaadin Plugin for Gradle',
-                'Implementation-Version': version,
+                'Implementation-Version': archiveVersion,
                 'Implementation-Vendor': 'John Ahlroos',
         )
     }
@@ -188,7 +184,7 @@ jar {
  */
 task sourcesJar(type: Jar) {
     from sourceSets.main.allSource
-    classifier = 'sources'
+    archiveClassifier.set('sources')
     include 'com/**/*.groovy'
     include 'com/**/*.java'
 }
@@ -235,7 +231,7 @@ task uncategorizedTests(type:Test, dependsOn:['test','jar']) {
     systemProperty 'integrationTestProjectVersion', version
     maxParallelForks = Runtime.runtime.availableProcessors() > 1 ? Runtime.runtime.availableProcessors() - 1 : 1
     testClassesDirs = sourceSets.functionalTest.output.classesDirs
-    classpath = sourceSets.functionalTest.runtimeClasspath
+    classpath += sourceSets.functionalTest.runtimeClasspath
 }
 
 task widgetsetCompileTests(type:Test, dependsOn:['test','jar']) {
@@ -250,7 +246,7 @@ task widgetsetCompileTests(type:Test, dependsOn:['test','jar']) {
     systemProperty 'integrationTestProjectVersion', version
     maxParallelForks = Runtime.runtime.availableProcessors() > 1 ? Runtime.runtime.availableProcessors() - 1 : 1
     testClassesDirs = sourceSets.functionalTest.output.classesDirs
-    classpath = sourceSets.functionalTest.runtimeClasspath
+    classpath += sourceSets.functionalTest.runtimeClasspath
 }
 
 task themeCompileTests(type:Test, dependsOn:['test','jar']) {
@@ -265,7 +261,7 @@ task themeCompileTests(type:Test, dependsOn:['test','jar']) {
     systemProperty 'integrationTestProjectVersion', version
     maxParallelForks = Runtime.runtime.availableProcessors() > 1 ? Runtime.runtime.availableProcessors() - 1 : 1
     testClassesDirs = sourceSets.functionalTest.output.classesDirs
-    classpath = sourceSets.functionalTest.runtimeClasspath
+    classpath += sourceSets.functionalTest.runtimeClasspath
 }
 
 task fullCompileTests(type:Test, dependsOn:['test','jar']) {
@@ -279,7 +275,7 @@ task fullCompileTests(type:Test, dependsOn:['test','jar']) {
     systemProperty 'integrationTestProjectVersion', version
     maxParallelForks = Runtime.runtime.availableProcessors() > 1 ? Runtime.runtime.availableProcessors() - 1 : 1
     testClassesDirs = sourceSets.functionalTest.output.classesDirs
-    classpath = sourceSets.functionalTest.runtimeClasspath
+    classpath += sourceSets.functionalTest.runtimeClasspath
 }
 
 task runProjectTests(type:Test, dependsOn:['test','jar']) {
@@ -293,7 +289,7 @@ task runProjectTests(type:Test, dependsOn:['test','jar']) {
     systemProperty 'integrationTestProjectVersion', version
     maxParallelForks = Runtime.runtime.availableProcessors() > 1 ? Runtime.runtime.availableProcessors() - 1 : 1
     testClassesDirs = sourceSets.functionalTest.output.classesDirs
-    classpath = sourceSets.functionalTest.runtimeClasspath
+    classpath += sourceSets.functionalTest.runtimeClasspath
 }
 
 /**
@@ -307,7 +303,7 @@ task proxyTest(type:Test, dependsOn: ['test','jar']) {
     include  '**/tests/*ProxyTest*'
     systemProperty 'integrationTestProjectVersion', version
     testClassesDirs = sourceSets.functionalTest.output.classesDirs
-    classpath = configurations.proxyTest + sourceSets.functionalTest.runtimeClasspath
+    classpath += configurations.proxyTest + sourceSets.functionalTest.runtimeClasspath
 }
 
 /**
@@ -320,7 +316,7 @@ task allTests(type:Test, dependsOn:['test','jar']) {
     }
     systemProperty 'integrationTestProjectVersion', version
     testClassesDirs = sourceSets.functionalTest.output.classesDirs
-    classpath = sourceSets.functionalTest.runtimeClasspath
+    classpath += sourceSets.functionalTest.runtimeClasspath
 }
 
 if(!ext.testCategory) {
@@ -353,7 +349,7 @@ codenarc{
 }
 
 checkstyle {
-    configDir = rootProject.file('config/checkstyle')
+    configFile rootProject.file('config/checkstyle/checkstyle.xml')
 }
 
 plugins.withType(GroovyBasePlugin) {

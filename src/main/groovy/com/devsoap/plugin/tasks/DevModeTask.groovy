@@ -20,6 +20,7 @@ import com.devsoap.plugin.Util
 import com.devsoap.plugin.servers.ApplicationServer
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
@@ -51,7 +52,7 @@ class DevModeTask extends DefaultTask {
     private final Property<String> server = project.objects.property(String)
     private final Property<Boolean> debug = project.objects.property(Boolean)
     private final Property<Integer> debugPort = project.objects.property(Integer)
-    private final Property<List<String>> jvmArgs = project.objects.property(List)
+    private final ListProperty<String> jvmArgs = project.objects.listProperty(String)
     private final Property<Integer> serverPort = project.objects.property(Integer)
     private final Property<Boolean> themeAutoRecompile = project.objects.property(Boolean)
     private final Property<Boolean> openInBrowser = project.objects.property(Boolean)
@@ -59,7 +60,7 @@ class DevModeTask extends DefaultTask {
     private final Property<Boolean> noserver = project.objects.property(Boolean)
     private final Property<String> bindAddress = project.objects.property(String)
     private final Property<Integer> codeServerPort = project.objects.property(Integer)
-    private final Property<List<String>> extraArgs = project.objects.property(List)
+    private final ListProperty<String> extraArgs = project.objects.listProperty(String)
     private final Property<String> logLevel = project.objects.property(String)
 
     /**
@@ -91,7 +92,7 @@ class DevModeTask extends DefaultTask {
         server.set('payara')
         debug.set(true)
         debugPort.set(8000)
-        jvmArgs.set(null)
+        jvmArgs.empty()
         serverPort.set(8080)
         themeAutoRecompile.set(true)
         openInBrowser.set(true)
@@ -99,7 +100,7 @@ class DevModeTask extends DefaultTask {
         noserver.set(false)
         bindAddress.set('127.0.0.1')
         codeServerPort.set(9997)
-        extraArgs.set(null)
+        extraArgs.empty()
         logLevel.set('INFO')
     }
 

@@ -1,6 +1,7 @@
+dist: xenial
 language: groovy
 jdk:
-  - oraclejdk8
+  - openjdk8
 env:
   - TEST_CATEGORY=uncategorizedTests
   - TEST_CATEGORY=widgetsetCompileTests
