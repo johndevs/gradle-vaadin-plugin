@@ -22,7 +22,7 @@ class GradleVersionTest extends IntegrationTest {
 
     @Parameterized.Parameters(name = "Gradle {0}")
     static Collection<String> getGradleVersions() {
-        [ '5.6.2']
+        [ '5.6.0']
     }
 
     @Override

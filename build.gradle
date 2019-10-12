@@ -27,7 +27,7 @@ plugins {
     id 'maven-publish'
     id 'idea'
     id 'codenarc'
-    id 'com.gradle.plugin-publish' version '0.10.0'
+    id 'com.gradle.plugin-publish' version '0.10.1'
     id 'checkstyle'
 }
 
@@ -396,3 +396,15 @@ pluginBundle {
         artifactId = 'gradle-vaadin-plugin'
     }
 }
+
+
+/***********************************************************************************************************************
+ *
+ * Misc.
+ *
+ **********************************************************************************************************************/
+wrapper {
+    gradleVersion = '5.6'
+    distributionUrl = distributionUrl.replace('bin', 'all') // Download sources
+}
+
