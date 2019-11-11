@@ -24,6 +24,7 @@ import com.devsoap.plugin.creators.ProjectCreator
 import com.devsoap.plugin.creators.ThemeCreator
 import com.devsoap.plugin.extensions.VaadinPluginExtension
 import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
 
@@ -46,6 +47,7 @@ class CreateAddonProjectTask extends DefaultTask {
     /**
      * The addon name
      */
+    @Input
     @Option(option = 'name', description = 'Addon name')
     String componentName = 'MyComponent'
 

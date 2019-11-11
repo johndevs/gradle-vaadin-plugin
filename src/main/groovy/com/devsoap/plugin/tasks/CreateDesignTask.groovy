@@ -20,6 +20,7 @@ import com.devsoap.plugin.TemplateUtil
 import com.devsoap.plugin.Util
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
 
@@ -42,30 +43,35 @@ class CreateDesignTask extends DefaultTask{
     /**
      * The design class name
      */
+    @Input
     @Option(option = 'name', description = 'The name of the design')
     String designName = 'BasicView'
 
     /**
      * The package where the design should be put
      */
+    @Input
     @Option(option = 'package', description = 'The package of the design')
     String designPackage = "com.example.${designName.toLowerCase()}"
 
     /**
      * Should a companion java file be created
      */
+    @Input
     @Option(option = 'companionFile', description = 'Create the companion file for the design')
     boolean createCompanionFile = true
 
     /**
      * Should a companion implementation file be created
      */
+    @Input
     @Option(option = 'implementationFile', description = 'Create implementation file for the design')
     boolean createImplementationFile = true
 
     /**
      * Should we output the templates available to the console instead of creating a design.
      */
+    @Input
     @Option(option = 'templates', description =
             'Lists the available templates. Add your templates to .vaadin/designer/templates to use them here.')
     boolean listTemplates = false
@@ -73,6 +79,7 @@ class CreateDesignTask extends DefaultTask{
     /**
      * The template to use for creating a design
      */
+    @Input
     @Option(option = 'template', description = "The selected template to use. Must be included in --templates")
     String template = null
 

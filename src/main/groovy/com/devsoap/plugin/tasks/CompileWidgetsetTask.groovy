@@ -32,6 +32,8 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 
 import java.util.concurrent.TimeUnit
@@ -51,31 +53,61 @@ class CompileWidgetsetTask extends DefaultTask {
 
     private static final WIDGETSET_CDN_URL = 'https://wsc.vaadin.com/'
 
+    @Input
     private final Property<String> style = project.objects.property(String)
+    @Input
     private final Property<Integer> optimize = project.objects.property(Integer)
+    @Input
     private final Property<Boolean> logEnabled = project.objects.property(Boolean)
+    @Input
     private final Property<String> logLevel = project.objects.property(String)
+    @Input
     private final Property<Integer> localWorkers = project.objects.property(Integer)
+    @Input
     private final Property<Boolean> draftCompile = project.objects.property(Boolean)
+    @Input
     private final Property<Boolean> strict = project.objects.property(Boolean)
+    @Input
+    @Optional
     private final Property<String> userAgent = project.objects.property(String)
+    @Input
     private final ListProperty<String> jvmArgs = project.objects.listProperty(String)
+    @Input
     private final ListProperty<String> extraArgs = project.objects.listProperty(String)
+    @Input
     private final ListProperty<String> sourcePaths = project.objects.listProperty(String)
+    @Input
     private final Property<Boolean> collapsePermutations = project.objects.property(Boolean)
+    @Input
     private final ListProperty<String> extraInherits = project.objects.listProperty(String)
+    @Input
     private final Property<Boolean> gwtSdkFirstInClasspath = project.objects.property(Boolean)
+    @Input
+    @Optional
     private final Property<String> outputDirectory = project.objects.property(String)
+    @Input
     private final Property<Boolean> widgetsetCDN = project.objects.property(Boolean)
+    @Input
     private final Property<Boolean> profiler = project.objects.property(Boolean)
+    @Input
     private final Property<Boolean> manageWidgetset = project.objects.property(Boolean)
+    @Input
+    @Optional
     private final Property<String> widgetset = project.objects.property(String)
+    @Input
+    @Optional
     private final Property<String> widgetsetGenerator = project.objects.property(String)
 
+    @Input
     private final Property<Boolean> proxyEnabled = project.objects.property(Boolean)
+    @Input
     private final Property<Integer> proxyPort = project.objects.property(Integer)
+    @Input
     private final Property<String> proxyScheme = project.objects.property(String)
+    @Input
     private final Property<String> proxyHost = project.objects.property(String)
+    @Input
+    @Optional
     private final Property<AuthConfig> proxyAuth = project.objects.property(AuthConfig)
 
     private Closure<Map> queryWidgetsetRequest = { version, style ->

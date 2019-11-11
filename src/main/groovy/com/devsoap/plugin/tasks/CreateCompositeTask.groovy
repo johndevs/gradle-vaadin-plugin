@@ -19,6 +19,7 @@ import com.devsoap.plugin.ProjectType
 import com.devsoap.plugin.TemplateUtil
 import com.devsoap.plugin.Util
 import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
 
@@ -37,12 +38,14 @@ class CreateCompositeTask extends DefaultTask {
     /**
      * The composite class name
      */
+    @Input
     @Option(option = 'name', description = 'Component name')
     String componentName = 'MyComposite'
 
     /**
      * The composite package name
      */
+    @Input
     @Option(option = 'package', description = 'Package name')
     String componentPackage = "com.example.${componentName.toLowerCase()}"
 

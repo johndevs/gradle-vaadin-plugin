@@ -17,6 +17,7 @@ package com.devsoap.plugin.tasks
 
 import groovy.json.JsonSlurper
 import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
 
@@ -43,18 +44,21 @@ class DirectorySearchTask extends DefaultTask {
     /**
      * Searches for addons using the given search pattern
      */
+    @Input
     @Option(option = 'search', description ='String to search for in addons')
     String searchPattern
 
     /**
      * Sorts the result with the given options
      */
+    @Input
     @Option(option = 'sort', description = 'Sort criteria (options:name,description,date,rating)')
     String sortOption
 
     /**
      * If enabled prints more information in the search results
      */
+    @Input
     @Option(option = 'verbose', description = 'Should verbose descriptions be shown')
     Boolean verbose
 

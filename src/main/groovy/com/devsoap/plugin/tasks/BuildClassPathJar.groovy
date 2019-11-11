@@ -20,6 +20,7 @@ import com.devsoap.plugin.Util
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.bundling.Jar
 
 /**
@@ -32,6 +33,7 @@ class BuildClassPathJar extends Jar {
 
     public static final String NAME = 'vaadinClassPathJar'
 
+    @Input
     private final Property<Boolean> useClassPathJar = project.objects.property(Boolean)
 
     BuildClassPathJar() {
@@ -51,7 +53,7 @@ class BuildClassPathJar extends Jar {
                 project.configurations[GradleVaadinPlugin.CONFIGURATION_RUN_SERVER] +
                 project.configurations[GradleVaadinPlugin.CONFIGURATION_THEME]
                 )
-                .filter { it.file && it.canonicalFile.name.endsWith('.jar')}
+                .filter { it.file && it.canonicalFile.name.endsWith('.jar') }
         manifest {
             it.attributes('Class-Path':files.collect { File file -> file.toURI().toString() }.join(' '))
         }

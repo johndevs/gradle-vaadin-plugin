@@ -62,7 +62,7 @@ sourceSets {
         resources {
             srcDir file('src/functionalTest/resources')
         }
-        compileClasspath += sourceSets.main.output + configurations.testRuntime
+        compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
         runtimeClasspath += output + compileClasspath
     }
 }
@@ -129,7 +129,7 @@ idea {
  * Compiles the tests
  */
 compileFunctionalTestGroovy {
-    classpath += configurations.proxyTest
+    classpath += configurations.proxyTest + configurations.testRuntimeClasspath
 }
 
 /**
@@ -154,6 +154,7 @@ processResources {
             ])
         }
     }
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
 
@@ -404,7 +405,7 @@ pluginBundle {
  *
  **********************************************************************************************************************/
 wrapper {
-    gradleVersion = '5.6'
+    gradleVersion = '6.0'
     distributionUrl = distributionUrl.replace('bin', 'all') // Download sources
 }
 

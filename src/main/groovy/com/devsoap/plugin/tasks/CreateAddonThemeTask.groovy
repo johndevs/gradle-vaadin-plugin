@@ -17,6 +17,8 @@ package com.devsoap.plugin.tasks
 
 import com.devsoap.plugin.creators.AddonThemeCreator
 import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.options.Option
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
@@ -32,11 +34,14 @@ class CreateAddonThemeTask extends DefaultTask {
 
     static final String NAME = 'vaadinCreateAddonTheme'
 
+    @Input
     private final Property<String> addonTitle = project.objects.property(String)
 
     /**
      * The theme name
      */
+    @Input
+    @Optional
     @Option(option = 'name', description = 'Theme name')
     String themeName = 'MyAddonTheme'
 

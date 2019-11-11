@@ -28,7 +28,7 @@ class KotlinTest extends KotlinIntegrationTest {
 
     @Parameterized.Parameters(name = "Kotlin {0}")
     static Collection<String> getKotlinVersions() {
-        [ '1.3.11']
+        [ '1.3.70']
     }
 
     @Test void 'Create project'() {

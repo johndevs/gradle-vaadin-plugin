@@ -18,6 +18,8 @@ package com.devsoap.plugin.tasks
 import com.devsoap.plugin.MessageLogger
 import com.devsoap.plugin.servers.ApplicationServer
 import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.options.Option
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
@@ -46,6 +48,7 @@ class RunTask extends DefaultTask {
     /**
      * Should the server be stopped after it has been started
      */
+    @Input
     @Option(option = 'stopAfterStart', description = 'Should the server stop after starting')
     boolean stopAfterStarting = false
 
@@ -53,16 +56,28 @@ class RunTask extends DefaultTask {
      * Should the browser be shown
      */
     // FIXME Is this duplicate to the property openInBrowser?
+    @Input
     @Option(option = 'nobrowser', description = 'Do not open browser after server has started')
     boolean nobrowser = false
 
+    @Input
     private final Property<String> server = project.objects.property(String)
+    @Input
     private final Property<Boolean> debug = project.objects.property(Boolean)
+    @Input
     private final Property<Integer> debugPort = project.objects.property(Integer)
+    @Input
     private final ListProperty<String> jvmArgs = project.objects.listProperty(String)
+    @Input
+    private final Property<Boolean> serverRestart = project.objects.property(Boolean)
+    @Input
     private final Property<Integer> serverPort = project.objects.property(Integer)
+    @Input
     private final Property<Boolean> themeAutoRecompile = project.objects.property(Boolean)
+    @Input
     private final Property<Boolean> openInBrowser = project.objects.property(Boolean)
+    @Input
+    @Optional
     private final Property<String> classesDir = project.objects.property(String)
 
     /**
@@ -199,6 +214,7 @@ class RunTask extends DefaultTask {
      */
     @Deprecated
     void setServerRestart(Boolean restart) {
+        serverRestart.set(restart)
         MessageLogger.nagUserOfDiscontinuedProperty(new Throwable(SERVER_RESTART_DEPRECATED_MESSAGE))
         restart
     }

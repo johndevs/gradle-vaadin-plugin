@@ -22,6 +22,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 
@@ -49,18 +50,33 @@ class DevModeTask extends DefaultTask {
     @Internal
     ApplicationServer serverInstance
 
+    @Input
     private final Property<String> server = project.objects.property(String)
+    @Input
     private final Property<Boolean> debug = project.objects.property(Boolean)
+    @Input
     private final Property<Integer> debugPort = project.objects.property(Integer)
+    @Input
     private final ListProperty<String> jvmArgs = project.objects.listProperty(String)
+    @Input
+    private final Property<Boolean> serverRestart = project.objects.property(Boolean)
+    @Input
     private final Property<Integer> serverPort = project.objects.property(Integer)
+    @Input
     private final Property<Boolean> themeAutoRecompile = project.objects.property(Boolean)
+    @Input
     private final Property<Boolean> openInBrowser = project.objects.property(Boolean)
+    @Input
     private final Property<String> classesDir = project.objects.property(String)
+    @Input
     private final Property<Boolean> noserver = project.objects.property(Boolean)
+    @Input
     private final Property<String> bindAddress = project.objects.property(String)
+    @Input
     private final Property<Integer> codeServerPort = project.objects.property(Integer)
+    @Input
     private final ListProperty<String> extraArgs = project.objects.listProperty(String)
+    @Input
     private final Property<String> logLevel = project.objects.property(String)
 
     /**
@@ -258,6 +274,7 @@ class DevModeTask extends DefaultTask {
      */
     @Deprecated
     void setServerRestart(Boolean restart) {
+        serverRestart.set(restart)
         MessageLogger.nagUserOfDiscontinuedProperty(new Throwable(RunTask.SERVER_RESTART_DEPRECATED_MESSAGE))
         restart
     }
