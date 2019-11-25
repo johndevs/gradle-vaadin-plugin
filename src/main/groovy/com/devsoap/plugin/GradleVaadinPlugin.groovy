@@ -296,12 +296,12 @@ class GradleVaadinPlugin implements Plugin<Project> {
 
             repositories.maven { repository ->
                 repository.name = ADDON_REPOSITORY_NAME
-                repository.url = 'http://maven.vaadin.com/vaadin-addons'
+                repository.url = 'https://maven.vaadin.com/vaadin-addons'
             }
 
             repositories.maven { repository ->
                 repository.name = VAADIN_SNAPSHOT_REPOSITORY_NAME
-                repository.url = 'http://oss.sonatype.org/content/repositories/vaadin-snapshots'
+                repository.url = 'https://oss.sonatype.org/content/repositories/vaadin-snapshots'
             }
 
             repositories.maven { repository ->
