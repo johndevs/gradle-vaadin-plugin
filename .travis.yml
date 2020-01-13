@@ -2,6 +2,10 @@ dist: xenial
 language: groovy
 jdk:
   - openjdk8
+  - openjdk9
+  - openjdk10
+  - openjdk11
+  - openjdk12
 env:
   - TEST_CATEGORY=uncategorizedTests
   - TEST_CATEGORY=widgetsetCompileTests

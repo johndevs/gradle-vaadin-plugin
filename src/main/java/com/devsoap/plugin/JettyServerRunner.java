@@ -76,7 +76,7 @@ public class JettyServerRunner {
 
         handler.setContextPath("/");
         handler.setBaseResource(Resource.newResource(webAppDir));
-        handler.setParentLoaderPriority(true);
+        handler.setParentLoaderPriority(false);
 
         handler.setExtraClasspath(String.join(";", classesDirs) + ";" + resourcesDir);
 
