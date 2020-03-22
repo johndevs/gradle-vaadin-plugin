@@ -21,6 +21,8 @@ import com.devsoap.plugin.creators.ProjectCreator
 import com.devsoap.plugin.creators.ThemeCreator
 import com.devsoap.plugin.extensions.VaadinPluginExtension
 import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
 
@@ -39,18 +41,24 @@ class CreateProjectTask extends DefaultTask {
     /**
      * The application class name
      */
+    @Input
+    @Optional
     @Option(option = 'name', description = 'Application name')
     String applicationName
 
     /**
      * The application package
      */
+    @Input
+    @Optional
     @Option(option = 'package', description = 'Application UI package')
     String applicationPackage
 
     /**
      * The fully qualified name of the widgetset
      */
+    @Input
+    @Optional
     @Option(option = 'widgetset', description = 'Widgetset name')
     String widgetsetFQN
 

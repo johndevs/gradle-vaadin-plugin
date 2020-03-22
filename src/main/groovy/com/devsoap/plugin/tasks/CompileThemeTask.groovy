@@ -27,6 +27,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import org.gradle.tooling.BuildActionFailureException
 
@@ -65,10 +66,14 @@ class CompileThemeTask extends DefaultTask {
 
     private static final String STYLES_SCSS = 'styles.scss'
 
+    @Input
+    @Optional
     private final Property<String> themesDirectory = project.objects.property(String)
     private final Property<String> compiler = project.objects.property(String)
     private final Property<Boolean> compress = project.objects.property(Boolean)
+    @Input
     private final Property<Boolean> useClasspathJar = project.objects.property(Boolean)
+    @Input
     private final ListProperty<String> jvmArgs = project.objects.listProperty(String)
 
     /**

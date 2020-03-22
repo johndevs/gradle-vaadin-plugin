@@ -9,6 +9,9 @@ env:
   - TEST_CATEGORY=fullCompileTests
   - TEST_CATEGORY=runProjectTests
   - TEST_CATEGORY=proxyTest
+before_script:
+  - echo $JAVA_OPTS
+  - export JAVA_OPTS=-Xmx4G
 script: "./gradlew --stacktrace check -PTEST_CATEGORY=$TEST_CATEGORY"
 branches:
   only:
