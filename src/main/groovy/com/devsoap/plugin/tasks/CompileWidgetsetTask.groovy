@@ -225,7 +225,7 @@ class CompileWidgetsetTask extends DefaultTask {
             /* Monitor changes in dependencies since upgrading a
             * dependency should also trigger a recompile of the widgetset
             */
-            inputs.files(project.configurations.compile)
+            inputs.files(project.configurations.implementation)
             inputs.files(project.configurations[GradleVaadinPlugin.CONFIGURATION_CLIENT])
             inputs.files(project.configurations[GradleVaadinPlugin.CONFIGURATION_CLIENT_COMPILE])
 
